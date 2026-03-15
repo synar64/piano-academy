@@ -183,6 +183,18 @@
             if (audioOn) initAudio();
         }
 
+        // JAVÍTOTT TISZTA HANGZÁS (SINE WAVE)
+        function playTone(midiNumber) {
+            if (!audioOn || !audioCtx) return; 
+            const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); 
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(440 * Math.pow(2, (midiNumber - 69) / 12), now); 
+            gain.gain.setValueAtTime(0.3, now); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2); 
+            osc.connect(gain); gain.connect(audioCtx.destination); 
+            osc.start(now); osc.stop(now + 1.3); 
+        }
+
         function toggleConfig(type) {
             if (type === 'accidental') {
                 useAccidentals = !useAccidentals;
@@ -206,19 +218,6 @@
             if (clef === 'bass') document.getElementById('btnBass').classList.add('active');
             if (clef === 'mixed') document.getElementById('btnMixed').classList.add('active');
             if(isRunning) { stopMission(); } else { drawEmptyStaff(); }
-        }
-
-        function playTone(midiNumber, velocity) {
-            if (!audioOn || !audioCtx) return; 
-            const osc = audioCtx.createOscillator(), gainNode = audioCtx.createGain();
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-            osc.frequency.value = 440 * Math.pow(2, (midiNumber - 69) / 12);
-            osc.type = 'triangle';
-            const vol = (velocity / 127) * 0.8;
-            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
-            const releaseTime = 0.4;
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + releaseTime);
-            osc.start(); osc.stop(audioCtx.currentTime + releaseTime);
         }
 
         function drawLedgers(x, offset, baseLineY) { 
@@ -246,7 +245,6 @@
                 ctx.beginPath(); ctx.moveTo(50, bassY+i*24); ctx.lineTo(800, bassY+i*24); ctx.stroke();
             }
             
-            // EZ A RÉSZ VÉDI MEG A KULCSOKAT AZ ELCSÚSZÁSTÓL:
             ctx.textAlign = 'center';
             ctx.textBaseline = 'alphabetic';
             
@@ -272,7 +270,6 @@
 
             ctx.beginPath(); ctx.ellipse(noteX, noteY, 18, 13, Math.PI / 8, 0, 2 * Math.PI); ctx.fill();
 
-            // SÚGÓ AZONNAL (MÁR 1 HIBA UTÁN IS) VAGY HA LEJÁRT AZ IDŐ
             if (useQuickHint || currentMistakes >= 1 || isWaitingForCorrection) {
                 ctx.fillStyle = isWaitingForCorrection ? '#ffaa00' : (visualClef === 'treble' ? '#bf5af2' : '#0a84ff'); 
                 ctx.font = 'bold 24px sans-serif'; 
@@ -373,7 +370,7 @@
             let data = event.data; let type = data[0] & 0xf0; let note = data[1]; let velocity = data[2];    
             
             if (type === 144 && velocity > 0 && currentNote) {
-                playTone(note, velocity);
+                playTone(note);
                 
                 if (note === currentNote.midi) {
                     if (!isWaitingForCorrection) updateStats(true); 
@@ -395,7 +392,6 @@
                         canvas.style.boxShadow = "0 10px 40px rgba(255,59,48,0.4)";
                         setTimeout(() => { if(!isWaitingForCorrection && isRunning) canvas.style.borderColor = "#222"; canvas.style.boxShadow = "none"; }, 300);
                         
-                        // SÚGÓ AZONNAL (1. HIBA UTÁN)
                         drawNote(currentNote); 
                         document.getElementById('status').innerHTML = `<span class="wrong">Mellé! Segítség: ez a(z) ${currentNote.name}</span>`;
                     }
@@ -461,7 +457,6 @@
             drawEmptyStaff();
         }
 
-        // PUSKA (Cheat Sheet)
         function openCheatSheet() { document.getElementById('hintModal').style.display = 'flex'; drawCheatSheet(); }
         function closeCheatSheet() { document.getElementById('hintModal').style.display = 'none'; }
 
