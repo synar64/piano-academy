@@ -9,10 +9,10 @@
             --bg-dark: #050508;
             --panel-bg: rgba(20, 20, 30, 0.6);
             --border-color: rgba(255, 255, 255, 0.1);
-            --accent-blue: #0a84ff;
             --accent-gold: #d4af37;
-            --accent-green: #32d74b;
             --accent-purple: #bf5af2;
+            --accent-blue: #0a84ff;
+            --accent-green: #32d74b;
             --accent-rose: #ff2d55;
             --text-main: #ffffff;
             --text-muted: #888899;
@@ -49,15 +49,7 @@
             border: 1px solid var(--border-color);
         }
 
-        .brand h1 {
-            margin: 0;
-            font-size: 42px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .brand h1 { margin: 0; font-size: 38px; letter-spacing: 4px; text-transform: uppercase; color: #fff; }
 
         .global-controls {
             display: flex;
@@ -82,37 +74,38 @@
             font-size: 14px;
         }
 
-        .control-btn:hover { border-color: var(--accent-blue); background: rgba(10, 132, 255, 0.1); }
+        .control-btn:hover { border-color: #fff; background: rgba(255, 255, 255, 0.1); }
 
+        /* GRID RENDSZER: Garantáltan 5 egyforma kártya egy sorban */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            align-items: stretch;
+            width: 100%;
         }
 
+        /* KÁRTYA STÍLUS ÉS ANIMÁCIÓ */
         .module-card {
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            padding: 30px;
+            padding: 30px 20px 20px 20px;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             backdrop-filter: blur(10px);
             position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            text-decoration: none;
-        }
-
-        .module-card::before { 
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; 
-            background: var(--card-color); box-shadow: 0 0 15px var(--card-color);
+            box-sizing: border-box;
+            border-top: 5px solid var(--card-color); /* Felső színes csík, ami együtt mozog a kártyával */
+            cursor: pointer; /* Egérmutató módosítása kattinthatóság jelzésére */
         }
 
         .module-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             border-color: rgba(255,255,255,0.3);
+            border-top-color: var(--card-color);
         }
 
         .card-kotta { --card-color: var(--accent-gold); }
@@ -121,83 +114,198 @@
         .card-ritmus { --card-color: var(--accent-green); }
         .card-hallas { --card-color: var(--accent-rose); }
 
-        .card-icon { font-size: 40px; margin-bottom: 20px; }
-        .card-title { font-size: 24px; font-weight: bold; margin: 0 0 10px 0; color: #fff; text-transform: uppercase;}
-        .card-desc { color: var(--text-muted); font-size: 14px; line-height: 1.6; flex-grow: 1;}
-        .play-btn { margin-top: 25px; font-weight: bold; display: flex; align-items: center; gap: 8px; text-transform: uppercase; color: #fff;}
+        .card-icon { font-size: 36px; margin-bottom: 15px; text-align: center; }
+        .card-title { font-size: 20px; font-weight: bold; margin: 0 0 10px 0; color: #fff; text-align: center; text-transform: uppercase;}
+        .card-desc { color: var(--text-muted); font-size: 13px; line-height: 1.5; flex-grow: 1; text-align: center; margin-bottom: 25px;}
 
-        .help-panel {
-            position: fixed; bottom: 30px; right: 30px; background: var(--panel-bg);
-            border: 1px solid var(--accent-blue); backdrop-filter: blur(15px);
-            padding: 20px; border-radius: 16px; display: none; z-index: 9999;
+        /* INFÓ GOMB (Beágyazva a kártyába, együtt mozog vele) */
+        .info-trigger {
+            position: absolute; bottom: 15px; right: 15px;
+            width: 22px; height: 22px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: serif; font-style: italic; font-size: 12px; font-weight: bold;
+            cursor: pointer; color: #888; transition: 0.3s;
         }
+        .info-trigger:hover { color: #fff; border-color: #fff; background: rgba(255,255,255,0.2); }
+
+        /* MODAL STÍLUSOK GÖRGETHETŐ TARTALOMMAL */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: #111; border: 1px solid #444; padding: 40px;
+            border-radius: 20px; max-width: 800px; width: 90%; position: relative;
+            max-height: 80vh; overflow-y: auto; text-align: left;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+        .modal-content h2 { margin-top: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .modal-content p { line-height: 1.8; color: #ccc; font-size: 15px; margin-bottom: 15px; }
+        .modal-content ul { color: #ccc; font-size: 15px; line-height: 1.8; padding-left: 20px; }
+        .modal-content li { margin-bottom: 10px; }
+        .modal-content .highlight { color: #fff; font-weight: bold; }
+        .close-modal { position: absolute; top: 20px; right: 25px; cursor: pointer; font-size: 28px; color: #666; transition: 0.2s;}
+        .close-modal:hover { color: #fff; }
+        
+        /* Modal görgetősáv formázás */
+        .modal-content::-webkit-scrollbar { width: 8px; }
+        .modal-content::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
+        .modal-content::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: #666; }
     </style>
 </head>
 <body>
 
     <div class="main-wrapper">
         <div class="header-container">
-            <div class="brand">
-                <h1>Zongora Akadémia</h1>
-            </div>
+            <div class="brand"><h1>Piano Academy</h1></div>
         </div>
 
         <div class="global-controls">
             <label class="control-btn">
-                <input type="checkbox" id="mute-toggle" onchange="toggleMute()" checked style="width:18px; height:18px;">
+                <input type="checkbox" id="mute-toggle" onchange="toggleMute()" checked style="width:16px; height:16px;">
                 Böngésző saját hangjának némítása
             </label>
-            <button class="control-btn" onclick="toggleHelp()">ℹ️ Súgó</button>
+            <button class="control-btn" onclick="showInfo('general')">ℹ️ Rendszer Súgó</button>
         </div>
 
         <div class="dashboard-grid">
-            <a href="zongora-kotta.html" class="module-card card-kotta">
+            
+            <div class="module-card card-kotta" onclick="window.location.href='zongora-kotta.html'">
                 <div class="card-icon">📖</div>
-                <h2 class="card-title">Kotta</h2>
-                <p class="card-desc">Fejleszd a kottaolvasási sebességedet. Vizuális kottafelismerés és reflex-tréning a billentyűzeten.</p>
-                <div class="play-btn">Indítás ▶</div>
-            </a>
+                <h2 class="card-title">Kottaolvasás</h2>
+                <p class="card-desc">Gyorsasági kottaolvasó tréner Violin és Basszus kulcsban, vizuális visszajelzéssel.</p>
+                <div class="info-trigger" onclick="event.stopPropagation(); showInfo('kotta')">i</div>
+            </div>
 
-            <a href="zongora-akkord.html" class="module-card card-akkord">
+            <div class="module-card card-akkord" onclick="window.location.href='zongora-akkord.html'">
                 <div class="card-icon">🎹</div>
-                <h2 class="card-title">Akkord</h2>
-                <p class="card-desc">Többszólamú polifónia tréning. Olvasd le a kottát, és üsd le a hármashangzatokat egyszerre.</p>
-                <div class="play-btn">Indítás ▶</div>
-            </a>
+                <h2 class="card-title">Akkord Mester</h2>
+                <p class="card-desc">Akkordfelismerés és elméleti tudás tesztelése. Helyes billentyűzet-leütés és dinamika elemzése.</p>
+                <div class="info-trigger" onclick="event.stopPropagation(); showInfo('akkord')">i</div>
+            </div>
 
-            <a href="zongora-hanon.html" class="module-card card-hanon">
+            <div class="module-card card-hanon" onclick="window.location.href='zongora-hanon.html'">
                 <div class="card-icon">🏃‍♂️</div>
-                <h2 class="card-title">Hanon</h2>
-                <p class="card-desc">Ujjfüggetlenítő és gyorsasági gyakorlatok két kézre. Egyenletesség és dinamika elemzése.</p>
-                <div class="play-btn">Indítás ▶</div>
-            </a>
+                <h2 class="card-title">Hanon No. 1</h2>
+                <p class="card-desc">Ujjgyakorlat a sebesség és függetlenség fejlesztésére. Valós idejű ritmusstabilitás mérés.</p>
+                <div class="info-trigger" onclick="event.stopPropagation(); showInfo('hanon')">i</div>
+            </div>
 
-            <a href="zongora-ritmus.html" class="module-card card-ritmus">
+            <div class="module-card card-ritmus" onclick="window.location.href='zongora-ritmus.html'">
                 <div class="card-icon">⏱️</div>
                 <h2 class="card-title">Ritmus</h2>
                 <p class="card-desc">Fejleszd az időzítésedet beépített metronómmal. Milliszekundum pontosságú mérés.</p>
-                <div class="play-btn">Indítás ▶</div>
-            </a>
+                <div class="info-trigger" onclick="event.stopPropagation(); showInfo('ritmus')">i</div>
+            </div>
 
-            <a href="zongora-hallas.html" class="module-card card-hallas">
+            <div class="module-card card-hallas" onclick="window.location.href='zongora-hallas.html'">
                 <div class="card-icon">🎧</div>
                 <h2 class="card-title">Hallás</h2>
-                <p class="card-desc">Abszolút és relatív hallásfejlesztés. Ismerd fel a lejátszott hangokat vakon, pusztán fülre hagyatkozva.</p>
-                <div class="play-btn">Indítás ▶</div>
-            </a>
+                <p class="card-desc">Abszolút és relatív hallásfejlesztés. Ismerd fel a lejátszott hangokat vakon.</p>
+                <div class="info-trigger" onclick="event.stopPropagation(); showInfo('hallas')">i</div>
+            </div>
+
         </div>
     </div>
 
-    <div id="help-panel" class="help-panel">
-        <div style="color:#fff; font-size:14px;"><b>Súgó:</b><br><br>Gyakorolj naponta a fejlődésért!</div>
-        <button onclick="toggleHelp()" style="margin-top:15px; cursor:pointer;">Bezárás</button>
+    <div id="infoModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalBody"></div>
+        </div>
     </div>
 
     <script>
         function toggleMute() { localStorage.setItem('globalWebMute', document.getElementById('mute-toggle').checked); }
-        function toggleHelp() { 
-            const p = document.getElementById('help-panel'); 
-            p.style.display = (p.style.display === 'none') ? 'flex' : 'none'; 
+        
+        const infoData = {
+            general: { 
+                title: "PIANO ACADEMY – Rendszer Ismertető", 
+                text: `<p>A Piano Academy egy professzionális, böngészőből futó interaktív oktatási környezet, amely a WebMIDI API technológiát használva közvetlenül és zéró késleltetéssel kommunikál a digitális zongoráddal vagy MIDI billentyűzeteddel.</p>
+                       <p><span class="highlight">A koncepció:</span> A rendszer nem elméleti tananyagokat kínál, hanem kőkemény reflex- és izommemória-fejlesztő gyakorlatokat. Az agyad és az ujjaid közötti reakcióidő minimalizálására épít.</p>
+                       <ul>
+                           <li><span class="highlight">Némítás kapcsoló:</span> A főoldalon található kapcsolóval letilthatod a böngésző saját, beépített szintetizátorát. Ez akkor hasznos, ha a digitális zongorád saját, kiváló minőségű hangszínét szeretnéd hallani gyakorlás közben, és elkerülnéd a kettős (visszhangzó) hangzást.</li>
+                           <li><span class="highlight">Napi rutin:</span> A modulok úgy lettek felépítve, hogy akár napi 15 perc (minden modulban 1-1 kör) szisztematikus elvégzése is mérhető fejlődést hozzon.</li>
+                       </ul>`
+            },
+            kotta: { 
+                title: "Kottaolvasás (Lapról Olvasás Tréner)", 
+                text: `<p>Ennek a modulnak a kizárólagos célja a vizuális jel (a kotta) és a fizikai cselekvés (a billentyű leütése) közötti reakcióidő lerövidítése. A kottát nem "kiszámolni" kell, hanem automatizmus szintjén felismerni.</p>
+                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
+                       <ul>
+                           <li><span class="highlight">Kulcsok:</span> Gyakorolhatsz dedikáltan Violin kulcsban (jobb kéz), Basszus kulcsban (bal kéz), vagy Vegyes módban, ahol a gép véletlenszerűen dobálja a regisztereket, kényszerítve a gyors agyi átkapcsolást.</li>
+                           <li><span class="highlight">Előjegyzések (ON/OFF):</span> Alapértelmezetten csak a törzshangokat (fehér billentyűk) kéri a rendszer. Ha bekapcsolod, a generátor kiterjeszti a skálát a módosított (fekete) hangokra (♯ és ♭) is, drasztikusan megnövelve a nehézséget.</li>
+                           <li><span class="highlight">Időkorlát és Szintlépés:</span> Minden küldetés 10 hangból áll. A kezdő időkorlát 5.0 másodperc hangonként. Ha hiba nélkül (100%-os pontossággal) teljesítesz egy szakaszt, a rendszer szintet lép, és dinamikusan csökkenti a rendelkezésre álló időt, folyamatos nyomás alatt tartva a reflexeidet.</li>
+                           <li><span class="highlight">Súgó és Puska:</span> A "Gyors-súgó" azonnal kiírja a hang nevét a kotta mellé, ha elrontod. A "Súgó (Puska)" egy nagyméretű, vizuális térképet nyit meg a teljes zongora billentyűzetről és a hozzá tartozó vonalrendszerről az orientáció megkönnyítésére.</li>
+                       </ul>`
+            },
+            akkord: { 
+                title: "Akkord Mester (Polifónia Tréner)", 
+                text: `<p>A zongorázás egyik legösszetettebb feladata a vertikális kottaolvasás (több hang egyidejű felismerése). Ez a modul az elméleti akkordépítést és a többszólamú látásmódot teszteli.</p>
+                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
+                       <ul>
+                           <li><span class="highlight">Oktatási Módok:</span> A <i>Kottaolvasó</i> módban a hagyományos vonalrendszerben jelennek meg az akkordok. A <i>Stúdió Zenész</i> (Lead) módban csak a nemzetközi akkordjeleket (pl. C, Dm, G7) látod, ami a könnyűzenei kíséretek és az improvizáció alapja.</li>
+                           <li><span class="highlight">Nehézségi Szintek:</span>
+                               <ul>
+                                   <li><b>1. Szint (Alap):</b> Csak alaphelyzetű hármashangzatok (terc + kvint).</li>
+                                   <li><b>2. Szint (Fordítások):</b> Bekapcsolja az első (szextakkord) és második (kvartszextakkord) fordításokat.</li>
+                                   <li><b>3. Szint (Haladó):</b> Négyeshangzatok (hetes akkordok, pl. G7, C7) és bonyolultabb módosítások.</li>
+                               </ul>
+                           </li>
+                           <li><span class="highlight">Kiértékelés:</span> A rendszer addig nem adja meg a találatot, amíg az akkord <b>összes</b> hangját nem szólaltatod meg egyszerre. Ugyanúgy tartalmazza az időkorlátos szintlépési rendszert, mint a Kotta modul.</li>
+                       </ul>`
+            },
+            hanon: { 
+                title: "Hanon No. 1 (Technikai és Kinetikus Tréner)", 
+                text: `<p>Charles-Louis Hanon 1873-as <i>A virtuóz zongorista</i> című művének első számú gyakorlata, modern köntösbe öltöztetve. A cél az ujjak tökéletes függetlenítése, egyenlő megerősítése és a csukló lazaságának fejlesztése.</p>
+                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
+                       <ul>
+                           <li><span class="highlight">Gyakorlási kiterjedés:</span> Választható 1 oktávos (kezdő) vagy 2 oktávos (haladó) futam.</li>
+                           <li><span class="highlight">Kézválasztó:</span> Izolálhatod a jobb vagy a bal kezet a gyengébb oldal célzott erősítésére, mielőtt a kétkezes (BOTH) módot választanád.</li>
+                           <li><span class="highlight">Edzés Módok:</span>
+                               <ul>
+                                   <li><b>Sprint:</b> 1 teljes kör (fel és le) a maximum sebesség tesztelésére.</li>
+                                   <li><b>Maraton:</b> 3 egymást követő kör, amely az állóképességet és az alkar izmait teszi próbára (a klasszikus konzervatóriumi követelmény).</li>
+                                   <li><b>Tréning:</b> Végtelenített ciklus a laza, ismétlődő gyakorláshoz.</li>
+                               </ul>
+                           </li>
+                           <li><span class="highlight">Valós idejű analitika:</span> A szoftver kiszámítja a pillanatnyi és átlagos <b>BPM</b>-edet (ütés per perc), valamint egy milliszekundum pontosságú matematikai szórás alapján kiszámítja a <b>Stabilitás %</b>-ot. A cél nem csak a gyorsaság, hanem a gépies egyenletesség elérése!</li>
+                       </ul>`
+            },
+            ritmus: { 
+                title: "Ritmus Tréner", 
+                text: `<p>A zene lelke a hibátlan időzítés. A Ritmus modul a "belső órád" (internal clock) kalibrálására szolgál, megszüntetve a kezdőkre jellemző akaratlan gyorsulást vagy lassulást.</p>
+                       <p><span class="highlight">Működési elv:</span></p>
+                       <ul>
+                           <li>A beépített metronóm megadja az alaptempót.</li>
+                           <li>A te feladatod, hogy tökéletes szinkronban üsd le a billentyűt a kattanásokkal.</li>
+                           <li>A rendszer a leütéseket nemcsak "jó" vagy "rossz" kategóriába sorolja, hanem milliszekundum (ms) pontossággal megmutatja a devianciát: mikor sietsz (pozitív ms) és mikor késel (negatív ms). Minél közelebb vagy a 0-hoz, annál stabilabb a ritmusod.</li>
+                       </ul>`
+            },
+            hallas: { 
+                title: "Ear Training (Abszolút és Relatív Hallásfejlesztő)", 
+                text: `<p>A fül finomhangolása elengedhetetlen a zenei improvizációhoz és a dallamok "hallás utáni" visszajátszásához. Ebben a modulban a gép által generált tiszta szinusz hangokat kell vakon megtalálnod a klaviatúrán.</p>
+                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
+                       <ul>
+                           <li><span class="highlight">Előjegyzések (ON/OFF):</span> Kezdő szinten (OFF) a gép csak a tiszta C-dúr skála (fehér) hangjait adja fel. Bekapcsolva bekerül a teljes kromatikus skála.</li>
+                           <li><span class="highlight">Szint:</span> Az 'Alap' beállítás egyetlen oktávra korlátozza a keresést, míg a 'Haladó' mód kinyitja a spektrumot több oktávra, jelentősen megnehezítve a tájékozódást.</li>
+                           <li><span class="highlight">Időkorlát (ON/OFF):</span> Ha frusztráló a sietség, kapcsold ki az órát, és keress stresszmentesen.</li>
+                           <li><span class="highlight">Visszajelzések:</span> Helyes találat esetén a panel azonnal kizöldül. Hibás találatnál a panel pirosan villan, és a rendszer azonnali instrukciót ad: megmondja, hogy a célhang <i>magasabban</i> vagy <i>alacsonyabban</i> található a leütött hanghoz képest (relatív hallás tréningezése).</li>
+                       </ul>`
+            }
+        };
+
+        function showInfo(type) {
+            document.getElementById('modalTitle').innerText = infoData[type].title;
+            document.getElementById('modalBody').innerHTML = infoData[type].text;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
         }
     </script>
 </body>
