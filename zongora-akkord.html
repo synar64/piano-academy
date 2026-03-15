@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piano Accord</title>
+    <title>Piano Accords</title>
     <style>
         :root {
             --neon-blue: #00d4ff; --neon-orange: #ffaa00; --neon-purple: #bf5af2;
@@ -65,7 +65,7 @@
     <a href="index.html" class="back-btn">← AKADÉMIA</a>
 
     <div style="text-align: center; margin-bottom: 2px;">
-        <h1>Akkord</h1>
+        <h1>AKKORD</h1>
     </div>
 
     <div id="timer-container"><div id="timer-bar"></div></div>
@@ -97,7 +97,7 @@
         <div class="stat-box stat-good"><div class="stat-label">Helyes</div><div id="scoreOk" class="stat-value">0</div></div>
     </div>
 
-    <button id="btnAction" onclick="handleAction()">▶ Gyakorlat indítása</button>
+    <button id="btnAction" onclick="handleAction()">▶ MIDI ÉLESÍTÉSE & INDÍTÁS</button>
     
     <div style="display:flex; flex-direction:column; align-items:center;">
         <canvas id="staffCanvas" width="850" height="480"></canvas>
@@ -172,14 +172,16 @@
             if(isRunning) { stopMission(); } else { draw(); }
         }
 
-        function playTone(m, v) {
-            if (!audioOn || !audioCtx) return;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = 440 * Math.pow(2, (m - 69) / 12); osc.type = 'triangle';
-            gain.gain.setValueAtTime((v/127)*0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.8);
+        // JAVÍTOTT TISZTA HANGZÁS (SINE WAVE)
+        function playTone(m) {
+            if (!audioOn || !audioCtx) return; 
+            const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); 
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(440 * Math.pow(2, (m - 69) / 12), now); 
+            gain.gain.setValueAtTime(0.3, now); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2); 
+            osc.connect(gain); gain.connect(audioCtx.destination); 
+            osc.start(now); osc.stop(now + 1.3); 
         }
 
         function drawLedgers(x, offset, baseLineY) { 
@@ -334,7 +336,7 @@
         function onMIDIMessage(e) {
             let [s, n, v] = e.data;
             if ((s & 0xf0) === 0x90 && v > 0) { 
-                activeMidiNotes.add(n); playTone(n, v); updatePanel(); 
+                activeMidiNotes.add(n); playTone(n); updatePanel(); 
                 if (isRunning) checkMatch(); 
             }
             else if ((s & 0xf0) === 0x80 || ((s & 0xf0) === 0x90 && v === 0)) { 
