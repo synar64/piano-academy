@@ -16,78 +16,78 @@
             height: 100vh; margin: 0; overflow: hidden;
         }
         .back-btn { position: fixed; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid #333; }
-        h1 { color: var(--neon-rose); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 28px; }
+        
+        h1 { color: var(--neon-rose); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 26px; text-shadow: 0 0 15px rgba(255,45,85,0.4); }
 
-        #timer-container { width: 700px; height: 10px; background: #222; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid #444; transition: opacity 0.3s; }
+        #timer-container { width: 850px; height: 12px; background: #222; border-radius: 6px; margin-bottom: 8px; overflow: hidden; border: 1px solid #444; transition: opacity 0.3s; }
         #timer-bar { width: 100%; height: 100%; background-color: var(--neon-purple); transition: width 0.1s linear; }
 
-        .game-container {
-            background: var(--panel-bg); padding: 30px; border-radius: 20px; border: 1px solid #333;
-            width: 700px; text-align: center; box-shadow: 0 0 30px rgba(255, 45, 85, 0.1);
-            box-sizing: border-box;
+        .master-panel { background: var(--panel-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; width: 850px; box-sizing: border-box;}
+        .button-group { display: flex; gap: 8px; flex-wrap: nowrap; justify-content: center; align-items: center; width: 100%; }
+        
+        button.cfg-btn { padding: 6px 12px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
+        button.cfg-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
+        button.cfg-btn.active { border-color: var(--neon-purple); color: var(--neon-purple); background: #15001a; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 8px; width: 850px; box-sizing: border-box; }
+        .stat-box { background: rgba(0,0,0,0.6); padding: 8px; border-radius: 10px; border: 1px solid #222; text-align: center; }
+        .stat-label { font-size: 9px; color: #555; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-value { font-size: 20px; font-weight: bold; font-family: monospace; color: var(--neon-blue); }
+
+        .game-panel {
+            background: var(--panel-bg); padding: 20px; border-radius: 15px; border: 2px solid #222;
+            width: 850px; text-align: center; box-sizing: border-box;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         #display-area {
-            font-size: 100px; margin: 15px 0; color: #333; font-weight: bold;
-            height: 120px; display: flex; align-items: center; justify-content: center;
-            transition: 0.3s;
+            font-size: 120px; margin: 10px 0; color: #333; font-weight: bold;
+            height: 140px; display: flex; align-items: center; justify-content: center;
         }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .stat-box { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; border: 1px solid #222; }
-        .stat-label { font-size: 9px; color: #555; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-size: 18px; font-weight: bold; color: var(--neon-blue); }
-
-        .cfg-btn { padding: 6px 12px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 10px; transition: 0.2s; text-transform: uppercase; }
-        .cfg-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
-
-        #btnAction {
-            padding: 12px 40px; background: var(--success-green); color: #000;
-            border: none; border-radius: 8px; cursor: pointer; font-weight: bold;
-            text-transform: uppercase; font-size: 16px; margin-bottom: 10px;
-        }
+        #btnAction { padding: 12px 60px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 15px; box-shadow: 0 4px 15px rgba(50,215,75,0.3); margin-bottom: 10px;}
         #btnAction.running { background: var(--error-red); color: #fff; }
 
         #user-input-display { font-size: 18px; color: var(--neon-orange); height: 25px; margin-bottom: 5px; font-family: monospace; }
-        #feedback-msg { font-size: 16px; color: #666; height: 25px; font-style: italic; margin-bottom: 15px; }
+        #feedback-msg { font-size: 18px; font-weight: bold; height: 24px; text-align: center; letter-spacing: 1px; color: var(--neon-blue); margin-bottom: 10px;}
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-btn">← ACADEMY</a>
+    <a href="index.html" class="back-btn">← AKADÉMIA</a>
 
     <h1>Hallásfejlesztő</h1>
 
     <div id="timer-container"><div id="timer-bar"></div></div>
 
-    <div class="game-container" id="mainContainer">
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div class="stat-label">Helyes</div>
-                <div id="score" class="stat-value">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Időkorlát</div>
-                <button id="btnTimerToggle" class="cfg-btn on" onclick="toggleTimerMode()">ON</button>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Súgó</div>
-                <button id="btnHint" class="cfg-btn" onclick="toggleHint()">OFF</button>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Státusz</div>
-                <div id="status-label" class="stat-value" style="color:var(--neon-rose); font-size: 14px;">OFF</div>
-            </div>
+    <div class="master-panel">
+        <div class="button-group">
+            <button id="btnAccToggle" class="cfg-btn" onclick="toggleAccidentals()">Előjegyzések: OFF</button>
+            <button id="btnLevelToggle" class="cfg-btn" onclick="toggleLevel()">Szint: ALAP</button>
+            <button id="btnHint" class="cfg-btn" onclick="toggleHint()">Súgó: OFF</button>
+            <button id="btnTimerToggle" class="cfg-btn on" onclick="toggleTimerMode()">Időkorlát: ON</button>
         </div>
+    </div>
 
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-label">Helyes találat</div>
+            <div id="score" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Státusz</div>
+            <div id="status-label" class="stat-value" style="color:var(--neon-rose);">VÁRAKOZÁS</div>
+        </div>
+    </div>
+
+    <div class="game-panel" id="mainContainer">
+        <button id="btnAction" onclick="handleAction()">▶ Gyakorlat indítása</button>
+        
         <div id="display-area">?</div>
         
         <div id="user-input-display">-</div>
         <div id="feedback-msg">Indítsd el a gyakorlatot!</div>
-
-        <button id="btnAction" onclick="handleAction()">▶ Gyakorlat indítása</button>
-        <br>
+        
         <button id="btnRepeat" onclick="repeatTarget()" style="background: transparent; color: #888; border: 1px solid #333; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 12px;">Újrajátszás 🔊</button>
     </div>
 
@@ -95,8 +95,13 @@
         let audioCtx, targetMidi, score = 0, isRunning = false;
         let timeLeft = 5.0, timerTicker = null, firstAttempt = true;
         let useQuickHint = false, useTimer = true, isMidiInitialized = false;
+        let useAccidentals = false, isAdvancedLevel = false;
         
-        const notes = { 60:'C4', 61:'C#4', 62:'D4', 63:'D#4', 64:'E4', 65:'F4', 66:'F#4', 67:'G4', 68:'G#4', 69:'A4', 70:'A#4', 71:'B4' };
+        const whiteNotes = { 60:'C4', 62:'D4', 64:'E4', 65:'F4', 67:'G4', 69:'A4', 71:'B4' };
+        const allNotes = { 
+            60:'C4', 61:'C#4', 62:'D4', 63:'D#4', 64:'E4', 65:'F4', 66:'F#4', 67:'G4', 68:'G#4', 69:'A4', 70:'A#4', 71:'B4',
+            48:'C3', 49:'C#3', 50:'D3', 51:'D#3', 52:'E3', 53:'F3', 54:'F#3', 55:'G3', 56:'G#3', 57:'A3', 58:'A#3', 59:'B3'
+        };
 
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -106,7 +111,8 @@
             }
         }
 
-        function playNote(midi, duration = 1.2) {
+        // JAVÍTVA: Mindkét hang ugyanazt a szép, hosszú (1.5s) lecsengést kapja
+        function playNote(midi) {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -114,14 +120,30 @@
             osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12);
             osc.type = 'sine';
             gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.5);
+        }
+
+        function toggleAccidentals() {
+            useAccidentals = !useAccidentals;
+            const btn = document.getElementById('btnAccToggle');
+            btn.innerText = `Előjegyzések: ${useAccidentals ? 'ON' : 'OFF'}`;
+            btn.classList.toggle('on', useAccidentals);
+            if (isRunning) handleAction();
+        }
+
+        function toggleLevel() {
+            isAdvancedLevel = !isAdvancedLevel;
+            const btn = document.getElementById('btnLevelToggle');
+            btn.innerText = `Szint: ${isAdvancedLevel ? 'HALADÓ' : 'ALAP'}`;
+            btn.classList.toggle('active', isAdvancedLevel);
+            if (isRunning) handleAction();
         }
 
         function toggleHint() {
             useQuickHint = !useQuickHint;
             const btn = document.getElementById('btnHint');
-            btn.innerText = useQuickHint ? "ON" : "OFF";
+            btn.innerText = `Súgó: ${useQuickHint ? 'ON' : 'OFF'}`;
             btn.classList.toggle('on', useQuickHint);
             if (isRunning && targetMidi) updateDisplay();
         }
@@ -130,7 +152,7 @@
             useTimer = !useTimer;
             const btn = document.getElementById('btnTimerToggle');
             const container = document.getElementById('timer-container');
-            btn.innerText = useTimer ? "ON" : "OFF";
+            btn.innerText = `Időkorlát: ${useTimer ? 'ON' : 'OFF'}`;
             btn.classList.toggle('on', useTimer);
             container.style.opacity = useTimer ? "1" : "0";
             if (!useTimer) clearInterval(timerTicker);
@@ -139,7 +161,7 @@
         function updateDisplay() {
             const display = document.getElementById('display-area');
             if (useQuickHint) {
-                display.innerText = notes[targetMidi];
+                display.innerText = allNotes[targetMidi];
                 display.style.color = "var(--neon-blue)";
             } else {
                 display.innerText = "?";
@@ -147,27 +169,25 @@
             }
         }
 
-        function repeatTarget() { if (isRunning && targetMidi) playNote(targetMidi, 1.5); }
-
         function nextNote() {
             if (!isRunning) return;
-            const midiKeys = Object.keys(notes);
-            targetMidi = parseInt(midiKeys[Math.floor(Math.random() * midiKeys.length)]);
+            let pool = [];
+            for (let midi in allNotes) {
+                let m = parseInt(midi);
+                let matchesLevel = isAdvancedLevel ? true : (m >= 60 && m <= 71);
+                let matchesAccidental = useAccidentals ? true : (whiteNotes[m] !== undefined);
+                if (matchesLevel && matchesAccidental) pool.push(m);
+            }
+            targetMidi = pool[Math.floor(Math.random() * pool.length)];
             firstAttempt = true;
             timeLeft = 5.0;
-            
             updateDisplay();
             document.getElementById('feedback-msg').innerText = "Hallgasd a hangot...";
             document.getElementById('user-input-display').innerText = "-";
-            
             const mainContainer = document.getElementById('mainContainer');
-            mainContainer.style.borderColor = "#333";
-            mainContainer.style.boxShadow = "0 0 30px rgba(255, 45, 85, 0.1)";
-
-            if (useTimer) {
-                updateTimerUI();
-                startTimer();
-            }
+            mainContainer.style.borderColor = "#222";
+            mainContainer.style.boxShadow = "none";
+            if (useTimer) startTimer();
             repeatTarget();
         }
 
@@ -176,11 +196,7 @@
             timerTicker = setInterval(() => {
                 if (!isRunning || !useTimer) return;
                 timeLeft -= 0.1;
-                if (timeLeft <= 0) {
-                    timeLeft = 0;
-                    clearInterval(timerTicker);
-                    document.getElementById('feedback-msg').innerText = "Keresd meg a hangot!";
-                }
+                if (timeLeft <= 0) { timeLeft = 0; clearInterval(timerTicker); document.getElementById('feedback-msg').innerText = "Keresd meg a hangot!"; }
                 updateTimerUI();
             }, 100);
         }
@@ -188,7 +204,6 @@
         function updateTimerUI() {
             const bar = document.getElementById('timer-bar');
             bar.style.width = (timeLeft / 5.0) * 100 + "%";
-            // LILA-RÓZSASZÍN indulás, piros csak a végén (30% alatt)
             bar.style.backgroundColor = timeLeft < 1.5 ? "var(--error-red)" : "var(--neon-purple)";
         }
 
@@ -197,78 +212,52 @@
                 if (!isRunning) return;
                 const [s, n, v] = e.data;
                 const mainContainer = document.getElementById('mainContainer');
-
                 if ((s & 0xf0) === 0x90 && v > 0) {
-                    playNote(n, 0.8);
-                    const noteName = notes[n] || n;
+                    playNote(n); // Most már ez is szép hosszan szól
+                    const noteName = allNotes[n] || n;
                     document.getElementById('user-input-display').innerText = "Ütött hang: " + noteName;
-
                     if (n === targetMidi) {
-                        if (firstAttempt && (!useTimer || timeLeft > 0)) {
-                            score++;
-                            document.getElementById('score').innerText = score;
-                            document.getElementById('feedback-msg').innerText = "TÖKÉLETES!";
-                        } else {
-                            document.getElementById('feedback-msg').innerText = "Megvan! Jöhet a következő...";
-                        }
-                        
+                        if (firstAttempt && (!useTimer || timeLeft > 0)) { score++; document.getElementById('score').innerText = score; }
                         clearInterval(timerTicker);
-                        
                         mainContainer.style.borderColor = "var(--success-green)";
                         mainContainer.style.boxShadow = "0 0 40px rgba(50, 215, 75, 0.4)";
-
                         const display = document.getElementById('display-area');
                         display.innerText = noteName;
                         display.style.color = "var(--success-green)";
+                        document.getElementById('feedback-msg').innerText = "TÖKÉLETES!";
                         setTimeout(nextNote, 1500);
                     } else {
                         firstAttempt = false;
                         mainContainer.style.borderColor = "var(--error-red)";
                         mainContainer.style.boxShadow = "0 0 40px rgba(255, 69, 58, 0.4)";
-                        
-                        setTimeout(() => {
-                            if (isRunning && !isCorrectHit()) {
-                                 mainContainer.style.borderColor = "#333";
-                            }
-                        }, 300);
-
-                        const display = document.getElementById('display-area');
-                        display.innerText = useQuickHint ? notes[targetMidi] : "!";
-                        display.style.color = "var(--error-red)";
+                        setTimeout(() => { if (isRunning) mainContainer.style.borderColor = "#222"; }, 300);
                         const diff = n < targetMidi ? "MAGASABB" : "ALACSONYABB";
-                        document.getElementById('feedback-msg').innerText = "A célhang " + diff + ".";
+                        document.getElementById('feedback-msg').innerText = "A célhang " + diff + "!";
                     }
                 }
             };
-        }
-
-        function isCorrectHit() {
-            const display = document.getElementById('display-area');
-            return display.style.color === "rgb(50, 215, 75)";
         }
 
         function handleAction() {
             initAudio();
             isRunning = !isRunning;
             const btn = document.getElementById('btnAction');
-            const mainContainer = document.getElementById('mainContainer');
-
             if (isRunning) {
                 btn.innerText = "◼ MEGSZAKÍTÁS";
                 btn.classList.add('running');
-                document.getElementById('status-label').innerText = "LIVE";
+                document.getElementById('status-label').innerText = "AKTÍV";
                 nextNote();
             } else {
                 btn.innerText = "▶ Gyakorlat indítása";
                 btn.classList.remove('running');
-                document.getElementById('status-label').innerText = "OFF";
+                document.getElementById('status-label').innerText = "VÁRAKOZÁS";
                 clearInterval(timerTicker);
                 document.getElementById('display-area').innerText = "?";
                 document.getElementById('display-area').style.color = "#333";
-                mainContainer.style.borderColor = "#333";
-                mainContainer.style.boxShadow = "0 0 30px rgba(255, 45, 85, 0.1)";
             }
         }
+        
+        function repeatTarget() { if (isRunning && targetMidi) playNote(targetMidi); }
     </script>
 </body>
 </html>
