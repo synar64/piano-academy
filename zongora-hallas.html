@@ -8,6 +8,7 @@
         :root {
             --neon-rose: #ff2d55; --bg-color: #050510; --panel-bg: rgba(0, 0, 0, 0.9);
             --success-green: #32d74b; --error-red: #ff453a; --neon-blue: #00d4ff; --neon-orange: #ffaa00;
+            --neon-purple: #bf5af2;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -17,14 +18,14 @@
         .back-btn { position: fixed; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid #333; }
         h1 { color: var(--neon-rose); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 28px; }
 
-        /* Időmérő sáv */
-        #timer-container { width: 700px; height: 8px; background: #222; border-radius: 4px; margin-bottom: 15px; overflow: hidden; border: 1px solid #333; }
-        #timer-bar { width: 100%; height: 100%; background-color: var(--neon-rose); transition: width 0.1s linear; }
+        #timer-container { width: 700px; height: 10px; background: #222; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid #444; transition: opacity 0.3s; }
+        #timer-bar { width: 100%; height: 100%; background-color: var(--neon-purple); transition: width 0.1s linear; }
 
         .game-container {
             background: var(--panel-bg); padding: 30px; border-radius: 20px; border: 1px solid #333;
             width: 700px; text-align: center; box-shadow: 0 0 30px rgba(255, 45, 85, 0.1);
             box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         #display-area {
@@ -33,10 +34,13 @@
             transition: 0.3s;
         }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border: 1px solid #222; }
-        .stat-label { font-size: 10px; color: #555; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-size: 22px; font-weight: bold; color: var(--neon-blue); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; border: 1px solid #222; }
+        .stat-label { font-size: 9px; color: #555; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-value { font-size: 18px; font-weight: bold; color: var(--neon-blue); }
+
+        .cfg-btn { padding: 6px 12px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 10px; transition: 0.2s; text-transform: uppercase; }
+        .cfg-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
 
         #btnAction {
             padding: 12px 40px; background: var(--success-green); color: #000;
@@ -57,19 +61,23 @@
 
     <div id="timer-container"><div id="timer-bar"></div></div>
 
-    <div class="game-container">
+    <div class="game-container" id="mainContainer">
         <div class="stats-grid">
             <div class="stat-box">
-                <div class="stat-label">Helyes (1. próbára)</div>
+                <div class="stat-label">Helyes</div>
                 <div id="score" class="stat-value">0</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Időkorlát</div>
-                <div class="stat-value"><span id="seconds">5.0</span>s</div>
+                <button id="btnTimerToggle" class="cfg-btn on" onclick="toggleTimerMode()">ON</button>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Súgó</div>
+                <button id="btnHint" class="cfg-btn" onclick="toggleHint()">OFF</button>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Státusz</div>
-                <div id="status-label" class="stat-value" style="color:var(--neon-rose)">OFF</div>
+                <div id="status-label" class="stat-value" style="color:var(--neon-rose); font-size: 14px;">OFF</div>
             </div>
         </div>
 
@@ -86,15 +94,18 @@
     <script>
         let audioCtx, targetMidi, score = 0, isRunning = false;
         let timeLeft = 5.0, timerTicker = null, firstAttempt = true;
+        let useQuickHint = false, useTimer = true, isMidiInitialized = false;
         
         const notes = { 60:'C4', 61:'C#4', 62:'D4', 63:'D#4', 64:'E4', 65:'F4', 66:'F#4', 67:'G4', 68:'G#4', 69:'A4', 70:'A#4', 71:'B4' };
 
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (navigator.requestMIDIAccess) navigator.requestMIDIAccess().then(onMIDISuccess);
+            if (!isMidiInitialized && navigator.requestMIDIAccess) {
+                navigator.requestMIDIAccess().then(onMIDISuccess);
+                isMidiInitialized = true;
+            }
         }
 
-        // Most már te is ugyanolyan szép "sine" hangon szólsz!
         function playNote(midi, duration = 1.2) {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
@@ -107,6 +118,35 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
+        function toggleHint() {
+            useQuickHint = !useQuickHint;
+            const btn = document.getElementById('btnHint');
+            btn.innerText = useQuickHint ? "ON" : "OFF";
+            btn.classList.toggle('on', useQuickHint);
+            if (isRunning && targetMidi) updateDisplay();
+        }
+
+        function toggleTimerMode() {
+            useTimer = !useTimer;
+            const btn = document.getElementById('btnTimerToggle');
+            const container = document.getElementById('timer-container');
+            btn.innerText = useTimer ? "ON" : "OFF";
+            btn.classList.toggle('on', useTimer);
+            container.style.opacity = useTimer ? "1" : "0";
+            if (!useTimer) clearInterval(timerTicker);
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('display-area');
+            if (useQuickHint) {
+                display.innerText = notes[targetMidi];
+                display.style.color = "var(--neon-blue)";
+            } else {
+                display.innerText = "?";
+                display.style.color = "#333";
+            }
+        }
+
         function repeatTarget() { if (isRunning && targetMidi) playNote(targetMidi, 1.5); }
 
         function nextNote() {
@@ -116,84 +156,117 @@
             firstAttempt = true;
             timeLeft = 5.0;
             
-            document.getElementById('display-area').innerText = "?";
-            document.getElementById('display-area').style.color = "#333";
+            updateDisplay();
             document.getElementById('feedback-msg').innerText = "Hallgasd a hangot...";
             document.getElementById('user-input-display').innerText = "-";
             
-            updateTimerUI();
+            const mainContainer = document.getElementById('mainContainer');
+            mainContainer.style.borderColor = "#333";
+            mainContainer.style.boxShadow = "0 0 30px rgba(255, 45, 85, 0.1)";
+
+            if (useTimer) {
+                updateTimerUI();
+                startTimer();
+            }
             repeatTarget();
-            startTimer();
         }
 
         function startTimer() {
             clearInterval(timerTicker);
             timerTicker = setInterval(() => {
-                if (!isRunning) return;
+                if (!isRunning || !useTimer) return;
                 timeLeft -= 0.1;
                 if (timeLeft <= 0) {
                     timeLeft = 0;
                     clearInterval(timerTicker);
-                    document.getElementById('feedback-msg').innerText = "Lejárt az idő! Keresd meg a hangot!";
+                    document.getElementById('feedback-msg').innerText = "Keresd meg a hangot!";
                 }
                 updateTimerUI();
             }, 100);
         }
 
         function updateTimerUI() {
-            document.getElementById('seconds').innerText = Math.max(0, timeLeft).toFixed(1);
             const bar = document.getElementById('timer-bar');
             bar.style.width = (timeLeft / 5.0) * 100 + "%";
-            bar.style.backgroundColor = timeLeft < 1.5 ? "var(--error-red)" : "var(--neon-rose)";
+            // LILA-RÓZSASZÍN indulás, piros csak a végén (30% alatt)
+            bar.style.backgroundColor = timeLeft < 1.5 ? "var(--error-red)" : "var(--neon-purple)";
         }
 
         function onMIDISuccess(midi) {
             for (var input of midi.inputs.values()) input.onmidimessage = (e) => {
                 if (!isRunning) return;
                 const [s, n, v] = e.data;
+                const mainContainer = document.getElementById('mainContainer');
+
                 if ((s & 0xf0) === 0x90 && v > 0) {
-                    playNote(n, 0.8); // Te is szép csengő hangon szólsz
+                    playNote(n, 0.8);
                     const noteName = notes[n] || n;
                     document.getElementById('user-input-display').innerText = "Ütött hang: " + noteName;
 
                     if (n === targetMidi) {
-                        if (firstAttempt && timeLeft > 0) {
+                        if (firstAttempt && (!useTimer || timeLeft > 0)) {
                             score++;
                             document.getElementById('score').innerText = score;
-                            document.getElementById('feedback-msg').innerText = "TÖKÉLETES! (1. próbára)";
+                            document.getElementById('feedback-msg').innerText = "TÖKÉLETES!";
                         } else {
                             document.getElementById('feedback-msg').innerText = "Megvan! Jöhet a következő...";
                         }
                         
                         clearInterval(timerTicker);
-                        document.getElementById('display-area').innerText = noteName;
-                        document.getElementById('display-area').style.color = "var(--success-green)";
+                        
+                        mainContainer.style.borderColor = "var(--success-green)";
+                        mainContainer.style.boxShadow = "0 0 40px rgba(50, 215, 75, 0.4)";
+
+                        const display = document.getElementById('display-area');
+                        display.innerText = noteName;
+                        display.style.color = "var(--success-green)";
                         setTimeout(nextNote, 1500);
                     } else {
-                        firstAttempt = false; // Elrontottad az első próbát, nincs pont
-                        document.getElementById('display-area').innerText = "!";
-                        document.getElementById('display-area').style.color = "var(--error-red)";
+                        firstAttempt = false;
+                        mainContainer.style.borderColor = "var(--error-red)";
+                        mainContainer.style.boxShadow = "0 0 40px rgba(255, 69, 58, 0.4)";
+                        
+                        setTimeout(() => {
+                            if (isRunning && !isCorrectHit()) {
+                                 mainContainer.style.borderColor = "#333";
+                            }
+                        }, 300);
+
+                        const display = document.getElementById('display-area');
+                        display.innerText = useQuickHint ? notes[targetMidi] : "!";
+                        display.style.color = "var(--error-red)";
                         const diff = n < targetMidi ? "MAGASABB" : "ALACSONYABB";
-                        document.getElementById('feedback-msg').innerText = "Próbáld újra! A célhang " + diff + ".";
+                        document.getElementById('feedback-msg').innerText = "A célhang " + diff + ".";
                     }
                 }
             };
+        }
+
+        function isCorrectHit() {
+            const display = document.getElementById('display-area');
+            return display.style.color === "rgb(50, 215, 75)";
         }
 
         function handleAction() {
             initAudio();
             isRunning = !isRunning;
             const btn = document.getElementById('btnAction');
+            const mainContainer = document.getElementById('mainContainer');
+
             if (isRunning) {
                 btn.innerText = "◼ MEGSZAKÍTÁS";
                 btn.classList.add('running');
                 document.getElementById('status-label').innerText = "LIVE";
                 nextNote();
             } else {
-                btn.innerText = "▶ GYAKORLAT INDÍTÁSA";
+                btn.innerText = "▶ Gyakorlat indítása";
                 btn.classList.remove('running');
                 document.getElementById('status-label').innerText = "OFF";
                 clearInterval(timerTicker);
+                document.getElementById('display-area').innerText = "?";
+                document.getElementById('display-area').style.color = "#333";
+                mainContainer.style.borderColor = "#333";
+                mainContainer.style.boxShadow = "0 0 30px rgba(255, 45, 85, 0.1)";
             }
         }
     </script>
