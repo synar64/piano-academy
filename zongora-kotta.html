@@ -61,11 +61,42 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
         .modal-content { background: #111; padding: 20px; border-radius: 16px; border: 1px solid #444; text-align: center; box-shadow: 0 10px 50px rgba(0,0,0,1); max-width: 900px; width: 100%; }
         #cheatCanvas { background: #000; border-radius: 8px; border: 1px solid #333; width: 100%; }
+        
+        /* TUTORIAL PANEL */
+        .tutorial-panel { position: fixed; right: -350px; top: 0; width: 330px; height: 100vh; background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(25, 25, 50, 0.95)); border-left: 2px solid #00d4ff; box-shadow: -5px 0 30px rgba(0, 212, 255, 0.2); z-index: 500; overflow-y: auto; transition: right 0.3s ease; }
+        .tutorial-panel.open { right: 0; }
+        .tutorial-header { padding: 15px 20px; border-bottom: 2px solid #00d4ff; margin-bottom: 20px; text-align: center; }
+        .tutorial-header h2 { margin: 0; color: #ffaa00; font-size: 18px; letter-spacing: 1px; }
+        .tutorial-close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #00d4ff; font-size: 24px; cursor: pointer; }
+        .tutorial-step { padding: 20px; margin-bottom: 15px; background: rgba(0, 20, 30, 0.8); border-left: 3px solid #00d4ff; border-radius: 4px; margin-left: 10px; margin-right: 10px; }
+        .step-counter { font-size: 12px; color: #00d4ff; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
+        .step-title { font-size: 16px; color: #ffaa00; font-weight: bold; margin-bottom: 10px; }
+        .step-text { font-size: 14px; color: #fff; line-height: 1.5; margin-bottom: 12px; }
+        .step-hint { background: rgba(0, 0, 0, 0.5); border-left: 3px solid #ffaa00; padding: 12px; border-radius: 4px; font-size: 13px; color: #ffdd99; margin-bottom: 10px; font-weight: 500; }
+        .step-info { background: rgba(0, 0, 0, 0.5); border-left: 3px solid #7dd3fc; padding: 12px; border-radius: 4px; font-size: 12px; color: #7dd3fc; font-weight: 500; }
+        .tutorial-nav { padding: 0 20px; display: flex; gap: 10px; margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
+        .tutorial-nav button { flex: 1; padding: 10px; border: 1px solid #00d4ff; background: rgba(0, 212, 255, 0.1); color: #00d4ff; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        .tutorial-nav button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .tutorial-toggle { position: fixed; right: 20px; top: 20px; background: rgba(0, 212, 255, 0.2); border: 2px solid #00d4ff; color: #00d4ff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; z-index: 400; }
+        .highlight-element { border: 3px solid #ffaa00 !important; box-shadow: 0 0 30px rgba(255, 170, 0, 0.8), inset 0 0 20px rgba(255, 170, 0, 0.2) !important; animation: strong-pulse 0.6s infinite !important; }
+        @keyframes strong-pulse { 0%, 100% { box-shadow: 0 0 30px rgba(255, 170, 0, 0.8), inset 0 0 20px rgba(255, 170, 0, 0.2); } 50% { box-shadow: 0 0 50px rgba(255, 170, 0, 1), inset 0 0 30px rgba(255, 170, 0, 0.4); } }
     </style>
 </head>
 <body>
 
     <a href="index.html" class="back-btn">← AKADÉMIA</a>
+    
+    <button class="tutorial-toggle" onclick="toggleTutorial()">❓ Útmutató</button>
+
+    <div id="tutorialPanel" class="tutorial-panel">
+        <button class="tutorial-close-btn" onclick="toggleTutorial()">✕</button>
+        <div class="tutorial-header"><h2>🎓 Útmutató</h2></div>
+        <div id="tutorialContent"></div>
+        <div class="tutorial-nav">
+            <button id="btnPrev" onclick="prevStep()" disabled>← Vissza</button>
+            <button id="btnNext" onclick="nextStep()">Tovább →</button>
+        </div>
+    </div>
 
     <div style="text-align: center; margin-bottom: 2px;">
         <h1>KOTTA</h1>
@@ -493,6 +524,64 @@
         }
 
         drawEmptyStaff();
+
+        // ==================== TUTORIAL ====================
+        let currentTutorialStep = 0;
+        const tutorialSteps = [
+            { title: "1️⃣ Kulcsok", text: "Válassz VIOLIN/BASSZUS/VEGYES kulcsot.", hint: "VIOLIN=jobb | BASSZUS=bal | VEGYES=mindkettő", info: "A kulcs határozza meg mely hangok jelennek meg.", el: "btnTreble" },
+            { title: "2️⃣ Beállítások", text: "Testreszabhatod a gyakorlatot.", hint: "ELŐJEGYZÉSEK: ON/OFF (♯, ♭ jelenjenek-e?)", info: "GYORS-SÚGÓ: fél másodperc után mutatja a választ.", el: "btnAccidental" },
+            { title: "3️⃣ MIDI Eszköz", text: "Kösd össze a zongorád.", hint: "Kattints az MIDI ÉLESÍTÉSE & INDÍTÁS gombra.", info: "Popup jeleníti meg a csatlakoztatott eszközöket.", el: "btnAction" },
+            { title: "4️⃣ Kotta", text: "Hang jelenik meg a vonalrendszeren.", hint: "Fehér pontok = hangok. Találd meg a billentyűt!", info: "Kék/narancssárga pont = speciális pozíció (C).", el: "staffCanvas" },
+            { title: "5️⃣ Válaszadás", text: "Üss le egy billentyűt. Azonnal kapsz visszajelzést.", hint: "Helyes = ZÖLD ✓ | Hibás = PIROS ✗", info: "Időkorlát elején hosszú, szintlépés után rövidebb.", el: "status" },
+            { title: "6️⃣ Pontok", text: "Nyomon követheted a haladásodat.", hint: "Helyes/Hibás = pontok | Combo = sorozat", info: "10 hang = 1 próba. Hibátlan = szint + felgyorsítás", el: "scoreOk" },
+            { title: "7️⃣ Puska", text: "Ha elakadsz, nyomj SÚGÓ gombot.", hint: "Megmutatja a zongora billentyűit és vonalakat.", info: "Segít a pozíciók memorizálásában.", el: "btnHintPopup" },
+            { title: "✅ Kész!", text: "Most már tudod hogyan működik!", hint: "Kattints az INDÍTÁS gombra és kezdd el! 🎯", info: "30-40 perc/nap = mérhető fejlődés", el: null }
+        ];
+
+        function toggleTutorial() {
+            document.getElementById('tutorialPanel').classList.toggle('open');
+            if(document.getElementById('tutorialPanel').classList.contains('open')) {
+                currentTutorialStep = 0;
+                showTutorialStep();
+            }
+        }
+
+        function showTutorialStep() {
+            const step = tutorialSteps[currentTutorialStep];
+            const content = document.getElementById('tutorialContent');
+            content.innerHTML = `
+                <div class="tutorial-step">
+                    <div class="step-counter">Lépés ${currentTutorialStep + 1}/${tutorialSteps.length}</div>
+                    <div class="step-title">${step.title}</div>
+                    <div class="step-text">${step.text}</div>
+                    <div class="step-hint">💡 ${step.hint}</div>
+                    <div class="step-info">ℹ️ ${step.info}</div>
+                </div>
+            `;
+            document.querySelectorAll('.highlight-element').forEach(el => el.classList.remove('highlight-element'));
+            if(step.el) {
+                const el = document.getElementById(step.el);
+                if(el) el.classList.add('highlight-element');
+            }
+            document.getElementById('btnPrev').disabled = currentTutorialStep === 0;
+            document.getElementById('btnNext').innerText = currentTutorialStep === tutorialSteps.length - 1 ? '✅ Bezárás' : 'Tovább →';
+        }
+
+        function nextStep() {
+            if(currentTutorialStep < tutorialSteps.length - 1) {
+                currentTutorialStep++;
+                showTutorialStep();
+            } else {
+                toggleTutorial();
+            }
+        }
+
+        function prevStep() {
+            if(currentTutorialStep > 0) {
+                currentTutorialStep--;
+                showTutorialStep();
+            }
+        }
     </script>
 </body>
 </html>
