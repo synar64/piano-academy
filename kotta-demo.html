@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotta - DEMO Mód</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #050510;
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .demo-header h1 {
+            color: #ffaa00;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .demo-header p {
+            color: #999;
+            font-size: 16px;
+        }
+        .demo-step-display {
+            background: rgba(0, 20, 40, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .demo-step-number {
+            color: #00d4ff;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .demo-step-title {
+            color: #ffaa00;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .demo-step-text {
+            color: #ccc;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .demo-step-hint {
+            background: rgba(255, 170, 0, 0.15);
+            border-left: 3px solid #ffaa00;
+            padding: 15px;
+            border-radius: 4px;
+            color: #ffdd99;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .demo-ui-section {
+            background: rgba(20, 20, 30, 0.9);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .demo-ui-section h3 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        .demo-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .demo-btn {
+            padding: 10px 20px;
+            border: 2px solid #333;
+            background: #0a0a0a;
+            color: #888;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .demo-btn.highlighted {
+            border-color: #ffaa00;
+            color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
+            animation: pulse-highlight 0.6s infinite;
+        }
+        @keyframes pulse-highlight {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 170, 0, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 170, 0, 0.7); }
+        }
+        .demo-btn:hover {
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .demo-control-btn {
+            padding: 12px 30px;
+            border: 2px solid #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .demo-control-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+        .demo-control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .demo-action-prompt {
+            background: rgba(50, 215, 75, 0.15);
+            border-left: 3px solid #32d74b;
+            padding: 15px;
+            border-radius: 4px;
+            color: #32d74b;
+            margin: 20px 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .demo-explanation {
+            background: rgba(191, 90, 242, 0.15);
+            border-left: 3px solid #bf5af2;
+            padding: 15px;
+            border-radius: 4px;
+            color: #d8a5ff;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 30px;
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+        .back-link:hover {
+            color: #00d4ff;
+            border-color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <a href="zongora-kotta.html" class="back-link">← Vissza a modulra</a>
+        
+        <div class="demo-header">
+            <h1>🎓 KOTTAOLVASÁS - DEMO MÓD</h1>
+            <p>Végigmegyünk az összes lépésen interaktívan!</p>
+        </div>
+
+        <div class="demo-step-display">
+            <div class="demo-step-number" id="stepCounter">Lépés 1 / 8</div>
+            <div class="demo-step-title" id="stepTitle">1️⃣ Kulcsok Választása</div>
+            <div class="demo-step-text" id="stepText">
+                A 'VIOLIN', 'BASSZUS' és 'VEGYES' gombok azt határozzák meg, hogy melyik kezed gyakorlodjon. 
+                Ez fontos, mert a jobb és bal kéz másként olvas kottát!
+            </div>
+            <div class="demo-step-hint" id="stepHint">
+                💡 VIOLIN kulcs = jobb kéz (magasabb hangok). BASSZUS kulcs = bal kéz (mélyebb hangok). VEGYES = mindkettő.
+            </div>
+            <div class="demo-explanation" id="stepExplanation">
+                ℹ️ Miért van ez? A zongorázásnál a jobb kéz általában az 1-es vonallal (középső C) kezdődő hangokat játssza, 
+                a bal kéz pedig az alatta lévőket. Ezért külön gyakorlunk.
+            </div>
+        </div>
+
+        <div class="demo-ui-section" id="demoUI">
+            <h3>Kottaolvasás Vezérlőpanele</h3>
+            <div class="demo-buttons">
+                <button class="demo-btn" id="btnTreble">VIOLIN</button>
+                <button class="demo-btn" id="btnBass">BASSZUS</button>
+                <button class="demo-btn" id="btnMixed">VEGYES</button>
+                <span style="color: #444; margin: 0 10px;">|</span>
+                <button class="demo-btn" id="btnAccidental">ELŐJEGYZÉSEK: ON</button>
+                <button class="demo-btn" id="btnHint">GYORS-SÚGÓ: OFF</button>
+                <span style="color: #444; margin: 0 10px;">|</span>
+                <button class="demo-btn" id="btnHintPopup">SÚGÓ (PUSKA)</button>
+                <button class="demo-btn" id="btnMute">ZONGORA: ON</button>
+            </div>
+            <div id="actionPrompt"></div>
+        </div>
+
+        <div class="demo-controls">
+            <button class="demo-control-btn" id="btnPrev" onclick="prevStep()" disabled>← Vissza</button>
+            <button class="demo-control-btn" id="btnNext" onclick="nextStep()">Tovább →</button>
+            <button class="demo-control-btn" onclick="resetDemo()">🔄 Újra</button>
+            <button class="demo-control-btn" onclick="window.location.href='zongora-kotta.html'">✕ Bezárás</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        
+        const steps = [
+            {
+                number: 1,
+                title: "1️⃣ Kulcsok Választása",
+                text: "A 'VIOLIN', 'BASSZUS' és 'VEGYES' gombok azt határozzák meg, hogy melyik kezed gyakorlodjon. Ez fontos, mert a jobb és bal kéz másként olvas kottát!",
+                hint: "💡 VIOLIN kulcs = jobb kéz (magasabb hangok). BASSZUS kulcs = bal kéz (mélyebb hangok). VEGYES = mindkettő.",
+                explanation: "ℹ️ Miért van ez? A zongorázásnál a jobb kéz általában az 1-es vonallal (középső C) kezdődő hangokat játssza, a bal kéz pedig az alatta lévőket. Ezért külön gyakorlunk.",
+                highlight: ["btnTreble", "btnBass", "btnMixed"],
+                action: null
+            },
+            {
+                number: 2,
+                title: "2️⃣ Beállítások - ELŐJEGYZÉSEK",
+                text: "Az 'ELŐJEGYZÉSEK' gomb azt szabályozza, hogy az gyakorlatban megjelenjenek-e a módosított hangok (♯ és ♭). Ha 'OFF', csak fehér billentyűk. Ha 'ON', fekete billentyűk is.",
+                hint: "💡 Kezdőknek: OFF-ra hagyni. Amikor magabiztosabbá válsz, kapcsold ON-ra a kihívásért.",
+                explanation: "ℹ️ ♯ (diézis) = egy félhanggal magasabb | ♭ (bemol) = egy félhanggal alacsonyabb. A fehér és fekete billentyűk váltakozva helyezkednek el.",
+                highlight: ["btnAccidental"],
+                action: null
+            },
+            {
+                number: 3,
+                title: "3️⃣ GYORS-SÚGÓ Beállítása",
+                text: "A \'GYORS-SÚGÓ\' gomb azt szabályozza, hogy az első HIBÁS leütés után azonnal megjelenjen-e a hang neve segítségként. Ez segítség, ha elakadsz.",
+                hint: "💡 Kezdőknek: OFF-ra kezd, így tanulsz meg magadtól felismerni. Később: ON-ra kapcsold ha hibázol és azonnal szeretnéd megtudni a választ.",
+                explanation: "ℹ️ A gyors súgó bekapcsolva: az első hibás leütés után azonnal megmutatja a helyes hangot. Ez segít gyorsabban tanulni, de OFF módban többet gondolkodsz és mélyebben tanulsz.",
+                highlight: ["btnHint"],
+                action: null
+            },
+            {
+                number: 4,
+                title: "4️⃣ MIDI Eszköz Csatlakoztatása",
+                text: "Az 'MIDI ÉLESÍTÉSE & INDÍTÁS' gomb aktiválja a zongorád csatlakoztatását. MIDI = Musical Instrument Digital Interface.",
+                hint: "💡 Kattints erre a gombra, majd válassz ki a felugró ablakban a csatlakoztatott zongorádat.",
+                explanation: "ℹ️ A rendszer csak akkor tudja mérni az ütéseid, ha kapcsolódik a MIDI-hez. Az első futtatásnál a böngésződ engedélyt fog kérni - fogadd el!",
+                highlight: [],
+                action: "⏸️ A DEMO itt megáll - valódi zongórád kellene a továbblépséshez!"
+            },
+            {
+                number: 5,
+                title: "5️⃣ A Kotta Vonalrendszere (Pentagram)",
+                text: "Az itt megjelenő 5 vonal az a 'pentagram' vagy 'vonalrendszer', ahol a hangok pozíciója jelenik meg.",
+                hint: "💡 A fehér kör = a hang. Az elhelyezkedése megmutatja, melyik billentyűt kell leütni.",
+                explanation: "ℹ️ A pentagram görögül 5-et jelent. 5 vonal van, közöttük 4 hely. Ez 9 pozíció = 9 különböző hang.",
+                highlight: [],
+                action: "🎯 A gyakorlat során itt jelennének meg a kotta hangjaid!"
+            },
+            {
+                number: 6,
+                title: "6️⃣ Válaszadás - Billentyű Leütése",
+                text: "Amikor megjelenik a hang, te ezt a hangot kell hogy megtaláld a zongorán és leütöd.",
+                hint: "💡 Helyes válasz = zöld szöveg. Hibás = piros szöveg és segítség: 'Ez az X hang'.",
+                explanation: "ℹ️ Az időkorlát fontos. Az elején 5 másodperc van, de ha jól csinálod, felgyorsul az ütem.",
+                highlight: [],
+                action: "🎯 Te ütnél le egy billentyűt a zongórán!"
+            },
+            {
+                number: 7,
+                title: "7️⃣ Statisztika - Pontok és Combo",
+                text: "Az alul látható számok mutatják az eredményedet: 'Helyes / Hibás' és 'Combo'.",
+                hint: "💡 Combo = a lánc. Ha elrontasz egyet, vissza-állítódik 0-ra. De kezd újra építeni!",
+                explanation: "ℹ️ 10 hang = 1 'küldetés'. Ha hibátlanul végigmész, a szint emelkedik és gyorsabb lesz.",
+                highlight: [],
+                action: null
+            },
+            {
+                number: 8,
+                title: "8️⃣ Segítség - A 'Puska' (Cheat Sheet)",
+                text: "A 'SÚGÓ (PUSKA)' gomb egy nagy pentagramot jelez meg a zongora teljes billentyűzetével.",
+                hint: "💡 A puska megmutatja: mely vonal/pozíció = mely billentyű a zongórán.",
+                explanation: "ℹ️ A narancssárga pont = C (középső C). A kék pontok = egyéb speciális pozíciók.",
+                highlight: ["btnHintPopup"],
+                action: null
+            },
+            {
+                number: 9,
+                title: "✅ Kész! Most Gyakorolsz!",
+                text: "Gratulálunk! Most már tudod, hogyan működik a Kottaolvasás tréner. Kattints 'Vissza a modulra' hogy elkezdj gyakorolni!",
+                hint: "💡 Napi 15-20 perc rendszeres gyakorlás jobb, mint hetente 3 óra.",
+                explanation: "ℹ️ A célod: gyorsan és automatikusan felismerni a hangokat. Ez 4-6 hét szisztematikus gyakorlás után lesz látható.",
+                highlight: [],
+                action: "🎯 Kezdj el gyakorolni az igazi modulban!"
+            }
+        ];
+
+        function showStep() {
+            const step = steps[currentStep];
+            document.getElementById("stepCounter").innerText = `Lépés ${step.number} / 9`;
+            document.getElementById("stepTitle").innerText = step.title;
+            document.getElementById("stepText").innerText = step.text;
+            document.getElementById("stepHint").innerHTML = step.hint;
+            document.getElementById("stepExplanation").innerHTML = step.explanation;
+
+            // Highlight gombokat
+            document.querySelectorAll(".demo-btn").forEach(btn => btn.classList.remove("highlighted"));
+            step.highlight.forEach(id => {
+                const btn = document.getElementById(id);
+                if(btn) btn.classList.add("highlighted");
+            });
+
+            // Action prompt
+            const actionPrompt = document.getElementById("actionPrompt");
+            if(step.action) {
+                actionPrompt.innerHTML = `<div class="demo-action-prompt">${step.action}</div>`;
+            } else {
+                actionPrompt.innerHTML = "";
+            }
+
+            // Gomb állapota
+            document.getElementById("btnPrev").disabled = currentStep === 0;
+            document.getElementById("btnNext").innerText = currentStep === 8 ? "✅ Befejezés" : "Tovább →";
+        }
+
+        function nextStep() {
+            if(currentStep < steps.length - 1) {
+                currentStep++;
+                showStep();
+            } else {
+                alert("Demo vége! Kattints 'Vissza a modulra' hogy gyakorolni kezdj!");
+            }
+        }
+
+        function prevStep() {
+            if(currentStep > 0) {
+                currentStep--;
+                showStep();
+            }
+        }
+
+        function resetDemo() {
+            currentStep = 0;
+            showStep();
+        }
+
+        // Indítás
+        showStep();
+    </script>
+</body>
+</html>
