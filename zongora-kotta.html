@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotta</title>
+    <style>
+        :root {
+            --neon-blue: #00d4ff; --neon-orange: #ffaa00; --neon-purple: #bf5af2;
+            --success-green: #32d74b; --error-red: #ff453a; --bg-color: #050510; --panel-bg: rgba(0, 0, 0, 0.9);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; margin: 0; overflow: hidden;
+        }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid #333; }
+        
+        h1 { color: var(--neon-orange); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 5px 0; font-size: 26px; text-shadow: 0 0 15px rgba(255,170,0,0.4); }
+
+        #timer-container { width: 850px; height: 12px; background: #222; border-radius: 6px; margin-bottom: 8px; overflow: hidden; border: 1px solid #444; }
+        #timer-bar { width: 100%; height: 100%; background-color: var(--neon-purple); transition: width 0.1s linear; }
+
+        .master-panel { background: var(--panel-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; width: 850px; box-sizing: border-box;}
+        .button-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; }
+        
+        button.cfg-btn { padding: 6px 12px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
+        button.cfg-btn.active { border-color: var(--neon-blue); color: var(--neon-blue); background: #001a25; }
+        
+        button.clef-treble.active { border-color: var(--neon-purple); color: var(--neon-purple); background: #15001a; }
+        button.clef-bass.active { border-color: var(--neon-blue); color: var(--neon-blue); background: #001a25; }
+        button.clef-mixed.active { border-color: var(--neon-orange); color: var(--neon-orange); background: #1a1000; }
+
+        .toggle-btn { border-color: #444; }
+        .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
+        
+        #btnHintPopup { border-color: var(--neon-blue); color: var(--neon-blue); }
+        #btnHintPopup:hover { background: var(--neon-blue); color: #000; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; width: 850px; box-sizing: border-box; }
+        .stat-box { background: rgba(0,0,0,0.6); padding: 5px; border-radius: 8px; border: 1px solid #222; text-align: center; }
+        .stat-label { font-size: 9px; color: #555; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-value { font-size: 18px; font-weight: bold; font-family: monospace; }
+        .stat-good .stat-value { color: var(--success-green); }
+        .stat-bad .stat-value { color: var(--error-red); }
+        .stat-combo .stat-value { color: var(--neon-orange); transition: transform 0.2s; display: inline-block; }
+        .stat-acc .stat-value { color: var(--neon-purple); }
+
+        #btnAction { padding: 10px 50px; background: var(--success-green); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 14px; box-shadow: 0 4px 15px rgba(50,215,75,0.3); margin-bottom: 5px;}
+        #btnAction.running { background: var(--error-red); color: #fff; box-shadow: 0 4px 15px rgba(255,69,58,0.3); }
+
+        canvas { background: #000; border: 2px solid #222; border-radius: 12px; transition: border-color 0.3s, box-shadow 0.3s; }
+        
+        #status { margin-top: 15px; font-size: 18px; font-weight: bold; height: 24px; text-align: center; letter-spacing: 1px; color: var(--neon-blue); }
+
+        .correct { color: var(--success-green); }
+        .wrong { color: var(--error-red); animation: shake 0.4s; }
+
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
+        .modal-content { background: #111; padding: 20px; border-radius: 16px; border: 1px solid #444; text-align: center; box-shadow: 0 10px 50px rgba(0,0,0,1); max-width: 900px; width: 100%; }
+        #cheatCanvas { background: #000; border-radius: 8px; border: 1px solid #333; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-btn">← AKADÉMIA</a>
+
+    <div style="text-align: center; margin-bottom: 2px;">
+        <h1>KOTTA</h1>
+    </div>
+
+    <div id="timer-container"><div id="timer-bar"></div></div>
+
+    <div class="master-panel">
+        <div class="button-group">
+            <button id="btnTreble" class="cfg-btn clef-treble active" onclick="setClef('treble')">VIOLIN</button>
+            <button id="btnBass" class="cfg-btn clef-bass" onclick="setClef('bass')">BASSZUS</button>
+            <button id="btnMixed" class="cfg-btn clef-mixed" onclick="setClef('mixed')">VEGYES</button>
+            <span style="color:#444;">|</span>
+            <button id="btnAccidental" class="cfg-btn toggle-btn on" onclick="toggleConfig('accidental')">ELŐJEGYZÉSEK: ON</button>
+            <button id="btnHint" class="cfg-btn toggle-btn" onclick="toggleConfig('hint')">GYORS-SÚGÓ: OFF</button>
+            <span style="color:#444;">|</span>
+            <button id="btnHintPopup" class="cfg-btn" onclick="openCheatSheet()">SÚGÓ (PUSKA)</button>
+            <button id="btnMute" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: ON</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box stat-acc"><div class="stat-label">Küldetés</div><div id="taskCount" class="stat-value">0 / 10</div></div>
+        <div class="stat-box stat-bad"><div class="stat-label">Időkorlát</div><div class="stat-value"><span id="seconds">5.0</span>s</div></div>
+        <div class="stat-box stat-good"><div class="stat-label">Helyes / Hibás</div><div class="stat-value"><span id="scoreOk">0</span> <span style="color:#666;">/</span> <span id="scoreBad" style="color:var(--error-red);">0</span></div></div>
+        <div class="stat-box stat-combo"><div class="stat-label">Combo</div><div id="scoreCombo" class="stat-value">0</div></div>
+    </div>
+
+    <button id="btnAction" onclick="handleAction()">▶ MIDI ÉLESÍTÉSE & INDÍTÁS</button>
+    
+    <div style="display:flex; flex-direction:column; align-items:center;">
+        <canvas id="staffCanvas" width="850" height="480"></canvas>
+        <div id="status">Kattints a gombra a kezdéshez!</div>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h1 id="modalTitle" style="color: var(--neon-purple);">Szakasz Lezárva</h1>
+            <h2 id="resPercent" style="font-size: 80px; color: var(--success-green); margin: 10px 0;">0%</h2>
+            <p id="resMsg" style="font-size: 24px; text-align: center; line-height: 1.5;">-</p>
+            <br>
+            <button onclick="startMission()" style="background: var(--success-green); color: #000; padding: 15px 50px; font-size: 20px; border:none; border-radius: 8px; cursor:pointer; font-weight:bold; text-transform:uppercase;">Következő kör</button>
+            <button onclick="document.getElementById('resultModal').style.display='none';" style="background: transparent; color: #888; padding: 15px 50px; font-size: 16px; border: 2px solid #444; border-radius: 8px; cursor:pointer; font-weight:bold; text-transform:uppercase; margin-top: 15px;">Bezárás</button>
+        </div>
+    </div>
+
+    <div id="hintModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color:var(--neon-blue); margin-top:0; margin-bottom: 10px; text-transform: uppercase;">A "Nagy Kotta" Rendszer</h2>
+            <canvas id="cheatCanvas" width="840" height="480"></canvas>
+            <br>
+            <button class="cfg-btn" style="margin-top: 15px; padding: 10px 40px; font-size: 16px; background: #333; color: #fff; border-color: #555;" onclick="closeCheatSheet()">Bezárás</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+        const timerBar = document.getElementById('timer-bar');
+        
+        let scoreOk = 0, scoreBad = 0, combo = 0, currentMistakes = 0, totalTasks = 0;
+        let audioCtx, audioOn = true, isMidiReady = false, isRunning = false;
+        let currentClefMode = 'treble', visualClef = 'treble', currentNote = null;
+        let useAccidentals = true, useQuickHint = false;
+        let isWaitingForCorrection = false;
+
+        let dynamicTimeLimit = 5.0, timeLeft = 5.0, timerTicker = null;
+
+        const trebleY = 120, bassY = 360; 
+
+        const trebleNotes = [
+            { name: 'C4', offset: -6, vars: [{m: 60, s: ''}, {m: 61, s: '♯'}] },
+            { name: 'D4', offset: -5, vars: [{m: 61, s: '♭'}, {m: 62, s: ''}, {m: 63, s: '♯'}] },
+            { name: 'E4', offset: -4, vars: [{m: 63, s: '♭'}, {m: 64, s: ''}] },
+            { name: 'F4', offset: -3, vars: [{m: 65, s: ''}, {m: 66, s: '♯'}] },
+            { name: 'G4', offset: -2, vars: [{m: 66, s: '♭'}, {m: 67, s: ''}, {m: 68, s: '♯'}] },
+            { name: 'A4', offset: -1, vars: [{m: 68, s: '♭'}, {m: 69, s: ''}, {m: 70, s: '♯'}] },
+            { name: 'B4', offset: 0,  vars: [{m: 70, s: '♭'}, {m: 71, s: ''}] },
+            { name: 'C5', offset: 1,  vars: [{m: 72, s: ''}, {m: 73, s: '♯'}] },
+            { name: 'D5', offset: 2,  vars: [{m: 73, s: '♭'}, {m: 74, s: ''}, {m: 75, s: '♯'}] },
+            { name: 'E5', offset: 3,  vars: [{m: 75, s: '♭'}, {m: 76, s: ''}] },
+            { name: 'F5', offset: 4,  vars: [{m: 77, s: ''}, {m: 78, s: '♯'}] },
+            { name: 'G5', offset: 5,  vars: [{m: 78, s: '♭'}, {m: 79, s: ''}, {m: 80, s: '♯'}] },
+            { name: 'A5', offset: 6,  vars: [{m: 80, s: '♭'}, {m: 81, s: ''}] }
+        ];
+
+        const bassNotes = [
+            { name: 'E2', offset: -6, vars: [{m: 39, s: '♭'}, {m: 40, s: ''}] },
+            { name: 'F2', offset: -5, vars: [{m: 41, s: ''}, {m: 42, s: '♯'}] },
+            { name: 'G2', offset: -4, vars: [{m: 42, s: '♭'}, {m: 43, s: ''}, {m: 44, s: '♯'}] },
+            { name: 'A2', offset: -3, vars: [{m: 44, s: '♭'}, {m: 45, s: ''}, {m: 46, s: '♯'}] },
+            { name: 'B2', offset: -2, vars: [{m: 46, s: '♭'}, {m: 47, s: ''}] },
+            { name: 'C3', offset: -1, vars: [{m: 48, s: ''}, {m: 49, s: '♯'}] },
+            { name: 'D3', offset: 0,  vars: [{m: 49, s: '♭'}, {m: 50, s: ''}, {m: 51, s: '♯'}] },
+            { name: 'E3', offset: 1,  vars: [{m: 51, s: '♭'}, {m: 52, s: ''}] },
+            { name: 'F3', offset: 2,  vars: [{m: 53, s: ''}, {m: 54, s: '♯'}] },
+            { name: 'G3', offset: 3,  vars: [{m: 54, s: '♭'}, {m: 55, s: ''}, {m: 56, s: '♯'}] },
+            { name: 'A3', offset: 4,  vars: [{m: 56, s: '♭'}, {m: 57, s: ''}, {m: 58, s: '♯'}] },
+            { name: 'B3', offset: 5,  vars: [{m: 58, s: '♭'}, {m: 59, s: ''}] },
+            { name: 'C4', offset: 6,  vars: [{m: 60, s: ''}, {m: 61, s: '♯'}] }
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (navigator.requestMIDIAccess) { navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure); }
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function toggleAudio() {
+            audioOn = !audioOn;
+            const btn = document.getElementById('btnMute');
+            btn.innerText = `ZONGORA: ${audioOn ? 'ON' : 'OFF'}`;
+            btn.classList.toggle('on', audioOn);
+            if (audioOn) initAudio();
+        }
+
+        function toggleConfig(type) {
+            if (type === 'accidental') {
+                useAccidentals = !useAccidentals;
+                document.getElementById('btnAccidental').innerText = `ELŐJEGYZÉSEK: ${useAccidentals ? 'ON' : 'OFF'}`;
+                document.getElementById('btnAccidental').classList.toggle('on', useAccidentals);
+            } else {
+                useQuickHint = !useQuickHint;
+                document.getElementById('btnHint').innerText = `GYORS-SÚGÓ: ${useQuickHint ? 'ON' : 'OFF'}`;
+                document.getElementById('btnHint').classList.toggle('on', useQuickHint);
+                if (isRunning && currentNote) drawNote(currentNote);
+            }
+            if (isRunning && type === 'accidental') { currentNote = null; generateNewNote(); }
+        }
+
+        function setClef(clef) {
+            currentClefMode = clef;
+            document.getElementById('btnTreble').classList.remove('active');
+            document.getElementById('btnBass').classList.remove('active');
+            document.getElementById('btnMixed').classList.remove('active');
+            if (clef === 'treble') document.getElementById('btnTreble').classList.add('active');
+            if (clef === 'bass') document.getElementById('btnBass').classList.add('active');
+            if (clef === 'mixed') document.getElementById('btnMixed').classList.add('active');
+            if(isRunning) { stopMission(); } else { drawEmptyStaff(); }
+        }
+
+        function playTone(midiNumber, velocity) {
+            if (!audioOn || !audioCtx) return; 
+            const osc = audioCtx.createOscillator(), gainNode = audioCtx.createGain();
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+            osc.frequency.value = 440 * Math.pow(2, (midiNumber - 69) / 12);
+            osc.type = 'triangle';
+            const vol = (velocity / 127) * 0.8;
+            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            const releaseTime = 0.4;
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + releaseTime);
+            osc.start(); osc.stop(audioCtx.currentTime + releaseTime);
+        }
+
+        function drawLedgers(x, offset, baseLineY) { 
+            ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 3; 
+            if (offset <= -6) {
+                for (let p = -6; p >= offset; p -= 2) { 
+                    let py = baseLineY - (p * 12); 
+                    ctx.beginPath(); ctx.moveTo(x - 28, py); ctx.lineTo(x + 28, py); ctx.stroke(); 
+                }
+            }
+            if (offset >= 6) {
+                for (let p = 6; p <= offset; p += 2) { 
+                    let py = baseLineY - (p * 12); 
+                    ctx.beginPath(); ctx.moveTo(x - 28, py); ctx.lineTo(x + 28, py); ctx.stroke(); 
+                }
+            }
+        }
+
+        function drawEmptyStaff() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+            
+            for(let i=-2; i<=2; i++){ 
+                ctx.beginPath(); ctx.moveTo(50, trebleY+i*24); ctx.lineTo(800, trebleY+i*24); ctx.stroke(); 
+                ctx.beginPath(); ctx.moveTo(50, bassY+i*24); ctx.lineTo(800, bassY+i*24); ctx.stroke();
+            }
+            
+            // EZ A RÉSZ VÉDI MEG A KULCSOKAT AZ ELCSÚSZÁSTÓL:
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic';
+            
+            ctx.font='240px serif'; ctx.fillStyle='#bf5af2'; ctx.fillText('\uD834\uDD1E', 95, trebleY+72);
+            ctx.font='130px serif'; ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY+36);
+        }
+
+        function drawNote(noteObj) {
+            drawEmptyStaff();
+            if(!noteObj) return;
+
+            let baseLineY = visualClef === 'treble' ? trebleY : bassY;
+            let noteY = baseLineY - (noteObj.offset * 12);
+            let noteX = canvas.width / 2;
+
+            ctx.fillStyle = isWaitingForCorrection ? '#ff3b30' : '#fff';
+            drawLedgers(noteX, noteObj.offset, baseLineY);
+
+            if (noteObj.symbol !== '') {
+                ctx.font = '40px serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+                ctx.fillText(noteObj.symbol, noteX - 28, noteY);
+            }
+
+            ctx.beginPath(); ctx.ellipse(noteX, noteY, 18, 13, Math.PI / 8, 0, 2 * Math.PI); ctx.fill();
+
+            // SÚGÓ AZONNAL (MÁR 1 HIBA UTÁN IS) VAGY HA LEJÁRT AZ IDŐ
+            if (useQuickHint || currentMistakes >= 1 || isWaitingForCorrection) {
+                ctx.fillStyle = isWaitingForCorrection ? '#ffaa00' : (visualClef === 'treble' ? '#bf5af2' : '#0a84ff'); 
+                ctx.font = 'bold 24px sans-serif'; 
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(noteObj.name, noteX + 40, noteY);
+            }
+        }
+
+        function generateNewNote() {
+            currentMistakes = 0; 
+            if(currentClefMode === 'mixed') visualClef = Math.random() > 0.5 ? 'treble' : 'bass';
+            else visualClef = currentClefMode;
+            
+            let noteList = visualClef === 'treble' ? trebleNotes : bassNotes;
+            let baseNote = noteList[Math.floor(Math.random() * noteList.length)];
+            let variant = useAccidentals 
+                ? baseNote.vars[Math.floor(Math.random() * baseNote.vars.length)]
+                : baseNote.vars.find(v => v.s === '');
+
+            currentNote = { name: baseNote.name + (variant.s ? ' ' + variant.s : ''), offset: baseNote.offset, midi: variant.m, symbol: variant.s };
+            
+            isWaitingForCorrection = false;
+            canvas.style.borderColor = "#222";
+            document.getElementById('status').innerText = "Keresd meg a hangot!";
+            document.getElementById('status').style.color = "var(--neon-orange)";
+            drawNote(currentNote);
+        }
+
+        function startTimer() {
+            clearInterval(timerTicker); 
+            timeLeft = dynamicTimeLimit; 
+            updateTimerUI();
+            timerTicker = setInterval(() => {
+                if (isWaitingForCorrection || !isRunning) return;
+                timeLeft -= 0.1;
+                if (timeLeft <= 0) { timeLeft = 0; stopAndShow(); }
+                updateTimerUI();
+            }, 100);
+        }
+
+        function updateTimerUI() {
+            document.getElementById('seconds').innerText = Math.max(0, timeLeft).toFixed(1);
+            timerBar.style.width = (timeLeft / dynamicTimeLimit) * 100 + "%";
+            timerBar.style.backgroundColor = timeLeft < (dynamicTimeLimit * 0.3) ? "#ff3b30" : "#bf5af2";
+        }
+
+        function stopAndShow() {
+            clearInterval(timerTicker);
+            isWaitingForCorrection = true;
+            canvas.style.borderColor = "#ff3b30";
+            document.getElementById('status').innerText = "LEJÁRT AZ IDŐ! Keresd meg a billentyűt!";
+            document.getElementById('status').style.color = "#ff3b30";
+            drawNote(currentNote); 
+        }
+
+        function nextTask() {
+            if (totalTasks >= 10) { stopMission(); showResult(); return; }
+            totalTasks++;
+            document.getElementById('taskCount').innerText = `${totalTasks} / 10`;
+            generateNewNote();
+            startTimer();
+        }
+
+        function updateStats(isCorrect) {
+            if (isCorrect) {
+                scoreOk++; combo++; 
+                document.getElementById('scoreCombo').style.transform = "scale(1.6)"; 
+                setTimeout(() => document.getElementById('scoreCombo').style.transform = "scale(1)", 200);
+            } else {
+                scoreBad++; combo = 0; 
+            }
+            
+            document.getElementById('scoreOk').innerText = scoreOk; 
+            document.getElementById('scoreBad').innerText = scoreBad; 
+            document.getElementById('scoreCombo').innerText = combo;
+        }
+
+        function showResult() {
+            const percent = Math.round((scoreOk / 10) * 100);
+            document.getElementById('resPercent').innerText = percent + "%";
+            document.getElementById('resPercent').style.color = percent === 100 ? "var(--success-green)" : "var(--neon-orange)";
+            
+            if (percent === 100) {
+                dynamicTimeLimit = Math.max(1.0, dynamicTimeLimit - 1.0);
+                document.getElementById('modalTitle').innerText = "SZINTLÉPÉS! ⚡";
+                document.getElementById('resMsg').innerText = `Hibátlan játék! A következő körben már csak ${dynamicTimeLimit} másodperced lesz hangonként!`;
+            } else {
+                document.getElementById('modalTitle').innerText = "Szakasz Lezárva";
+                document.getElementById('modalTitle').style.color = "var(--neon-blue)";
+                document.getElementById('resMsg').innerText = (percent >= 80) ? "Szép munka! Gyakorolj tovább, hogy gyorsulhass!" : "Gyakorolj még ezen a szinten, neked menni fog!";
+            }
+            document.getElementById('resultModal').style.display = "flex";
+        }
+
+        function onMIDIMessage(event) {
+            if (!isRunning) return;
+            let data = event.data; let type = data[0] & 0xf0; let note = data[1]; let velocity = data[2];    
+            
+            if (type === 144 && velocity > 0 && currentNote) {
+                playTone(note, velocity);
+                
+                if (note === currentNote.midi) {
+                    if (!isWaitingForCorrection) updateStats(true); 
+                    
+                    isWaitingForCorrection = false;
+                    clearInterval(timerTicker);
+                    
+                    document.getElementById('status').innerHTML = `<span class="correct">Helyes! (${currentNote.name})</span>`;
+                    canvas.style.borderColor = "var(--success-green)";
+                    canvas.style.boxShadow = "0 10px 40px rgba(50,215,75,0.4)";
+                    setTimeout(() => { canvas.style.boxShadow = "none"; }, 300);
+
+                    setTimeout(() => { if(isRunning) nextTask(); }, 500); 
+                } else {
+                    if (!isWaitingForCorrection) {
+                        currentMistakes++; 
+                        updateStats(false); 
+                        canvas.style.borderColor = "var(--error-red)";
+                        canvas.style.boxShadow = "0 10px 40px rgba(255,59,48,0.4)";
+                        setTimeout(() => { if(!isWaitingForCorrection && isRunning) canvas.style.borderColor = "#222"; canvas.style.boxShadow = "none"; }, 300);
+                        
+                        // SÚGÓ AZONNAL (1. HIBA UTÁN)
+                        drawNote(currentNote); 
+                        document.getElementById('status').innerHTML = `<span class="wrong">Mellé! Segítség: ez a(z) ${currentNote.name}</span>`;
+                    }
+                }
+            }
+        }
+
+        function onMIDISuccess(midiAccess) {
+            for (var input of midiAccess.inputs.values()) { input.onmidimessage = onMIDIMessage; }
+            isMidiReady = true;
+            document.getElementById('btnAction').innerText = "▶ GYAKORLAT INDÍTÁSA";
+            document.getElementById('status').innerText = "MIDI kész! Indítsd a gyakorlatot!";
+            document.getElementById('status').style.color = "var(--success-green)";
+        }
+        function onMIDIFailure() { 
+            document.getElementById('status').innerText = "Hiba: Nincs MIDI kapcsolat."; 
+            document.getElementById('status').style.color = "var(--error-red)";
+        }
+
+        function handleAction() {
+            const btn = document.getElementById('btnAction');
+            if (!isMidiReady) {
+                initAudio();
+                if (navigator.requestMIDIAccess) { navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure); }
+                btn.innerText = "KAPCSOLÓDÁS...";
+                return;
+            }
+
+            if (isRunning) {
+                stopMission();
+            } else {
+                startMission();
+            }
+        }
+
+        function startMission() {
+            scoreOk = 0; scoreBad = 0; combo = 0; totalTasks = 0; currentMistakes = 0;
+            document.getElementById('scoreOk').innerText = "0"; 
+            document.getElementById('scoreBad').innerText = "0"; 
+            document.getElementById('scoreCombo').innerText = "0"; 
+            document.getElementById('resultModal').style.display = "none";
+            
+            isRunning = true;
+            const btn = document.getElementById('btnAction');
+            btn.innerText = "◼ MEGSZAKÍTÁS";
+            btn.classList.add('running');
+            
+            nextTask();
+        }
+
+        function stopMission() {
+            isRunning = false;
+            clearInterval(timerTicker);
+            
+            const btn = document.getElementById('btnAction');
+            btn.innerText = "▶ GYAKORLAT INDÍTÁSA";
+            btn.classList.remove('running');
+            
+            currentNote = null;
+            document.getElementById('status').innerText = "Gyakorlat leállítva.";
+            document.getElementById('status').style.color = "var(--neon-blue)";
+            canvas.style.borderColor = "#222";
+            drawEmptyStaff();
+        }
+
+        // PUSKA (Cheat Sheet)
+        function openCheatSheet() { document.getElementById('hintModal').style.display = 'flex'; drawCheatSheet(); }
+        function closeCheatSheet() { document.getElementById('hintModal').style.display = 'none'; }
+
+        function drawCheatSheet() {
+            const cCtx = document.getElementById('cheatCanvas').getContext('2d');
+            cCtx.clearRect(0, 0, 840, 480);
+            const lineSp = 15; cCtx.strokeStyle = '#333'; cCtx.lineWidth = 2;
+            for(let i=0; i<5; i++) { cCtx.beginPath(); cCtx.moveTo(40, 75 + i*lineSp); cCtx.lineTo(800, 75 + i*lineSp); cCtx.stroke(); }
+            for(let i=0; i<5; i++) { cCtx.beginPath(); cCtx.moveTo(40, 165 + i*lineSp); cCtx.lineTo(800, 165 + i*lineSp); cCtx.stroke(); }
+            cCtx.fillStyle = '#bf5af2'; cCtx.font = '70px serif'; cCtx.textAlign = 'center'; cCtx.textBaseline = 'middle'; cCtx.fillText('𝄞', 70, 105); 
+            cCtx.fillStyle = '#0a84ff'; cCtx.fillText('𝄢', 70, 195);
+            
+            const kY = 320; const kH = 130; const keyW = 30; const startX = 100;
+            const whiteKeys = ['F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5'];
+            const noteYs = [232.5, 225, 217.5, 210, 202.5, 195, 187.5, 180, 172.5, 165, 157.5, 150, 142.5, 135, 127.5, 120, 112.5, 105, 97.5, 90, 82.5, 75, 67.5, 60];
+            
+            cCtx.fillStyle = '#fff'; cCtx.strokeStyle = '#000'; cCtx.lineWidth = 1;
+            for(let i=0; i<whiteKeys.length; i++) { cCtx.fillRect(startX + i*keyW, kY, keyW, kH); cCtx.strokeRect(startX + i*keyW, kY, keyW, kH); }
+            const blackIdxs = [0,1,2, 4,5, 7,8,9, 11,12, 14,15,16, 18,19, 21,22];
+            cCtx.fillStyle = '#000';
+            for(let b of blackIdxs) { cCtx.fillRect(startX + b*keyW + keyW - 10, kY, 20, kH * 0.6); }
+            
+            for(let i=0; i<whiteKeys.length; i++) {
+                let nx = startX + i*keyW + keyW/2; let ny = noteYs[i];
+                let isMiddleC = (whiteKeys[i] === 'C4'); let isOtherC = (whiteKeys[i] === 'C3' || whiteKeys[i] === 'C5');
+                cCtx.strokeStyle = isMiddleC ? 'rgba(255, 170, 0, 0.8)' : (isOtherC ? 'rgba(10, 132, 255, 0.6)' : 'rgba(255, 255, 255, 0.2)');
+                cCtx.lineWidth = isMiddleC ? 2 : 1; cCtx.beginPath(); cCtx.moveTo(nx, ny); cCtx.lineTo(nx, kY); cCtx.stroke();
+                if (ny === 150 || ny === 60 || ny === 240) { cCtx.strokeStyle = '#fff'; cCtx.lineWidth = 2; cCtx.beginPath(); cCtx.moveTo(nx-15, ny); cCtx.lineTo(nx+15, ny); cCtx.stroke(); }
+                cCtx.fillStyle = isMiddleC ? '#ffaa00' : (isOtherC ? '#0a84ff' : '#fff');
+                cCtx.beginPath(); cCtx.ellipse(nx, ny, 11, 8, Math.PI / 8, 0, 2 * Math.PI); cCtx.fill();
+                cCtx.fillStyle = isMiddleC ? '#ffaa00' : '#000'; cCtx.font = 'bold 12px sans-serif'; cCtx.textAlign = 'center';
+                cCtx.fillText(whiteKeys[i].charAt(0), nx, kY + 115);
+            }
+        }
+
+        drawEmptyStaff();
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanon Maraton 14.2 - Unified UI</title>
+    <style>
+        :root {
+            --neon-blue: #00d4ff; --neon-orange: #ffaa00; --neon-purple: #bf5af2;
+            --success-green: #32d74b; --error-red: #ff453a; --bg-color: #050510; --panel-bg: rgba(0, 0, 0, 0.9);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; margin: 0; overflow: hidden;
+        }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid #333; }
+        h1 { color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; text-shadow: 0 0 15px rgba(0,212,255,0.4); }
+        .master-panel { background: var(--panel-bg); padding: 15px 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        .button-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        button.cfg-btn { padding: 8px 16px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
+        button.cfg-btn.active { border-color: var(--neon-blue); color: var(--neon-blue); background: #001a25; }
+        button.hand-lh.active { border-color: var(--neon-orange); color: var(--neon-orange); background: #1a1000; }
+        button.hand-both.active { border-color: var(--neon-purple); color: var(--neon-purple); background: #15001a; }
+        .toggle-btn { border-color: #444; min-width: 130px; }
+        .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; min-width: 500px; }
+        .stat-box { background: rgba(0,0,0,0.6); padding: 8px; border-radius: 10px; border: 1px solid #222; text-align: center; }
+        .stat-label { font-size: 9px; color: #555; text-transform: uppercase; margin-bottom: 2px; }
+        .stat-value { font-size: 20px; font-weight: bold; font-family: monospace; }
+        canvas { background: #000; border: 2px solid #222; border-radius: 12px; }
+        #btnStart { padding: 12px 60px; background: var(--success-green); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 15px; box-shadow: 0 4px 15px rgba(50,215,75,0.3); margin-top: 5px; }
+        #btnStart.running { background: var(--error-red); color: #fff; box-shadow: 0 4px 15px rgba(255,69,58,0.3); }
+        #resultModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← AKADÉMIA</a>
+    <h1>Hanon Maraton 14.2</h1>
+    
+    <div class="master-panel">
+        <div class="button-group" id="modeButtons">
+            <button id="modeSPRINT" class="cfg-btn active" onclick="setMode('SPRINT')">SPRINT (1X)</button>
+            <button id="modeMARATHON" class="cfg-btn" onclick="setMode('MARATHON')">MARATON (3X)</button>
+            <button id="modeTRAINING" class="cfg-btn" onclick="setMode('TRAINING')">TRÉNING (∞)</button>
+        </div>
+        <div class="button-group" id="handButtons">
+            <button id="handRH" class="cfg-btn" onclick="setHand('RH')">JOBB KÉZ</button>
+            <button id="handLH" class="cfg-btn" onclick="setHand('LH')">BAL KÉZ</button>
+            <button id="handBOTH" class="cfg-btn active" onclick="setHand('BOTH')">KÉT KÉZ</button>
+            <button id="oct1" class="cfg-btn" onclick="setOctave(1)">1 OKTÁV</button>
+            <button id="oct2" class="cfg-btn" onclick="setOctave(2)">2 OKTÁV</button>
+        </div>
+        <div class="button-group">
+            <button id="audioToggle" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: ON</button>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">Stabilitás</div><div id="uniformity" class="stat-value" style="color:var(--success-green);">100%</div></div>
+        <div class="stat-box"><div class="stat-label">BPM</div><div id="bpm" class="stat-value">0</div></div>
+        <div class="stat-box"><div class="stat-label">Haladás</div><div id="progress" class="stat-value" style="color:var(--neon-blue);">1 | 0 / 14</div></div>
+    </div>
+    
+    <button id="btnStart" onclick="handleMainButton()">▶ MIDI ÉLESÍTÉSE & INDÍTÁS</button>
+    <canvas id="staffCanvas" width="850" height="520" style="margin-top: 15px;"></canvas>
+    <div id="status" style="margin-top:8px; font-size:16px; color:var(--neon-blue); font-weight:bold;">Kattints a gombra a kezdéshez!</div>
+
+    <div id="resultModal">
+        <h1 style="color: var(--neon-blue);">ANALÍZIS</h1>
+        <div id="resSummary" style="font-size: 18px; margin: 25px; line-height: 2;"></div>
+        <button onclick="closeModal()" style="background: var(--success-green); color:#000; padding: 15px 50px; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; text-transform:uppercase;">BEFEJEZÉS</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+        let audioCtx, audioOn = true, isMidiReady = false;
+        
+        const whiteKeys = [36,38,40,41,43,45,47, 48,50,52,53,55,57,59, 60,62,64,65,67,69,71, 72,74,76,77,79,81,83, 84,86,88,89,91,93,95,96];
+        const ascPattern = [0, 2, 3, 4, 5, 4, 3, 2], descPattern = [5, 3, 2, 1, 0, 1, 2, 3];
+        
+        let selectedMode = 'SPRINT', selectedHand = 'BOTH', selectedOctaves = 1;
+        let rootIndex = 14, currentIndex = 0, blocksDone = 0, currentLoop = 1, isAscending = true, isRunning = false;
+        let lastNoteTime = 0, timeDiffs = [], mistakes = 0, allBpms = [], rhHit = false, lhHit = false;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function handleMainButton() { 
+            const btn = document.getElementById('btnStart');
+            if (!isMidiReady) {
+                initAudio();
+                if (navigator.requestMIDIAccess) {
+                    navigator.requestMIDIAccess().then(access => {
+                        for (let input of access.inputs.values()) input.onmidimessage = onMIDIMessage;
+                        isMidiReady = true;
+                        btn.innerText = "▶ GYAKORLAT INDÍTÁSA";
+                        document.getElementById('status').innerText = "MIDI kész! Indítsd a gyakorlatot!";
+                        document.getElementById('status').style.color = "var(--success-green)";
+                    });
+                }
+                return;
+            }
+            isRunning ? stopPractice() : startPractice(); 
+        }
+        
+        function startPractice() { 
+            initAudio();
+            isRunning = true; currentIndex = 0; mistakes = 0; timeDiffs = []; allBpms = []; lastNoteTime = 0; currentLoop = 1; blocksDone = 0; isAscending = true;
+            rootIndex = (selectedOctaves === 1) ? 14 : 7; 
+            const btn = document.getElementById('btnStart'); btn.innerText = "◼ STOP / RESET"; btn.classList.add('running');
+            document.getElementById('status').innerText = "Gyakorlat folyamatban...";
+            document.getElementById('status').style.color = "var(--neon-orange)";
+            updateProgressLabel(); draw(); 
+        }
+        
+        function stopPractice() { 
+            isRunning = false; 
+            const btn = document.getElementById('btnStart'); btn.innerText = "▶ GYAKORLAT INDÍTÁSA"; btn.classList.remove('running'); 
+            document.getElementById('status').innerText = "Gyakorlat leállítva.";
+            document.getElementById('status').style.color = "var(--neon-blue)";
+            draw(); 
+        }
+        
+        function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
+        function toggleAudio() { audioOn = !audioOn; const btn = document.getElementById('audioToggle'); btn.innerText = `ZONGORA: ${audioOn ? 'ON' : 'OFF'}`; btn.classList.toggle('on', audioOn); if (audioOn) initAudio(); }
+        function setMode(m) { selectedMode = m; document.querySelectorAll('#modeButtons .cfg-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode' + m).classList.add('active'); updateProgressLabel(); }
+        function setHand(mode) { selectedHand = mode; document.querySelectorAll('#handButtons .cfg-btn').forEach(b => { if(b.innerText.includes('KÉZ')) b.classList.remove('active'); }); document.getElementById('hand' + mode).classList.add('active'); draw(); }
+        
+        function setOctave(num) { 
+            selectedOctaves = num; 
+            document.getElementById('oct1').classList.toggle('active', num === 1); 
+            document.getElementById('oct2').classList.toggle('active', num === 2); 
+            rootIndex = (num === 1) ? 14 : 7; 
+            updateProgressLabel(); draw(); 
+        }
+        
+        function updateProgressLabel() { document.getElementById('progress').innerText = `${selectedMode === 'TRAINING' ? '∞' : currentLoop} | ${blocksDone} / ${selectedOctaves * 14}`; }
+        function playSound(midi) { if (!audioCtx || !audioOn) return; const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.08, now + 0.02); gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.9); }
+        
+        function drawLedgers(x, offset, baseLineY) { 
+            ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 2; 
+            if (offset <= -6) {
+                for (let p = -6; p >= offset; p -= 2) { 
+                    let py = baseLineY - (p * 12); 
+                    ctx.beginPath(); ctx.moveTo(x - 22, py); ctx.lineTo(x + 22, py); ctx.stroke(); 
+                }
+            }
+            if (offset >= 6) {
+                for (let p = 6; p <= offset; p += 2) { 
+                    let py = baseLineY - (p * 12); 
+                    ctx.beginPath(); ctx.moveTo(x - 22, py); ctx.lineTo(x + 22, py); ctx.stroke(); 
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1.0; 
+            const trebleY = 140, bassY = 400; 
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+            
+            if (selectedHand !== 'LH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, trebleY+i*24); ctx.lineTo(800, trebleY+i*24); ctx.stroke(); } ctx.font='240px serif'; ctx.fillStyle='#bf5af2'; ctx.fillText('\uD834\uDD1E', 95, trebleY+72); }
+            if (selectedHand !== 'RH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, bassY+i*24); ctx.lineTo(800, bassY+i*24); ctx.stroke(); } ctx.font='130px serif'; ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY+36); }
+            
+            const currentPattern = isAscending ? ascPattern : descPattern;
+            currentPattern.forEach((step, i) => {
+                let indexRH = rootIndex + step;
+                let indexLH = rootIndex - 7 + step;
+                let offRH = indexRH - 20; 
+                let offLH = indexLH - 8;  
+                
+                ctx.globalAlpha = (isRunning && i < currentIndex) ? 0.2 : (isRunning && i === currentIndex ? 1.0 : 0.08);
+                if(!isRunning && i === 0) ctx.globalAlpha = 1.0;
+                let x = 220 + (i * 72);
+                
+                if (selectedHand !== 'LH') { ctx.fillStyle = (isRunning && i === currentIndex) ? "#00d4ff" : "#fff"; let yRH = trebleY - offRH * 12; drawLedgers(x, offRH, trebleY); ctx.beginPath(); ctx.ellipse(x, yRH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); }
+                if (selectedHand !== 'RH') { ctx.fillStyle = (isRunning && i === currentIndex) ? "#ffaa00" : "#fff"; let yLH = bassY - offLH * 12; drawLedgers(x, offLH, bassY); ctx.beginPath(); ctx.ellipse(x, yLH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); }
+            });
+        }
+
+        function onMIDIMessage(e) {
+            if (!isRunning) return;
+            let [s, n, v] = e.data;
+            if ((s & 0xf0) === 0x90 && v > 0) {
+                const currentPattern = isAscending ? ascPattern : descPattern;
+                let tRH = whiteKeys[rootIndex + currentPattern[currentIndex]];
+                let tLH = whiteKeys[rootIndex - 7 + currentPattern[currentIndex]];
+                
+                if (selectedHand === 'RH' && n === tRH) { playSound(n); processHit(); }
+                else if (selectedHand === 'LH' && n === tLH) { playSound(n); processHit(); }
+                else if (selectedHand === 'BOTH') { 
+                    if (n === tRH && !rhHit) { rhHit = true; playSound(n); } 
+                    if (n === tLH && !lhHit) { lhHit = true; playSound(n); } 
+                    if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(); } 
+                }
+                else if (n !== tRH && n !== tLH) mistakes++;
+            }
+        }
+
+        function processHit() {
+            const now = performance.now();
+            if (lastNoteTime !== 0) {
+                let diff = now - lastNoteTime; timeDiffs.push(diff); allBpms.push(60000/diff);
+                let avg = timeDiffs.reduce((a,b)=>a+b)/timeDiffs.length, dev = Math.sqrt(timeDiffs.reduce((a,b)=>a+Math.pow(b-avg,2),0)/timeDiffs.length);
+                document.getElementById('uniformity').innerText = Math.round(Math.max(0, 100-(dev/3))) + "%";
+                document.getElementById('bpm').innerText = Math.round(60000/diff);
+            }
+            lastNoteTime = now; currentIndex++;
+            let totalPerLoop = selectedOctaves * 14;
+            
+            if (!isAscending && blocksDone === totalPerLoop - 1 && currentIndex === 4) {
+                if (selectedMode === 'SPRINT') { finish(); return; }
+                else if (selectedMode === 'MARATHON' && currentLoop >= 3) { finish(); return; }
+                else { currentLoop++; blocksDone = 0; isAscending = true; rootIndex = (selectedOctaves === 1 ? 14 : 7); currentIndex = 0; updateProgressLabel(); draw(); return; }
+            }
+            if (currentIndex >= 8) { 
+                currentIndex = 0; blocksDone++; 
+                if (isAscending) { rootIndex++; let limit = (selectedOctaves === 1 ? 21 : 21); if (rootIndex > limit) { isAscending = false; rootIndex = limit; } } 
+                else { rootIndex--; } 
+                updateProgressLabel(); 
+            }
+            draw();
+        }
+
+        function finish() { isRunning = false; const avgBpm = Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length); document.getElementById('resSummary').innerHTML = `BPM: ${avgBpm}<br>Stabilitás: ${document.getElementById('uniformity').innerText}`; document.getElementById('resultModal').style.display = "flex"; }
+        
+        setOctave(1);
+    </script>
+</body>
+</html>
