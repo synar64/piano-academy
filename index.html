@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zongora Akadémia | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #050508;
@@ -32,11 +33,11 @@
             text-transform: uppercase; color: #fff; text-align: center;
         }
 
-        .main-wrapper { width: 100%; max-width: 1400px; z-index: 1; }
+        .main-wrapper { width: 100%; max-width: 1400px; z-index: 1; display: flex; flex-direction: column; align-items: center; }
 
         .dashboard-grid {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; width: 100%;
-            margin-bottom: 60px;
+            margin-bottom: 20px;
         }
 
         .module-card {
@@ -47,9 +48,7 @@
             display: flex; flex-direction: column; align-items: center; 
             justify-content: flex-start; 
             cursor: pointer; border-top: 6px solid var(--card-color);
-            aspect-ratio: 4 / 5;
-            text-align: center;
-            box-sizing: border-box;
+            aspect-ratio: 4 / 5; text-align: center; box-sizing: border-box;
         }
 
         .module-card:hover {
@@ -58,27 +57,108 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
-        .info-display-area {
-            margin-top: 20px; padding: 40px; background: rgba(255,255,255,0.03);
-            border-radius: 24px; border: 1px solid var(--border-color); width: 100%;
-            box-sizing: border-box; text-align: left; min-height: 320px;
-            backdrop-filter: blur(10px);
-        }
-
         .card-kotta { --card-color: var(--accent-gold); }
         .card-akkord { --card-color: var(--accent-purple); }
         .card-hanon { --card-color: var(--accent-blue); }
-        .card-skala { --card-color: var(--accent-green); } /* Ritmus helyett Skála */
+        .card-skala { --card-color: var(--accent-green); }
         .card-hallas { --card-color: var(--accent-rose); }
 
         .card-icon { font-size: 50px; height: 60px; margin-bottom: 20px; display: flex; align-items: center; }
         .card-title { font-size: 22px; font-weight: 900; height: 55px; margin: 0 0 10px 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; width: 100%; }
         .card-desc { color: var(--text-muted); font-size: 13px; line-height: 1.5; text-align: center; margin: 0; }
 
+        /* KŐBE VÉSETT INFO DISPLAY AREA */
+        .info-display-area {
+            margin-top: 20px; padding: 40px; background: rgba(255,255,255,0.03);
+            border-radius: 24px; border: 1px solid var(--border-color); width: 100%;
+            box-sizing: border-box; text-align: left; 
+            height: 390px; /* SZIGORÚAN FIX MAGASSÁG - Nincs több ugrálás! */
+            overflow: hidden; /* Megakadályozza, hogy bármi kitolja a doboz szélét */
+            backdrop-filter: blur(10px); display: block; margin-bottom: 40px;
+        }
+
         .info-display-area h2 { color: #fff; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0; }
         .info-display-area p { line-height: 1.8; color: #ccc; font-size: 16px; margin-bottom: 15px; }
-        .info-display-area ul { line-height: 2; color: #bbb; font-size: 15px; }
+        .info-display-area ul { line-height: 2; color: #bbb; font-size: 15px; margin-top: 0; }
         .info-display-area .highlight { color: #fff; font-weight: bold; }
+
+        /* ÁTLÁTSZÓ DIÁK SZEKCIÓJA */
+        .slides-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .presentation-slide {
+            width: 100%;
+            max-width: 1000px;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* VIDEÓ GOMB AZ OLDAL ALJÁN */
+        .video-btn-container {
+            display: flex; justify-content: center; width: 100%; margin-bottom: 80px;
+        }
+        
+        .video-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 60px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s ease;
+        }
+        
+        .video-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 40px rgba(10, 132, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .clapper-icon { font-size: 80px; line-height: 1; }
+        
+        .video-btn-text {
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 26px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: bold;
+        }
+
+        /* VIDEÓ MODAL (Felugró ablak) */
+        .video-modal {
+            display: none; position: fixed; z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            justify-content: center; align-items: center;
+        }
+
+        .video-modal-content {
+            position: relative; width: 90%; max-width: 1200px;
+            aspect-ratio: 16 / 9; background: #000;
+            border-radius: 24px; border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        .video-modal-content video { width: 100%; height: 100%; border-radius: 24px; object-fit: cover; }
+
+        .close-video {
+            position: absolute; top: -50px; right: 0; color: #888;
+            font-size: 40px; cursor: pointer; transition: 0.3s;
+        }
+        .close-video:hover { color: #fff; }
     </style>
 </head>
 <body>
@@ -129,9 +209,52 @@
                 </ul>
             </div>
         </div>
+
+        <div class="slides-wrapper">
+            <img src="Dia1.png" class="presentation-slide" alt="Bemutató Dia 1">
+            <img src="Dia2.png" class="presentation-slide" alt="Bemutató Dia 2">
+            <img src="Dia3.png" class="presentation-slide" alt="Bemutató Dia 3">
+            <img src="Dia4.png" class="presentation-slide" alt="Bemutató Dia 4">
+            <img src="Dia5.png" class="presentation-slide" alt="Bemutató Dia 5">
+            <img src="Dia6.png" class="presentation-slide" alt="Bemutató Dia 6">
+            <img src="Dia7.png" class="presentation-slide" alt="Bemutató Dia 7">
+            <img src="Dia8.png" class="presentation-slide" alt="Bemutató Dia 8">
+        </div>
+
+        <div class="video-btn-container">
+            <button class="video-btn" onclick="openVideo()">
+                <span class="clapper-icon">🎬</span>
+                <span class="video-btn-text">Bemutató videó</span>
+            </button>
+        </div>
+
+    </div>
+
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <span class="close-video" onclick="closeVideo()">&times;</span>
+            <video id="promoVideo" controls preload="metadata" poster="video-kezdőkép.jpg">
+                <source src="Zongora_Akadémia.mp4" type="video/mp4">
+                A böngésződ nem támogatja a videót.
+            </video>
+        </div>
     </div>
 
     <script>
+        // VIDEÓ KEZELŐ FUNKCIÓK
+        const videoModal = document.getElementById('videoModal');
+        const promoVideo = document.getElementById('promoVideo');
+
+        function openVideo() {
+            videoModal.style.display = "flex";
+        }
+
+        function closeVideo() {
+            videoModal.style.display = "none";
+            promoVideo.pause(); // Megállítja a videót a bezáráskor
+        }
+
+        // MIDI INICIALIZÁLÁS
         window.onload = function() {
             if (navigator.requestMIDIAccess) {
                 navigator.requestMIDIAccess().then(
