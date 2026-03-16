@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg-dark: #050508;
-            --panel-bg: rgba(20, 20, 30, 0.5);
+            --panel-bg: rgba(20, 20, 30, 0.8);
             --border-color: rgba(255, 255, 255, 0.1);
             --accent-gold: #d4af37;
             --accent-purple: #bf5af2;
@@ -20,170 +20,65 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; 
-            padding: 20px 40px; 
-            min-height: 100vh;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
+            margin: 0; padding: 20px 40px; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
             background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.5) 0%, rgba(5, 5, 8, 1) 100%), url('zongora-hatter-dark.jpg');
-            background-size: cover; 
-            background-position: center; 
-            background-attachment: fixed;
-            background-color: var(--bg-dark); 
-            color: var(--text-main);
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: var(--bg-dark); color: var(--text-main);
         }
 
         .brand h1 { 
-            margin: 40px 0; 
-            font-size: 42px; 
-            letter-spacing: 8px; 
-            text-transform: uppercase; 
-            color: #fff; 
-            text-align: center;
+            margin: 40px 0; font-size: 42px; letter-spacing: 8px; 
+            text-transform: uppercase; color: #fff; text-align: center;
         }
 
-        .main-wrapper { 
-            width: 100%; 
-            max-width: 1400px; 
-            z-index: 1; 
-        }
+        .main-wrapper { width: 100%; max-width: 1400px; z-index: 1; }
 
         .dashboard-grid {
-            display: grid; 
-            grid-template-columns: repeat(5, 1fr); 
-            gap: 20px; 
-            width: 100%;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; width: 100%;
             margin-bottom: 60px;
         }
 
         .module-card {
-            background: var(--panel-bg); 
-            border: 1px solid var(--border-color);
-            border-radius: 20px; 
-            padding: 45px 20px;
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 20px; padding: 45px 20px;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            backdrop-filter: blur(15px); 
-            position: relative;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            backdrop-filter: blur(15px); position: relative;
+            display: flex; flex-direction: column; align-items: center; 
             justify-content: flex-start; 
-            cursor: pointer; 
-            border-top: 6px solid var(--card-color);
+            cursor: pointer; border-top: 6px solid var(--card-color);
             aspect-ratio: 4 / 5;
             text-align: center;
             box-sizing: border-box;
-            text-decoration: none;
-            color: inherit;
         }
 
         .module-card:hover {
             transform: translateY(-5px);
             border-color: rgba(255,255,255,0.4);
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            background: rgba(20, 20, 30, 0.7);
         }
 
         .info-display-area {
-            margin-top: 20px; 
-            padding: 40px; 
-            background: rgba(255,255,255,0.03);
-            border-radius: 24px; 
-            border: 1px solid var(--border-color); 
-            width: 100%;
-            box-sizing: border-box; 
-            text-align: left; 
-            min-height: 320px;
+            margin-top: 20px; padding: 40px; background: rgba(255,255,255,0.03);
+            border-radius: 24px; border: 1px solid var(--border-color); width: 100%;
+            box-sizing: border-box; text-align: left; min-height: 320px;
             backdrop-filter: blur(10px);
         }
 
         .card-kotta { --card-color: var(--accent-gold); }
         .card-akkord { --card-color: var(--accent-purple); }
         .card-hanon { --card-color: var(--accent-blue); }
-        .card-ritmus { --card-color: var(--accent-green); }
+        .card-skala { --card-color: var(--accent-green); } /* Ritmus helyett Skála */
         .card-hallas { --card-color: var(--accent-rose); }
 
-        .card-icon { 
-            font-size: 50px; 
-            height: 60px; 
-            margin-bottom: 20px; 
-            display: flex; 
-            align-items: center; 
-        }
-        
-        .card-title { 
-            font-size: 22px; 
-            font-weight: 900; 
-            height: 55px; 
-            margin: 0 0 10px 0; 
-            color: #fff; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            width: 100%; 
-        }
-        
-        .card-desc { 
-            color: var(--text-muted); 
-            font-size: 13px; 
-            line-height: 1.5; 
-            text-align: center; 
-            margin: 0; 
-        }
+        .card-icon { font-size: 50px; height: 60px; margin-bottom: 20px; display: flex; align-items: center; }
+        .card-title { font-size: 22px; font-weight: 900; height: 55px; margin: 0 0 10px 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; width: 100%; }
+        .card-desc { color: var(--text-muted); font-size: 13px; line-height: 1.5; text-align: center; margin: 0; }
 
-        .info-display-area h2 { 
-            color: #fff; 
-            text-transform: uppercase; 
-            letter-spacing: 3px; 
-            border-bottom: 1px solid #333; 
-            padding-bottom: 15px; 
-            margin-top: 0; 
-        }
-        
-        .info-display-area p { 
-            line-height: 1.8; 
-            color: #ccc; 
-            font-size: 16px; 
-            margin-bottom: 15px; 
-        }
-        
-        .info-display-area ul { 
-            line-height: 2; 
-            color: #bbb; 
-            font-size: 15px; 
-        }
-        
-        .info-display-area .highlight { 
-            color: #fff; 
-            font-weight: bold; 
-        }
-
-        @media (max-width: 1024px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            body {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .brand h1 {
-                font-size: 28px;
-            }
-        }
+        .info-display-area h2 { color: #fff; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0; }
+        .info-display-area p { line-height: 1.8; color: #ccc; font-size: 16px; margin-bottom: 15px; }
+        .info-display-area ul { line-height: 2; color: #bbb; font-size: 15px; }
+        .info-display-area .highlight { color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -192,35 +87,35 @@
 
     <div class="main-wrapper">
         <div class="dashboard-grid">
-            <a href="zongora-kotta.html" class="module-card card-kotta" onmouseover="updateInfo('kotta')" onmouseout="updateInfo('general')">
+            <div class="module-card card-kotta" onclick="window.location.href='zongora-kotta.html'" onmouseover="updateInfo('kotta')" onmouseout="updateInfo('general')">
                 <div class="card-icon">📖</div>
                 <h2 class="card-title">Kottaolvasás</h2>
                 <p class="card-desc">Gyorsasági kottaolvasó tréner Violin és Basszus kulcsban, vizuális visszajelzéssel.</p>
-            </a>
+            </div>
 
-            <a href="zongora-akkord.html" class="module-card card-akkord" onmouseover="updateInfo('akkord')" onmouseout="updateInfo('general')">
+            <div class="module-card card-akkord" onclick="window.location.href='zongora-akkord.html'" onmouseover="updateInfo('akkord')" onmouseout="updateInfo('general')">
                 <div class="card-icon">🎹</div>
                 <h2 class="card-title">Akkord Mester</h2>
                 <p class="card-desc">Akkordfelismerés és elméleti tudás tesztelése. Helyes billentyűzet-leütés és dinamika elemzése.</p>
-            </a>
+            </div>
 
-            <a href="zongora-hanon.html" class="module-card card-hanon" onmouseover="updateInfo('hanon')" onmouseout="updateInfo('general')">
+            <div class="module-card card-hanon" onclick="window.location.href='zongora-hanon.html'" onmouseover="updateInfo('hanon')" onmouseout="updateInfo('general')">
                 <div class="card-icon">🏃‍♂️</div>
                 <h2 class="card-title">Hanon No. 1</h2>
                 <p class="card-desc">Ujjgyakorlat a sebesség és függetlenség fejlesztésére. Valós idejű ritmusstabilitás mérés.</p>
-            </a>
+            </div>
 
-            <a href="zongora-ritmus.html" class="module-card card-ritmus" onmouseover="updateInfo('ritmus')" onmouseout="updateInfo('general')">
-                <div class="card-icon">⏱️</div>
-                <h2 class="card-title">Ritmus</h2>
-                <p class="card-desc">Fejleszd az időzítésedet beépített metronómmal. Milliszekundum pontosságú mérés.</p>
-            </a>
+            <div class="module-card card-skala" onclick="window.location.href='zongora-skala.html'" onmouseover="updateInfo('skala')" onmouseout="updateInfo('general')">
+                <div class="card-icon">🎶</div>
+                <h2 class="card-title">Skála</h2>
+                <p class="card-desc">Gyakorold a Dúr és Moll skálákat oda-vissza, egy vagy két oktávon, intelligens előjegyzésekkel.</p>
+            </div>
 
-            <a href="zongora-hallas.html" class="module-card card-hallas" onmouseover="updateInfo('hallas')" onmouseout="updateInfo('general')">
+            <div class="module-card card-hallas" onclick="window.location.href='zongora-hallas.html'" onmouseover="updateInfo('hallas')" onmouseout="updateInfo('general')">
                 <div class="card-icon">🎧</div>
                 <h2 class="card-title">Hallás</h2>
                 <p class="card-desc">Abszolút és relatív hallásfejlesztés. Ismerd fel a lejátszott hangokat vakon.</p>
-            </a>
+            </div>
         </div>
 
         <div id="infoArea" class="info-display-area">
@@ -287,14 +182,14 @@
                            <li><span class="highlight">Analitika:</span> Kiszámítja a pillanatnyi és átlagos BPM-et, valamint a ritmus-egyenletességet mutató Stabilitás %-ot.</li>
                        </ul>`
             },
-            ritmus: {
-                title: "Ritmus Tréner",
-                text: `<p>A modul a "belső órád" kalibrálására szolgál, megszüntetve a kezdőkre jellemző akaratlan tempóváltásokat.</p>
-                       <p><span class="highlight">Működési elv:</span></p>
+            skala: {
+                title: "Skála (Hangsor Tréner)",
+                text: `<p>A legfontosabb Dúr és Moll skálák begyakorlása, ami elengedhetetlen a biztos zongoratudáshoz, a hangnemek megértéséhez és a helyes ujjrendek elsajátításához.</p>
+                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
                        <ul>
-                           <li>A beépített metronóm megadja az alaptempót, neked pedig szinkronban kell maradnod.</li>
-                           <li>A rendszer milliszekundum (ms) pontossággal mutatja a devianciát: mikor sietsz (+) és mikor késel (-).</li>
-                           <li>A cél a 0-hoz közeli értékek és a stabil ritmusérzék elérése.</li>
+                           <li><span class="highlight">Hangnemi gazdagság:</span> 7 Dúr és 7 természetes Moll skála választható ki a legördülő menüből.</li>
+                           <li><span class="highlight">Intelligens előjegyzések:</span> A rendszer automatikusan és dinamikusan teszi ki a szükséges kereszteket (♯) és béket (♭) a kottába.</li>
+                           <li><span class="highlight">Gyakorlási módok:</span> Gyakorolj 1 vagy 2 oktávon, jobb vagy bal kézzel, megszakítás nélküli folyamatos (Maraton) módban.</li>
                        </ul>`
             },
             hallas: {
