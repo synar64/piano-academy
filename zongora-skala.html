@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skála - Pro Zongora Akadémia</title>
+    <title>Skála</title>
     <style>
         :root {
             --neon-blue: #00d4ff; --neon-orange: #ffaa00; --neon-purple: #bf5af2;
@@ -104,6 +104,7 @@
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
         let audioCtx, audioOn = true, isMidiReady = false;
         
+        // --- SKÁLA ADATBÁZIS HANGOKKAL ---
         const scaleData = {
             "C_DUR": { notes: [ {n:'C',s:'',m:0,o:0}, {n:'D',s:'',m:2,o:1}, {n:'E',s:'',m:4,o:2}, {n:'F',s:'',m:5,o:3}, {n:'G',s:'',m:7,o:4}, {n:'A',s:'',m:9,o:5}, {n:'H',s:'',m:11,o:6}, {n:'C',s:'',m:12,o:7} ] },
             "C_MOLL": { notes: [ {n:'C',s:'',m:0,o:0}, {n:'D',s:'',m:2,o:1}, {n:'E',s:'♭',m:3,o:2}, {n:'F',s:'',m:5,o:3}, {n:'G',s:'',m:7,o:4}, {n:'A',s:'♭',m:8,o:5}, {n:'H',s:'♭',m:10,o:6}, {n:'C',s:'',m:12,o:7} ] },
@@ -127,6 +128,36 @@
             "H_MOLL": { notes: [ {n:'H',s:'',m:11,o:6}, {n:'C',s:'♯',m:13,o:7}, {n:'D',s:'',m:14,o:8}, {n:'E',s:'',m:16,o:9}, {n:'F',s:'♯',m:18,o:10}, {n:'G',s:'',m:19,o:11}, {n:'A',s:'',m:21,o:12}, {n:'H',s:'',m:23,o:13} ] }
         };
 
+        // --- DINAMIKUS UJJREND ADATBÁZIS ---
+        const fingerings = {
+            std: { // C, D, E, G, A
+                rh1: [1,2,3,1,2,3,4,5, 4,3,2,1,3,2],
+                rh2: [1,2,3,1,2,3,4,1,2,3,1,2,3,4,5, 4,3,2,1,3,2,1,4,3,2,1,3,2],
+                lh1: [5,4,3,2,1,3,2,1, 2,3,1,2,3,4],
+                lh2: [5,4,3,2,1,3,2,1,4,3,2,1,3,2,1, 2,3,1,2,3,4,1,2,3,1,2,3,4]
+            },
+            f_type: { // F
+                rh1: [1,2,3,4,1,2,3,4, 3,2,1,4,3,2],
+                rh2: [1,2,3,4,1,2,3,1,2,3,4,1,2,3,4, 3,2,1,4,3,2,1,3,2,1,4,3,2],
+                lh1: [5,4,3,2,1,3,2,1, 2,3,1,2,3,4],
+                lh2: [5,4,3,2,1,3,2,1,4,3,2,1,3,2,1, 2,3,1,2,3,4,1,2,3,1,2,3,4]
+            },
+            h_type: { // H
+                rh1: [1,2,3,1,2,3,4,5, 4,3,2,1,3,2],
+                rh2: [1,2,3,1,2,3,4,1,2,3,1,2,3,4,5, 4,3,2,1,3,2,1,4,3,2,1,3,2],
+                lh1: [4,3,2,1,4,3,2,1, 2,3,4,1,2,3],
+                lh2: [4,3,2,1,4,3,2,1,3,2,1,4,3,2,1, 2,3,4,1,2,3,1,2,3,4,1,2,3]
+            }
+        };
+
+        const scaleTypes = {
+            "C_DUR": "std", "C_MOLL": "std", "D_DUR": "std", "D_MOLL": "std",
+            "E_DUR": "std", "E_MOLL": "std", "G_DUR": "std", "G_MOLL": "std",
+            "A_DUR": "std", "A_MOLL": "std",
+            "F_DUR": "f_type", "F_MOLL": "f_type",
+            "H_DUR": "h_type", "H_MOLL": "h_type"
+        };
+
         let selectedMode = 'SPRINT', selectedHand = 'BOTH', selectedOctaves = 1, showHints = false;
         let isRunning = false;
         let seqBlocks = [], currentBlockIndex = 0, currentNoteInBlock = 0;
@@ -139,7 +170,7 @@
             let baseNotes = scaleData[scaleKey].notes;
             
             let loopSeq = [];
-            // Felfelé haladás
+            // Felfelé
             for (let oct = 0; oct < selectedOctaves; oct++) {
                 let limit = (oct === selectedOctaves - 1) ? 8 : 7;
                 for (let i = 0; i < limit; i++) {
@@ -147,9 +178,19 @@
                     loopSeq.push({ n: n.n, s: n.s, m_rel: n.m + (oct * 12), o_rel: n.o + (oct * 7) });
                 }
             }
-            // Lefelé haladás (Ne ismételjük a legfelső, és a legalsó gyökérhangot sem!)
+            // Lefelé
             for (let i = loopSeq.length - 2; i > 0; i--) { 
                 loopSeq.push(loopSeq[i]); 
+            }
+
+            // Ujjrendek hozzárendelése
+            let typeKey = scaleTypes[scaleKey];
+            let f_rh_arr = fingerings[typeKey]['rh' + selectedOctaves];
+            let f_lh_arr = fingerings[typeKey]['lh' + selectedOctaves];
+
+            for (let i = 0; i < loopSeq.length; i++) {
+                loopSeq[i].f_rh = f_rh_arr[i];
+                loopSeq[i].f_lh = f_lh_arr[i];
             }
 
             // Hurok generálása a folyamatos játékhoz
@@ -162,7 +203,7 @@
             // A legeslegvégére beletesszük a lezáró gyökérhangot
             flatSeq.push(loopSeq[0]);
             
-            // 8 hangos vizuális blokkokra bontás
+            // 8 hangos blokkokra bontás
             seqBlocks = [];
             for(let i=0; i<flatSeq.length; i+=8) { 
                 seqBlocks.push(flatSeq.slice(i, i+8)); 
@@ -298,8 +339,15 @@
                     
                     if (showHints) {
                         ctx.globalAlpha = 1.0; 
-                        ctx.fillStyle = '#aaa'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                        ctx.fillText(noteObj.n + noteObj.s, x, trebleY + 110);
+                        ctx.font = 'bold 16px sans-serif'; ctx.textBaseline = 'middle';
+                        
+                        // Betűjel Szürkén
+                        ctx.fillStyle = '#aaa'; ctx.textAlign = 'right';
+                        ctx.fillText(noteObj.n + noteObj.s, x - 4, trebleY + 110);
+                        
+                        // Ujjrend Dinamikusan Neon-Zölddel
+                        ctx.fillStyle = '#32d74b'; ctx.textAlign = 'left';
+                        ctx.fillText(noteObj.f_rh, x + 4, trebleY + 110);
                     }
                 }
                 if (selectedHand !== 'RH') { 
@@ -317,8 +365,15 @@
                     
                     if (showHints) {
                         ctx.globalAlpha = 1.0; 
-                        ctx.fillStyle = '#aaa'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                        ctx.fillText(noteObj.n + noteObj.s, x, bassY + 105);
+                        ctx.font = 'bold 16px sans-serif'; ctx.textBaseline = 'middle';
+                        
+                        // Betűjel Szürkén
+                        ctx.fillStyle = '#aaa'; ctx.textAlign = 'right';
+                        ctx.fillText(noteObj.n + noteObj.s, x - 4, bassY + 105);
+                        
+                        // Ujjrend Dinamikusan Neon-Narancssárgával
+                        ctx.fillStyle = '#ffaa00'; ctx.textAlign = 'left';
+                        ctx.fillText(noteObj.f_lh, x + 4, bassY + 105);
                     }
                 }
             });
