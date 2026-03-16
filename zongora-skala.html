@@ -87,7 +87,7 @@
     <div class="stats-grid">
         <div class="stat-box"><div class="stat-label">Stabilitás</div><div id="uniformity" class="stat-value" style="color:var(--success-green);">100%</div></div>
         <div class="stat-box"><div class="stat-label">BPM</div><div id="bpm" class="stat-value">0</div></div>
-        <div class="stat-box"><div class="stat-label">Haladás</div><div id="progress" class="stat-value" style="color:var(--neon-blue);">1 | 0 / 0</div></div>
+        <div class="stat-box"><div class="stat-label">Blokk</div><div id="progress" class="stat-value" style="color:var(--neon-blue);">0 / 0</div></div>
     </div>
     
     <button id="btnStart" onclick="handleMainButton()">▶ MIDI ÉLESÍTÉSE & INDÍTÁS</button>
@@ -104,8 +104,6 @@
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
         let audioCtx, audioOn = true, isMidiReady = false;
         
-        // --- SKÁLA ADATBÁZIS ---
-        // m: MIDI eltolás a C-hez képest, o: Vonal eltolás a C-hez képest
         const scaleData = {
             "C_DUR": { notes: [ {n:'C',s:'',m:0,o:0}, {n:'D',s:'',m:2,o:1}, {n:'E',s:'',m:4,o:2}, {n:'F',s:'',m:5,o:3}, {n:'G',s:'',m:7,o:4}, {n:'A',s:'',m:9,o:5}, {n:'H',s:'',m:11,o:6}, {n:'C',s:'',m:12,o:7} ] },
             "C_MOLL": { notes: [ {n:'C',s:'',m:0,o:0}, {n:'D',s:'',m:2,o:1}, {n:'E',s:'♭',m:3,o:2}, {n:'F',s:'',m:5,o:3}, {n:'G',s:'',m:7,o:4}, {n:'A',s:'♭',m:8,o:5}, {n:'H',s:'♭',m:10,o:6}, {n:'C',s:'',m:12,o:7} ] },
@@ -131,7 +129,7 @@
 
         let selectedMode = 'SPRINT', selectedHand = 'BOTH', selectedOctaves = 1, showHints = false;
         let isRunning = false;
-        let seqBlocks = [], currentBlockIndex = 0, currentNoteInBlock = 0, blocksDone = 0, currentLoop = 1;
+        let seqBlocks = [], currentBlockIndex = 0, currentNoteInBlock = 0;
         let lastNoteTime = 0, timeDiffs = [], allBpms = [], rhHit = false, lhHit = false;
 
         const trebleY = 140, bassY = 400;
@@ -139,24 +137,38 @@
         function buildSequence() {
             let scaleKey = document.getElementById('scaleSelect').value;
             let baseNotes = scaleData[scaleKey].notes;
-            let seq = [];
             
+            let loopSeq = [];
             // Felfelé haladás
             for (let oct = 0; oct < selectedOctaves; oct++) {
                 let limit = (oct === selectedOctaves - 1) ? 8 : 7;
                 for (let i = 0; i < limit; i++) {
                     let n = baseNotes[i];
-                    seq.push({ n: n.n, s: n.s, m_rel: n.m + (oct * 12), o_rel: n.o + (oct * 7) });
+                    loopSeq.push({ n: n.n, s: n.s, m_rel: n.m + (oct * 12), o_rel: n.o + (oct * 7) });
                 }
             }
-            // Lefelé haladás
-            for (let i = seq.length - 2; i >= 0; i--) { seq.push(seq[i]); }
+            // Lefelé haladás (Ne ismételjük a legfelső, és a legalsó gyökérhangot sem!)
+            for (let i = loopSeq.length - 2; i > 0; i--) { 
+                loopSeq.push(loopSeq[i]); 
+            }
+
+            // Hurok generálása a folyamatos játékhoz
+            let flatSeq = [];
+            let loops = (selectedMode === 'SPRINT') ? 1 : (selectedMode === 'MARATHON' ? 3 : 100);
             
-            // Hanon-szerű 8 hangos blokkokra bontás
+            for(let l=0; l<loops; l++) {
+                flatSeq = flatSeq.concat(loopSeq);
+            }
+            // A legeslegvégére beletesszük a lezáró gyökérhangot
+            flatSeq.push(loopSeq[0]);
+            
+            // 8 hangos vizuális blokkokra bontás
             seqBlocks = [];
-            for(let i=0; i<seq.length; i+=8) { seqBlocks.push(seq.slice(i, i+8)); }
+            for(let i=0; i<flatSeq.length; i+=8) { 
+                seqBlocks.push(flatSeq.slice(i, i+8)); 
+            }
             
-            currentBlockIndex = 0; currentNoteInBlock = 0; blocksDone = 0;
+            currentBlockIndex = 0; currentNoteInBlock = 0;
             updateProgressLabel();
         }
 
@@ -188,8 +200,8 @@
         
         function startPractice() { 
             initAudio();
-            isRunning = true; currentNoteInBlock = 0; currentBlockIndex = 0; blocksDone = 0;
-            timeDiffs = []; allBpms = []; lastNoteTime = 0; currentLoop = 1;
+            isRunning = true; currentNoteInBlock = 0; currentBlockIndex = 0;
+            timeDiffs = []; allBpms = []; lastNoteTime = 0;
             buildSequence();
             const btn = document.getElementById('btnStart'); btn.innerText = "◼ STOP / RESET"; btn.classList.add('running');
             document.getElementById('status').innerText = "Gyakorlat folyamatban...";
@@ -208,22 +220,25 @@
         
         function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
         function toggleAudio() { audioOn = !audioOn; const btn = document.getElementById('audioToggle'); btn.innerText = `ZONGORA: ${audioOn ? 'ON' : 'OFF'}`; btn.classList.toggle('on', audioOn); if (audioOn) initAudio(); }
-        function setMode(m) { selectedMode = m; document.querySelectorAll('#modeButtons .cfg-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode' + m).classList.add('active'); updateProgressLabel(); }
+        function setMode(m) { selectedMode = m; document.querySelectorAll('#modeButtons .cfg-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode' + m).classList.add('active'); changeScale(); }
         function setHand(mode) { selectedHand = mode; document.querySelectorAll('#handButtons .cfg-btn').forEach(b => { if(b.innerText.includes('KÉZ')) b.classList.remove('active'); }); document.getElementById('hand' + mode).classList.add('active'); draw(); }
         function setOctave(num) { selectedOctaves = num; document.getElementById('oct1').classList.toggle('active', num === 1); document.getElementById('oct2').classList.toggle('active', num === 2); changeScale(); }
         
-        function updateProgressLabel() { document.getElementById('progress').innerText = `${selectedMode === 'TRAINING' ? '∞' : currentLoop} | ${blocksDone} / ${seqBlocks.length}`; }
+        function updateProgressLabel() { 
+            let total = selectedMode === 'TRAINING' ? '∞' : seqBlocks.length;
+            let current = seqBlocks.length === 0 ? 0 : Math.min(currentBlockIndex + 1, seqBlocks.length);
+            document.getElementById('progress').innerText = `${current} / ${total}`; 
+        }
         
         function playSound(midi) { 
             if (!audioCtx || !audioOn) return; 
             const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); 
-            osc.type = 'triangle'; 
+            osc.type = 'sine'; 
             osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); 
-            gain.gain.setValueAtTime(0, now); 
-            gain.gain.linearRampToValueAtTime(0.08, now + 0.02); 
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8); 
+            gain.gain.setValueAtTime(0.3, now); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2); 
             osc.connect(gain); gain.connect(audioCtx.destination); 
-            osc.start(now); osc.stop(now + 0.9); 
+            osc.start(now); osc.stop(now + 1.3); 
         }
         
         function drawLedgers(x, offset, baseLineY) { 
@@ -250,7 +265,6 @@
             if (selectedHand !== 'LH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, trebleY+i*24); ctx.lineTo(800, trebleY+i*24); ctx.stroke(); } }
             if (selectedHand !== 'RH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, bassY+i*24); ctx.lineTo(800, bassY+i*24); ctx.stroke(); } }
             
-            // Biztonsági Visszaállítás az elcsúszás ellen
             ctx.textAlign = 'center';
             ctx.textBaseline = 'alphabetic';
             
@@ -264,12 +278,13 @@
                 let offRH = -6 + noteObj.o_rel; 
                 let offLH = -1 + noteObj.o_rel;  
                 
-                ctx.globalAlpha = (isRunning && i < currentNoteInBlock) ? 0.2 : (isRunning && i === currentNoteInBlock ? 1.0 : 0.08);
-                if(!isRunning && i === 0 && currentBlockIndex === 0) ctx.globalAlpha = 1.0;
+                let noteAlpha = (isRunning && i < currentNoteInBlock) ? 0.2 : (isRunning && i === currentNoteInBlock ? 1.0 : 0.4);
+                if(!isRunning) noteAlpha = 0.6;
                 
                 let x = 220 + (i * 72);
                 
                 if (selectedHand !== 'LH') { 
+                    ctx.globalAlpha = noteAlpha;
                     ctx.fillStyle = (isRunning && i === currentNoteInBlock) ? "#00d4ff" : "#fff"; 
                     let yRH = trebleY - offRH * 12; 
                     drawLedgers(x, offRH, trebleY); 
@@ -282,11 +297,13 @@
                     ctx.beginPath(); ctx.ellipse(x, yRH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); 
                     
                     if (showHints) {
-                        ctx.fillStyle = '#888'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                        ctx.fillText(noteObj.n + noteObj.s, x, trebleY + 85);
+                        ctx.globalAlpha = 1.0; 
+                        ctx.fillStyle = '#aaa'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(noteObj.n + noteObj.s, x, trebleY + 110);
                     }
                 }
                 if (selectedHand !== 'RH') { 
+                    ctx.globalAlpha = noteAlpha;
                     ctx.fillStyle = (isRunning && i === currentNoteInBlock) ? "#ffaa00" : "#fff"; 
                     let yLH = bassY - offLH * 12; 
                     drawLedgers(x, offLH, bassY); 
@@ -299,8 +316,9 @@
                     ctx.beginPath(); ctx.ellipse(x, yLH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); 
                     
                     if (showHints) {
-                        ctx.fillStyle = '#888'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                        ctx.fillText(noteObj.n + noteObj.s, x, bassY + 85);
+                        ctx.globalAlpha = 1.0; 
+                        ctx.fillStyle = '#aaa'; ctx.font = 'bold 16px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(noteObj.n + noteObj.s, x, bassY + 105);
                     }
                 }
             });
@@ -311,8 +329,8 @@
             let [s, n, v] = e.data;
             if ((s & 0xf0) === 0x90 && v > 0) {
                 let noteObj = seqBlocks[currentBlockIndex][currentNoteInBlock];
-                let tRH = 60 + noteObj.m_rel; // C4 a bázis (jobb)
-                let tLH = 48 + noteObj.m_rel; // C3 a bázis (bal)
+                let tRH = 60 + noteObj.m_rel; 
+                let tLH = 48 + noteObj.m_rel; 
                 
                 if (selectedHand === 'RH' && n === tRH) { playSound(n); processHit(); }
                 else if (selectedHand === 'LH' && n === tLH) { playSound(n); processHit(); }
@@ -337,23 +355,22 @@
             if (currentNoteInBlock >= seqBlocks[currentBlockIndex].length) {
                 currentNoteInBlock = 0;
                 currentBlockIndex++;
-                blocksDone++;
                 updateProgressLabel();
                 
                 if (currentBlockIndex >= seqBlocks.length) {
-                    if (selectedMode === 'SPRINT') { finish(); return; }
-                    else if (selectedMode === 'MARATHON' && currentLoop >= 3) { finish(); return; }
-                    else { 
-                        currentLoop++; 
-                        currentBlockIndex = 0; blocksDone = 0; 
-                        updateProgressLabel(); draw(); return; 
-                    }
+                    finish(); 
+                    return; 
                 }
             }
             draw();
         }
 
-        function finish() { isRunning = false; const avgBpm = Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length); document.getElementById('resSummary').innerHTML = `BPM: ${avgBpm}<br>Stabilitás: ${document.getElementById('uniformity').innerText}`; document.getElementById('resultModal').style.display = "flex"; }
+        function finish() { 
+            isRunning = false; 
+            const avgBpm = allBpms.length > 0 ? Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length) : 0; 
+            document.getElementById('resSummary').innerHTML = `BPM: ${avgBpm}<br>Stabilitás: ${document.getElementById('uniformity').innerText}`; 
+            document.getElementById('resultModal').style.display = "flex"; 
+        }
         
         window.onload = () => { buildSequence(); draw(); };
     </script>
