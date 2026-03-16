@@ -67,14 +67,12 @@
         .card-title { font-size: 22px; font-weight: 900; height: 55px; margin: 0 0 10px 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; width: 100%; }
         .card-desc { color: var(--text-muted); font-size: 13px; line-height: 1.5; text-align: center; margin: 0; }
 
-        /* KŐBE VÉSETT INFO DISPLAY AREA */
         .info-display-area {
             margin-top: 20px; padding: 40px; background: rgba(255,255,255,0.03);
             border-radius: 24px; border: 1px solid var(--border-color); width: 100%;
             box-sizing: border-box; text-align: left; 
-            height: 390px; /* SZIGORÚAN FIX MAGASSÁG - Nincs több ugrálás! */
-            overflow: hidden; /* Megakadályozza, hogy bármi kitolja a doboz szélét */
-            backdrop-filter: blur(10px); display: block; margin-bottom: 40px;
+            height: 390px; overflow: hidden;
+            backdrop-filter: blur(10px); display: block; margin-bottom: 60px;
         }
 
         .info-display-area h2 { color: #fff; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0; }
@@ -100,70 +98,58 @@
             object-fit: contain;
         }
 
-        /* VIDEÓ GOMB AZ OLDAL ALJÁN */
-        .video-btn-container {
-            display: flex; justify-content: center; width: 100%; margin-bottom: 80px;
-        }
-        
-        .video-btn {
-            background: rgba(255, 255, 255, 0.03);
+        /* VIDEÓ KONTÉNER (Most már legalul!) */
+        .video-wrapper {
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 24px;
+            overflow: hidden;
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 30px 60px;
-            cursor: pointer;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+            margin-bottom: 80px;
+            position: relative;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
-            backdrop-filter: blur(15px);
-            transition: all 0.4s ease;
         }
         
-        .video-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent-blue);
-            box-shadow: 0 10px 40px rgba(10, 132, 255, 0.2);
-            transform: translateY(-5px);
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .clapper-icon { font-size: 80px; line-height: 1; }
-        
-        .video-btn-text {
+        .custom-play-btn {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(10, 132, 255, 0.85);
             color: #fff;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 26px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 45px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(10, 132, 255, 0.6);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            padding-left: 8px;
+            box-sizing: border-box;
         }
 
-        /* VIDEÓ MODAL (Felugró ablak) */
-        .video-modal {
-            display: none; position: fixed; z-index: 2000;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.95);
-            justify-content: center; align-items: center;
+        .custom-play-btn:hover {
+            transform: scale(1.15);
+            background: rgba(255, 45, 85, 0.9);
+            box-shadow: 0 0 40px rgba(255, 45, 85, 0.8);
         }
-
-        .video-modal-content {
-            position: relative; width: 90%; max-width: 1200px;
-            aspect-ratio: 16 / 9; background: #000;
-            border-radius: 24px; border: 1px solid var(--border-color);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-        }
-
-        .video-modal-content video { width: 100%; height: 100%; border-radius: 24px; object-fit: cover; }
-
-        .close-video {
-            position: absolute; top: -50px; right: 0; color: #888;
-            font-size: 40px; cursor: pointer; transition: 0.3s;
-        }
-        .close-video:hover { color: #fff; }
     </style>
 </head>
 <body>
 
-    <div class="brand"><h1>Interaktív Zongora Akadémia</h1></div>
+    <div class="brand"><h1>Zongora Akadémia</h1></div>
 
     <div class="main-wrapper">
         <div class="dashboard-grid">
@@ -221,40 +207,31 @@
             <img src="Dia8.png" class="presentation-slide" alt="Bemutató Dia 8">
         </div>
 
-        <div class="video-btn-container">
-            <button class="video-btn" onclick="openVideo()">
-                <span class="clapper-icon">🎬</span>
-                <span class="video-btn-text">Bemutató videó</span>
-            </button>
-        </div>
-
-    </div>
-
-    <div id="videoModal" class="video-modal">
-        <div class="video-modal-content">
-            <span class="close-video" onclick="closeVideo()">&times;</span>
-            <video id="promoVideo" controls preload="metadata" poster="video-kezdőkép.jpg">
-                <source src="Zongora_Akadémia.mp4" type="video/mp4">
+        <div class="video-wrapper">
+            <video id="promoVideo" preload="metadata">
+                <source src="Zongora_Akadémia.mp4#t=0.001" type="video/mp4">
                 A böngésződ nem támogatja a videót.
             </video>
+            <div class="custom-play-btn" id="playBtn" onclick="startVideo()">▶</div>
         </div>
+
     </div>
 
     <script>
-        // VIDEÓ KEZELŐ FUNKCIÓK
-        const videoModal = document.getElementById('videoModal');
-        const promoVideo = document.getElementById('promoVideo');
-
-        function openVideo() {
-            videoModal.style.display = "flex";
+        // --- VIDEÓ INDÍTÁSA ---
+        function startVideo() {
+            const video = document.getElementById('promoVideo');
+            const playBtn = document.getElementById('playBtn');
+            
+            // Vezérlők bekapcsolása
+            video.setAttribute('controls', 'controls');
+            // Gomb eltüntetése
+            playBtn.style.display = 'none';
+            // Videó lejátszása
+            video.play();
         }
 
-        function closeVideo() {
-            videoModal.style.display = "none";
-            promoVideo.pause(); // Megállítja a videót a bezáráskor
-        }
-
-        // MIDI INICIALIZÁLÁS
+        // --- MIDI ÉS INFO PANEL ---
         window.onload = function() {
             if (navigator.requestMIDIAccess) {
                 navigator.requestMIDIAccess().then(
