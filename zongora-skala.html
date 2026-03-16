@@ -3,45 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skála - Pro Zongora Akadémia</title>
+    <title>Skála - Zongora Akadémia</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-blue: #00d4ff; --neon-orange: #ffaa00; --neon-purple: #bf5af2;
-            --success-green: #32d74b; --error-red: #ff453a; --bg-color: #050510; --panel-bg: rgba(0, 0, 0, 0.9);
+            --neon-blue: #0a84ff; --neon-orange: #ff9f0a; --neon-purple: #bf5af2;
+            --success-green: #32d74b; --error-red: #ff453a; --bg-dark: #050508; 
+            --panel-bg: rgba(20, 20, 30, 0.75); --border-color: rgba(255, 255, 255, 0.15);
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.5) 0%, rgba(5, 5, 8, 1) 100%), url('zongora-hatter-dark.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: var(--bg-dark); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; margin: 0; overflow: hidden;
         }
-        .font-loader { position: absolute; visibility: hidden; font-family: 'Noto Music', 'Rajdhani', serif; top: -100px; }
-        .back-btn { position: fixed; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid #333; z-index: 10; }
-        h1 { color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; text-shadow: 0 0 15px rgba(0,212,255,0.4); }
-        .master-panel { background: var(--panel-bg); padding: 15px 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; position: relative; z-index: 5; }
+        .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Noto Music'; }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 10; transition: 0.3s; }
+        .back-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        h1 { color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 5px 0; font-size: 26px; text-shadow: 0 0 15px rgba(10,132,255,0.4); }
+
+        .master-panel { background: var(--panel-bg); padding: 15px 25px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; position: relative; z-index: 5; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 850px; box-sizing: border-box; }
         .button-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-        button.cfg-btn, select.cfg-btn { padding: 8px 16px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
+        button.cfg-btn, select.cfg-btn { padding: 8px 16px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
         select.cfg-btn { appearance: none; text-align: center; color: #fff; padding-right: 25px; }
-        button.cfg-btn.active { border-color: var(--neon-blue); color: var(--neon-blue); background: #001a25; }
-        button.hand-lh.active { border-color: var(--neon-orange); color: var(--neon-orange); background: #1a1000; }
-        button.hand-both.active { border-color: var(--neon-purple); color: var(--neon-purple); background: #15001a; }
+        button.cfg-btn:hover, select.cfg-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        
+        #modeButtons button.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+        #handRH.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+        #handLH.active { border-color: var(--neon-orange); color: var(--neon-orange); background: rgba(255, 159, 10, 0.15); }
+        #handBOTH.active { border-color: var(--neon-purple); color: var(--neon-purple); background: rgba(191, 90, 242, 0.15); }
+        #oct1.active, #oct2.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+        
         .toggle-btn { border-color: #444; min-width: 110px; }
-        .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px; min-width: 600px; position: relative; z-index: 5; }
-        .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
-        .stat-value { font-size: 32px; font-weight: 700; font-family: 'Rajdhani', sans-serif; line-height: 1; }
-        canvas { background: #000; border: 2px solid #222; border-radius: 12px; position: relative; z-index: 5; }
-        #btnStart { padding: 12px 60px; background: var(--success-green); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 15px; box-shadow: 0 4px 15px rgba(50,215,75,0.3); margin-top: 5px; position: relative; z-index: 5; }
-        #btnStart.running { background: var(--error-red); color: #fff; }
-        #status { margin-top: 12px; font-size: 18px; color: var(--neon-blue); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px; }
-        #resultModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; }
+        .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: rgba(50, 215, 75, 0.15); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px; width: 850px; box-sizing: border-box; position: relative; z-index: 5;}
+        .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .stat-label { font-size: 11px; color: #bbb; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
+        .stat-value { font-size: 32px; font-weight: 700; font-family: 'Rajdhani', sans-serif; line-height: 1; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+
+        #btnStart { padding: 12px 60px; background: var(--success-green); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 15px; box-shadow: 0 4px 15px rgba(50,215,75,0.3); margin-top: 5px; margin-bottom: 5px; position: relative; z-index: 5; }
+        #btnStart.running { background: var(--error-red); color: #fff; box-shadow: 0 4px 15px rgba(255,69,58,0.3); }
+        
+        canvas { background: rgba(10, 10, 15, 0.7); border: 1px solid var(--border-color); border-radius: 12px; position: relative; z-index: 5; backdrop-filter: blur(15px); box-shadow: 0 15px 50px rgba(0,0,0,0.6); box-sizing: border-box; }
+        #status { margin-top: 12px; font-size: 18px; color: var(--neon-blue); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px; text-shadow: 0 0 10px rgba(10,132,255,0.5); }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; }
+        .modal-content { background: rgba(20, 20, 30, 0.85); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.8); max-width: 650px; width: 90%; backdrop-filter: blur(20px); }
     </style>
 </head>
 <body>
-    <div class="font-loader">𝄞𝄢 0123456789 % ♯ ♭</div>
+    <div class="font-loader">𝄞𝄢</div>
     <a href="index.html" class="back-btn">← AKADÉMIA</a>
-    <h1>SKÁLA</h1>
+    
+    <div style="text-align: center; position: relative; z-index: 5;">
+        <h1>SKÁLA</h1>
+    </div>
+
     <div class="master-panel">
         <div class="button-group" id="modeButtons">
             <button id="modeSPRINT" class="cfg-btn active" onclick="setMode('SPRINT')">SPRINT (1X)</button>
@@ -50,8 +69,9 @@
         </div>
         <div class="button-group" id="handButtons">
             <button id="handRH" class="cfg-btn" onclick="setHand('RH')">JOBB KÉZ</button>
-            <button id="handLH" class="cfg-btn" onclick="setHand('LH')">BAL KÉZ</button>
-            <button id="handBOTH" class="cfg-btn active" onclick="setHand('BOTH')">KÉT KÉZ</button>
+            <button id="handLH" class="cfg-btn hand-lh" onclick="setHand('LH')">BAL KÉZ</button>
+            <button id="handBOTH" class="cfg-btn hand-both active" onclick="setHand('BOTH')">KÉT KÉZ</button>
+            <span style="color:#555;">|</span>
             <button id="oct1" class="cfg-btn active" onclick="setOctave(1)">1 OKTÁV</button>
             <button id="oct2" class="cfg-btn" onclick="setOctave(2)">2 OKTÁV</button>
         </div>
@@ -64,9 +84,9 @@
                     <option value="C_MOLL">C Moll</option><option value="D_MOLL">D Moll</option><option value="E_MOLL">E Moll</option><option value="F_MOLL">F Moll</option><option value="G_MOLL">G Moll</option><option value="A_MOLL">A Moll</option><option value="H_MOLL">H (B) Moll</option>
                 </optgroup>
             </select>
-            <button id="btnHintName" class="cfg-btn toggle-btn" onclick="toggleHint('name')">HANGOK: OFF</button>
-            <button id="btnHintFinger" class="cfg-btn toggle-btn" onclick="toggleHint('finger')">UJJREND: OFF</button>
-            <button id="audioToggle" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: ON</button>
+            <button id="btnHintName" class="cfg-btn toggle-btn" onclick="toggleHint('name')">HANGOK: KI</button>
+            <button id="btnHintFinger" class="cfg-btn toggle-btn" onclick="toggleHint('finger')">UJJREND: KI</button>
+            <button id="audioToggle" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: BE</button>
         </div>
     </div>
     <div class="stats-grid">
@@ -74,12 +94,25 @@
         <div class="stat-box"><div class="stat-label">BPM</div><div id="bpm" class="stat-value" style="color:#fff;">0</div></div>
         <div class="stat-box"><div class="stat-label">Blokk</div><div id="progress" class="stat-value" style="color:var(--neon-blue);">0 / 0</div></div>
     </div>
-    <button id="btnStart" onclick="handleMainButton()">▶ MIDI ÉLESÍTÉSE & INDÍTÁS</button>
-    <canvas id="staffCanvas" width="850" height="520"></canvas>
-    <div id="status">READY</div>
+    <button id="btnStart" onclick="handleMainButton()">▶ GYAKORLAT INDÍTÁSA</button>
+    <div style="display:flex; flex-direction:column; align-items:center;">
+        <canvas id="staffCanvas" width="850" height="520"></canvas>
+        <div id="status">BETÖLTÉS...</div>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <h1 style="color: var(--neon-blue); text-transform: uppercase; letter-spacing: 2px;">Gyakorlat Befejezve</h1>
+            <div id="resSummary" style="font-size: 26px; font-family: 'Rajdhani', sans-serif; margin: 15px 0; line-height: 1.4;"></div>
+            <button onclick="document.getElementById('resultModal').style.display='none'; stopPractice();" style="background: var(--success-green); color: #000; padding: 15px 50px; font-size: 20px; border:none; border-radius: 8px; cursor:pointer; font-weight:bold; text-transform:uppercase; margin-top: 15px;">RENDBEN</button>
+        </div>
+    </div>
 
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+        const imgSharp = new Image(), imgBe = new Image();
+        imgSharp.src = 'sharp.png'; imgBe.src = 'be.png';
+
         let audioCtx, audioOn = true, isMidiReady = false;
         const trebleY = 140, bassY = 400;
 
@@ -112,7 +145,32 @@
         let showNames = false, showFinger = false;
         let isRunning = false;
         let seqBlocks = [], currentBlockIndex = 0, currentNoteInBlock = 0;
+        
+        // Elemző változók
         let lastNoteTime = 0, timeDiffs = [], allBpms = [], rhHit = false, lhHit = false;
+        let previousNoteObj = null;
+        let hitDetails = [];
+
+        function setMode(mode) {
+            selectedMode = mode;
+            document.querySelectorAll('#modeButtons .cfg-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`mode${mode}`).classList.add('active');
+            if(isRunning) stopPractice(); buildSequence(); draw();
+        }
+
+        function setHand(hand) {
+            selectedHand = hand;
+            document.querySelectorAll('#handButtons .cfg-btn').forEach(b => { if(b.id.includes('hand')) b.classList.remove('active'); });
+            document.getElementById(`hand${hand}`).classList.add('active');
+            if(isRunning) stopPractice(); draw();
+        }
+
+        function setOctave(oct) {
+            selectedOctaves = oct;
+            document.getElementById('oct1').classList.remove('active'); document.getElementById('oct2').classList.remove('active');
+            document.getElementById(`oct${oct}`).classList.add('active');
+            if(isRunning) stopPractice(); buildSequence(); draw();
+        }
 
         function buildSequence() {
             let scaleKey = document.getElementById('scaleSelect').value;
@@ -144,18 +202,26 @@
             if(type === 'name') {
                 showNames = !showNames;
                 const btn = document.getElementById('btnHintName');
-                btn.innerText = `HANGOK: ${showNames ? 'ON' : 'OFF'}`;
+                btn.innerText = `HANGOK: ${showNames ? 'BE' : 'KI'}`;
                 btn.classList.toggle('on', showNames);
             } else {
                 showFinger = !showFinger;
                 const btn = document.getElementById('btnHintFinger');
-                btn.innerText = `UJJREND: ${showFinger ? 'ON' : 'OFF'}`;
+                btn.innerText = `UJJREND: ${showFinger ? 'BE' : 'KI'}`;
                 btn.classList.toggle('on', showFinger);
             }
             draw(); 
         }
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+
+        function toggleAudio() {
+            audioOn = !audioOn;
+            const btn = document.getElementById('audioToggle');
+            btn.innerText = `ZONGORA: ${audioOn ? 'BE' : 'KI'}`;
+            btn.classList.toggle('on', audioOn);
+            if (audioOn) initAudio();
+        }
 
         function handleMainButton() { 
             const btn = document.getElementById('btnStart');
@@ -165,8 +231,7 @@
                     navigator.requestMIDIAccess().then(access => {
                         for (let input of access.inputs.values()) input.onmidimessage = onMIDIMessage;
                         isMidiReady = true;
-                        btn.innerText = "▶ GYAKORLAT INDÍTÁSA";
-                        document.getElementById('status').innerText = "CONNECTED";
+                        startPractice();
                     });
                 }
                 return;
@@ -175,29 +240,41 @@
         }
         
         function startPractice() { 
-            initAudio(); isRunning = true; currentNoteInBlock = 0; currentBlockIndex = 0; timeDiffs = []; allBpms = []; lastNoteTime = 0;
-            buildSequence(); const btn = document.getElementById('btnStart'); btn.innerText = "◼ STOP / RESET"; btn.classList.add('running');
-            document.getElementById('status').innerText = "PRACTICING...";
+            initAudio(); isRunning = true; currentNoteInBlock = 0; currentBlockIndex = 0; 
+            timeDiffs = []; allBpms = []; hitDetails = []; lastNoteTime = 0; previousNoteObj = null;
+            buildSequence(); const btn = document.getElementById('btnStart'); btn.innerText = "◼ LEÁLLÍTÁS"; btn.classList.add('running');
+            document.getElementById('status').innerText = "GYAKORLÁS...";
             draw(); 
         }
         
         function stopPractice() { 
             isRunning = false; const btn = document.getElementById('btnStart'); btn.innerText = "▶ GYAKORLAT INDÍTÁSA"; btn.classList.remove('running'); 
-            document.getElementById('status').innerText = "READY";
+            document.getElementById('status').innerText = "KÉSZEN ÁLL";
             currentNoteInBlock = 0; currentBlockIndex = 0; draw(); 
         }
         
         function updateProgressLabel() { let total = selectedMode === 'TRAINING' ? '∞' : seqBlocks.length; let current = seqBlocks.length === 0 ? 0 : Math.min(currentBlockIndex + 1, seqBlocks.length); document.getElementById('progress').innerText = `${current} / ${total}`; }
         function playSound(midi) { if (!audioCtx || !audioOn) return; const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 1.3); }
         
+        function drawTintedImage(img, x, y, w, h, color) {
+            const tempCanvas = document.createElement('canvas');
+            const tCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = w; tempCanvas.height = h;
+            tCtx.drawImage(img, 0, 0, w, h);
+            tCtx.globalCompositeOperation = 'source-in';
+            tCtx.fillStyle = color;
+            tCtx.fillRect(0, 0, w, h);
+            ctx.drawImage(tempCanvas, x, y);
+        }
+
         function drawEmptyStaff() {
             ctx.globalAlpha = 1.0; ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2;
             if (selectedHand !== 'LH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, trebleY+i*24); ctx.lineTo(800, trebleY+i*24); ctx.stroke(); } }
             if (selectedHand !== 'RH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, bassY+i*24); ctx.lineTo(800, bassY+i*24); ctx.stroke(); } }
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            if (selectedHand !== 'LH') { ctx.font='100px "Noto Music", serif'; ctx.fillStyle='#bf5af2'; ctx.fillText('\uD834\uDD1E', 95, trebleY + 20); }
-            if (selectedHand !== 'RH') { ctx.font='94px "Noto Music", serif'; ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY + 12); }
+            if (selectedHand !== 'LH') { ctx.font='100px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('\uD834\uDD1E', 95, trebleY + 20); }
+            if (selectedHand !== 'RH') { ctx.font='94px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY + 12); }
         }
 
         function draw() {
@@ -208,35 +285,33 @@
                 let offRH = -6 + noteObj.o_rel, offLH = -1 + noteObj.o_rel;  
                 ctx.globalAlpha = (isRunning && i < currentNoteInBlock) ? 0.15 : (isRunning && i === currentNoteInBlock ? 1.0 : 0.45);
                 if(!isRunning && i === 0 && currentBlockIndex === 0) ctx.globalAlpha = 1.0;
-                let x = 220 + (i * 72);
+                
+                // MÓDOSÍTÁS 1: 85px távolság
+                let x = 180 + (i * 85); 
                 
                 if (selectedHand !== 'LH') { 
-                    ctx.fillStyle = (isRunning && i === currentNoteInBlock) ? "#00d4ff" : "#fff"; 
+                    let colorRH = (isRunning && i === currentNoteInBlock) ? "#0a84ff" : "#fff"; 
                     let yRH = trebleY - offRH * 12; 
                     
-                    // JAVÍTOTT SEGÉDVONALAK JOBB KÉZNÉL
                     ctx.save();
-                    // Alapértelmezett, láthatóbb szürke (világosabb, mint a kottavonal)
                     ctx.strokeStyle = '#666'; 
-                    // Ha aktív a hang, akkor neon kék
-                    if (isRunning && i === currentNoteInBlock) {
-                        ctx.strokeStyle = "#00d4ff";
-                        ctx.globalAlpha = 1.0;
-                    } else if (isRunning && i < currentNoteInBlock) {
-                        ctx.globalAlpha = 0.15; // Lehalkított fényerő a már leütött hangoknak
-                    } else {
-                        // Várakozó hangok segédvonalai: stabil szürke és fényerő (0.5)
-                        ctx.globalAlpha = 0.5; 
-                    }
-                    // Megerősített vastagság (3px), de az árnyalat sötétebb
+                    if (isRunning && i === currentNoteInBlock) { ctx.strokeStyle = "#0a84ff"; ctx.globalAlpha = 1.0; } 
+                    else if (isRunning && i < currentNoteInBlock) { ctx.globalAlpha = 0.15; } 
+                    else { ctx.globalAlpha = 0.5; }
                     ctx.lineWidth = 3;
-                    if (offRH <= -6) { for (let p = -6; p >= offRH; p -= 2) { ctx.beginPath(); ctx.moveTo(x-22, trebleY-p*12); ctx.lineTo(x+22, trebleY-p*12); ctx.stroke(); } }
-                    if (offRH >= 6) { for (let p = 6; p <= offRH; p += 2) { ctx.beginPath(); ctx.moveTo(x-22, trebleY-p*12); ctx.lineTo(x+22, trebleY-p*12); ctx.stroke(); } }
+                    if (offRH <= -6) { for (let p = -6; p >= offRH; p -= 2) { ctx.beginPath(); ctx.moveTo(x-25, trebleY-p*12); ctx.lineTo(x+25, trebleY-p*12); ctx.stroke(); } }
+                    if (offRH >= 6) { for (let p = 6; p <= offRH; p += 2) { ctx.beginPath(); ctx.moveTo(x-25, trebleY-p*12); ctx.lineTo(x+25, trebleY-p*12); ctx.stroke(); } }
                     ctx.restore();
 
-                    // Előjegyzés rajzolása a megfelelő térközzel és mérettel
-                    if (noteObj.s !== '') { ctx.save(); ctx.font = '36px "Noto Music"'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(noteObj.s, x - 30, yRH); ctx.restore(); }
-                    ctx.beginPath(); ctx.ellipse(x, yRH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); 
+                    // MÓDOSÍTÁS 2 & 3: s=38, x-52, y-3
+                    if (noteObj.s !== '') { 
+                        const img = (noteObj.s === '♯' || noteObj.s === '#') ? imgSharp : imgBe;
+                        const s = 38; 
+                        drawTintedImage(img, x - 52, yRH - s/2 - 3, s, s, colorRH);
+                    }
+                    
+                    ctx.beginPath(); ctx.ellipse(x, yRH, 16, 12, Math.PI/8, 0, 2*Math.PI); 
+                    ctx.fillStyle = colorRH; ctx.fill(); 
                     
                     if (showNames || showFinger) { 
                         ctx.save(); ctx.globalAlpha = 1.0; ctx.font = 'bold 22px "Rajdhani"';
@@ -245,33 +320,35 @@
                         ctx.restore(); 
                     }
                 }
+                
                 if (selectedHand !== 'RH') { 
-                    ctx.fillStyle = (isRunning && i === currentNoteInBlock) ? "#ffaa00" : "#fff"; 
+                    let colorLH = (isRunning && i === currentNoteInBlock) ? "#ff9f0a" : "#fff"; 
                     let yLH = bassY - offLH * 12; 
                     
-                    // JAVÍTOTT SEGÉDVONALAK BAL KÉZNÉL
                     ctx.save();
-                    ctx.strokeStyle = '#666'; // Láthatóbb szürke
-                    if (isRunning && i === currentNoteInBlock) {
-                        ctx.strokeStyle = "#ffaa00";
-                        ctx.globalAlpha = 1.0;
-                    } else if (isRunning && i < currentNoteInBlock) {
-                        ctx.globalAlpha = 0.15;
-                    } else {
-                        ctx.globalAlpha = 0.5; // Stabil fényerő a várakozó segédvonalaknak
-                    }
-                    ctx.lineWidth = 3; // Megerősített vastagság
-                    if (offLH <= -6) { for (let p = -6; p >= offLH; p -= 2) { ctx.beginPath(); ctx.moveTo(x-22, bassY-p*12); ctx.lineTo(x+22, bassY-p*12); ctx.stroke(); } }
-                    if (offLH >= 6) { for (let p = 6; p <= offLH; p += 2) { ctx.beginPath(); ctx.moveTo(x-22, bassY-p*12); ctx.lineTo(x+22, bassY-p*12); ctx.stroke(); } }
+                    ctx.strokeStyle = '#666';
+                    if (isRunning && i === currentNoteInBlock) { ctx.strokeStyle = "#ff9f0a"; ctx.globalAlpha = 1.0; } 
+                    else if (isRunning && i < currentNoteInBlock) { ctx.globalAlpha = 0.15; } 
+                    else { ctx.globalAlpha = 0.5; }
+                    ctx.lineWidth = 3;
+                    if (offLH <= -6) { for (let p = -6; p >= offLH; p -= 2) { ctx.beginPath(); ctx.moveTo(x-25, bassY-p*12); ctx.lineTo(x+25, bassY-p*12); ctx.stroke(); } }
+                    if (offLH >= 6) { for (let p = 6; p <= offLH; p += 2) { ctx.beginPath(); ctx.moveTo(x-25, bassY-p*12); ctx.lineTo(x+25, bassY-p*12); ctx.stroke(); } }
                     ctx.restore();
 
-                    if (noteObj.s !== '') { ctx.save(); ctx.font = '36px "Noto Music"'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(noteObj.s, x - 30, yLH); ctx.restore(); }
-                    ctx.beginPath(); ctx.ellipse(x, yLH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); 
+                    // MÓDOSÍTÁS 2 & 3
+                    if (noteObj.s !== '') { 
+                        const img = (noteObj.s === '♯' || noteObj.s === '#') ? imgSharp : imgBe;
+                        const s = 38; 
+                        drawTintedImage(img, x - 52, yLH - s/2 - 3, s, s, colorLH);
+                    }
+                    
+                    ctx.beginPath(); ctx.ellipse(x, yLH, 16, 12, Math.PI/8, 0, 2*Math.PI); 
+                    ctx.fillStyle = colorLH; ctx.fill(); 
                     
                     if (showNames || showFinger) { 
                         ctx.save(); ctx.globalAlpha = 1.0; ctx.font = 'bold 22px "Rajdhani"';
                         if(showNames) { ctx.fillStyle = '#aaa'; ctx.textAlign = 'right'; ctx.fillText(noteObj.n + noteObj.s, x - 6, bassY + 105); }
-                        if(showFinger) { ctx.fillStyle = '#ffaa00'; ctx.textAlign = (showNames ? 'left' : 'center'); ctx.fillText(noteObj.f_lh, (showNames ? x + 6 : x), bassY + 105); }
+                        if(showFinger) { ctx.fillStyle = '#ff9f0a'; ctx.textAlign = (showNames ? 'left' : 'center'); ctx.fillText(noteObj.f_lh, (showNames ? x + 6 : x), bassY + 105); }
                         ctx.restore(); 
                     }
                 }
@@ -285,31 +362,80 @@
             if ((s & 0xf0) === 0x90 && v > 0) {
                 let noteObj = seqBlocks[currentBlockIndex][currentNoteInBlock];
                 let tRH = 60 + noteObj.m_rel, tLH = 48 + noteObj.m_rel; 
-                if (selectedHand === 'RH' && n === tRH) { playSound(n); processHit(); }
-                else if (selectedHand === 'LH' && n === tLH) { playSound(n); processHit(); }
+                if (selectedHand === 'RH' && n === tRH) { playSound(n); processHit(noteObj); }
+                else if (selectedHand === 'LH' && n === tLH) { playSound(n); processHit(noteObj); }
                 else if (selectedHand === 'BOTH') { 
                     if (n === tRH && !rhHit) { rhHit = true; playSound(n); } 
                     if (n === tLH && !lhHit) { lhHit = true; playSound(n); } 
-                    if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(); } 
+                    if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(noteObj); } 
                 }
             }
         }
 
-        function processHit() {
+        function processHit(currentNoteObj) {
             const now = performance.now();
-            if (lastNoteTime !== 0) {
-                let diff = now - lastNoteTime; timeDiffs.push(diff); allBpms.push(60000/diff);
+            if (lastNoteTime !== 0 && previousNoteObj) {
+                let diff = now - lastNoteTime; 
+                timeDiffs.push(diff); 
+                allBpms.push(60000/diff);
+                // MENTJÜK A VÁLTÁSOKAT AZ ELEMZÉSHEZ
+                hitDetails.push({ diff: diff, from: previousNoteObj, to: currentNoteObj });
+                
                 let avg = timeDiffs.reduce((a,b)=>a+b)/timeDiffs.length, dev = Math.sqrt(timeDiffs.reduce((a,b)=>a+Math.pow(b-avg,2),0)/timeDiffs.length);
                 document.getElementById('uniformity').innerText = Math.round(Math.max(0, 100-(dev/3))) + "%";
                 document.getElementById('bpm').innerText = Math.round(60000/diff);
             }
-            lastNoteTime = now; currentNoteInBlock++;
-            if (currentNoteInBlock >= seqBlocks[currentBlockIndex].length) { currentNoteInBlock = 0; currentBlockIndex++; updateProgressLabel(); if (currentBlockIndex >= seqBlocks.length) { finish(); return; } }
+            lastNoteTime = now; previousNoteObj = currentNoteObj; currentNoteInBlock++;
+            
+            if (currentNoteInBlock >= seqBlocks[currentBlockIndex].length) { 
+                currentNoteInBlock = 0; currentBlockIndex++; updateProgressLabel(); 
+                if (currentBlockIndex >= seqBlocks.length) { finish(); return; } 
+            }
             draw();
         }
 
-        function finish() { isRunning = false; const avgBpm = allBpms.length > 0 ? Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length) : 0; document.getElementById('resSummary').innerHTML = `BPM: ${avgBpm}<br>Stabilitás: ${document.getElementById('uniformity').innerText}`; document.getElementById('resultModal').style.display = "flex"; }
-        window.onload = () => { document.fonts.ready.then(() => { buildSequence(); draw(); }); };
+        function finish() { 
+            isRunning = false; 
+            let avgBpm = allBpms.length > 0 ? Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length) : 0; 
+            let uniVal = parseFloat(document.getElementById('uniformity').innerText) || 0;
+            
+            // SZÖVEGES ÉRTÉKELÉS GENERÁLÁSA
+            let verbalFeedback = "";
+            if (uniVal >= 95) verbalFeedback = "Tökéletes, egyenletes tempó! Készen állsz a színpadra.";
+            else if (uniVal >= 85) verbalFeedback = "Nagyon jó futam! Kis odafigyeléssel hibátlan lesz.";
+            else verbalFeedback = "Lassíts a tempón, és figyelj az egyenletes leütésekre!";
+
+            // LEGLASSABB PONT (DÖCCENÉS) KERESÉSE
+            let slowestPointText = "";
+            if (hitDetails.length > 0) {
+                let slowest = hitDetails.reduce((prev, current) => (prev.diff > current.diff) ? prev : current, {diff: 0});
+                let f_text = "";
+                if (selectedHand === 'RH') f_text = `(Ujjrend: ${slowest.from.f_rh} ➔ ${slowest.to.f_rh})`;
+                else if (selectedHand === 'LH') f_text = `(Ujjrend: ${slowest.from.f_lh} ➔ ${slowest.to.f_lh})`;
+                
+                slowestPointText = `<div style="margin-top: 15px; font-size: 18px; color: #ffaa00; border-top: 1px solid #444; padding-top: 15px;">
+                    ⚠️ A leglassabb váltás: <b>${slowest.from.n}${slowest.from.s}</b> ➔ <b>${slowest.to.n}${slowest.to.s}</b> között volt.<br>
+                    <span style="font-size: 16px; color: #888;">${f_text} - Ezt a részt gyakorold kiemelten!</span>
+                </div>`;
+            }
+
+            document.getElementById('resSummary').innerHTML = `
+                <div style="font-size: 24px; color: #aaa;">${verbalFeedback}</div>
+                <div style="display:flex; justify-content:center; gap: 40px; margin-top:15px;">
+                    <div>BPM:<br><span style="color:var(--neon-blue); font-size: 40px;">${avgBpm}</span></div>
+                    <div>Stabilitás:<br><span style="color:var(--success-green); font-size: 40px;">${uniVal}%</span></div>
+                </div>
+                ${slowestPointText}
+            `;
+            document.getElementById('resultModal').style.display = "flex"; 
+        }
+        
+        document.fonts.ready.then(function () {
+            document.getElementById('status').innerText="KÉSZEN ÁLL";
+            buildSequence();
+            draw();
+        });
+        window.onload = () => { if(document.fonts.status === 'loaded') drawEmptyStaff(); };
     </script>
 </body>
 </html>
