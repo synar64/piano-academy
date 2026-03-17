@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kotta - Steinway Edition</title>
+    <title>Kotta - Pure Steinway Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,8 +17,7 @@
             height: 100vh; margin: 0; overflow: hidden;
         }
         .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Noto Music'; }
-        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 10; transition: 0.3s; }
-        
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 10; }
         h1 { color: var(--neon-orange); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 5px 0; font-size: 26px; }
         #timer-container { width: 850px; height: 12px; background: rgba(0,0,0,0.6); border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border-color); overflow: hidden; }
         #timer-bar { width: 100%; height: 100%; background-color: var(--neon-purple); transition: width 0.1s linear; }
@@ -59,6 +58,7 @@
             <button id="btnAccidental" class="cfg-btn toggle-btn on" onclick="toggleConfig('accidental')">MÓDOSÍTÓK</button>
             <button id="btnHint" class="cfg-btn toggle-btn" onclick="toggleConfig('hint')">GYORS-SÚGÓ</button>
             <span style="color:#555;">|</span>
+            <button class="cfg-btn" onclick="openCheatSheet()">SÚGÓ</button>
             <button id="kbToggle" class="cfg-btn toggle-btn" onclick="toggleKeyboard()">BILLENTYŰ</button>
             <button id="btnMute" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA</button>
         </div>
@@ -74,13 +74,26 @@
     <div id="status">TÖLTÉS...</div>
     <div id="pianoWrapper"><div class="piano-container" id="piano"></div></div>
 
+    <div id="resultModal" class="modal-overlay">
+        <h1 style="color: var(--neon-purple);">SZAKASZ LEZÁRVA</h1>
+        <h2 id="resPercent" style="font-size: 80px; color: var(--success-green);">0%</h2>
+        <button onclick="startMission()" style="background:var(--success-green); padding:15px 40px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">KÖVETKEZŐ KÖR</button>
+    </div>
+
+    <div id="hintModal" class="modal-overlay">
+        <div style="background: rgba(20,20,30,0.9); padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center;">
+            <canvas id="cheatCanvas" width="840" height="400"></canvas><br>
+            <button class="cfg-btn" style="margin-top:15px;" onclick="closeCheatSheet()">BEZÁRÁS</button>
+        </div>
+    </div>
+
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
         const imgSharp = new Image(), imgBe = new Image();
         imgSharp.src = 'sharp.png'; imgBe.src = 'be.png';
 
         let scoreOk=0, combo=0, totalTasks=0, isRunning=false, isMidiReady=false;
-        let audioCtx, compressor, audioBuffers = {}, activeNotes = {}, audioOn=true;
+        let audioCtx, audioBuffers = {}, activeNotes = {}, audioOn=true;
         let timeLeft=5.0, timerTicker=null, currentNote=null, isWaitingForCorrection=false, isTransitioning=false;
         let trebleActive=true, bassActive=true, visualClef='treble', useAccidentals=true, useQuickHint=false, timerEnabled=true;
 
@@ -89,21 +102,12 @@
         async function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                compressor = audioCtx.createDynamicsCompressor();
-                compressor.threshold.setValueAtTime(-24, audioCtx.currentTime);
-                compressor.ratio.setValueAtTime(4, audioCtx.currentTime);
-                compressor.connect(audioCtx.destination);
-                
                 for(let i=21; i<=108; i++) {
                     const oct = Math.floor(i/12)-1;
                     const name = noteNames[i%12] + oct;
-                    // Megpróbáljuk betölteni a fájlt
-                    fetch(`audio/piano/${name}.mp3`).then(r => {
-                        if(r.ok) return r.arrayBuffer();
-                        throw new Error('Nincs meg');
-                    })
-                    .then(ab => audioCtx.decodeAudioData(ab))
-                    .then(buf => audioBuffers[i] = buf)
+                    fetch(`audio/piano/${name}.mp3`).then(r => r.ok ? r.arrayBuffer() : null)
+                    .then(ab => ab ? audioCtx.decodeAudioData(ab) : null)
+                    .then(buf => { if(buf) audioBuffers[i] = buf; })
                     .catch(()=>{});
                 }
             }
@@ -112,16 +116,12 @@
 
         function playSound(midi, velocity) {
             if (!audioOn || !audioCtx) return;
+            let buffer = audioBuffers[midi], playbackRate = 1.0;
             
-            let buffer = audioBuffers[midi];
-            let playbackRate = 1.0;
-
-            // Ha nincs meg a pontos hang (pl. C#4), megkeressük a szomszédos C4-et
             if (!buffer) {
                 if (audioBuffers[midi-1]) { buffer = audioBuffers[midi-1]; playbackRate = 1.05946; }
                 else if (audioBuffers[midi+1]) { buffer = audioBuffers[midi+1]; playbackRate = 0.94387; }
             }
-
             if (!buffer) return;
 
             const source = audioCtx.createBufferSource();
@@ -129,10 +129,11 @@
             source.buffer = buffer;
             source.playbackRate.value = playbackRate;
             
-            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(velocity/127, audioCtx.currentTime + 0.01);
+            // Tiszta szűrőmentes hangátvitel
+            gainNode.gain.setValueAtTime(velocity/127, audioCtx.currentTime);
+            source.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
             
-            source.connect(gainNode); gainNode.connect(compressor);
             source.start(0);
             activeNotes[midi] = { src: source, gain: gainNode };
         }
@@ -141,10 +142,9 @@
             if (activeNotes[midi]) {
                 const { src, gain } = activeNotes[midi];
                 const now = audioCtx.currentTime;
-                gain.gain.cancelScheduledValues(now);
                 gain.gain.setValueAtTime(gain.gain.value, now);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
-                src.stop(now + 0.6);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4); 
+                src.stop(now + 0.5);
                 delete activeNotes[midi];
             }
         }
@@ -156,9 +156,11 @@
                 if(trebleActive) { ctx.beginPath(); ctx.moveTo(50, 100+i*20); ctx.lineTo(800, 100+i*20); ctx.stroke(); }
                 if(bassActive) { ctx.beginPath(); ctx.moveTo(50, 300+i*20); ctx.lineTo(800, 300+i*20); ctx.stroke(); }
             }
+            
+            // Pontos arányok a Hanon fájl alapján!
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            if(trebleActive) { ctx.font='100px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('𝄞', 85, 125); }
-            if(bassActive) { ctx.font='90px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('𝄢', 85, 295); }
+            if(trebleActive) { ctx.font='100px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('𝄞', 95, 120); }
+            if(bassActive) { ctx.font='100px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('𝄢', 95, 312); }
         }
 
         function drawNote(noteObj) {
@@ -195,6 +197,7 @@
 
         function startMission() {
             scoreOk=0; combo=0; totalTasks=0; isRunning=true; isTransitioning=false;
+            document.getElementById('resultModal').style.display='none';
             document.getElementById('btnAction').innerText="◼ LEÁLLÍTÁS";
             document.getElementById('btnAction').classList.add('running');
             nextTask();
@@ -208,7 +211,7 @@
         }
 
         function nextTask() {
-            if (totalTasks >= 10) { stopMission(); return; }
+            if (totalTasks >= 10) { stopMission(); showResult(); return; }
             totalTasks++; document.getElementById('taskCount').innerText = `${totalTasks} / 10`;
             generateNewNote(); startTimer();
         }
@@ -258,6 +261,20 @@
         function toggleConfig(t) { if(t==='accidental') useAccidentals=!useAccidentals; else useQuickHint=!useQuickHint; drawNote(currentNote); }
         function toggleKeyboard() { const w = document.getElementById('pianoWrapper'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; }
         function toggleAudio() { audioOn = !audioOn; document.getElementById('btnMute').classList.toggle('on', audioOn); }
+        function showResult() { document.getElementById('resPercent').innerText = (scoreOk*10)+"%"; document.getElementById('resultModal').style.display='flex'; }
+        
+        function openCheatSheet() { document.getElementById('hintModal').style.display='flex'; drawCheatSheet(); }
+        function closeCheatSheet() { document.getElementById('hintModal').style.display='none'; }
+        function drawCheatSheet() {
+            const c = document.getElementById('cheatCanvas').getContext('2d');
+            c.clearRect(0,0,840,400); c.strokeStyle='rgba(255,255,255,0.2)'; c.lineWidth=2;
+            for(let i=-2; i<=2; i++){ c.beginPath(); c.moveTo(40, 100+i*20); c.lineTo(800, 100+i*20); c.stroke(); c.beginPath(); c.moveTo(40, 300+i*20); c.lineTo(800, 300+i*20); c.stroke(); }
+            
+            // Itt is a Hanon beállítások futnak!
+            c.textAlign = 'center'; c.textBaseline = 'middle';
+            c.font='100px "Noto Music"'; c.fillStyle='#bf5af2'; c.fillText('𝄞', 95, 120); 
+            c.font='100px "Noto Music"'; c.fillStyle='#0a84ff'; c.fillText('𝄢', 95, 312);
+        }
 
         const p = document.getElementById('piano');
         for (let i = 36; i <= 84; i++) {
