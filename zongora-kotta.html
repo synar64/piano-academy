@@ -94,34 +94,36 @@
 
                 for(let i=21; i<=108; i++) {
                     const oct = Math.floor(i/12)-1;
-                    const name = noteNames[i%12] + oct;
-                    const bName = (name === "B-1") ? "B-1" : name;
+                    const baseName = noteNames[i%12] + oct;
                     audioBuffers[i] = {};
 
+                    // Te listád variációi
                     ["PP", "MP", "MF", "FF", "Mp", "Mf"].forEach(dyn => {
                         const variations = [
-                            `${dyn} ${bName}.mp3`,
-                            `${dyn.toUpperCase()} ${bName}.mp3`,
-                            `${dyn.charAt(0).toUpperCase()}${dyn.slice(1).toLowerCase()} ${bName}.mp3`
+                            `${dyn} ${baseName}.mp3`,
+                            `${dyn.toUpperCase()} ${baseName}.mp3`,
+                            `${dyn.charAt(0).toUpperCase()}${dyn.slice(1).toLowerCase()} ${baseName}.mp3`
                         ];
+                        
+                        // Különleges esetek kezelése a listád alapján
+                        if (baseName === "B0") variations.push(`${dyn} B-1.mp3`, `${dyn.toUpperCase()} B-1.mp3`);
 
                         variations.forEach(v => {
-                            // JAVÍTÁS: encodeURIComponent használata a # jel kezeléséhez!
-                            const encodedFilename = v.replace(/#/g, '%23');
-                            fetch(`audio/piano/${encodedFilename}`)
+                            const encoded = v.replace(/#/g, '%23');
+                            fetch(`audio/piano/${encoded}`)
                             .then(r => r.ok ? r.arrayBuffer() : null)
                             .then(ab => ab ? audioCtx.decodeAudioData(ab) : null)
-                            .then(buf => {
+                            .then(buf => { 
                                 if(buf) {
                                     audioBuffers[i][dyn.toUpperCase()] = buf;
-                                    if(!loadedKeys.has(i)) {
+                                    if (!loadedKeys.has(i)) {
                                         loadedKeys.add(i);
                                         const progress = Math.round((loadedKeys.size / totalKeys) * 100);
                                         document.getElementById('status').innerText = `STEINWAY BETÖLTÉS: ${progress}%`;
                                         if(loadedKeys.size >= totalKeys) document.getElementById('status').innerText = "STEINWAY KÉSZEN ÁLL";
                                     }
                                 }
-                            }).catch(()=>{});
+                            }).catch(() => {});
                         });
                     });
                 }
@@ -130,21 +132,27 @@
         }
 
         function playSound(midi, velocity) {
-            if (!audioOn || !audioCtx || !audioBuffers[midi]) return;
+            if (!audioOn || !audioCtx) return;
             let d = velocity < 32 ? "PP" : (velocity < 64 ? "MP" : (velocity < 96 ? "MF" : "FF"));
             
-            // Okosabb buffer választás: ha nincs meg a kívánt dinamika, keresünk mást
-            let buffer = audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"];
+            let buffer = null;
             let playbackRate = 1.0;
 
-            // Ha egyáltalán nincs hang az adott billentyűhöz (pl. fekete billentyű hiba)
+            // 1. Próbáljuk a pontos hangot és pontos dinamikát
+            if (audioBuffers[midi]) {
+                buffer = audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"];
+            }
+
+            // 2. Ha nincs meg, keressük a legközelebbi szomszédot (felfelé és lefelé 12 hangig)
             if (!buffer) {
-                const neighbors = [midi-1, midi+1, midi-2, midi+2];
-                for (let n of neighbors) {
-                    if (audioBuffers[n] && (audioBuffers[n][d] || audioBuffers[n]["MF"])) {
-                        buffer = audioBuffers[n][d] || audioBuffers[n]["MF"];
-                        playbackRate = Math.pow(2, (midi - n) / 12);
-                        break;
+                for (let dist = 1; dist <= 12; dist++) {
+                    if (audioBuffers[midi - dist]) {
+                        buffer = audioBuffers[midi - dist][d] || audioBuffers[midi - dist]["MF"] || audioBuffers[midi - dist]["FF"];
+                        if (buffer) { playbackRate = Math.pow(2, dist / 12); break; }
+                    }
+                    if (audioBuffers[midi + dist]) {
+                        buffer = audioBuffers[midi + dist][d] || audioBuffers[midi + dist]["MF"] || audioBuffers[midi + dist]["FF"];
+                        if (buffer) { playbackRate = Math.pow(2, -dist / 12); break; }
                     }
                 }
             }
