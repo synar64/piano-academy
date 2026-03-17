@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Hanon Pro - Munkatársi Teszt Verzió</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #0a84ff; --neon-orange: #ff9f0a; --success-green: #32d74b;
+            --bg-dark: #050508; --panel-bg: rgba(20, 20, 30, 0.85); --border-color: rgba(255, 255, 255, 0.2);
+        }
+        body {
+            font-family: sans-serif; background: var(--bg-dark); color: #fff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0;
+        }
+        h1 { color: var(--neon-blue); text-transform: uppercase; margin: 10px 0; }
+        
+        .master-panel { background: var(--panel-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); width: 800px; margin-bottom: 10px; text-align: center; }
+        
+        /* ZONGORA STÍLUS - GARANTÁLT MEGJELENÉS */
+        .piano-container { 
+            display: flex; background: #111; padding: 10px; border-radius: 8px; 
+            border: 2px solid #333; margin-top: 20px; position: relative;
+        }
+        .key { 
+            width: 35px; height: 140px; border: 1px solid #000; border-radius: 0 0 5px 5px; 
+            cursor: pointer; position: relative; display: flex; align-items: flex-end; 
+            justify-content: center; font-size: 10px; color: #888; transition: 0.1s; user-select: none;
+        }
+        .white { background: #fff; z-index: 1; }
+        .white:active, .white.pressed { background: var(--neon-blue) !important; color: #fff; }
+        .black { 
+            background: #000; width: 24px; height: 85px; margin-left: -12px; margin-right: -12px; 
+            z-index: 2; border-radius: 0 0 3px 3px; color: #fff; border: 1px solid #333;
+        }
+        .black:active, .black.pressed { background: var(--neon-orange) !important; }
+
+        canvas { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 8px; }
+        #btnStart { padding: 15px 60px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 18px; margin: 10px 0; }
+        #status { color: var(--neon-orange); font-weight: bold; margin-top: 10px; font-family: 'Rajdhani'; }
+    </style>
+</head>
+<body>
+
+    <h1>Hanon Pro Academy</h1>
+
+    <div class="master-panel">
+        <div style="font-size: 11px; color: #888; letter-spacing: 2px; margin-bottom: 10px;">RENDSZERVEZÉRLŐ</div>
+        <button id="btnStart" onclick="startEverything()">▶ RENDSZER AKTIVÁLÁSA</button>
+    </div>
+
+    <canvas id="staffCanvas" width="800" height="200"></canvas>
+
+    <div class="piano-container" id="piano"></div>
+
+    <div id="status">KATTINTS AZ AKTIVÁLÁSHOZ!</div>
+
+    <script>
+        const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+        let audioCtx, audioBuffers = {};
+        const noteNames = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+        const samplePath = "audio/piano/";
+
+        // 1. A zongora kirajzolása AZONNAL, nem vár semmire
+        function createKeys() {
+            const piano = document.getElementById('piano');
+            piano.innerHTML = ''; // Törlés biztonság kedvéért
+            for (let i = 48; i <= 72; i++) {
+                const isBlack = [1, 3, 6, 8, 10].includes(i % 12);
+                const key = document.createElement('div');
+                key.className = `key ${isBlack ? 'black' : 'white'}`;
+                key.id = `key-${i}`;
+                key.innerHTML = `<span>${noteNames[i%12]}</span>`;
+                
+                key.onmousedown = (e) => { 
+                    e.preventDefault();
+                    playNote(i, 100); 
+                    key.classList.add('pressed'); 
+                };
+                key.onmouseup = () => key.classList.remove('pressed');
+                key.onmouseleave = () => key.classList.remove('pressed');
+                piano.appendChild(key);
+            }
+            console.log("Zongora létrehozva.");
+        }
+
+        async function startEverything() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            document.getElementById('status').innerText = "BETÖLTÉS ÉS MIDI KERESÉS...";
+            
+            // MIDI Csatlakozás
+            if (navigator.requestMIDIAccess) {
+                navigator.requestMIDIAccess().then(access => {
+                    for (let input of access.inputs.values()) {
+                        input.onmidimessage = (e) => {
+                            let [s, n, v] = e.data;
+                            if ((s & 0xf0) === 0x90 && v > 0) {
+                                playNote(n, v);
+                                const k = document.getElementById(`key-${n}`);
+                                if(k) { k.classList.add('pressed'); setTimeout(()=>k.classList.remove('pressed'), 200); }
+                            }
+                        };
+                    }
+                });
+            }
+
+            // Próbáljuk meg betölteni a mintákat a háttérben
+            document.getElementById('status').innerText = "RENDSZER AKTÍV. TESZTELJ!";
+            loadSamples(); 
+        }
+
+        async function loadSamples() {
+            for(let i = 48; i <= 72; i++) {
+                const name = noteNames[i % 12] + (Math.floor(i / 12) - 1);
+                try {
+                    const r = await fetch(`${samplePath}${name}.mp3`);
+                    if(r.ok) {
+                        const ab = await r.arrayBuffer();
+                        audioBuffers[i] = await audioCtx.decodeAudioData(ab);
+                    }
+                } catch(e) { /* Ha nem találja, marad a szinti */ }
+            }
+        }
+
+        function playNote(midi, vel) {
+            if (!audioCtx) return;
+
+            // HA VAN MP3 MINTA
+            if (audioBuffers[midi]) {
+                const s = audioCtx.createBufferSource();
+                const g = audioCtx.createGain();
+                s.buffer = audioBuffers[midi];
+                g.gain.setValueAtTime(vel/127, audioCtx.currentTime);
+                s.connect(g); g.connect(audioCtx.destination);
+                s.start(0);
+            } 
+            // HA NINCS MP3, MARAD A RÉGI CSENGŐ (Biztonsági tartalék)
+            else {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), audioCtx.currentTime);
+                g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                osc.connect(g); g.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        function drawStaff() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#444'; ctx.lineWidth = 1;
+            for(let i=-2; i<=2; i++){
+                ctx.beginPath(); ctx.moveTo(50, 100+i*15); ctx.lineTo(750, 100+i*15); ctx.stroke();
+            }
+            ctx.fillStyle = "#888"; ctx.font = "12px Arial";
+            ctx.fillText("KOTTA HELYE (TESZT ÜZEMMÓD)", 300, 105);
+        }
+
+        // AZONNALI INDÍTÁS
+        createKeys();
+        drawStaff();
+    </script>
+</body>
+</html>
