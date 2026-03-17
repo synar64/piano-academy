@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kotta - Steinway Classic Edition</title>
+    <title>Kotta - Steinway Master Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -89,9 +89,6 @@
 
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-        const imgSharp = new Image(), imgBe = new Image();
-        imgSharp.src = 'sharp.png'; imgBe.src = 'be.png';
-
         let audioCtx, audioBuffers = {}, activeNotes = {}, audioOn=true;
         let scoreOk=0, combo=0, totalTasks=0, isRunning=false, isMidiReady=false;
         let timeLeft=5.0, timerTicker=null, currentNote=null, isWaitingForCorrection=false, isTransitioning=false;
@@ -103,8 +100,10 @@
         async function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                let totalFiles = 0;
                 let loadedFiles = 0;
+                let fetchPromises = [];
+
+                document.getElementById('status').innerText = "HANGOK KERESÉSE...";
 
                 for(let i=21; i<=108; i++) {
                     const oct = Math.floor(i/12)-1;
@@ -112,38 +111,73 @@
                     audioBuffers[i] = {};
 
                     ["PP", "MP", "MF", "FF", "Mp", "Mf"].forEach(dyn => {
-                        totalFiles++;
                         const v = `${dyn} ${name}.mp3`;
+                        // Okos URL kódolás a # miatt
                         const url = `audio/piano/${encodeURIComponent(v)}`;
                         
-                        fetch(url).then(r => r.ok ? r.arrayBuffer() : null)
-                        .then(ab => ab ? audioCtx.decodeAudioData(ab) : null)
+                        let p = fetch(url)
+                        .then(r => r.ok ? r.arrayBuffer() : Promise.reject())
+                        .then(ab => audioCtx.decodeAudioData(ab))
                         .then(buf => {
-                            loadedFiles++;
-                            if(buf) audioBuffers[i][dyn.toUpperCase()] = buf;
-                            
-                            const progress = Math.round((loadedFiles / (88 * 4)) * 100);
-                            if (progress <= 100) {
-                                document.getElementById('status').innerText = `BETÖLTÉS: ${progress}%`;
+                            const stdDyn = dyn.toUpperCase();
+                            if(!audioBuffers[i][stdDyn]) {
+                                audioBuffers[i][stdDyn] = buf;
+                                loadedFiles++;
+                                document.getElementById('status').innerText = `BETÖLTVE: ${loadedFiles} fájl`;
                             }
-                            if(progress >= 100) document.getElementById('status').innerText = "STEINWAY KÉSZEN ÁLL";
-                        }).catch(()=>{ loadedFiles++; });
+                        }).catch(() => {});
+                        
+                        fetchPromises.push(p);
                     });
                 }
+                
+                // Amikor az ÖSSZES keresés lefutott, készen vagyunk!
+                Promise.all(fetchPromises).then(() => {
+                    document.getElementById('status').innerText = "STEINWAY KÉSZEN ÁLL";
+                });
             }
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
         function playSound(midi, velocity) {
-            if (!audioOn || !audioCtx || !audioBuffers[midi]) return;
+            if (!audioOn || !audioCtx) return;
             let d = velocity < 32 ? "PP" : (velocity < 64 ? "MP" : (velocity < 96 ? "MF" : "FF"));
             
-            let buffer = audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"];
+            let buffer = null;
+            let bestDistance = 0;
+
+            // 1. Megvan a hang?
+            if (audioBuffers[midi] && (audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"])) {
+                buffer = audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"];
+            } else {
+                // 2. Ha nincs meg, megkeressük a legközelebbi szomszédot és lehangoljuk!
+                for (let dist = 1; dist <= 24; dist++) {
+                    for (let sign of [1, -1]) {
+                        let checkMidi = midi + (dist * sign);
+                        if (audioBuffers[checkMidi]) {
+                            let found = audioBuffers[checkMidi][d] || audioBuffers[checkMidi]["MF"] || audioBuffers[checkMidi]["FF"] || audioBuffers[checkMidi]["PP"];
+                            if (found) {
+                                buffer = found;
+                                bestDistance = checkMidi - midi; // Kiszámoljuk a távolságot
+                                break;
+                            }
+                        }
+                    }
+                    if (buffer) break;
+                }
+            }
             
             if (!buffer) return;
+            
             const source = audioCtx.createBufferSource();
             const gainNode = audioCtx.createGain();
             source.buffer = buffer;
+            
+            // Itt történik a csoda: a szomszédos hangot a megfelelő magasságúra húzzuk!
+            if (bestDistance !== 0) {
+                source.playbackRate.value = Math.pow(2, -bestDistance / 12);
+            }
+            
             gainNode.gain.setValueAtTime((velocity/127), audioCtx.currentTime);
             source.connect(gainNode).connect(audioCtx.destination);
             source.start(0);
@@ -275,56 +309,28 @@
             }, 100);
         }
 
-        // --- GOMB VEZÉRLŐ FUNKCIÓK ---
-        
-        function toggleTimerSetting() { 
-            timerEnabled = !timerEnabled; 
-            document.getElementById('btnTimerToggle').classList.toggle('on', timerEnabled); 
-            if (isRunning) startTimer(); 
-        }
-        
+        // --- GOMBOK ---
+        function toggleTimerSetting() { timerEnabled = !timerEnabled; document.getElementById('btnTimerToggle').classList.toggle('on', timerEnabled); if (isRunning) startTimer(); }
         function toggleClef(clef) { 
-            if (clef === 'treble') trebleActive = !trebleActive; 
-            else bassActive = !bassActive; 
+            if (clef === 'treble') trebleActive = !trebleActive; else bassActive = !bassActive; 
             if (!trebleActive && !bassActive) { trebleActive=true; bassActive=true; } 
-            
             document.getElementById('btnTreble').classList.toggle('active', trebleActive);
             document.getElementById('btnBass').classList.toggle('active', bassActive);
-            
-            drawEmptyStaff(); 
-            if (currentNote && isRunning) drawNote(currentNote);
+            drawEmptyStaff(); if (currentNote && isRunning) drawNote(currentNote);
         }
-        
         function toggleConfig(t) { 
-            if (t === 'accidental') {
-                useAccidentals = !useAccidentals;
-                document.getElementById('btnAccidental').classList.toggle('on', useAccidentals);
-            } else {
-                useQuickHint = !useQuickHint;
-                document.getElementById('btnHint').classList.toggle('on', useQuickHint);
-            }
+            if (t === 'accidental') { useAccidentals = !useAccidentals; document.getElementById('btnAccidental').classList.toggle('on', useAccidentals); } 
+            else { useQuickHint = !useQuickHint; document.getElementById('btnHint').classList.toggle('on', useQuickHint); }
             if (currentNote && isRunning) drawNote(currentNote);
         }
-        
         function toggleKeyboard() { 
             const w = document.getElementById('pianoWrapper'); 
             const isVisible = w.style.display === 'flex';
             w.style.display = isVisible ? 'none' : 'flex'; 
             document.getElementById('kbToggle').classList.toggle('on', !isVisible);
         }
-        
-        function toggleAudio() { 
-            audioOn = !audioOn; 
-            document.getElementById('btnMute').classList.toggle('on', audioOn); 
-        }
-
-        function showResult() { 
-            document.getElementById('resPercent').innerText = (scoreOk*10)+"%"; 
-            document.getElementById('resultModal').style.display='flex'; 
-        }
-        
-        // --- JAVÍTOTT SÚGÓ ABLAK HANGOKKAL ---
-
+        function toggleAudio() { audioOn = !audioOn; document.getElementById('btnMute').classList.toggle('on', audioOn); }
+        function showResult() { document.getElementById('resPercent').innerText = (scoreOk*10)+"%"; document.getElementById('resultModal').style.display='flex'; }
         function openCheatSheet() { document.getElementById('hintModal').style.display='flex'; drawCheatSheet(); }
         function closeCheatSheet() { document.getElementById('hintModal').style.display='none'; }
         
@@ -350,8 +356,7 @@
                         c.beginPath(); c.moveTo(x-18, bY-(p*10)); c.lineTo(x+18, bY-(p*10)); c.stroke();
                     }
                 }
-                c.beginPath(); c.ellipse(x, nY, 14, 9, Math.PI/8, 0, 2*Math.PI); 
-                c.fillStyle = '#fff'; c.fill();
+                c.beginPath(); c.ellipse(x, nY, 14, 9, Math.PI/8, 0, 2*Math.PI); c.fillStyle = '#fff'; c.fill();
                 c.fillStyle = '#ff9f0a'; c.font = 'bold 18px Rajdhani'; c.fillText(name, x, nY - 25);
             };
 
