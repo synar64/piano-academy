@@ -129,7 +129,6 @@
             source.buffer = buffer;
             source.playbackRate.value = playbackRate;
             
-            // Tiszta szűrőmentes hangátvitel
             gainNode.gain.setValueAtTime(velocity/127, audioCtx.currentTime);
             source.connect(gainNode);
             gainNode.connect(audioCtx.destination);
@@ -157,10 +156,9 @@
                 if(bassActive) { ctx.beginPath(); ctx.moveTo(50, 300+i*20); ctx.lineTo(800, 300+i*20); ctx.stroke(); }
             }
             
-            // Pontos arányok a Hanon fájl alapján!
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            if(trebleActive) { ctx.font='100px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('𝄞', 95, 120); }
-            if(bassActive) { ctx.font='100px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('𝄢', 95, 312); }
+            if(trebleActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('𝄞', 95, 117); }
+            if(bassActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('𝄢', 95, 310); }
         }
 
         function drawNote(noteObj) {
@@ -270,10 +268,9 @@
             c.clearRect(0,0,840,400); c.strokeStyle='rgba(255,255,255,0.2)'; c.lineWidth=2;
             for(let i=-2; i<=2; i++){ c.beginPath(); c.moveTo(40, 100+i*20); c.lineTo(800, 100+i*20); c.stroke(); c.beginPath(); c.moveTo(40, 300+i*20); c.lineTo(800, 300+i*20); c.stroke(); }
             
-            // Itt is a Hanon beállítások futnak!
             c.textAlign = 'center'; c.textBaseline = 'middle';
-            c.font='100px "Noto Music"'; c.fillStyle='#bf5af2'; c.fillText('𝄞', 95, 120); 
-            c.font='100px "Noto Music"'; c.fillStyle='#0a84ff'; c.fillText('𝄢', 95, 312);
+            c.font='85px "Noto Music"'; c.fillStyle='#bf5af2'; c.fillText('𝄞', 70, 117); 
+            c.font='85px "Noto Music"'; c.fillStyle='#0a84ff'; c.fillText('𝄢', 70, 310);
         }
 
         const p = document.getElementById('piano');
@@ -286,9 +283,14 @@
             p.appendChild(k);
         }
 
-        document.fonts.load('100px "Noto Music"').then(() => {
-            document.getElementById('status').innerText="KÉSZEN ÁLL";
-            drawEmptyStaff();
+        // ITT A MEGOLDÁS: Várakozás a betűtípus betöltésére az induláskor!
+        window.addEventListener('load', () => {
+            document.fonts.ready.then(() => {
+                document.getElementById('status').innerText="KÉSZEN ÁLL";
+                drawEmptyStaff();
+                // Biztonsági másodperctöredék késleltetés, ha a böngésző lassan rajzolná át
+                setTimeout(drawEmptyStaff, 150);
+            });
         });
     </script>
 </body>
