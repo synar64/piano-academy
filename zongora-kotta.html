@@ -129,7 +129,9 @@
             source.buffer = buffer;
             source.playbackRate.value = playbackRate;
             
-            gainNode.gain.setValueAtTime(velocity/127, audioCtx.currentTime);
+            // 100% RAW VOLUME. Semmi halkítás, semmi torzítás.
+            gainNode.gain.value = 1.0;
+            
             source.connect(gainNode);
             gainNode.connect(audioCtx.destination);
             
@@ -141,9 +143,11 @@
             if (activeNotes[midi]) {
                 const { src, gain } = activeNotes[midi];
                 const now = audioCtx.currentTime;
+                // Azonnali megállítás! Nincs elnyújtott fade-out ami elrontja a hangot.
+                // (0.05s kell, hogy a hangszóró ne adjon ki pattanó digitális zajt a hirtelen vágás miatt)
                 gain.gain.setValueAtTime(gain.gain.value, now);
-                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4); 
-                src.stop(now + 0.5);
+                gain.gain.linearRampToValueAtTime(0.0001, now + 0.05); 
+                src.stop(now + 0.06);
                 delete activeNotes[midi];
             }
         }
@@ -283,12 +287,10 @@
             p.appendChild(k);
         }
 
-        // ITT A MEGOLDÁS: Várakozás a betűtípus betöltésére az induláskor!
         window.addEventListener('load', () => {
             document.fonts.ready.then(() => {
                 document.getElementById('status').innerText="KÉSZEN ÁLL";
                 drawEmptyStaff();
-                // Biztonsági másodperctöredék késleltetés, ha a böngésző lassan rajzolná át
                 setTimeout(drawEmptyStaff, 150);
             });
         });
