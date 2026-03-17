@@ -3,202 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hanon - Pro Zongora Akadémia</title>
+    <title>Hanon No. 1 - Zongora Akadémia</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-blue: #00d4ff; --neon-orange: #ffaa00; --neon-purple: #bf5af2;
-            --success-green: #32d74b; --error-red: #ff453a; --bg-color: #050510; --panel-bg: rgba(0, 0, 0, 0.9);
+            --neon-blue: #0a84ff; --neon-orange: #ff9f0a; --neon-purple: #bf5af2;
+            --success-green: #32d74b; --error-red: #ff453a; --bg-dark: #050508; 
+            --panel-bg: rgba(20, 20, 30, 0.75); --border-color: rgba(255, 255, 255, 0.15);
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.5) 0%, rgba(5, 5, 8, 1) 100%), url('zongora-hatter-dark.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: var(--bg-dark); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; margin: 0; overflow: hidden;
         }
-        
-        .font-loader { position: absolute; visibility: hidden; font-family: 'Noto Music', 'Rajdhani', serif; top: -100px; }
+        .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Noto Music'; }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 10; transition: 0.3s; }
+        .back-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        h1 { color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 26px; text-shadow: 0 0 15px rgba(10,132,255,0.4); }
 
-        .back-btn { position: fixed; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid #333; z-index: 10; }
-        h1 { color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px; text-shadow: 0 0 15px rgba(0,212,255,0.4); }
+        .master-panel { background: var(--panel-bg); padding: 15px 30px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .button-row { display: flex; gap: 10px; justify-content: space-between; align-items: center; width: 100%; }
+        .group-separator { width: 1px; height: 30px; background: rgba(255,255,255,0.1); margin: 0 5px; }
         
-        .master-panel { background: var(--panel-bg); padding: 15px 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; align-items: center; position: relative; z-index: 5;}
-        .button-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        button.cfg-btn { padding: 10px 18px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
+        button.cfg-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
         
-        button.cfg-btn { padding: 8px 16px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
-        button.cfg-btn.active { border-color: var(--neon-blue); color: var(--neon-blue); background: #001a25; }
-        button.hand-lh.active { border-color: var(--neon-orange); color: var(--neon-orange); background: #1a1000; }
-        button.hand-both.active { border-color: var(--neon-purple); color: var(--neon-purple); background: #15001a; }
+        button.active-blue.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+        button#handRH.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+        button#handLH.active { border-color: var(--neon-orange); color: var(--neon-orange); background: rgba(255, 159, 10, 0.15); }
+        button#handBOTH.active { border-color: var(--neon-purple); color: var(--neon-purple); background: rgba(191, 90, 242, 0.15); }
         
-        .toggle-btn { border-color: #444; min-width: 130px; }
-        .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px; min-width: 600px; position: relative; z-index: 5;}
-        .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
+        .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: rgba(50, 215, 75, 0.15); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; width: 850px; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; backdrop-filter: blur(10px); }
+        .stat-label { font-size: 11px; color: #bbb; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
         .stat-value { font-size: 32px; font-weight: 700; font-family: 'Rajdhani', sans-serif; line-height: 1; }
-        
-        canvas { background: #000; border: 2px solid #222; border-radius: 12px; position: relative; z-index: 5; }
-        
-        #btnStart { padding: 12px 60px; background: var(--success-green); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 15px; box-shadow: 0 4px 15px rgba(50,215,75,0.3); margin-top: 5px; position: relative; z-index: 5; }
-        #btnStart.running { background: var(--error-red); color: #fff; box-shadow: 0 4px 15px rgba(255,69,58,0.3); }
-        
-        #status { margin-top: 12px; font-size: 18px; color: var(--neon-blue); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px; }
 
-        #resultModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; }
+        canvas { background: rgba(10, 10, 15, 0.7); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(15px); box-shadow: 0 15px 50px rgba(0,0,0,0.6); }
+        #btnStart { padding: 14px 80px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 16px; box-shadow: 0 4px 20px rgba(50,215,75,0.4); margin: 10px 0; }
+        #btnStart.running { background: var(--error-red); color: #fff; }
+        #status { margin-top: 10px; font-size: 18px; color: var(--neon-blue); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: rgba(20, 20, 30, 0.85); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; max-width: 500px; width: 90%; }
     </style>
 </head>
 <body>
-
-    <div class="font-loader">𝄞𝄢 0123456789 %</div>
-
+    <div class="font-loader">𝄞𝄢</div>
     <a href="index.html" class="back-btn">← AKADÉMIA</a>
     <h1>Hanon No. 1</h1>
-    
+
     <div class="master-panel">
-        <div class="button-group" id="modeButtons">
-            <button id="modeSPRINT" class="cfg-btn active" onclick="setMode('SPRINT')">SPRINT (1X)</button>
-            <button id="modeMARATHON" class="cfg-btn" onclick="setMode('MARATHON')">MARATON (3X)</button>
-            <button id="modeTRAINING" class="cfg-btn" onclick="setMode('TRAINING')">TRÉNING (∞)</button>
-        </div>
-        <div class="button-group" id="handButtons">
-            <button id="handRH" class="cfg-btn" onclick="setHand('RH')">JOBB KÉZ</button>
-            <button id="handLH" class="cfg-btn" onclick="setHand('LH')">BAL KÉZ</button>
-            <button id="handBOTH" class="cfg-btn active" onclick="setHand('BOTH')">KÉT KÉZ</button>
-            <button id="oct1" class="cfg-btn active" onclick="setOctave(1)">1 OKTÁV</button>
-            <button id="oct2" class="cfg-btn" onclick="setOctave(2)">2 OKTÁV</button>
-        </div>
-        <div class="button-group">
-            <button id="audioToggle" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: ON</button>
-            <button id="btnMidi" class="cfg-btn toggle-btn" onclick="initMidi()">MIDI CSATLAKOZTATÁSA</button>
+        <div class="button-row">
+            <div style="display:flex; gap:6px;">
+                <button id="modeSPRINT" class="cfg-btn active-blue active" onclick="setMode('SPRINT')">SPRINT</button>
+                <button id="modeMARATHON" class="cfg-btn active-blue" onclick="setMode('MARATHON')">MARATON</button>
+                <button id="modeTRAINING" class="cfg-btn active-blue" onclick="setMode('TRAINING')">TRÉNING</button>
+            </div>
+            <div class="group-separator"></div>
+            <div style="display:flex; gap:6px;">
+                <button id="handRH" class="cfg-btn" onclick="setHand('RH')">JOBB KÉZ</button>
+                <button id="handLH" class="cfg-btn" onclick="setHand('LH')">BAL KÉZ</button>
+                <button id="handBOTH" class="cfg-btn active" onclick="setHand('BOTH')">KÉT KÉZ</button>
+            </div>
+            <div class="group-separator"></div>
+            <button id="audioToggle" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: BE</button>
         </div>
     </div>
-    
+
     <div class="stats-grid">
         <div class="stat-box"><div class="stat-label">Stabilitás</div><div id="uniformity" class="stat-value" style="color:var(--success-green);">100%</div></div>
-        <div class="stat-box"><div class="stat-label">BPM</div><div id="bpm" class="stat-value" style="color: #fff;">0</div></div>
-        <div class="stat-box"><div class="stat-label">Haladás</div><div id="progress" class="stat-value" style="color:var(--neon-blue);">1 | 0 / 14</div></div>
+        <div class="stat-box"><div class="stat-label">BPM</div><div id="bpm" class="stat-value">0</div></div>
+        <div class="stat-box"><div class="stat-label">Irány</div><div id="progress" class="stat-value" style="color:var(--neon-blue);">STOP</div></div>
     </div>
-    
-    <button id="btnStart" style="display:none;" onclick="handleMainButton()">INDÍTÁS</button>
-    <canvas id="staffCanvas" width="850" height="520"></canvas>
-    <div id="status">READY</div>
 
-    <div id="resultModal">
-        <h1 style="color: var(--neon-blue);">ANALÍZIS</h1>
-        <div id="resSummary" style="font-size: 18px; margin: 25px; line-height: 2;"></div>
-        <button onclick="closeModal()" style="background: var(--success-green); color:#000; padding: 15px 50px; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; text-transform:uppercase;">BEFEJEZÉS</button>
+    <button id="btnStart" onclick="handleMainButton()">▶ GYAKORLAT INDÍTÁSA</button>
+    <canvas id="staffCanvas" width="850" height="500"></canvas>
+    <div id="status">KÉSZEN ÁLL</div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <h1 style="color: var(--neon-blue); text-transform: uppercase; letter-spacing: 2px;">Analízis</h1>
+            <div id="resSummary" style="font-size: 22px; margin: 25px 0; line-height: 1.6; font-family: 'Rajdhani';"></div>
+            <button onclick="closeModal()" style="background: var(--success-green); color:#000; padding: 15px 50px; border:none; border-radius: 8px; font-weight:bold; cursor:pointer; text-transform:uppercase;">Rendben</button>
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-        let audioCtx, audioOn = true, isMidiReady = false;
-        const whiteKeys = [36,38,40,41,43,45,47, 48,50,52,53,55,57,59, 60,62,64,65,67,69,71, 72,74,76,77,79,81,83, 84,86,88,89,91,93,95,96];
-        const ascPattern = [0, 2, 3, 4, 5, 4, 3, 2], descPattern = [5, 3, 2, 1, 0, 1, 2, 3];
-        let selectedMode = 'SPRINT', selectedHand = 'BOTH', selectedOctaves = 1;
-        let rootIndex = 14, currentIndex = 0, blocksDone = 0, currentLoop = 1, isAscending = true, isRunning = false;
+        let audioCtx, audioOn = true, isMidiReady = false, isRunning = false;
+        
+        const whiteKeys = [36,38,40,41,43,45,47, 48,50,52,53,55,57,59, 60,62,64,65,67,69,71, 72,74,76,77,79,81,83, 84,86,88,89,91,93,95];
+        
+        const patternAsc = [0, 2, 3, 4, 5, 4, 3, 2];
+        const patternDesc = [0, -2, -3, -4, -5, -4, -3, -2];
+        
+        let selectedMode = 'SPRINT', selectedHand = 'BOTH', currentLoop = 1;
+        let rootIndex = 14, currentIndex = 0, isAscending = true, isFinalNote = false;
         let lastNoteTime = 0, timeDiffs = [], allBpms = [], rhHit = false, lhHit = false;
-        const trebleY = 140, bassY = 400;
 
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
+        const trebleY = 140, bassY = 380;
 
-        function initMidi() {
-            initAudio();
-            if (navigator.requestMIDIAccess) {
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+
+        function handleMainButton() {
+            if (!isMidiReady) {
+                initAudio();
                 navigator.requestMIDIAccess().then(access => {
                     for (let input of access.inputs.values()) input.onmidimessage = onMIDIMessage;
-                    isMidiReady = true;
-                    document.getElementById('btnMidi').innerText = "MIDI: ON";
-                    document.getElementById('btnMidi').classList.add('on');
-                    document.getElementById('btnStart').style.display = 'inline-block';
+                    isMidiReady = true; startPractice();
                 });
+                return;
             }
+            isRunning ? stopPractice() : startPractice();
         }
 
-        function handleMainButton() { isRunning ? stopPractice() : startPractice(); }
-        function startPractice() { 
-            initAudio(); isRunning = true; currentIndex = 0; timeDiffs = []; allBpms = []; lastNoteTime = 0; currentLoop = 1; blocksDone = 0; isAscending = true;
-            rootIndex = (selectedOctaves === 1) ? 14 : 7; 
-            const btn = document.getElementById('btnStart'); btn.innerText = "STOP / RESET"; btn.classList.add('running');
-            updateProgressLabel(); draw(); 
-        }
-        function stopPractice() { isRunning = false; const btn = document.getElementById('btnStart'); btn.innerText = "INDÍTÁS"; btn.classList.remove('running'); draw(); }
-        function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
-        function toggleAudio() { audioOn = !audioOn; const btn = document.getElementById('audioToggle'); btn.innerText = `ZONGORA: ${audioOn ? 'ON' : 'OFF'}`; btn.classList.toggle('on', audioOn); if (audioOn) initAudio(); }
-        function setMode(m) { selectedMode = m; document.querySelectorAll('#modeButtons .cfg-btn').forEach(b => b.classList.remove('active')); document.getElementById('mode' + m).classList.add('active'); updateProgressLabel(); }
-        function setHand(mode) { selectedHand = mode; document.querySelectorAll('#handButtons .cfg-btn').forEach(b => { if(b.innerText.includes('KÉZ')) b.classList.remove('active'); }); document.getElementById('hand' + mode).classList.add('active'); draw(); }
-        function setOctave(num) { selectedOctaves = num; document.getElementById('oct1').classList.toggle('active', num === 1); document.getElementById('oct2').classList.toggle('active', num === 2); rootIndex = (num === 1) ? 14 : 7; updateProgressLabel(); draw(); }
-        function updateProgressLabel() { document.getElementById('progress').innerText = `${selectedMode === 'TRAINING' ? '∞' : currentLoop} | ${blocksDone} / ${selectedOctaves * 14}`; }
-        
-        function playSound(midi) { 
-            if (!audioCtx || !audioOn) return; 
-            const now = audioCtx.currentTime, osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); 
-            osc.type = 'sine'; osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); 
-            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2); 
-            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 1.3); 
+        function startPractice() {
+            isRunning = true; currentIndex = 0; rootIndex = 14; isAscending = true; isFinalNote = false;
+            currentLoop = 1; timeDiffs = []; allBpms = []; lastNoteTime = 0; rhHit = false; lhHit = false;
+            const btn = document.getElementById('btnStart'); btn.innerText = "◼ LEÁLLÍTÁS"; btn.classList.add('running');
+            document.getElementById('status').innerText = "GYAKORLÁS..."; draw();
         }
 
-        function drawEmptyStaff() {
-            ctx.globalAlpha = 1.0;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
-            if (selectedHand !== 'LH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, trebleY+i*24); ctx.lineTo(800, trebleY+i*24); ctx.stroke(); } }
-            if (selectedHand !== 'RH') { for(let i=-2; i<=2; i++){ ctx.beginPath(); ctx.moveTo(50, bassY+i*24); ctx.lineTo(800, bassY+i*24); ctx.stroke(); } }
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            if (selectedHand !== 'LH') { ctx.font='100px "Noto Music", serif'; ctx.fillStyle='#bf5af2'; ctx.fillText('\uD834\uDD1E', 95, trebleY + 20); }
-            if (selectedHand !== 'RH') { ctx.font='94px "Noto Music", serif'; ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY + 12); }
-        }
-
-        function draw() {
-            drawEmptyStaff();
-            const currentPattern = isAscending ? ascPattern : descPattern;
-            currentPattern.forEach((step, i) => {
-                let indexRH = rootIndex + step, indexLH = rootIndex - 7 + step;
-                let offRH = indexRH - 20, offLH = indexLH - 8;  
-                
-                // MÓDOSÍTOTT: Erősebb kontraszt a hátralévő hangoknak (0.35)
-                ctx.globalAlpha = (isRunning && i < currentIndex) ? 0.15 : (isRunning && i === currentIndex ? 1.0 : 0.35);
-                if(!isRunning && i === 0) ctx.globalAlpha = 1.0;
-                
-                let x = 220 + (i * 72);
-                if (selectedHand !== 'LH') { 
-                    ctx.fillStyle = (isRunning && i === currentIndex) ? "#00d4ff" : "#fff"; 
-                    let yRH = trebleY - offRH * 12; 
-                    // MÓDOSÍTOTT: Pótvonalak rajzolása már az indítás előtt is!
-                    ctx.save(); ctx.globalAlpha = (isRunning && i === currentIndex) ? 1.0 : 0.4;
-                    if (offRH <= -6) { for (let p = -6; p >= offRH; p -= 2) { ctx.beginPath(); ctx.moveTo(x-22, trebleY-p*12); ctx.lineTo(x+22, trebleY-p*12); ctx.stroke(); } }
-                    if (offRH >= 6) { for (let p = 6; p <= offRH; p += 2) { ctx.beginPath(); ctx.moveTo(x-22, trebleY-p*12); ctx.lineTo(x+22, trebleY-p*12); ctx.stroke(); } }
-                    ctx.restore();
-                    ctx.beginPath(); ctx.ellipse(x, yRH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); 
-                }
-                if (selectedHand !== 'RH') { 
-                    ctx.fillStyle = (isRunning && i === currentIndex) ? "#ffaa00" : "#fff"; 
-                    let yLH = bassY - offLH * 12; 
-                    ctx.save(); ctx.globalAlpha = (isRunning && i === currentIndex) ? 1.0 : 0.4;
-                    if (offLH <= -6) { for (let p = -6; p >= offLH; p -= 2) { ctx.beginPath(); ctx.moveTo(x-22, bassY-p*12); ctx.lineTo(x+22, bassY-p*12); ctx.stroke(); } }
-                    if (offLH >= 6) { for (let p = 6; p <= offLH; p += 2) { ctx.beginPath(); ctx.moveTo(x-22, bassY-p*12); ctx.lineTo(x+22, bassY-p*12); ctx.stroke(); } }
-                    ctx.restore();
-                    ctx.beginPath(); ctx.ellipse(x, yLH, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill(); 
-                }
-            });
-            ctx.globalAlpha = 1.0;
-        }
+        function stopPractice() { isRunning = false; const btn = document.getElementById('btnStart'); btn.innerText = "▶ GYAKORLAT INDÍTÁSA"; btn.classList.remove('running'); document.getElementById('status').innerText = "KÉSZEN ÁLL"; draw(); }
 
         function onMIDIMessage(e) {
             if (!isRunning) return;
             let [s, n, v] = e.data;
             if ((s & 0xf0) === 0x90 && v > 0) {
-                const currentPattern = isAscending ? ascPattern : descPattern;
-                let tRH = whiteKeys[rootIndex + currentPattern[currentIndex]];
-                let tLH = whiteKeys[rootIndex - 7 + currentPattern[currentIndex]];
+                let target = isFinalNote ? 14 : rootIndex + (isAscending ? patternAsc : patternDesc)[currentIndex];
+                let tRH = whiteKeys[target];
+                let tLH = whiteKeys[target - 7]; 
+                
                 if (selectedHand === 'RH' && n === tRH) { playSound(n); processHit(); }
                 else if (selectedHand === 'LH' && n === tLH) { playSound(n); processHit(); }
-                else if (selectedHand === 'BOTH') { 
-                    if (n === tRH && !rhHit) { rhHit = true; playSound(n); } 
-                    if (n === tLH && !lhHit) { lhHit = true; playSound(n); } 
-                    if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(); } 
+                else if (selectedHand === 'BOTH') {
+                    if (n === tRH && !rhHit) { rhHit = true; playSound(n); }
+                    if (n === tLH && !lhHit) { lhHit = true; playSound(n); }
+                    if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(); }
                 }
             }
         }
@@ -211,23 +156,123 @@
                 document.getElementById('uniformity').innerText = Math.round(Math.max(0, 100-(dev/3))) + "%";
                 document.getElementById('bpm').innerText = Math.round(60000/diff);
             }
-            lastNoteTime = now; currentIndex++;
-            let totalPerLoop = selectedOctaves * 14;
-            if (!isAscending && blocksDone === totalPerLoop - 1 && currentIndex === 4) {
-                if (selectedMode === 'SPRINT') { finish(); return; }
-                else if (selectedMode === 'MARATHON' && currentLoop >= 3) { finish(); return; }
-                else { currentLoop++; blocksDone = 0; isAscending = true; rootIndex = (selectedOctaves === 1 ? 14 : 7); currentIndex = 0; updateProgressLabel(); draw(); return; }
+            lastNoteTime = now;
+
+            if (isFinalNote) {
+                if ((selectedMode === 'MARATHON' && currentLoop < 3) || selectedMode === 'TRAINING') {
+                    currentLoop++; rootIndex = 14; isAscending = true; isFinalNote = false; currentIndex = 0;
+                } else { finish(); return; }
+            } else {
+                currentIndex++;
+                if (currentIndex >= 8) {
+                    currentIndex = 0;
+                    if (isAscending) {
+                        if (rootIndex === 20) { // B4 az utolsó emelkedő
+                            isAscending = false; 
+                            rootIndex = 25; // UGRÁS G5-re
+                        } else {
+                            rootIndex++;
+                        }
+                    } else {
+                        if (rootIndex === 18) { // G4 AZ UTOLSÓ LEERESZKEDŐ
+                            isFinalNote = true; // Záró C4 jön azonnal
+                        } else {
+                            rootIndex--;
+                        }
+                    }
+                }
             }
-            if (currentIndex >= 8) { 
-                currentIndex = 0; blocksDone++; 
-                if (isAscending) { rootIndex++; if (rootIndex > 21) { isAscending = false; rootIndex = 21; } } else { rootIndex--; } 
-                updateProgressLabel(); 
-            }
+            document.getElementById('progress').innerText = isFinalNote ? "ZÁRÁS" : (isAscending ? "FEL" : "LE");
             draw();
         }
 
-        function finish() { isRunning = false; const avgBpm = Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length); document.getElementById('resSummary').innerHTML = `BPM: ${avgBpm}<br>Stabilitás: ${document.getElementById('uniformity').innerText}`; document.getElementById('resultModal').style.display = "flex"; }
-        window.onload = () => { document.fonts.ready.then(() => { drawEmptyStaff(); draw(); }); };
+        function drawLedgers(x, off, baseY, color) {
+            ctx.strokeStyle = color; ctx.lineWidth = 3;
+            if (off >= 6) {
+                for (let p = 6; p <= off; p += 2) {
+                    let ly = baseY - p * 12;
+                    ctx.beginPath(); ctx.moveTo(x - 22, ly); ctx.lineTo(x + 22, ly); ctx.stroke();
+                }
+            }
+            if (off <= -6) {
+                for (let p = -6; p >= off; p -= 2) {
+                    let ly = baseY - p * 12;
+                    ctx.beginPath(); ctx.moveTo(x - 22, ly); ctx.lineTo(x + 22, ly); ctx.stroke();
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2;
+            
+            for(let i=-2; i<=2; i++){
+                if(selectedHand!=='LH'){ctx.beginPath();ctx.moveTo(50,trebleY+i*24);ctx.lineTo(800,trebleY+i*24);ctx.stroke();}
+                if(selectedHand!=='RH'){ctx.beginPath();ctx.moveTo(50,bassY+i*24);ctx.lineTo(800,bassY+i*24);ctx.stroke();}
+            }
+            
+            ctx.font='100px "Noto Music"'; ctx.textAlign='center'; ctx.textBaseline='middle';
+            if(selectedHand!=='LH'){ctx.fillStyle='#bf5af2'; ctx.fillText('\uD834\uDD1E', 95, trebleY + 20);}
+            if(selectedHand!=='RH'){ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY + 12);}
+
+            if (isRunning) {
+                if (isFinalNote) {
+                    drawNote(14, 0, true);
+                } else {
+                    const p = isAscending ? patternAsc : patternDesc;
+                    p.forEach((step, i) => {
+                        ctx.globalAlpha = i < currentIndex ? 0.15 : (i === currentIndex ? 1.0 : 0.35);
+                        drawNote(rootIndex + step, i, false);
+                    });
+                }
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        function drawNote(targetIndex, xPos, isWhole) {
+            let x = 200 + (xPos * 80);
+            
+            if (selectedHand !== 'LH') {
+                let off = targetIndex - 20; 
+                let y = trebleY - off * 12;
+                let color = (!isWhole && xPos === currentIndex) || isWhole ? "#0a84ff" : "#fff";
+                ctx.fillStyle = color;
+                drawLedgers(x, off, trebleY, color);
+                ctx.beginPath(); ctx.ellipse(x, y, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill();
+            }
+            
+            if (selectedHand !== 'RH') {
+                let off = targetIndex - 7 - 8; 
+                let y = bassY - off * 12;
+                let color = (!isWhole && xPos === currentIndex) || isWhole ? "#ff9f0a" : "#fff";
+                ctx.fillStyle = color;
+                drawLedgers(x, off, bassY, color);
+                ctx.beginPath(); ctx.ellipse(x, y, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill();
+            }
+        }
+
+        // Hanggenerátor JAVÍTVA
+        function playSound(midi) { 
+            if (!audioOn || !audioCtx) return; 
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain(); 
+            osc.type = 'sine'; 
+            osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); 
+            gain.gain.setValueAtTime(0.15, now); 
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8); 
+            osc.connect(gain); 
+            gain.connect(audioCtx.destination); 
+            osc.start(now); 
+            osc.stop(now + 1); 
+        }
+
+        function finish() { isRunning = false; const avg = allBpms.length > 0 ? Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length) : 0; document.getElementById('resSummary').innerHTML = `Tempó: <span style="color:var(--neon-blue)">${avg} BPM</span><br>Stabilitás: <span style="color:var(--success-green)">${document.getElementById('uniformity').innerText}</span><br><br>Hajszálpontos teljesítés a Nagykönyv szerint!`; document.getElementById('resultModal').style.display = "flex"; }
+        function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
+        function toggleAudio() { audioOn = !audioOn; document.getElementById('audioToggle').innerText = `ZONGORA: ${audioOn?'BE':'KI'}`; document.getElementById('audioToggle').classList.toggle('on', audioOn); }
+        function setMode(m) { selectedMode = m; document.querySelectorAll('.active-blue').forEach(b=>b.classList.remove('active')); document.getElementById('mode'+m).classList.add('active'); if(isRunning) stopPractice(); }
+        function setHand(h) { selectedHand = h; document.getElementById('handRH').classList.toggle('active', h==='RH'); document.getElementById('handLH').classList.toggle('active', h==='LH'); document.getElementById('handBOTH').classList.toggle('active', h==='BOTH'); if(isRunning) stopPractice(); draw(); }
+        window.onload = () => { document.fonts.ready.then(draw); };
     </script>
 </body>
 </html>
