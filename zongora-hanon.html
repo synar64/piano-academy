@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hanon No. 1 - Zongora Akadémia</title>
+    <title>Hanon No. 1 - Zongora Akadémia PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -23,15 +23,15 @@
         .back-btn:hover { color: #fff; border-color: var(--neon-blue); background: rgba(10,132,255,0.1); }
         h1 { color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 26px; text-shadow: 0 0 15px rgba(10,132,255,0.4); }
 
-        .master-panel { background: var(--panel-bg); padding: 15px 30px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .master-panel { position: relative; z-index: 100; background: var(--panel-bg); padding: 15px 30px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         .button-row { display: flex; gap: 15px; justify-content: space-between; align-items: flex-end; width: 100%; }
         .btn-group-container { display: flex; flex-direction: column; align-items: center; gap: 6px; }
         .group-title { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
         .group-separator { width: 1px; height: 35px; background: rgba(255,255,255,0.15); margin: 0 5px; }
         
-        button.cfg-btn, select.cfg-btn { padding: 9px 16px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; font-family: inherit; outline: none; }
-        button.cfg-btn:hover, select.cfg-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        button.cfg-btn { padding: 9px 16px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; font-family: inherit; outline: none; }
+        button.cfg-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
         
         button.active-blue.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
         button#handRH.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
@@ -39,23 +39,28 @@
         
         .toggle-btn { text-align: center; }
         .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: rgba(50, 215, 75, 0.15); }
-        
-        select.cfg-btn { appearance: none; -webkit-appearance: none; -moz-appearance: none; text-align-last: center; padding-right: 25px; background-image: url('data:image/svg+xml;utf8,<svg fill="%23aaa" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position-x: 95%; background-position-y: 50%; }
-        select.cfg-btn option { background: #111; color: #fff; }
-        select.cfg-btn.off-mode { border-color: #444; color: #aaa; background-color: rgba(0,0,0,0.5); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; width: 850px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; width: 850px; position: relative; z-index: 10; }
         .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; backdrop-filter: blur(10px); }
         .stat-label { font-size: 11px; color: #bbb; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
         .stat-value { font-size: 32px; font-weight: 700; font-family: 'Rajdhani', sans-serif; line-height: 1; }
 
-        canvas { background: rgba(10, 10, 15, 0.7); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(15px); box-shadow: 0 15px 50px rgba(0,0,0,0.6); }
-        #btnStart { padding: 14px 80px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 16px; box-shadow: 0 4px 20px rgba(50,215,75,0.4); margin: 10px 0; }
+        canvas { background: rgba(10, 10, 15, 0.7); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(15px); box-shadow: 0 15px 50px rgba(0,0,0,0.6); position: relative; z-index: 1; }
+        #btnStart { padding: 14px 80px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 16px; box-shadow: 0 4px 20px rgba(50,215,75,0.4); margin: 10px 0; position: relative; z-index: 10; }
         #btnStart.running { background: var(--error-red); color: #fff; box-shadow: 0 4px 20px rgba(255,69,58,0.4); }
         #status { margin-top: 10px; font-size: 18px; color: var(--neon-blue); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 10000; justify-content: center; align-items: center; }
         .modal-content { background: rgba(20, 20, 30, 0.9); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+
+        /* VIRTUÁLIS ZONGORA */
+        #pianoWrapper { display: none; width: 850px; justify-content: center; margin-top: 15px; }
+        .piano-container { display: flex; background: #000; padding: 5px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .key { width: 30px; height: 100px; border: 1px solid #111; border-radius: 0 0 4px 4px; cursor: pointer; position: relative; display: flex; align-items: flex-end; justify-content: center; font-size: 8px; color: #666; transition: 0.1s; user-select: none; }
+        .white { background: #eee; }
+        .white.pressed { background: var(--neon-blue) !important; color: #fff; }
+        .black { background: #111; width: 20px; height: 60px; margin-left: -10px; margin-right: -10px; z-index: 2; border-radius: 0 0 2px 2px; }
+        .black.pressed { background: var(--neon-orange) !important; }
     </style>
 </head>
 <body>
@@ -90,13 +95,10 @@
             <div class="btn-group-container">
                 <div class="group-title">Hangzás & Motor</div>
                 <div style="display:flex; gap:6px;">
-                    <select id="audioSelect" class="cfg-btn toggle-btn on" onchange="changeAudioMode()">
-                        <option value="sine_classic">HANG: CSENGŐ</option>
-                        <option value="triangle">HANG: E-ZONGORA</option>
-                        <option value="sawtooth">HANG: FÉNYES</option>
-                        <option value="square">HANG: 8-BIT</option>
-                        <option value="off">ZONGORA: KI</option>
-                    </select>
+                    
+                    <button id="audioToggle" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: BE</button>
+                    
+                    <button id="kbToggle" class="cfg-btn toggle-btn" onclick="toggleKeyboard()">BILLENTYŰ</button>
                     <button id="dynToggle" class="cfg-btn toggle-btn on" onclick="toggleDynamics()">DINAMIKA</button>
                 </div>
             </div>
@@ -112,6 +114,11 @@
 
     <button id="btnStart" onclick="handleMainButton()">▶ GYAKORLAT INDÍTÁSA</button>
     <canvas id="staffCanvas" width="850" height="500"></canvas>
+    
+    <div id="pianoWrapper">
+        <div class="piano-container" id="piano"></div>
+    </div>
+
     <div id="status">KÉSZEN ÁLL</div>
 
     <div id="resultModal" class="modal-overlay">
@@ -124,38 +131,82 @@
 
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-        let audioCtx, useDynamics = true, isMidiReady = false, isRunning = false;
+        let audioCtx, compressor, audioBuffers = {}, useDynamics = true, isAudioEnabled = true, isMidiReady = false, isRunning = false;
         let activeNotes = {}; 
         
         const whiteKeys = [36,38,40,41,43,45,47, 48,50,52,53,55,57,59, 60,62,64,65,67,69,71, 72,74,76,77,79,81,83, 84,86,88,89,91,93,95];
         const patternAsc = [0, 2, 3, 4, 5, 4, 3, 2];
         const patternDesc = [0, -2, -3, -4, -5, -4, -3, -2]; 
+        const noteNames = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
         
         let selectedMode = 'SPRINT';
-        
-        // Zseniális UX: a két gomb állapota vezérli a logikát
-        let rhActive = true;
-        let lhActive = true;
-        let selectedHand = 'BOTH';
-        
-        let currentLoop = 1;
-        let rootIndex = 14, currentIndex = 0, isAscending = true, isFinalNote = false;
+        let rhActive = true, lhActive = true, selectedHand = 'BOTH';
+        let currentLoop = 1, rootIndex = 14, currentIndex = 0, isAscending = true, isFinalNote = false;
         let lastNoteTime = 0, timeDiffs = [], allBpms = [], rhHit = false, lhHit = false;
-
         const trebleY = 140, bassY = 380;
 
-        function initAudio() { 
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+        function createPiano() {
+            const p = document.getElementById('piano');
+            for (let i = 48; i <= 72; i++) {
+                const isB = [1,3,6,8,10].includes(i%12);
+                const k = document.createElement('div');
+                k.className = `key ${isB?'black':'white'}`; k.id = `key-${i}`;
+                k.onmousedown = (e) => { e.preventDefault(); simulateMidi(i, 100); };
+                k.onmouseup = () => simulateMidi(i, 0);
+                k.onmouseleave = () => simulateMidi(i, 0);
+                p.appendChild(k);
+            }
+        }
+
+        function simulateMidi(note, vel) {
+            onMIDIMessage({ data: [vel > 0 ? 0x90 : 0x80, note, vel] });
+        }
+
+        function toggleKeyboard() {
+            const w = document.getElementById('pianoWrapper');
+            const b = document.getElementById('kbToggle');
+            const isVisible = w.style.display === 'flex';
+            w.style.display = isVisible ? 'none' : 'flex';
+            b.classList.toggle('on', !isVisible);
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('audioToggle');
+            btn.classList.toggle('on', isAudioEnabled);
+            btn.innerText = isAudioEnabled ? "ZONGORA" : "ZONGORA";
+            if(isAudioEnabled) initAudio();
+        }
+
+        async function initAudio() { 
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+                compressor = audioCtx.createDynamicsCompressor();
+                compressor.threshold.setValueAtTime(-15, audioCtx.currentTime);
+                compressor.ratio.setValueAtTime(12, audioCtx.currentTime);
+                compressor.connect(audioCtx.destination);
+                
+                for(let i=48; i<=84; i++) {
+                    const name = noteNames[i%12] + (Math.floor(i/12)-1);
+                    try {
+                        let r = await fetch(`audio/piano/${name}.mp3`);
+                        if(!r.ok) r = await fetch(`audio/piano/${name.toLowerCase()}.mp3`);
+                        if(r.ok) {
+                            const ab = await r.arrayBuffer();
+                            audioBuffers[i] = await audioCtx.decodeAudioData(ab);
+                        }
+                    } catch(e) {}
+                }
+            }
             if (audioCtx.state === 'suspended') audioCtx.resume(); 
         }
 
         function handleMainButton() {
             if (!isMidiReady) {
-                initAudio();
+                if (isAudioEnabled) initAudio();
                 navigator.requestMIDIAccess().then(access => {
                     for (let input of access.inputs.values()) input.onmidimessage = onMIDIMessage;
-                    isMidiReady = true; 
-                    startPractice();
+                    isMidiReady = true; startPractice();
                 });
                 return;
             }
@@ -171,41 +222,34 @@
 
         function stopPractice() { isRunning = false; const btn = document.getElementById('btnStart'); btn.innerText = "▶ GYAKORLAT INDÍTÁSA"; btn.classList.remove('running'); document.getElementById('status').innerText = "KÉSZEN ÁLL"; draw(); }
 
+        // LETISZTULT HANGMOTOR - CSAK AZ MP3 ZONGORA MARADT
         function playSound(midi, velocity) { 
-            const sel = document.getElementById('audioSelect').value;
-            if (sel === 'off' || !audioCtx) return; 
-            
+            if (!isAudioEnabled || !audioCtx || !audioBuffers[midi]) return; 
             if (activeNotes[midi]) stopSound(midi);
 
             const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain(); 
+            const source = audioCtx.createBufferSource();
             
-            osc.type = (sel === 'sine_classic') ? 'sine' : sel; 
-            osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); 
-            
-            let maxVolume = useDynamics ? (velocity / 127) * 0.4 : 0.2;
-            
+            source.buffer = audioBuffers[midi];
+            let maxVolume = useDynamics ? (velocity / 127) * 2.5 : 1.5; 
             gain.gain.setValueAtTime(maxVolume, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8); 
-
-            osc.connect(gain); 
-            gain.connect(audioCtx.destination); 
-            osc.start(now); 
-
-            activeNotes[midi] = { osc, gain };
+            
+            source.connect(gain); 
+            gain.connect(compressor); 
+            source.start(now); 
+            
+            activeNotes[midi] = { src: source, gain: gain };
         }
 
         function stopSound(midi) {
             if (activeNotes[midi]) {
                 const now = audioCtx.currentTime;
-                const { osc, gain } = activeNotes[midi];
-                
+                const { src, gain } = activeNotes[midi];
                 gain.gain.cancelScheduledValues(now);
                 gain.gain.setValueAtTime(gain.gain.value, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-                
-                osc.stop(now + 0.15);
+                src.stop(now + 0.15);
                 delete activeNotes[midi];
             }
         }
@@ -214,11 +258,16 @@
             let [status, note, velocity] = e.data;
             let cmd = status & 0xf0;
 
+            const k = document.getElementById(`key-${note}`);
+            if (k) {
+                if (cmd === 0x90 && velocity > 0) k.classList.add('pressed');
+                else k.classList.remove('pressed');
+            }
+
             if (cmd === 0x90 && velocity > 0) {
                 if (isRunning) {
                     let targetIdx = isFinalNote ? 14 : rootIndex + (isAscending ? patternAsc : patternDesc)[currentIndex];
-                    let tRH = whiteKeys[targetIdx];
-                    let tLH = whiteKeys[targetIdx - 7];
+                    let tRH = whiteKeys[targetIdx], tLH = whiteKeys[targetIdx - 7];
                     
                     if (selectedHand === 'RH' && note === tRH) { playSound(note, velocity); processHit(); }
                     else if (selectedHand === 'LH' && note === tLH) { playSound(note, velocity); processHit(); }
@@ -226,15 +275,9 @@
                         if (note === tRH && !rhHit) { rhHit = true; playSound(note, velocity); } 
                         if (note === tLH && !lhHit) { lhHit = true; playSound(note, velocity); } 
                         if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(); } 
-                    } else {
-                        playSound(note, velocity);
-                    }
-                } else {
-                    playSound(note, velocity);
-                }
-            } else if (cmd === 0x80 || (cmd === 0x90 && velocity === 0)) {
-                stopSound(note);
-            }
+                    } else playSound(note, velocity);
+                } else playSound(note, velocity);
+            } else if (cmd === 0x80 || (cmd === 0x90 && velocity === 0)) stopSound(note);
         }
 
         function processHit() {
@@ -255,13 +298,8 @@
                 currentIndex++;
                 if (currentIndex >= 8) {
                     currentIndex = 0;
-                    if (isAscending) {
-                        if (rootIndex === 20) { isAscending = false; rootIndex = 25; } 
-                        else { rootIndex++; }
-                    } else {
-                        if (rootIndex === 18) { isFinalNote = true; } 
-                        else { rootIndex--; }
-                    }
+                    if (isAscending) { if (rootIndex === 20) { isAscending = false; rootIndex = 25; } else rootIndex++; } 
+                    else { if (rootIndex === 18) { isFinalNote = true; } else rootIndex--; }
                 }
             }
             document.getElementById('progress').innerText = isFinalNote ? "ZÁRÁS" : (isAscending ? "FEL" : "LE");
@@ -288,9 +326,8 @@
             if(selectedHand!=='RH'){ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY + 12);}
 
             if (isRunning) {
-                if (isFinalNote) {
-                    drawNote(14, 0, true);
-                } else {
+                if (isFinalNote) drawNote(14, 0, true);
+                else {
                     const p = isAscending ? patternAsc : patternDesc;
                     p.forEach((step, i) => {
                         ctx.globalAlpha = i < currentIndex ? 0.15 : (i === currentIndex ? 1.0 : 0.35);
@@ -303,22 +340,16 @@
 
         function drawNote(targetIndex, xPos, isWhole) {
             let x = 200 + (xPos * 80);
-            
             if (selectedHand !== 'LH') {
-                let off = targetIndex - 20; 
-                let y = trebleY - off * 12;
+                let off = targetIndex - 20; let y = trebleY - off * 12;
                 let color = (!isWhole && xPos === currentIndex) || isWhole ? "#0a84ff" : "#fff";
-                ctx.fillStyle = color;
-                drawLedgers(x, off, trebleY, color);
+                ctx.fillStyle = color; drawLedgers(x, off, trebleY, color);
                 ctx.beginPath(); ctx.ellipse(x, y, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill();
             }
-            
             if (selectedHand !== 'RH') {
-                let off = targetIndex - 7 - 8; 
-                let y = bassY - off * 12;
+                let off = targetIndex - 7 - 8; let y = bassY - off * 12;
                 let color = (!isWhole && xPos === currentIndex) || isWhole ? "#ff9f0a" : "#fff";
-                ctx.fillStyle = color;
-                drawLedgers(x, off, bassY, color);
+                ctx.fillStyle = color; drawLedgers(x, off, bassY, color);
                 ctx.beginPath(); ctx.ellipse(x, y, 16, 12, Math.PI/8, 0, 2*Math.PI); ctx.fill();
             }
         }
@@ -326,22 +357,7 @@
         function finish() { isRunning = false; const avg = allBpms.length > 0 ? Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length) : 0; document.getElementById('resSummary').innerHTML = `Tempó: <span style="color:var(--neon-blue)">${avg} BPM</span><br>Stabilitás: <span style="color:var(--success-green)">${document.getElementById('uniformity').innerText}</span>`; document.getElementById('resultModal').style.display = "flex"; }
         function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
         
-        function changeAudioMode() {
-            const sel = document.getElementById('audioSelect');
-            if (sel.value === 'off') {
-                sel.classList.remove('on');
-                sel.classList.add('off-mode');
-            } else {
-                sel.classList.add('on');
-                sel.classList.remove('off-mode');
-                initAudio();
-            }
-        }
-        
-        function toggleDynamics() { 
-            useDynamics = !useDynamics; 
-            document.getElementById('dynToggle').classList.toggle('on', useDynamics); 
-        }
+        function toggleDynamics() { useDynamics = !useDynamics; document.getElementById('dynToggle').classList.toggle('on', useDynamics); }
         
         function setMode(m) { 
             selectedMode = m; 
@@ -350,28 +366,16 @@
             if(isRunning) stopPractice(); 
         }
         
-        // A zseniális "Kéz-kombinációs" logika
         function toggleHand(h) {
-            if (h === 'RH') rhActive = !rhActive;
-            if (h === 'LH') lhActive = !lhActive;
-            
-            // Megakadályozzuk, hogy mindkét kezet kikapcsolja a felhasználó
-            if (!rhActive && !lhActive) {
-                if (h === 'RH') rhActive = true;
-                if (h === 'LH') lhActive = true;
-            }
-
+            if (h === 'RH') rhActive = !rhActive; if (h === 'LH') lhActive = !lhActive;
+            if (!rhActive && !lhActive) { if (h === 'RH') rhActive = true; if (h === 'LH') lhActive = true; }
             document.getElementById('handRH').classList.toggle('active', rhActive);
             document.getElementById('handLH').classList.toggle('active', lhActive);
-
-            if (rhActive && lhActive) selectedHand = 'BOTH';
-            else if (rhActive) selectedHand = 'RH';
-            else selectedHand = 'LH';
-
-            if (isRunning) stopPractice();
-            draw();
+            selectedHand = (rhActive && lhActive) ? 'BOTH' : (rhActive ? 'RH' : 'LH');
+            if (isRunning) stopPractice(); draw();
         }
 
+        createPiano();
         window.onload = () => { document.fonts.ready.then(draw); };
     </script>
 </body>
