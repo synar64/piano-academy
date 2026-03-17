@@ -76,9 +76,13 @@
 
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-        let audioCtx, audioBuffers = {}, activeNotes = {}, audioOn=true;
+        const imgSharp = new Image(), imgBe = new Image();
+        imgSharp.src = 'sharp.png'; imgBe.src = 'be.png';
+
         let scoreOk=0, combo=0, totalTasks=0, isRunning=false, isMidiReady=false;
-        let currentNote=null, isTransitioning=false, trebleActive=true, bassActive=true, visualClef='treble', timerEnabled=true;
+        let audioCtx, audioBuffers = {}, activeNotes = {}, audioOn=true;
+        let timeLeft=5.0, timerTicker=null, currentNote=null, isWaitingForCorrection=false, isTransitioning=false;
+        let trebleActive=true, bassActive=true, visualClef='treble', useAccidentals=true, useQuickHint=false, timerEnabled=true;
 
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
         
@@ -91,10 +95,9 @@
                 for(let i=21; i<=108; i++) {
                     const oct = Math.floor(i/12)-1;
                     const name = noteNames[i%12] + oct;
-                    const bName = (name === "B-1") ? "B-1" : name; // Kezeli a speciális B-1 esetet
+                    const bName = (name === "B-1") ? "B-1" : name;
                     audioBuffers[i] = {};
 
-                    // Minden lehetséges névváltozatot megpróbálunk a listád alapján
                     ["PP", "MP", "MF", "FF", "Mp", "Mf"].forEach(dyn => {
                         const variations = [
                             `${dyn} ${bName}.mp3`,
@@ -103,7 +106,9 @@
                         ];
 
                         variations.forEach(v => {
-                            fetch(encodeURI(`audio/piano/${v}`))
+                            // JAVÍTÁS: encodeURIComponent használata a # jel kezeléséhez!
+                            const encodedFilename = v.replace(/#/g, '%23');
+                            fetch(`audio/piano/${encodedFilename}`)
                             .then(r => r.ok ? r.arrayBuffer() : null)
                             .then(ab => ab ? audioCtx.decodeAudioData(ab) : null)
                             .then(buf => {
@@ -127,12 +132,28 @@
         function playSound(midi, velocity) {
             if (!audioOn || !audioCtx || !audioBuffers[midi]) return;
             let d = velocity < 32 ? "PP" : (velocity < 64 ? "MP" : (velocity < 96 ? "MF" : "FF"));
+            
+            // Okosabb buffer választás: ha nincs meg a kívánt dinamika, keresünk mást
             let buffer = audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"];
+            let playbackRate = 1.0;
+
+            // Ha egyáltalán nincs hang az adott billentyűhöz (pl. fekete billentyű hiba)
+            if (!buffer) {
+                const neighbors = [midi-1, midi+1, midi-2, midi+2];
+                for (let n of neighbors) {
+                    if (audioBuffers[n] && (audioBuffers[n][d] || audioBuffers[n]["MF"])) {
+                        buffer = audioBuffers[n][d] || audioBuffers[n]["MF"];
+                        playbackRate = Math.pow(2, (midi - n) / 12);
+                        break;
+                    }
+                }
+            }
             
             if (!buffer) return;
             const source = audioCtx.createBufferSource();
             const gainNode = audioCtx.createGain();
             source.buffer = buffer;
+            source.playbackRate.value = playbackRate;
             gainNode.gain.setValueAtTime((velocity/127), audioCtx.currentTime);
             source.connect(gainNode); gainNode.connect(audioCtx.destination);
             source.start(0);
