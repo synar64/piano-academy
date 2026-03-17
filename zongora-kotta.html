@@ -143,7 +143,11 @@
             const source = audioCtx.createBufferSource();
             const gainNode = audioCtx.createGain();
             source.buffer = audioBuffers[midi];
-            gainNode.gain.setValueAtTime(velocity/127, audioCtx.currentTime);
+            
+            // ÚJ: Finom Attack, hogy ne pattanjon a hang kezdete
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(velocity/127, audioCtx.currentTime + 0.01);
+            
             source.connect(gainNode); gainNode.connect(lowFilter);
             source.start(0);
             activeNotes[midi] = { src: source, gain: gainNode };
@@ -152,8 +156,14 @@
         function stopSound(midi) {
             if (activeNotes[midi]) {
                 const { src, gain } = activeNotes[midi];
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-                src.stop(audioCtx.currentTime + 0.6);
+                const now = audioCtx.currentTime;
+                
+                // ÚJ: Kőkemény rögzítés és szép, biztos lecsengés a rövid kattintásokhoz is
+                gain.gain.cancelScheduledValues(now);
+                gain.gain.setValueAtTime(gain.gain.value, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+                
+                src.stop(now + 0.6);
                 delete activeNotes[midi];
             }
         }
