@@ -19,23 +19,30 @@
             height: 100vh; margin: 0; overflow: hidden;
         }
         .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Noto Music'; }
-        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 10; transition: 0.3s; }
-        .back-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 10; transition: 0.3s; backdrop-filter: blur(10px); }
+        .back-btn:hover { color: #fff; border-color: var(--neon-blue); background: rgba(10,132,255,0.1); }
         h1 { color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 26px; text-shadow: 0 0 15px rgba(10,132,255,0.4); }
 
         .master-panel { background: var(--panel-bg); padding: 15px 30px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .button-row { display: flex; gap: 10px; justify-content: space-between; align-items: center; width: 100%; }
-        .group-separator { width: 1px; height: 30px; background: rgba(255,255,255,0.1); margin: 0 5px; }
         
-        button.cfg-btn { padding: 10px 18px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
-        button.cfg-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .button-row { display: flex; gap: 15px; justify-content: space-between; align-items: flex-end; width: 100%; }
+        .btn-group-container { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .group-title { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        .group-separator { width: 1px; height: 35px; background: rgba(255,255,255,0.15); margin: 0 5px; }
+        
+        button.cfg-btn, select.cfg-btn { padding: 9px 16px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; font-family: inherit; outline: none; }
+        button.cfg-btn:hover, select.cfg-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
         
         button.active-blue.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
         button#handRH.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
         button#handLH.active { border-color: var(--neon-orange); color: var(--neon-orange); background: rgba(255, 159, 10, 0.15); }
-        button#handBOTH.active { border-color: var(--neon-purple); color: var(--neon-purple); background: rgba(191, 90, 242, 0.15); }
         
+        .toggle-btn { text-align: center; }
         .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: rgba(50, 215, 75, 0.15); }
+        
+        select.cfg-btn { appearance: none; -webkit-appearance: none; -moz-appearance: none; text-align-last: center; padding-right: 25px; background-image: url('data:image/svg+xml;utf8,<svg fill="%23aaa" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position-x: 95%; background-position-y: 50%; }
+        select.cfg-btn option { background: #111; color: #fff; }
+        select.cfg-btn.off-mode { border-color: #444; color: #aaa; background-color: rgba(0,0,0,0.5); }
 
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; width: 850px; }
         .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center; backdrop-filter: blur(10px); }
@@ -44,11 +51,11 @@
 
         canvas { background: rgba(10, 10, 15, 0.7); border: 1px solid var(--border-color); border-radius: 12px; backdrop-filter: blur(15px); box-shadow: 0 15px 50px rgba(0,0,0,0.6); }
         #btnStart { padding: 14px 80px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 16px; box-shadow: 0 4px 20px rgba(50,215,75,0.4); margin: 10px 0; }
-        #btnStart.running { background: var(--error-red); color: #fff; }
+        #btnStart.running { background: var(--error-red); color: #fff; box-shadow: 0 4px 20px rgba(255,69,58,0.4); }
         #status { margin-top: 10px; font-size: 18px; color: var(--neon-blue); font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-content { background: rgba(20, 20, 30, 0.85); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; max-width: 500px; width: 90%; }
+        .modal-content { background: rgba(20, 20, 30, 0.9); padding: 40px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
     </style>
 </head>
 <body>
@@ -58,19 +65,42 @@
 
     <div class="master-panel">
         <div class="button-row">
-            <div style="display:flex; gap:6px;">
-                <button id="modeSPRINT" class="cfg-btn active-blue active" onclick="setMode('SPRINT')">SPRINT</button>
-                <button id="modeMARATHON" class="cfg-btn active-blue" onclick="setMode('MARATHON')">MARATON</button>
-                <button id="modeTRAINING" class="cfg-btn active-blue" onclick="setMode('TRAINING')">TRÉNING</button>
+            
+            <div class="btn-group-container">
+                <div class="group-title">Gyakorlat Mód</div>
+                <div style="display:flex; gap:6px;">
+                    <button id="modeSPRINT" class="cfg-btn active-blue active" onclick="setMode('SPRINT')">SPRINT</button>
+                    <button id="modeMARATHON" class="cfg-btn active-blue" onclick="setMode('MARATHON')">MARATON</button>
+                    <button id="modeTRAINING" class="cfg-btn active-blue" onclick="setMode('TRAINING')">TRÉNING</button>
+                </div>
             </div>
+
             <div class="group-separator"></div>
-            <div style="display:flex; gap:6px;">
-                <button id="handRH" class="cfg-btn" onclick="setHand('RH')">JOBB KÉZ</button>
-                <button id="handLH" class="cfg-btn" onclick="setHand('LH')">BAL KÉZ</button>
-                <button id="handBOTH" class="cfg-btn active" onclick="setHand('BOTH')">KÉT KÉZ</button>
+
+            <div class="btn-group-container">
+                <div class="group-title">Kezek</div>
+                <div style="display:flex; gap:6px;">
+                    <button id="handRH" class="cfg-btn active" onclick="toggleHand('RH')">JOBB</button>
+                    <button id="handLH" class="cfg-btn active" onclick="toggleHand('LH')">BAL</button>
+                </div>
             </div>
+
             <div class="group-separator"></div>
-            <button id="audioToggle" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA: BE</button>
+
+            <div class="btn-group-container">
+                <div class="group-title">Hangzás & Motor</div>
+                <div style="display:flex; gap:6px;">
+                    <select id="audioSelect" class="cfg-btn toggle-btn on" onchange="changeAudioMode()">
+                        <option value="sine_classic">HANG: CSENGŐ</option>
+                        <option value="triangle">HANG: E-ZONGORA</option>
+                        <option value="sawtooth">HANG: FÉNYES</option>
+                        <option value="square">HANG: 8-BIT</option>
+                        <option value="off">ZONGORA: KI</option>
+                    </select>
+                    <button id="dynToggle" class="cfg-btn toggle-btn on" onclick="toggleDynamics()">DINAMIKA</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -94,27 +124,38 @@
 
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-        let audioCtx, audioOn = true, isMidiReady = false, isRunning = false;
+        let audioCtx, useDynamics = true, isMidiReady = false, isRunning = false;
+        let activeNotes = {}; 
         
         const whiteKeys = [36,38,40,41,43,45,47, 48,50,52,53,55,57,59, 60,62,64,65,67,69,71, 72,74,76,77,79,81,83, 84,86,88,89,91,93,95];
-        
         const patternAsc = [0, 2, 3, 4, 5, 4, 3, 2];
-        const patternDesc = [0, -2, -3, -4, -5, -4, -3, -2];
+        const patternDesc = [0, -2, -3, -4, -5, -4, -3, -2]; 
         
-        let selectedMode = 'SPRINT', selectedHand = 'BOTH', currentLoop = 1;
+        let selectedMode = 'SPRINT';
+        
+        // Zseniális UX: a két gomb állapota vezérli a logikát
+        let rhActive = true;
+        let lhActive = true;
+        let selectedHand = 'BOTH';
+        
+        let currentLoop = 1;
         let rootIndex = 14, currentIndex = 0, isAscending = true, isFinalNote = false;
         let lastNoteTime = 0, timeDiffs = [], allBpms = [], rhHit = false, lhHit = false;
 
         const trebleY = 140, bassY = 380;
 
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
+        function initAudio() { 
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+            if (audioCtx.state === 'suspended') audioCtx.resume(); 
+        }
 
         function handleMainButton() {
             if (!isMidiReady) {
                 initAudio();
                 navigator.requestMIDIAccess().then(access => {
                     for (let input of access.inputs.values()) input.onmidimessage = onMIDIMessage;
-                    isMidiReady = true; startPractice();
+                    isMidiReady = true; 
+                    startPractice();
                 });
                 return;
             }
@@ -130,21 +171,69 @@
 
         function stopPractice() { isRunning = false; const btn = document.getElementById('btnStart'); btn.innerText = "▶ GYAKORLAT INDÍTÁSA"; btn.classList.remove('running'); document.getElementById('status').innerText = "KÉSZEN ÁLL"; draw(); }
 
-        function onMIDIMessage(e) {
-            if (!isRunning) return;
-            let [s, n, v] = e.data;
-            if ((s & 0xf0) === 0x90 && v > 0) {
-                let target = isFinalNote ? 14 : rootIndex + (isAscending ? patternAsc : patternDesc)[currentIndex];
-                let tRH = whiteKeys[target];
-                let tLH = whiteKeys[target - 7]; 
+        function playSound(midi, velocity) { 
+            const sel = document.getElementById('audioSelect').value;
+            if (sel === 'off' || !audioCtx) return; 
+            
+            if (activeNotes[midi]) stopSound(midi);
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain(); 
+            
+            osc.type = (sel === 'sine_classic') ? 'sine' : sel; 
+            osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); 
+            
+            let maxVolume = useDynamics ? (velocity / 127) * 0.4 : 0.2;
+            
+            gain.gain.setValueAtTime(maxVolume, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8); 
+
+            osc.connect(gain); 
+            gain.connect(audioCtx.destination); 
+            osc.start(now); 
+
+            activeNotes[midi] = { osc, gain };
+        }
+
+        function stopSound(midi) {
+            if (activeNotes[midi]) {
+                const now = audioCtx.currentTime;
+                const { osc, gain } = activeNotes[midi];
                 
-                if (selectedHand === 'RH' && n === tRH) { playSound(n); processHit(); }
-                else if (selectedHand === 'LH' && n === tLH) { playSound(n); processHit(); }
-                else if (selectedHand === 'BOTH') {
-                    if (n === tRH && !rhHit) { rhHit = true; playSound(n); }
-                    if (n === tLH && !lhHit) { lhHit = true; playSound(n); }
-                    if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(); }
+                gain.gain.cancelScheduledValues(now);
+                gain.gain.setValueAtTime(gain.gain.value, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                
+                osc.stop(now + 0.15);
+                delete activeNotes[midi];
+            }
+        }
+
+        function onMIDIMessage(e) {
+            let [status, note, velocity] = e.data;
+            let cmd = status & 0xf0;
+
+            if (cmd === 0x90 && velocity > 0) {
+                if (isRunning) {
+                    let targetIdx = isFinalNote ? 14 : rootIndex + (isAscending ? patternAsc : patternDesc)[currentIndex];
+                    let tRH = whiteKeys[targetIdx];
+                    let tLH = whiteKeys[targetIdx - 7];
+                    
+                    if (selectedHand === 'RH' && note === tRH) { playSound(note, velocity); processHit(); }
+                    else if (selectedHand === 'LH' && note === tLH) { playSound(note, velocity); processHit(); }
+                    else if (selectedHand === 'BOTH') { 
+                        if (note === tRH && !rhHit) { rhHit = true; playSound(note, velocity); } 
+                        if (note === tLH && !lhHit) { lhHit = true; playSound(note, velocity); } 
+                        if (rhHit && lhHit) { rhHit = false; lhHit = false; processHit(); } 
+                    } else {
+                        playSound(note, velocity);
+                    }
+                } else {
+                    playSound(note, velocity);
                 }
+            } else if (cmd === 0x80 || (cmd === 0x90 && velocity === 0)) {
+                stopSound(note);
             }
         }
 
@@ -167,18 +256,11 @@
                 if (currentIndex >= 8) {
                     currentIndex = 0;
                     if (isAscending) {
-                        if (rootIndex === 20) { // B4 az utolsó emelkedő
-                            isAscending = false; 
-                            rootIndex = 25; // UGRÁS G5-re
-                        } else {
-                            rootIndex++;
-                        }
+                        if (rootIndex === 20) { isAscending = false; rootIndex = 25; } 
+                        else { rootIndex++; }
                     } else {
-                        if (rootIndex === 18) { // G4 AZ UTOLSÓ LEERESZKEDŐ
-                            isFinalNote = true; // Záró C4 jön azonnal
-                        } else {
-                            rootIndex--;
-                        }
+                        if (rootIndex === 18) { isFinalNote = true; } 
+                        else { rootIndex--; }
                     }
                 }
             }
@@ -188,18 +270,8 @@
 
         function drawLedgers(x, off, baseY, color) {
             ctx.strokeStyle = color; ctx.lineWidth = 3;
-            if (off >= 6) {
-                for (let p = 6; p <= off; p += 2) {
-                    let ly = baseY - p * 12;
-                    ctx.beginPath(); ctx.moveTo(x - 22, ly); ctx.lineTo(x + 22, ly); ctx.stroke();
-                }
-            }
-            if (off <= -6) {
-                for (let p = -6; p >= off; p -= 2) {
-                    let ly = baseY - p * 12;
-                    ctx.beginPath(); ctx.moveTo(x - 22, ly); ctx.lineTo(x + 22, ly); ctx.stroke();
-                }
-            }
+            if (off >= 6) { for (let p = 6; p <= off; p += 2) { let ly = baseY - p * 12; ctx.beginPath(); ctx.moveTo(x - 22, ly); ctx.lineTo(x + 22, ly); ctx.stroke(); } }
+            if (off <= -6) { for (let p = -6; p >= off; p -= 2) { let ly = baseY - p * 12; ctx.beginPath(); ctx.moveTo(x - 22, ly); ctx.lineTo(x + 22, ly); ctx.stroke(); } }
         }
 
         function draw() {
@@ -251,27 +323,55 @@
             }
         }
 
-        // Hanggenerátor JAVÍTVA
-        function playSound(midi) { 
-            if (!audioOn || !audioCtx) return; 
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain(); 
-            osc.type = 'sine'; 
-            osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), now); 
-            gain.gain.setValueAtTime(0.15, now); 
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8); 
-            osc.connect(gain); 
-            gain.connect(audioCtx.destination); 
-            osc.start(now); 
-            osc.stop(now + 1); 
+        function finish() { isRunning = false; const avg = allBpms.length > 0 ? Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length) : 0; document.getElementById('resSummary').innerHTML = `Tempó: <span style="color:var(--neon-blue)">${avg} BPM</span><br>Stabilitás: <span style="color:var(--success-green)">${document.getElementById('uniformity').innerText}</span>`; document.getElementById('resultModal').style.display = "flex"; }
+        function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
+        
+        function changeAudioMode() {
+            const sel = document.getElementById('audioSelect');
+            if (sel.value === 'off') {
+                sel.classList.remove('on');
+                sel.classList.add('off-mode');
+            } else {
+                sel.classList.add('on');
+                sel.classList.remove('off-mode');
+                initAudio();
+            }
+        }
+        
+        function toggleDynamics() { 
+            useDynamics = !useDynamics; 
+            document.getElementById('dynToggle').classList.toggle('on', useDynamics); 
+        }
+        
+        function setMode(m) { 
+            selectedMode = m; 
+            document.querySelectorAll('#modeSPRINT, #modeMARATHON, #modeTRAINING').forEach(b=>b.classList.remove('active')); 
+            document.getElementById('mode'+m).classList.add('active'); 
+            if(isRunning) stopPractice(); 
+        }
+        
+        // A zseniális "Kéz-kombinációs" logika
+        function toggleHand(h) {
+            if (h === 'RH') rhActive = !rhActive;
+            if (h === 'LH') lhActive = !lhActive;
+            
+            // Megakadályozzuk, hogy mindkét kezet kikapcsolja a felhasználó
+            if (!rhActive && !lhActive) {
+                if (h === 'RH') rhActive = true;
+                if (h === 'LH') lhActive = true;
+            }
+
+            document.getElementById('handRH').classList.toggle('active', rhActive);
+            document.getElementById('handLH').classList.toggle('active', lhActive);
+
+            if (rhActive && lhActive) selectedHand = 'BOTH';
+            else if (rhActive) selectedHand = 'RH';
+            else selectedHand = 'LH';
+
+            if (isRunning) stopPractice();
+            draw();
         }
 
-        function finish() { isRunning = false; const avg = allBpms.length > 0 ? Math.round(allBpms.reduce((a,b)=>a+b)/allBpms.length) : 0; document.getElementById('resSummary').innerHTML = `Tempó: <span style="color:var(--neon-blue)">${avg} BPM</span><br>Stabilitás: <span style="color:var(--success-green)">${document.getElementById('uniformity').innerText}</span><br><br>Hajszálpontos teljesítés a Nagykönyv szerint!`; document.getElementById('resultModal').style.display = "flex"; }
-        function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
-        function toggleAudio() { audioOn = !audioOn; document.getElementById('audioToggle').innerText = `ZONGORA: ${audioOn?'BE':'KI'}`; document.getElementById('audioToggle').classList.toggle('on', audioOn); }
-        function setMode(m) { selectedMode = m; document.querySelectorAll('.active-blue').forEach(b=>b.classList.remove('active')); document.getElementById('mode'+m).classList.add('active'); if(isRunning) stopPractice(); }
-        function setHand(h) { selectedHand = h; document.getElementById('handRH').classList.toggle('active', h==='RH'); document.getElementById('handLH').classList.toggle('active', h==='LH'); document.getElementById('handBOTH').classList.toggle('active', h==='BOTH'); if(isRunning) stopPractice(); draw(); }
         window.onload = () => { document.fonts.ready.then(draw); };
     </script>
 </body>
