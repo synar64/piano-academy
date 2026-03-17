@@ -129,8 +129,10 @@
             source.buffer = buffer;
             source.playbackRate.value = playbackRate;
             
-            // 100% RAW VOLUME. Semmi halkítás, semmi torzítás.
-            gainNode.gain.value = 1.0;
+            // DINAMIKA VISSZAÁLLÍTVA! A leütés ereje (velocity) szabályozza a hangerőt.
+            // A szorzó (0.8) megakadályozza, hogy nagyon hangos ff fájlok torzítsanak.
+            const volume = (velocity / 127) * 0.8;
+            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
             
             source.connect(gainNode);
             gainNode.connect(audioCtx.destination);
@@ -143,11 +145,13 @@
             if (activeNotes[midi]) {
                 const { src, gain } = activeNotes[midi];
                 const now = audioCtx.currentTime;
-                // Azonnali megállítás! Nincs elnyújtott fade-out ami elrontja a hangot.
-                // (0.05s kell, hogy a hangszóró ne adjon ki pattanó digitális zajt a hirtelen vágás miatt)
+                
+                // ZONGORASZERŰ TOMPÍTÁS (0.3 másodperc) a kattogás megszüntetésére.
+                gain.gain.cancelScheduledValues(now);
                 gain.gain.setValueAtTime(gain.gain.value, now);
-                gain.gain.linearRampToValueAtTime(0.0001, now + 0.05); 
-                src.stop(now + 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3); 
+                
+                src.stop(now + 0.35);
                 delete activeNotes[midi];
             }
         }
