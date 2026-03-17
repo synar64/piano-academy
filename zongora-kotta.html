@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kotta - Pure Steinway Edition</title>
+    <title>Kotta - Steinway Multi-Layer</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -105,7 +105,9 @@
                 for(let i=21; i<=108; i++) {
                     const oct = Math.floor(i/12)-1;
                     const name = noteNames[i%12] + oct;
-                    fetch(`audio/piano/${name}.mp3`).then(r => r.ok ? r.arrayBuffer() : null)
+                    // IGAZÍTVA AZ "FF " ELŐTAGHOZ ÉS A KETTŐSKERESZTHEZ
+                    const fileUrl = encodeURI(`audio/piano/FF ${name}.mp3`);
+                    fetch(fileUrl).then(r => r.ok ? r.arrayBuffer() : null)
                     .then(ab => ab ? audioCtx.decodeAudioData(ab) : null)
                     .then(buf => { if(buf) audioBuffers[i] = buf; })
                     .catch(()=>{});
@@ -117,7 +119,6 @@
         function playSound(midi, velocity) {
             if (!audioOn || !audioCtx) return;
             let buffer = audioBuffers[midi], playbackRate = 1.0;
-            
             if (!buffer) {
                 if (audioBuffers[midi-1]) { buffer = audioBuffers[midi-1]; playbackRate = 1.05946; }
                 else if (audioBuffers[midi+1]) { buffer = audioBuffers[midi+1]; playbackRate = 0.94387; }
@@ -129,14 +130,11 @@
             source.buffer = buffer;
             source.playbackRate.value = playbackRate;
             
-            // DINAMIKA VISSZAÁLLÍTVA! A leütés ereje (velocity) szabályozza a hangerőt.
-            // A szorzó (0.8) megakadályozza, hogy nagyon hangos ff fájlok torzítsanak.
-            const volume = (velocity / 127) * 0.8;
-            gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+            // DINAMIKUS HANGERŐ: 0.6 a szorzó, hogy ne torzítson
+            gainNode.gain.setValueAtTime((velocity / 127) * 0.6, audioCtx.currentTime);
             
             source.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
             source.start(0);
             activeNotes[midi] = { src: source, gain: gainNode };
         }
@@ -145,12 +143,8 @@
             if (activeNotes[midi]) {
                 const { src, gain } = activeNotes[midi];
                 const now = audioCtx.currentTime;
-                
-                // ZONGORASZERŰ TOMPÍTÁS (0.3 másodperc) a kattogás megszüntetésére.
-                gain.gain.cancelScheduledValues(now);
                 gain.gain.setValueAtTime(gain.gain.value, now);
                 gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3); 
-                
                 src.stop(now + 0.35);
                 delete activeNotes[midi];
             }
@@ -163,7 +157,6 @@
                 if(trebleActive) { ctx.beginPath(); ctx.moveTo(50, 100+i*20); ctx.lineTo(800, 100+i*20); ctx.stroke(); }
                 if(bassActive) { ctx.beginPath(); ctx.moveTo(50, 300+i*20); ctx.lineTo(800, 300+i*20); ctx.stroke(); }
             }
-            
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             if(trebleActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('𝄞', 95, 117); }
             if(bassActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('𝄢', 95, 310); }
@@ -275,7 +268,6 @@
             const c = document.getElementById('cheatCanvas').getContext('2d');
             c.clearRect(0,0,840,400); c.strokeStyle='rgba(255,255,255,0.2)'; c.lineWidth=2;
             for(let i=-2; i<=2; i++){ c.beginPath(); c.moveTo(40, 100+i*20); c.lineTo(800, 100+i*20); c.stroke(); c.beginPath(); c.moveTo(40, 300+i*20); c.lineTo(800, 300+i*20); c.stroke(); }
-            
             c.textAlign = 'center'; c.textBaseline = 'middle';
             c.font='85px "Noto Music"'; c.fillStyle='#bf5af2'; c.fillText('𝄞', 70, 117); 
             c.font='85px "Noto Music"'; c.fillStyle='#0a84ff'; c.fillText('𝄢', 70, 310);
