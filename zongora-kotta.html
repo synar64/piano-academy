@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kotta - Steinway Ultra-Pro</title>
+    <title>Kotta - Steinway Ultra-Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -71,11 +71,27 @@
     </div>
     <button id="btnAction" onclick="handleAction()">▶ GYAKORLAT INDÍTÁSA</button>
     <canvas id="staffCanvas" width="850" height="400"></canvas>
-    <div id="status">TÖLTÉS...</div>
+    <div id="status">VÁRAKOZÁS...</div>
     <div id="pianoWrapper"><div class="piano-container" id="piano"></div></div>
+
+    <div id="resultModal" class="modal-overlay">
+        <h1 style="color: var(--neon-purple);">SZAKASZ LEZÁRVA</h1>
+        <h2 id="resPercent" style="font-size: 80px; color: var(--success-green);">0%</h2>
+        <button onclick="startMission()" style="background:var(--success-green); padding:15px 40px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">KÖVETKEZŐ KÖR</button>
+    </div>
+
+    <div id="hintModal" class="modal-overlay">
+        <div style="background: rgba(20,20,30,0.9); padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center;">
+            <canvas id="cheatCanvas" width="840" height="400"></canvas><br>
+            <button class="cfg-btn" style="margin-top:15px;" onclick="closeCheatSheet()">BEZÁRÁS</button>
+        </div>
+    </div>
 
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+        const imgSharp = new Image(), imgBe = new Image();
+        imgSharp.src = 'sharp.png'; imgBe.src = 'be.png';
+
         let scoreOk=0, combo=0, totalTasks=0, isRunning=false, isMidiReady=false;
         let audioCtx, audioBuffers = {}, activeNotes = {}, audioOn=true;
         let timeLeft=5.0, timerTicker=null, currentNote=null, isWaitingForCorrection=false, isTransitioning=false;
@@ -86,26 +102,38 @@
         async function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let loadedCount = 0;
+                const totalToLoad = 88;
+
                 for(let i=21; i<=108; i++) {
                     const oct = Math.floor(i/12)-1;
                     const baseName = noteNames[i%12] + oct;
                     audioBuffers[i] = {};
 
-                    // Próbálkozási lista a TE fájlneveid alapján
-                    const tryLoad = (midi, dynPrefix, name) => {
+                    ["PP", "MP", "MF", "FF", "Mf", "Mp"].forEach(dynPrefix => {
                         const variations = [
-                            `${dynPrefix.toUpperCase()} ${name}`,
-                            `${dynPrefix.charAt(0).toUpperCase()}${dynPrefix.slice(1).toLowerCase()} ${name}`
+                            `${dynPrefix} ${baseName}.mp3`,
+                            `${dynPrefix.toUpperCase()} ${baseName}.mp3`
                         ];
                         
                         variations.forEach(v => {
-                            fetch(encodeURI(`audio/piano/${v}.mp3`)).then(r => r.ok ? r.arrayBuffer() : null)
+                            fetch(encodeURI(`audio/piano/${v}`))
+                            .then(r => r.ok ? r.arrayBuffer() : null)
                             .then(ab => ab ? audioCtx.decodeAudioData(ab) : null)
-                            .then(buf => { if(buf) audioBuffers[midi][dynPrefix.toUpperCase()] = buf; });
+                            .then(buf => { 
+                                if(buf) {
+                                    const standardDyn = dynPrefix.toUpperCase();
+                                    audioBuffers[i][standardDyn] = buf;
+                                    if (standardDyn === "MF") {
+                                        loadedCount++;
+                                        document.getElementById('status').innerText = `BETÖLTÉS: ${Math.round((loadedCount/totalToLoad)*100)}%`;
+                                        if(loadedCount >= totalToLoad) document.getElementById('status').innerText = "STEINWAY KÉSZEN ÁLL";
+                                    }
+                                }
+                            })
+                            .catch(() => {});
                         });
-                    };
-
-                    ["PP", "MP", "MF", "FF"].forEach(d => tryLoad(i, d, baseName));
+                    });
                 }
             }
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -145,6 +173,7 @@
                 if(bassActive) { ctx.beginPath(); ctx.moveTo(50, 300+i*20); ctx.lineTo(800, 300+i*20); ctx.stroke(); }
             }
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            // Hanon arányok a 20px-es vonalközhöz igazítva!
             if(trebleActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('𝄞', 95, 117); }
             if(bassActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('𝄢', 95, 310); }
         }
@@ -247,7 +276,34 @@
         function toggleKeyboard() { const w = document.getElementById('pianoWrapper'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; }
         function toggleAudio() { audioOn = !audioOn; document.getElementById('btnMute').classList.toggle('on', audioOn); }
 
-        window.onload = () => { document.fonts.ready.then(drawEmptyStaff); };
+        function openCheatSheet() { document.getElementById('hintModal').style.display='flex'; drawCheatSheet(); }
+        function closeCheatSheet() { document.getElementById('hintModal').style.display='none'; }
+        function drawCheatSheet() {
+            const c = document.getElementById('cheatCanvas').getContext('2d');
+            c.clearRect(0,0,840,400); c.strokeStyle='rgba(255,255,255,0.2)'; c.lineWidth=2;
+            for(let i=-2; i<=2; i++){ c.beginPath(); c.moveTo(40, 100+i*20); c.lineTo(800, 100+i*20); c.stroke(); c.beginPath(); c.moveTo(40, 300+i*20); c.lineTo(800, 300+i*20); c.stroke(); }
+            c.textAlign = 'center'; c.textBaseline = 'middle';
+            c.font='85px "Noto Music"'; c.fillStyle='#bf5af2'; c.fillText('𝄞', 70, 117); 
+            c.font='85px "Noto Music"'; c.fillStyle='#0a84ff'; c.fillText('𝄢', 70, 310);
+        }
+
+        const p = document.getElementById('piano');
+        for (let i = 36; i <= 84; i++) {
+            const isB = [1,3,6,8,10].includes(i%12);
+            const k = document.createElement('div');
+            k.className = `key ${isB?'black':'white'}`; k.id = `key-${i}`;
+            k.onmousedown = () => onMIDIMessage({data:[0x90, i, 100]});
+            k.onmouseup = () => onMIDIMessage({data:[0x80, i, 0]});
+            p.appendChild(k);
+        }
+
+        window.addEventListener('load', () => {
+            document.fonts.ready.then(() => {
+                document.getElementById('status').innerText="KÉSZEN ÁLL";
+                drawEmptyStaff();
+                setTimeout(drawEmptyStaff, 150);
+            });
+        });
     </script>
 </body>
 </html>
