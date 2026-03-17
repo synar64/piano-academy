@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kotta - Steinway Master Edition</title>
+    <title>Kotta - All-in-One Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -41,7 +41,6 @@
         .white.pressed { background: var(--neon-blue) !important; color: #fff; }
         .black { background: #111; width: 14px; height: 50px; margin-left: -7px; margin-right: -7px; z-index: 2; border-radius: 0 0 2px 2px; }
         .black.pressed { background: var(--neon-orange) !important; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
     </style>
 </head>
 <body>
@@ -58,9 +57,9 @@
             <button id="btnAccidental" class="cfg-btn toggle-btn on" onclick="toggleConfig('accidental')">ELŐJEGYZÉSEK</button>
             <button id="btnHint" class="cfg-btn toggle-btn" onclick="toggleConfig('hint')">GYORS-SÚGÓ</button>
             <span style="color:#555;">|</span>
+            <button id="btnAudioMode" class="cfg-btn toggle-btn on" onclick="cycleAudioMode()">HANG: STEINWAY</button>
             <button class="cfg-btn" onclick="openCheatSheet()">SÚGÓ</button>
             <button id="kbToggle" class="cfg-btn toggle-btn" onclick="toggleKeyboard()">BILLENTYŰ</button>
-            <button id="btnMute" class="cfg-btn toggle-btn on" onclick="toggleAudio()">ZONGORA</button>
         </div>
     </div>
     <div class="stats-grid">
@@ -74,25 +73,12 @@
     <div id="status">VÁRAKOZÁS...</div>
     <div id="pianoWrapper"><div class="piano-container" id="piano"></div></div>
 
-    <div id="resultModal" class="modal-overlay">
-        <h1 style="color: var(--neon-purple);">SZAKASZ LEZÁRVA</h1>
-        <h2 id="resPercent" style="font-size: 80px; color: var(--success-green);">0%</h2>
-        <button onclick="startMission()" style="background:var(--success-green); padding:15px 40px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">KÖVETKEZŐ KÖR</button>
-    </div>
-
-    <div id="hintModal" class="modal-overlay">
-        <div style="background: rgba(20,20,30,0.9); padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center;">
-            <canvas id="cheatCanvas" width="840" height="400"></canvas><br>
-            <button class="cfg-btn" style="margin-top:15px;" onclick="closeCheatSheet()">BEZÁRÁS</button>
-        </div>
-    </div>
-
     <script>
         const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-        let audioCtx, audioBuffers = {}, activeNotes = {}, audioOn=true;
+        let audioCtx, audioBuffers = {}, activeNotes = {};
+        let audioMode = 'steinway'; // steinway, synth, off
         let scoreOk=0, combo=0, totalTasks=0, isRunning=false, isMidiReady=false;
         let timeLeft=5.0, timerTicker=null, currentNote=null, isWaitingForCorrection=false, isTransitioning=false;
-        
         let trebleActive=true, bassActive=true, visualClef='treble', useAccidentals=true, useQuickHint=false, timerEnabled=true;
 
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -100,88 +86,80 @@
         async function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                let loadedFiles = 0;
-                let fetchPromises = [];
-
-                document.getElementById('status').innerText = "HANGOK KERESÉSE...";
-
                 for(let i=21; i<=108; i++) {
                     const oct = Math.floor(i/12)-1;
                     const name = noteNames[i%12] + oct;
                     audioBuffers[i] = {};
-
                     ["PP", "MP", "MF", "FF", "Mp", "Mf"].forEach(dyn => {
-                        const v = `${dyn} ${name}.mp3`;
-                        // Okos URL kódolás a # miatt
-                        const url = `audio/piano/${encodeURIComponent(v)}`;
-                        
-                        let p = fetch(url)
-                        .then(r => r.ok ? r.arrayBuffer() : Promise.reject())
+                        const url = `audio/piano/${encodeURIComponent(dyn + ' ' + name + '.mp3')}`;
+                        fetch(url).then(r => r.ok ? r.arrayBuffer() : Promise.reject())
                         .then(ab => audioCtx.decodeAudioData(ab))
-                        .then(buf => {
-                            const stdDyn = dyn.toUpperCase();
-                            if(!audioBuffers[i][stdDyn]) {
-                                audioBuffers[i][stdDyn] = buf;
-                                loadedFiles++;
-                                document.getElementById('status').innerText = `BETÖLTVE: ${loadedFiles} fájl`;
-                            }
-                        }).catch(() => {});
-                        
-                        fetchPromises.push(p);
+                        .then(buf => { if(!audioBuffers[i][dyn.toUpperCase()]) audioBuffers[i][dyn.toUpperCase()] = buf; })
+                        .catch(()=>{});
                     });
                 }
-                
-                // Amikor az ÖSSZES keresés lefutott, készen vagyunk!
-                Promise.all(fetchPromises).then(() => {
-                    document.getElementById('status').innerText = "STEINWAY KÉSZEN ÁLL";
-                });
             }
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        function playSound(midi, velocity) {
-            if (!audioOn || !audioCtx) return;
-            let d = velocity < 32 ? "PP" : (velocity < 64 ? "MP" : (velocity < 96 ? "MF" : "FF"));
-            
-            let buffer = null;
-            let bestDistance = 0;
-
-            // 1. Megvan a hang?
-            if (audioBuffers[midi] && (audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"])) {
-                buffer = audioBuffers[midi][d] || audioBuffers[midi]["MF"] || audioBuffers[midi]["FF"] || audioBuffers[midi]["PP"];
+        function cycleAudioMode() {
+            const btn = document.getElementById('btnAudioMode');
+            if (audioMode === 'steinway') {
+                audioMode = 'synth';
+                btn.innerText = "HANG: SZINTI";
+                btn.className = "cfg-btn toggle-btn on";
+            } else if (audioMode === 'synth') {
+                audioMode = 'off';
+                btn.innerText = "HANG: NÉMA";
+                btn.className = "cfg-btn toggle-btn";
             } else {
-                // 2. Ha nincs meg, megkeressük a legközelebbi szomszédot és lehangoljuk!
-                for (let dist = 1; dist <= 24; dist++) {
-                    for (let sign of [1, -1]) {
-                        let checkMidi = midi + (dist * sign);
-                        if (audioBuffers[checkMidi]) {
-                            let found = audioBuffers[checkMidi][d] || audioBuffers[checkMidi]["MF"] || audioBuffers[checkMidi]["FF"] || audioBuffers[checkMidi]["PP"];
-                            if (found) {
-                                buffer = found;
-                                bestDistance = checkMidi - midi; // Kiszámoljuk a távolságot
-                                break;
-                            }
+                audioMode = 'steinway';
+                btn.innerText = "HANG: STEINWAY";
+                btn.className = "cfg-btn toggle-btn on";
+            }
+            document.getElementById('status').innerText = `MÓD: ${audioMode.toUpperCase()}`;
+        }
+
+        function playSound(midi, velocity) {
+            if (audioMode === 'off' || !audioCtx) return;
+
+            if (audioMode === 'synth') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440 * Math.pow(2, (midi - 69) / 12), audioCtx.currentTime);
+                gain.gain.setValueAtTime(velocity/127 * 0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+                osc.connect(gain).connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.8);
+                return;
+            }
+
+            let d = velocity < 32 ? "PP" : (velocity < 64 ? "MP" : (velocity < 96 ? "MF" : "FF"));
+            let buffer = null, bestDist = 0;
+            if (audioBuffers[midi] && (audioBuffers[midi][d] || audioBuffers[midi]["MF"])) {
+                buffer = audioBuffers[midi][d] || audioBuffers[midi]["MF"];
+            } else {
+                for (let dist = 1; dist <= 12; dist++) {
+                    for (let s of [1, -1]) {
+                        let chk = midi + (dist * s);
+                        if (audioBuffers[chk] && (audioBuffers[chk][d] || audioBuffers[chk]["MF"])) {
+                            buffer = audioBuffers[chk][d] || audioBuffers[chk]["MF"];
+                            bestDist = chk - midi; break;
                         }
                     }
                     if (buffer) break;
                 }
             }
-            
             if (!buffer) return;
-            
-            const source = audioCtx.createBufferSource();
-            const gainNode = audioCtx.createGain();
-            source.buffer = buffer;
-            
-            // Itt történik a csoda: a szomszédos hangot a megfelelő magasságúra húzzuk!
-            if (bestDistance !== 0) {
-                source.playbackRate.value = Math.pow(2, -bestDistance / 12);
-            }
-            
-            gainNode.gain.setValueAtTime((velocity/127), audioCtx.currentTime);
-            source.connect(gainNode).connect(audioCtx.destination);
-            source.start(0);
-            activeNotes[midi] = { src: source, gain: gainNode };
+            const src = audioCtx.createBufferSource();
+            const g = audioCtx.createGain();
+            src.buffer = buffer;
+            if (bestDist !== 0) src.playbackRate.value = Math.pow(2, -bestDist / 12);
+            g.gain.setValueAtTime((velocity/127), audioCtx.currentTime);
+            src.connect(g).connect(audioCtx.destination);
+            src.start(0);
+            activeNotes[midi] = { src: src, gain: g };
         }
 
         function stopSound(midi) {
@@ -202,7 +180,6 @@
                 if(trebleActive) { ctx.beginPath(); ctx.moveTo(50, 100+i*20); ctx.lineTo(800, 100+i*20); ctx.stroke(); }
                 if(bassActive) { ctx.beginPath(); ctx.moveTo(50, 300+i*20); ctx.lineTo(800, 300+i*20); ctx.stroke(); }
             }
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             if(trebleActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#bf5af2'; ctx.fillText('𝄞', 95, 117); }
             if(bassActive) { ctx.font='85px "Noto Music"'; ctx.fillStyle='#0a84ff'; ctx.fillText('𝄢', 95, 310); }
         }
@@ -221,17 +198,8 @@
                 }
             }
             ctx.beginPath(); ctx.ellipse(nX, nY, 15, 10, Math.PI/8, 0, 2*Math.PI); ctx.fillStyle = color; ctx.fill();
-            
-            if (noteObj.name.includes('#')) {
-                ctx.fillStyle = color;
-                ctx.font = '30px Arial';
-                ctx.fillText('♯', nX - 35, nY + 2);
-            }
-
-            if (useQuickHint || isWaitingForCorrection) {
-                ctx.fillStyle = isWaitingForCorrection ? '#ff9f0a' : '#fff';
-                ctx.font = 'bold 20px Rajdhani'; ctx.fillText(noteObj.name, nX + 50, nY);
-            }
+            if (noteObj.name.includes('#')) { ctx.fillStyle = color; ctx.font = '30px Arial'; ctx.fillText('♯', nX - 35, nY + 2); }
+            if (useQuickHint || isWaitingForCorrection) { ctx.fillStyle = isWaitingForCorrection ? '#ff9f0a' : '#fff'; ctx.font = 'bold 20px Rajdhani'; ctx.fillText(noteObj.name, nX + 50, nY); }
         }
 
         function handleAction() {
@@ -243,14 +211,11 @@
                         if ((s & 0xf0) === 0x90 && v > 0) {
                             playSound(n, v);
                             if(isRunning && !isTransitioning && n === currentNote.midi) {
-                                isTransitioning = true; if(!isWaitingForCorrection || !timerEnabled) { scoreOk++; combo++; }
+                                isTransitioning = true; scoreOk++; combo++;
                                 document.getElementById('scoreOk').innerText = scoreOk;
                                 document.getElementById('scoreCombo').innerText = combo;
                                 document.getElementById('status').innerText = "HELYES!";
                                 setTimeout(() => { isTransitioning = false; nextTask(); }, 600);
-                            } else if (isRunning && !isTransitioning && n !== currentNote.midi) {
-                                combo=0; document.getElementById('scoreCombo').innerText=0;
-                                document.getElementById('status').innerText="PRÓBÁLD ÚJRA!";
                             }
                         } else if ((s & 0xf0) === 0x80) stopSound(n);
                     };
@@ -261,121 +226,30 @@
             isRunning ? stopMission() : startMission();
         }
 
-        function startMission() {
-            scoreOk=0; combo=0; totalTasks=0; isRunning=true; isTransitioning=false;
-            document.getElementById('resultModal').style.display='none';
-            document.getElementById('btnAction').innerText="◼ LEÁLLÍTÁS";
-            document.getElementById('btnAction').classList.add('running');
-            nextTask();
-        }
-
-        function stopMission() {
-            isRunning=false; clearInterval(timerTicker);
-            document.getElementById('btnAction').innerText="▶ GYAKORLAT INDÍTÁSA";
-            document.getElementById('btnAction').classList.remove('running');
-            drawEmptyStaff();
-        }
-
-        function nextTask() {
-            if (totalTasks >= 10) { stopMission(); showResult(); return; }
-            totalTasks++; document.getElementById('taskCount').innerText = `${totalTasks} / 10`;
-            generateNewNote(); startTimer();
-        }
-
+        function startMission() { scoreOk=0; combo=0; totalTasks=0; isRunning=true; isTransitioning=false; nextTask(); document.getElementById('btnAction').innerText="◼ LEÁLLÍTÁS"; }
+        function stopMission() { isRunning=false; clearInterval(timerTicker); document.getElementById('btnAction').innerText="▶ GYAKORLAT INDÍTÁSA"; drawEmptyStaff(); }
+        function nextTask() { if (totalTasks >= 10) { stopMission(); return; } totalTasks++; document.getElementById('taskCount').innerText = `${totalTasks} / 10`; generateNewNote(); startTimer(); }
         function generateNewNote() {
             visualClef = (trebleActive && bassActive) ? (Math.random() > 0.5 ? 'treble' : 'bass') : (trebleActive ? 'treble' : 'bass');
-            const all_tN = [{name:'C4',o:-6,m:60},{name:'C#4',o:-6,m:61},{name:'D4',o:-5,m:62},{name:'D#4',o:-5,m:63},{name:'E4',o:-4,m:64},{name:'F4',o:-3,m:65},{name:'F#4',o:-3,m:66},{name:'G4',o:-2,m:67},{name:'G#4',o:-2,m:68},{name:'A4',o:-1,m:69},{name:'A#4',o:-1,m:70},{name:'B4',o:0,m:71},{name:'C5',o:1,m:72}];
-            const all_bN = [{name:'E2',o:-6,m:40},{name:'F2',o:-5,m:41},{name:'F#2',o:-5,m:42},{name:'G2',o:-4,m:43},{name:'G#2',o:-4,m:44},{name:'A2',o:-3,m:45},{name:'A#2',o:-3,m:46},{name:'B2',o:-2,m:47},{name:'C3',o:-1,m:48},{name:'C#3',o:-1,m:49},{name:'D3',o:0,m:50},{name:'D#3',o:0,m:51},{name:'E3',o:1,m:52},{name:'F3',o:2,m:53},{name:'F#3',o:2,m:54},{name:'G3',o:3,m:55},{name:'G#3',o:3,m:56},{name:'A3',o:4,m:57},{name:'A#3',o:4,m:58},{name:'B3',o:5,m:59},{name:'C4',o:6,m:60}];
-            
-            let list = visualClef === 'treble' ? all_tN : all_bN;
-            if (!useAccidentals) list = list.filter(n => !n.name.includes('#'));
-
+            const all = [{name:'C4',o:-6,m:60},{name:'D4',o:-5,m:62},{name:'E4',o:-4,m:64},{name:'F4',o:-3,m:65},{name:'G4',o:-2,m:67},{name:'A4',o:-1,m:69},{name:'B4',o:0,m:71},{name:'C5',o:1,m:72}];
+            let list = all; if (!useAccidentals) list = list.filter(n => !n.name.includes('#'));
             let bNote = list[Math.floor(Math.random()*list.length)];
             currentNote = { name: bNote.name, offset: bNote.o, midi: bNote.m };
-            isWaitingForCorrection=false;
             drawNote(currentNote);
         }
-
         function startTimer() {
-            clearInterval(timerTicker); 
-            if (!timerEnabled) { document.getElementById('seconds').innerText = "--"; document.getElementById('timer-bar').style.width = "100%"; return; }
-            timeLeft=5.0;
+            clearInterval(timerTicker); if (!timerEnabled) return; timeLeft=5.0;
             timerTicker = setInterval(() => {
                 if(!isRunning || isTransitioning) return;
-                timeLeft -= 0.1;
-                if(timeLeft<=0) { timeLeft=0; isWaitingForCorrection=true; drawNote(currentNote); }
+                timeLeft -= 0.1; if(timeLeft<=0) { timeLeft=0; isWaitingForCorrection=true; drawNote(currentNote); }
                 document.getElementById('seconds').innerText = Math.max(0, timeLeft).toFixed(1);
                 document.getElementById('timer-bar').style.width = (timeLeft/5.0)*100+"%";
             }, 100);
         }
-
-        // --- GOMBOK ---
-        function toggleTimerSetting() { timerEnabled = !timerEnabled; document.getElementById('btnTimerToggle').classList.toggle('on', timerEnabled); if (isRunning) startTimer(); }
-        function toggleClef(clef) { 
-            if (clef === 'treble') trebleActive = !trebleActive; else bassActive = !bassActive; 
-            if (!trebleActive && !bassActive) { trebleActive=true; bassActive=true; } 
-            document.getElementById('btnTreble').classList.toggle('active', trebleActive);
-            document.getElementById('btnBass').classList.toggle('active', bassActive);
-            drawEmptyStaff(); if (currentNote && isRunning) drawNote(currentNote);
-        }
-        function toggleConfig(t) { 
-            if (t === 'accidental') { useAccidentals = !useAccidentals; document.getElementById('btnAccidental').classList.toggle('on', useAccidentals); } 
-            else { useQuickHint = !useQuickHint; document.getElementById('btnHint').classList.toggle('on', useQuickHint); }
-            if (currentNote && isRunning) drawNote(currentNote);
-        }
-        function toggleKeyboard() { 
-            const w = document.getElementById('pianoWrapper'); 
-            const isVisible = w.style.display === 'flex';
-            w.style.display = isVisible ? 'none' : 'flex'; 
-            document.getElementById('kbToggle').classList.toggle('on', !isVisible);
-        }
-        function toggleAudio() { audioOn = !audioOn; document.getElementById('btnMute').classList.toggle('on', audioOn); }
-        function showResult() { document.getElementById('resPercent').innerText = (scoreOk*10)+"%"; document.getElementById('resultModal').style.display='flex'; }
-        function openCheatSheet() { document.getElementById('hintModal').style.display='flex'; drawCheatSheet(); }
-        function closeCheatSheet() { document.getElementById('hintModal').style.display='none'; }
-        
-        function drawCheatSheet() {
-            const c = document.getElementById('cheatCanvas').getContext('2d');
-            c.clearRect(0,0,840,400); 
-            c.strokeStyle='rgba(255,255,255,0.2)'; c.lineWidth=2;
-            for(let i=-2; i<=2; i++){ 
-                c.beginPath(); c.moveTo(40, 100+i*20); c.lineTo(800, 100+i*20); c.stroke(); 
-                c.beginPath(); c.moveTo(40, 300+i*20); c.lineTo(800, 300+i*20); c.stroke(); 
-            }
-            c.textAlign = 'center'; c.textBaseline = 'middle';
-            c.font='85px "Noto Music"'; c.fillStyle='#bf5af2'; c.fillText('𝄞', 70, 117); 
-            c.font='85px "Noto Music"'; c.fillStyle='#0a84ff'; c.fillText('𝄢', 70, 310);
-            
-            const drawHintNote = (name, offset, isTreble, x) => {
-                const bY = isTreble ? 100 : 300;
-                const nY = bY - (offset * 10);
-                if (offset <= -6 || offset >= 6) {
-                    c.strokeStyle = '#fff'; c.lineWidth = 2;
-                    let step = offset <= -6 ? -2 : 2;
-                    for (let p = (offset <= -6 ? -6 : 6); (step > 0 ? p <= offset : p >= offset); p += step) {
-                        c.beginPath(); c.moveTo(x-18, bY-(p*10)); c.lineTo(x+18, bY-(p*10)); c.stroke();
-                    }
-                }
-                c.beginPath(); c.ellipse(x, nY, 14, 9, Math.PI/8, 0, 2*Math.PI); c.fillStyle = '#fff'; c.fill();
-                c.fillStyle = '#ff9f0a'; c.font = 'bold 18px Rajdhani'; c.fillText(name, x, nY - 25);
-            };
-
-            const tNotes = [{n:'C4',o:-6},{n:'D4',o:-5},{n:'E4',o:-4},{n:'F4',o:-3},{n:'G4',o:-2},{n:'A4',o:-1},{n:'B4',o:0},{n:'C5',o:1}];
-            tNotes.forEach((note, i) => drawHintNote(note.n, note.o, true, 160 + i * 80));
-
-            const bNotes = [{n:'C3',o:-1},{n:'D3',o:0},{n:'E3',o:1},{n:'F3',o:2},{n:'G3',o:3},{n:'A3',o:4},{n:'B3',o:5},{n:'C4',o:6}];
-            bNotes.forEach((note, i) => drawHintNote(note.n, note.o, false, 160 + i * 80));
-        }
-
-        const p = document.getElementById('piano');
-        for (let i = 36; i <= 84; i++) {
-            const isB = [1,3,6,8,10].includes(i%12);
-            const k = document.createElement('div');
-            k.className = `key ${isB?'black':'white'}`; k.id = `key-${i}`;
-            k.onmousedown = () => { if(isMidiReady) onMIDIMessage({data:[0x90, i, 100]}); };
-            k.onmouseup = () => { if(isMidiReady) onMIDIMessage({data:[0x80, i, 0]}); };
-            p.appendChild(k);
-        }
+        function toggleTimerSetting() { timerEnabled = !timerEnabled; document.getElementById('btnTimerToggle').classList.toggle('on', timerEnabled); }
+        function toggleClef(c) { if (c === 'treble') trebleActive = !trebleActive; else bassActive = !bassActive; if (!trebleActive && !bassActive) { trebleActive=true; bassActive=true; } document.getElementById('btnTreble').classList.toggle('active', trebleActive); document.getElementById('btnBass').classList.toggle('active', bassActive); drawEmptyStaff(); }
+        function toggleConfig(t) { if (t === 'accidental') useAccidentals = !useAccidentals; else useQuickHint = !useQuickHint; document.getElementById('btnAccidental').classList.toggle('on', useAccidentals); document.getElementById('btnHint').classList.toggle('on', useQuickHint); drawNote(currentNote); }
+        function toggleKeyboard() { const w = document.getElementById('pianoWrapper'); w.style.display = w.style.display === 'flex' ? 'none' : 'flex'; }
 
         window.onload = () => { document.fonts.ready.then(drawEmptyStaff); };
     </script>
