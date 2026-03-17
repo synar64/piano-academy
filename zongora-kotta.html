@@ -55,7 +55,7 @@
             <button id="btnBass" class="cfg-btn active" onclick="toggleClef('bass')">BASSZUS</button>
             <button id="btnTimerToggle" class="cfg-btn toggle-btn on" onclick="toggleTimerSetting()">IDŐKORLÁT</button>
             <span style="color:#555;">|</span>
-            <button id="btnAccidental" class="cfg-btn toggle-btn on" onclick="toggleConfig('accidental')">MÓDOSÍTÓK</button>
+            <button id="btnAccidental" class="cfg-btn toggle-btn on" onclick="toggleConfig('accidental')">ELŐJEGYZÉSEK</button>
             <button id="btnHint" class="cfg-btn toggle-btn" onclick="toggleConfig('hint')">GYORS-SÚGÓ</button>
             <span style="color:#555;">|</span>
             <button class="cfg-btn" onclick="openCheatSheet()">SÚGÓ</button>
@@ -188,7 +188,6 @@
             }
             ctx.beginPath(); ctx.ellipse(nX, nY, 15, 10, Math.PI/8, 0, 2*Math.PI); ctx.fillStyle = color; ctx.fill();
             
-            // Ha van benne #, kirajzoljuk a képet (vagy sima szöveget, ha a kép nem töltött be)
             if (noteObj.name.includes('#')) {
                 ctx.fillStyle = color;
                 ctx.font = '30px Arial';
@@ -276,7 +275,7 @@
             }, 100);
         }
 
-        // --- GOMB VEZÉRLŐ FUNKCIÓK (Visszaállítva!) ---
+        // --- GOMB VEZÉRLŐ FUNKCIÓK ---
         
         function toggleTimerSetting() { 
             timerEnabled = !timerEnabled; 
@@ -287,7 +286,7 @@
         function toggleClef(clef) { 
             if (clef === 'treble') trebleActive = !trebleActive; 
             else bassActive = !bassActive; 
-            if (!trebleActive && !bassActive) { trebleActive=true; bassActive=true; } // Nem lehet mindkettőt kikapcsolni
+            if (!trebleActive && !bassActive) { trebleActive=true; bassActive=true; } 
             
             document.getElementById('btnTreble').classList.toggle('active', trebleActive);
             document.getElementById('btnBass').classList.toggle('active', bassActive);
@@ -324,15 +323,43 @@
             document.getElementById('resultModal').style.display='flex'; 
         }
         
+        // --- JAVÍTOTT SÚGÓ ABLAK HANGOKKAL ---
+
         function openCheatSheet() { document.getElementById('hintModal').style.display='flex'; drawCheatSheet(); }
         function closeCheatSheet() { document.getElementById('hintModal').style.display='none'; }
+        
         function drawCheatSheet() {
             const c = document.getElementById('cheatCanvas').getContext('2d');
-            c.clearRect(0,0,840,400); c.strokeStyle='rgba(255,255,255,0.2)'; c.lineWidth=2;
-            for(let i=-2; i<=2; i++){ c.beginPath(); c.moveTo(40, 100+i*20); c.lineTo(800, 100+i*20); c.stroke(); c.beginPath(); c.moveTo(40, 300+i*20); c.lineTo(800, 300+i*20); c.stroke(); }
+            c.clearRect(0,0,840,400); 
+            c.strokeStyle='rgba(255,255,255,0.2)'; c.lineWidth=2;
+            for(let i=-2; i<=2; i++){ 
+                c.beginPath(); c.moveTo(40, 100+i*20); c.lineTo(800, 100+i*20); c.stroke(); 
+                c.beginPath(); c.moveTo(40, 300+i*20); c.lineTo(800, 300+i*20); c.stroke(); 
+            }
             c.textAlign = 'center'; c.textBaseline = 'middle';
             c.font='85px "Noto Music"'; c.fillStyle='#bf5af2'; c.fillText('𝄞', 70, 117); 
             c.font='85px "Noto Music"'; c.fillStyle='#0a84ff'; c.fillText('𝄢', 70, 310);
+            
+            const drawHintNote = (name, offset, isTreble, x) => {
+                const bY = isTreble ? 100 : 300;
+                const nY = bY - (offset * 10);
+                if (offset <= -6 || offset >= 6) {
+                    c.strokeStyle = '#fff'; c.lineWidth = 2;
+                    let step = offset <= -6 ? -2 : 2;
+                    for (let p = (offset <= -6 ? -6 : 6); (step > 0 ? p <= offset : p >= offset); p += step) {
+                        c.beginPath(); c.moveTo(x-18, bY-(p*10)); c.lineTo(x+18, bY-(p*10)); c.stroke();
+                    }
+                }
+                c.beginPath(); c.ellipse(x, nY, 14, 9, Math.PI/8, 0, 2*Math.PI); 
+                c.fillStyle = '#fff'; c.fill();
+                c.fillStyle = '#ff9f0a'; c.font = 'bold 18px Rajdhani'; c.fillText(name, x, nY - 25);
+            };
+
+            const tNotes = [{n:'C4',o:-6},{n:'D4',o:-5},{n:'E4',o:-4},{n:'F4',o:-3},{n:'G4',o:-2},{n:'A4',o:-1},{n:'B4',o:0},{n:'C5',o:1}];
+            tNotes.forEach((note, i) => drawHintNote(note.n, note.o, true, 160 + i * 80));
+
+            const bNotes = [{n:'C3',o:-1},{n:'D3',o:0},{n:'E3',o:1},{n:'F3',o:2},{n:'G3',o:3},{n:'A3',o:4},{n:'B3',o:5},{n:'C4',o:6}];
+            bNotes.forEach((note, i) => drawHintNote(note.n, note.o, false, 160 + i * 80));
         }
 
         const p = document.getElementById('piano');
