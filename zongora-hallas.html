@@ -3,92 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Piano Academy | Ear Training</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <title>Piano Academy | Hallásfejlesztő</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
         :root {
-            --neon-rose: #ff2d55; --bg-color: #050510; --panel-bg: rgba(0, 0, 0, 0.9);
-            --success-green: #32d74b; --error-red: #ff453a; --neon-blue: #00d4ff; --neon-orange: #ffaa00;
-            --neon-purple: #bf5af2;
+            --neon-blue: #0a84ff; --neon-orange: #ff9f0a; --bg-dark: #050508; 
+            --panel-bg: rgba(20, 20, 30, 0.85); --border-color: rgba(255, 255, 255, 0.15);
+            --error-red: #ff453a;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.5) 0%, rgba(5, 5, 8, 1) 100%), url('zongora-hatter-dark.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: var(--bg-dark); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; margin: 0; overflow: hidden;
         }
-        .font-loader { position: absolute; visibility: hidden; font-family: 'Rajdhani', serif; top: -100px; }
-        .back-btn { position: fixed; top: 15px; left: 15px; color: #888; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid #333; z-index: 10; }
-        h1 { color: var(--neon-rose); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 26px; text-shadow: 0 0 15px rgba(255,45,85,0.4); }
-        #timer-container { width: 850px; height: 12px; background: #222; border-radius: 6px; margin-bottom: 8px; overflow: hidden; border: 1px solid #444; transition: opacity 0.3s; }
-        #timer-bar { width: 100%; height: 100%; background-color: var(--neon-purple); transition: width 0.1s linear; }
-        .master-panel { background: var(--panel-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid #333; margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; width: 850px; box-sizing: border-box; position: relative; z-index: 5;}
-        .button-group { display: flex; gap: 8px; flex-wrap: nowrap; justify-content: center; align-items: center; width: 100%; }
-        button.cfg-btn { padding: 6px 12px; background: #0a0a0a; color: #888; border: 2px solid #333; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; }
-        button.cfg-btn.on { border-color: var(--success-green); color: var(--success-green); background: #001a05; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 8px; width: 850px; box-sizing: border-box; position: relative; z-index: 5; }
-        .stat-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid #333; text-align: center; }
-        .stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; }
-        .stat-value { font-size: 32px; font-weight: 700; font-family: 'Rajdhani', sans-serif; line-height: 1; color: var(--neon-blue); }
-        .game-panel { background: var(--panel-bg); padding: 20px; border-radius: 15px; border: 2px solid #222; width: 850px; text-align: center; box-sizing: border-box; position: relative; z-index: 5; }
+        .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Noto Music'; }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 100; backdrop-filter: blur(10px); transition: 0.3s; }
+        .back-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
         
-        /* JAVÍTOTT MÉRETŰ SÚGÓ TERÜLET */
-        #display-area {
-            font-size: 80px; margin: 10px 0; color: #333; font-weight: bold; font-family: 'Rajdhani', sans-serif;
-            height: 100px; display: flex; align-items: center; justify-content: center;
+        h1 { color: #fff; text-transform: uppercase; letter-spacing: 5px; margin: 0 0 10px 0; font-size: 26px; text-shadow: 0 0 15px var(--neon-blue); }
+
+        .master-panel { background: var(--panel-bg); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 8px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); }
+        .button-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; }
+        
+        button.cfg-btn { padding: 8px 16px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; outline: none; }
+        button.cfg-btn.active, button.cfg-btn.on { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; width: 850px; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 1px; }
+        .stat-value { font-size: 26px; font-weight: 700; font-family: 'Rajdhani', sans-serif; line-height: 1; color: #eee; transition: color 0.3s; }
+        .stat-value.highlight { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+
+        .game-panel { background: var(--panel-bg); padding: 20px; border-radius: 15px; border: 1px solid var(--border-color); width: 850px; text-align: center; box-sizing: border-box; backdrop-filter: blur(15px); position: relative; z-index: 5; }
+        
+        #display-area { height: 180px; display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+        #question-mark { font-size: 100px; color: #222; font-weight: bold; font-family: 'Rajdhani', sans-serif; }
+        #miniStaff { display: none; margin: 0 auto; }
+
+        #btnAction { 
+            padding: 14px 60px; 
+            background: rgba(10, 132, 255, 0.1); 
+            color: var(--neon-blue); 
+            border: 1px solid var(--neon-blue); 
+            border-radius: 8px; cursor: pointer; 
+            font-weight: bold; text-transform: uppercase; 
+            font-size: 15px; margin-bottom: 10px; transition: 0.3s; 
+        }
+        #btnAction:hover { background: rgba(10, 132, 255, 0.2); }
+        #btnAction.running { 
+            background: rgba(10, 132, 255, 0.15); 
+            color: var(--neon-blue); 
+            border-color: var(--neon-blue); 
         }
 
-        #btnAction { padding: 12px 60px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 15px; box-shadow: 0 4px 15px rgba(50,215,75,0.3); margin-bottom: 10px;}
-        #btnAction.running { background: var(--error-red); color: #fff; }
-        #user-input-display { font-size: 20px; color: var(--neon-orange); height: 25px; margin-bottom: 5px; font-family: 'Rajdhani', sans-serif; font-weight: bold; }
-        #feedback-msg { font-size: 18px; font-weight: bold; height: 24px; text-align: center; letter-spacing: 1px; color: var(--neon-blue); margin-bottom: 10px; font-family: 'Rajdhani', sans-serif; }
+        #feedback-msg { font-size: 18px; font-weight: bold; height: 24px; text-align: center; color: var(--neon-blue); margin-bottom: 10px; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px;}
+
+        #pianoWrapper { display: flex; width: 100%; justify-content: center; margin-top: 15px; position: relative; }
+        .piano-container { display: flex; background: #000; padding: 5px; border-radius: 8px; border: 1px solid var(--border-color); width: 100%; box-sizing: border-box; }
+        .key { flex: 1; height: 100px; border: 1px solid #111; border-radius: 0 0 4px 4px; cursor: pointer; transition: 0.1s; position: relative; display: flex; align-items: flex-end; justify-content: center; font-size: 8px; color: #666; user-select: none; }
+        .white { background: #eee; z-index: 1; }
+        .white.pressed { background: var(--neon-blue) !important; color: #fff; }
+        .white.error { background: var(--error-red) !important; }
+        .black { background: #111; height: 65px; margin-left: -1.5%; margin-right: -1.5%; z-index: 2; border-radius: 0 0 2px 2px; min-width: 1.8%; }
+        .black.pressed { background: var(--neon-blue) !important; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #050508; padding: 40px; border-radius: 16px; border: 2px solid var(--neon-blue); text-align: center; }
     </style>
 </head>
 <body>
-    <div class="font-loader">0123456789 .s ?</div>
+    <div class="font-loader">𝄞𝄢</div>
     <a href="index.html" class="back-btn">← AKADÉMIA</a>
     <h1>Hallásfejlesztő</h1>
-    <div id="timer-container"><div id="timer-bar"></div></div>
+
     <div class="master-panel">
         <div class="button-group">
-            <button id="btnAccToggle" class="cfg-btn" onclick="toggleAccidentals()">Előjegyzések: OFF</button>
-            <button id="btnLevelToggle" class="cfg-btn" onclick="toggleLevel()">Szint: ALAP</button>
-            <button id="btnHint" class="cfg-btn" onclick="toggleHint()">Súgó: OFF</button>
-            <button id="btnTimerToggle" class="cfg-btn on" onclick="toggleTimerMode()">Időkorlát: ON</button>
+            <button id="btnAccToggle" class="cfg-btn" onclick="toggleAccidentals()">Előjegyzések</button>
+            <button id="btnLevelToggle" class="cfg-btn" onclick="toggleLevel()">Haladó Szint</button>
+            <button id="btnHint" class="cfg-btn" onclick="toggleHint()">Súgó</button>
+            <button id="btnTimerToggle" class="cfg-btn on" onclick="toggleTimerMode()">Időkorlát</button>
+            <span style="color:#444;">|</span>
+            <button id="btnMute" class="cfg-btn on" onclick="toggleAudioMute()">HANG</button>
         </div>
     </div>
+
     <div class="stats-grid">
-        <div class="stat-box"><div class="stat-label">Helyes találat</div><div id="score" class="stat-value">0</div></div>
-        <div class="stat-box"><div class="stat-label">Státusz</div><div id="status-label" class="stat-value" style="color:var(--neon-rose);">VÁRAKOZÁS</div></div>
+        <div class="stat-box"><div class="stat-label">Küldetés</div><div id="taskCount" class="stat-value" style="color: #aaa;">0 / 10</div></div>
+        <div class="stat-box"><div class="stat-label">Időkorlát</div><div id="countdown" class="stat-value">--</div></div>
+        <div class="stat-box"><div class="stat-label">Találat / Hiba</div><div class="stat-value"><span id="scoreOk" style="color:var(--neon-blue);">0</span> <span style="color:#555;">/</span> <span id="scoreBad" style="color:var(--error-red);">0</span></div></div>
+        <div class="stat-box"><div class="stat-label">Sorozat</div><div id="scoreCombo" class="stat-value highlight">0</div></div>
     </div>
+
     <div class="game-panel" id="mainContainer">
         <button id="btnAction" onclick="handleAction()">▶ Gyakorlat indítása</button>
-        <div id="display-area">?</div>
-        <div id="user-input-display">-</div>
-        <div id="feedback-msg">KÉSZ</div>
-        <button id="btnRepeat" onclick="repeatTarget()" style="background: transparent; color: #888; border: 1px solid #333; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 12px; text-transform: uppercase; font-weight: bold;">Újrajátszás 🔊</button>
+        
+        <div id="display-area">
+            <span id="question-mark">?</span>
+            <canvas id="miniStaff" width="400" height="200"></canvas>
+        </div>
+
+        <div id="feedback-msg">KÉSZEN ÁLL</div>
+        <div id="pianoWrapper"><div class="piano-container" id="piano"></div></div>
+        <div style="margin-top:15px;"><button id="btnRepeat" onclick="repeatTarget()" style="background:transparent; color:#666; border:1px solid #333; padding:8px 15px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; text-transform:uppercase; transition: 0.2s;">Újrajátszás 🔊</button></div>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <h1 style="color: var(--neon-blue);">SZAKASZ LEZÁRVA</h1>
+            <h2 id="resPercent" style="font-size: 60px; color: #fff; margin: 10px 0;">0%</h2>
+            <button onclick="closeResult()" style="background: var(--neon-blue); color:#000; padding: 12px 40px; border:none; border-radius: 8px; cursor:pointer; font-weight:bold; text-transform:uppercase;">BEZÁRÁS</button>
+        </div>
     </div>
 
     <script>
-        let audioCtx, targetMidi, score = 0, isRunning = false;
-        let timeLeft = 5.0, timerTicker = null, firstAttempt = true;
-        let useQuickHint = false, useTimer = true, isMidiInitialized = false;
-        let useAccidentals = false, isAdvancedLevel = false;
-        const whiteNotes = { 60:'C4', 62:'D4', 64:'E4', 65:'F4', 67:'G4', 69:'A4', 71:'B4' };
+        let audioCtx, targetMidi, isRunning = false, isMidiInitialized = false;
+        let scoreOk = 0, scoreBad = 0, combo = 0, tasksDone = 0;
+        let timeLeft = 7, timerTicker = null, firstAttempt = true, audioMuted = false;
+        let useQuickHint = false, useTimer = true, useAccidentals = false, isAdvancedLevel = false;
+        
         const allNotes = { 60:'C4', 61:'C#4', 62:'D4', 63:'D#4', 64:'E4', 65:'F4', 66:'F#4', 67:'G4', 68:'G#4', 69:'A4', 70:'A#4', 71:'B4', 48:'C3', 49:'C#3', 50:'D3', 51:'D#3', 52:'E3', 53:'F3', 54:'F#3', 55:'G3', 56:'G#3', 57:'A3', 58:'A#3', 59:'B3' };
+        const whiteNotes = [60, 62, 64, 65, 67, 69, 71, 48, 50, 52, 53, 55, 57, 59];
 
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (!isMidiInitialized && navigator.requestMIDIAccess) { navigator.requestMIDIAccess().then(onMIDISuccess); isMidiInitialized = true; } }
-        function playNote(midi) { if (!audioCtx) return; const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12); osc.type = 'sine'; gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5); osc.start(); osc.stop(audioCtx.currentTime + 1.5); }
-        function toggleAccidentals() { useAccidentals = !useAccidentals; const btn = document.getElementById('btnAccToggle'); btn.innerText = `Előjegyzések: ${useAccidentals ? 'ON' : 'OFF'}`; btn.classList.toggle('on', useAccidentals); if (isRunning) handleAction(); }
-        function toggleLevel() { isAdvancedLevel = !isAdvancedLevel; const btn = document.getElementById('btnLevelToggle'); btn.innerText = `Szint: ${isAdvancedLevel ? 'HALADÓ' : 'ALAP'}`; btn.classList.toggle('on', isAdvancedLevel); if (isRunning) handleAction(); }
-        function toggleHint() { useQuickHint = !useQuickHint; const btn = document.getElementById('btnHint'); btn.innerText = `Súgó: ${useQuickHint ? 'ON' : 'OFF'}`; btn.classList.toggle('on', useQuickHint); if (isRunning && targetMidi) updateDisplay(); }
-        function toggleTimerMode() { useTimer = !useTimer; const btn = document.getElementById('btnTimerToggle'); document.getElementById('timer-container').style.opacity = useTimer ? "1" : "0"; btn.innerText = `Időkorlát: ${useTimer ? 'ON' : 'OFF'}`; btn.classList.toggle('on', useTimer); if (!useTimer) clearInterval(timerTicker); }
-        function updateDisplay() { const display = document.getElementById('display-area'); if (useQuickHint) { display.innerText = allNotes[targetMidi]; display.style.color = "var(--neon-blue)"; } else { display.innerText = "?"; display.style.color = "#333"; } }
-        function nextNote() { if (!isRunning) return; let pool = []; for (let midi in allNotes) { let m = parseInt(midi); let matchesLevel = isAdvancedLevel ? true : (m >= 60 && m <= 71); let matchesAccidental = useAccidentals ? true : (whiteNotes[m] !== undefined); if (matchesLevel && matchesAccidental) pool.push(m); } targetMidi = pool[Math.floor(Math.random() * pool.length)]; firstAttempt = true; timeLeft = 5.0; updateDisplay(); document.getElementById('feedback-msg').innerText = "HALLGASD A HANGOT..."; document.getElementById('mainContainer').style.borderColor = "#222"; if (useTimer) startTimer(); repeatTarget(); }
-        function startTimer() { clearInterval(timerTicker); timerTicker = setInterval(() => { if (!isRunning || !useTimer) return; timeLeft -= 0.1; if (timeLeft <= 0) { timeLeft = 0; clearInterval(timerTicker); document.getElementById('feedback-msg').innerText = "KERESD MEG A HANGOT!"; } updateTimerUI(); }, 100); }
-        function updateTimerUI() { const bar = document.getElementById('timer-bar'); bar.style.width = (timeLeft / 5.0) * 100 + "%"; bar.style.backgroundColor = timeLeft < 1.5 ? "var(--error-red)" : "var(--neon-purple)"; }
-        function onMIDISuccess(midi) { for (var input of midi.inputs.values()) input.onmidimessage = (e) => { if (!isRunning) return; const [s, n, v] = e.data; const mainContainer = document.getElementById('mainContainer'); if ((s & 0xf0) === 0x90 && v > 0) { playNote(n); const noteName = allNotes[n] || n; document.getElementById('user-input-display').innerText = "ÜTÖTT HANG: " + noteName; if (n === targetMidi) { if (firstAttempt && (!useTimer || timeLeft > 0)) { score++; document.getElementById('score').innerText = score; } clearInterval(timerTicker); mainContainer.style.borderColor = "var(--success-green)"; const display = document.getElementById('display-area'); display.innerText = noteName; display.style.color = "var(--success-green)"; document.getElementById('feedback-msg').innerText = "TÖKÉLETES!"; setTimeout(nextNote, 1500); } else { firstAttempt = false; mainContainer.style.borderColor = "var(--error-red)"; setTimeout(() => { if (isRunning) mainContainer.style.borderColor = "#222"; }, 300); const diff = n < targetMidi ? "MAGASABB" : "ALACSONYABB"; document.getElementById('feedback-msg').innerText = "A CÉLHANG " + diff + "!"; } } }; }
-        function handleAction() { initAudio(); isRunning = !isRunning; const btn = document.getElementById('btnAction'); if (isRunning) { btn.innerText = "◼ MEGSZAKÍTÁS"; btn.classList.add('running'); document.getElementById('status-label').innerText = "AKTÍV"; nextNote(); } else { btn.innerText = "▶ GYAKORLAT INDÍTÁSA"; btn.classList.remove('running'); document.getElementById('status-label').innerText = "VÁRAKOZÁS"; clearInterval(timerTicker); document.getElementById('display-area').innerText = "?"; document.getElementById('display-area').style.color = "#333"; document.getElementById('feedback-msg').innerText = "KÉSZ"; } }
+        const midiToNoteParams = {
+            48: {o:-1, c:'bass', s:''}, 49: {o:-1, c:'bass', s:'#'}, 50: {o:0, c:'bass', s:''}, 51: {o:0, c:'bass', s:'#'}, 
+            52: {o:1, c:'bass', s:''}, 53: {o:2, c:'bass', s:''}, 54: {o:2, c:'bass', s:'#'}, 55: {o:3, c:'bass', s:''}, 
+            56: {o:3, c:'bass', s:'#'}, 57: {o:4, c:'bass', s:''}, 58: {o:4, c:'bass', s:'#'}, 59: {o:5, c:'bass', s:''},
+            60: {o:-6, c:'treble', s:''}, 61: {o:-6, c:'treble', s:'#'}, 62: {o:-5, c:'treble', s:''}, 63: {o:-5, c:'treble', s:'#'}, 
+            64: {o:-4, c:'treble', s:''}, 65: {o:-3, c:'treble', s:''}, 66: {o:-3, c:'treble', s:'#'}, 67: {o:-2, c:'treble', s:''}, 
+            68: {o:-2, c:'treble', s:'#'}, 69: {o:-1, c:'treble', s:''}, 70: {o:-1, c:'treble', s:'#'}, 71: {o:0, c:'treble', s:''}
+        };
+
+        function initAudio() { 
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!isMidiInitialized && navigator.requestMIDIAccess) { 
+                navigator.requestMIDIAccess().then(access => { for (var input of access.inputs.values()) input.onmidimessage = onMIDIMessage; }); 
+                isMidiInitialized = true; 
+            } 
+        }
+
+        function handleKeyClick(n) {
+            initAudio();
+            const k = document.getElementById(`key-${n}`);
+            if(k) k.classList.add('pressed');
+            playNote(n);
+            if(isRunning) checkNote(n);
+        }
+
+        function handleKeyRelease(n) {
+            const k = document.getElementById(`key-${n}`);
+            if(k) k.classList.remove('pressed');
+        }
+
+        function createPiano() {
+            const p = document.getElementById('piano'); p.innerHTML = '';
+            for (let i = 36; i <= 84; i++) {
+                const isB = [1,3,6,8,10].includes(i%12);
+                const k = document.createElement('div');
+                k.className = `key ${isB?'black':'white'}`; k.id = `key-${i}`;
+                k.onmousedown = () => handleKeyClick(i);
+                k.onmouseup = () => handleKeyRelease(i);
+                k.onmouseleave = () => handleKeyRelease(i);
+                k.ontouchstart = (e) => { e.preventDefault(); handleKeyClick(i); };
+                k.ontouchend = (e) => { e.preventDefault(); handleKeyRelease(i); };
+                p.appendChild(k);
+            }
+        }
+
+        function playNote(midi) { 
+            if (!audioCtx || audioMuted) return; 
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); 
+            osc.connect(gain); gain.connect(audioCtx.destination); 
+            osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12); 
+            osc.type = 'sine'; gain.gain.setValueAtTime(0.4, audioCtx.currentTime); 
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2); 
+            osc.start(); osc.stop(audioCtx.currentTime + 1.2); 
+        }
+
+        function onMIDIMessage(e) {
+            const [s, n, v] = e.data;
+            if ((s & 0xf0) === 0x90 && v > 0) {
+                handleKeyClick(n);
+            } else if ((s & 0xf0) === 0x80 || ((s & 0xf0) === 0x90 && v === 0)) {
+                handleKeyRelease(n);
+            }
+        }
+
+        function drawMiniStaff(midi, revealNote, isSuccess = false) {
+            const c = document.getElementById('miniStaff');
+            const q = document.getElementById('question-mark');
+            c.style.display = 'block';
+            q.style.display = 'none';
+            
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, c.width, c.height);
+            
+            let params = midi ? midiToNoteParams[midi] : {c: 'treble', o: 0, s: ''};
+            
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.lineWidth = 2;
+            
+            const spacing = 20; 
+            const halfStep = 10; 
+            const cY = 100; 
+
+            for(let i=-2; i<=2; i++) {
+                ctx.beginPath(); ctx.moveTo(40, cY + i*spacing); ctx.lineTo(360, cY + i*spacing); ctx.stroke();
+            }
+
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.font = '80px "Noto Music"';
+            ctx.fillStyle = '#fff';
+            if (params.c === 'treble') { ctx.fillText('\uD834\uDD1E', 80, cY + 16); } 
+            else { ctx.fillText('\uD834\uDD22', 80, cY + 8); }
+
+            if (revealNote && midi) {
+                const nX = 200; 
+                const nY = cY - (params.o * halfStep);
+                let mainColor = isSuccess ? '#0a84ff' : '#fff';
+
+                if (params.o <= -6 || params.o >= 6) {
+                    ctx.strokeStyle = mainColor; ctx.lineWidth = 2;
+                    let step = params.o <= -6 ? -2 : 2;
+                    for (let p = (params.o <= -6 ? -6 : 6); (step > 0 ? p <= params.o : p >= params.o); p += step) {
+                        ctx.beginPath(); ctx.moveTo(nX-26, cY-p*halfStep); ctx.lineTo(nX+26, cY-p*halfStep); ctx.stroke();
+                    }
+                }
+
+                if (params.s === '#') {
+                    ctx.font = '36px Arial'; ctx.fillStyle = mainColor; ctx.fillText('♯', nX - 40, nY + 2);
+                }
+
+                ctx.beginPath(); ctx.ellipse(nX, nY, 15, 10, Math.PI/8, 0, 2*Math.PI); 
+                ctx.fillStyle = mainColor; ctx.fill();
+
+                ctx.font = 'bold 32px "Rajdhani"';
+                ctx.fillText(allNotes[midi], nX + 70, nY);
+            } else {
+                ctx.font = 'bold 80px "Rajdhani"';
+                ctx.fillStyle = '#222';
+                ctx.fillText('?', 200, cY);
+            }
+        }
+
+        function checkNote(n) {
+            const k = document.getElementById(`key-${n}`);
+            if (n === targetMidi) {
+                if (firstAttempt) { 
+                    scoreOk++; combo++; 
+                    document.getElementById('scoreOk').innerText = scoreOk;
+                    document.getElementById('scoreCombo').innerText = combo;
+                }
+                if(k) k.classList.add('pressed');
+                clearInterval(timerTicker);
+                drawMiniStaff(targetMidi, true, true);
+                document.getElementById('feedback-msg').innerText = "TÖKÉLETES!";
+                setTimeout(() => { if(k) k.classList.remove('pressed'); nextNote(); }, 1500);
+            } else {
+                firstAttempt = false;
+                combo = 0; scoreBad++;
+                document.getElementById('scoreBad').innerText = scoreBad;
+                document.getElementById('scoreCombo').innerText = combo;
+
+                if(k) { k.classList.add('error'); setTimeout(() => k.classList.remove('error'), 400); }
+                const diff = n < targetMidi ? "MAGASABB" : "ALACSONYABB";
+                document.getElementById('feedback-msg').innerText = "KERESD " + diff + "!";
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('scoreOk').innerText = scoreOk;
+            document.getElementById('scoreBad').innerText = scoreBad;
+            document.getElementById('scoreCombo').innerText = combo;
+            document.getElementById('taskCount').innerText = `${tasksDone} / 10`;
+        }
+
+        function toggleAudioMute() { audioMuted = !audioMuted; document.getElementById('btnMute').classList.toggle('on', !audioMuted); }
+        function toggleAccidentals() { useAccidentals = !useAccidentals; document.getElementById('btnAccToggle').classList.toggle('on', useAccidentals); if (isRunning) { tasksDone--; nextNote(); } }
+        function toggleLevel() { isAdvancedLevel = !isAdvancedLevel; document.getElementById('btnLevelToggle').classList.toggle('on', isAdvancedLevel); if (isRunning) { tasksDone--; nextNote(); } }
+        function toggleHint() { useQuickHint = !useQuickHint; document.getElementById('btnHint').classList.toggle('on', useQuickHint); drawMiniStaff(targetMidi, useQuickHint); }
+        function toggleTimerMode() { useTimer = !useTimer; document.getElementById('btnTimerToggle').classList.toggle('on', useTimer); if (!useTimer) { clearInterval(timerTicker); document.getElementById('countdown').innerText = "--"; document.getElementById('countdown').style.color = "#eee"; } }
+
+        function nextNote() { 
+            if (!isRunning) return; 
+            
+            if (tasksDone >= 10) {
+                stopMission();
+                document.getElementById('resPercent').innerText = Math.round((scoreOk/10)*100)+"%";
+                document.getElementById('resultModal').style.display = "flex";
+                return;
+            }
+
+            tasksDone++;
+            updateUI();
+
+            let pool = []; 
+            for (let midi in allNotes) { 
+                let m = parseInt(midi); 
+                let matchesL = isAdvancedLevel ? true : (m >= 60 && m <= 71); 
+                let matchesA = useAccidentals ? true : (whiteNotes.includes(m)); 
+                if (matchesL && matchesA) pool.push(m); 
+            } 
+            targetMidi = pool[Math.floor(Math.random() * pool.length)]; 
+            firstAttempt = true; 
+            timeLeft = 7; 
+            drawMiniStaff(targetMidi, useQuickHint);
+            document.getElementById('feedback-msg').innerText = "HALLGASD..."; 
+            if (useTimer) startTimer(); 
+            repeatTarget(); 
+        }
+
+        function startTimer() { 
+            clearInterval(timerTicker); 
+            const cd = document.getElementById('countdown');
+            cd.innerText = timeLeft; 
+            cd.style.color = "#eee";
+
+            timerTicker = setInterval(() => { 
+                if (!isRunning || !useTimer) return; 
+                timeLeft -= 1; 
+                cd.innerText = timeLeft; 
+                
+                if (timeLeft <= 3) { cd.style.color = "var(--error-red)"; }
+
+                // JAVÍTÁS: CSAK VÁR, NEM LÉP TOVÁBB MAGÁTÓL
+                if (timeLeft <= 0) { 
+                    clearInterval(timerTicker); 
+                    firstAttempt = false; combo = 0; scoreBad++; updateUI();
+                    document.getElementById('feedback-msg').innerText = "IDŐ LEJÁRT! ÜSD LE A HANGOT!";
+                    drawMiniStaff(targetMidi, true, false);
+                } 
+            }, 1000); 
+        }
+
+        function handleAction() { 
+            initAudio(); 
+            if (!isRunning) { 
+                scoreOk = 0; scoreBad = 0; combo = 0; tasksDone = 0;
+                isRunning = true;
+                const btn = document.getElementById('btnAction'); 
+                btn.innerText = "◼ MEGSZAKÍTÁS"; btn.classList.add('running'); nextNote(); 
+            } else { 
+                stopMission();
+            } 
+        }
+
+        function stopMission() {
+            isRunning = false;
+            const btn = document.getElementById('btnAction');
+            btn.innerText = "▶ Gyakorlat indítása"; btn.classList.remove('running'); 
+            clearInterval(timerTicker); 
+            drawMiniStaff(null, false);
+            document.getElementById('countdown').innerText = "--"; 
+            document.getElementById('countdown').style.color = "#eee";
+            document.getElementById('feedback-msg').innerText = "KÉSZEN ÁLL"; 
+        }
+
+        function closeResult() {
+            document.getElementById('resultModal').style.display='none';
+            drawMiniStaff(null, false);
+        }
+
         function repeatTarget() { if (isRunning && targetMidi) playNote(targetMidi); }
+        
+        window.onload = () => { 
+            createPiano(); 
+            document.fonts.ready.then(() => { drawMiniStaff(null, false); }); 
+        };
     </script>
 </body>
 </html>
