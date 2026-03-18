@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kotta - Ultimate Studio Mixer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Music&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        :root {
+            --neon-blue: #0a84ff; --neon-orange: #ff9f0a; --neon-purple: #bf5af2;
+            --success-green: #32d74b; --error-red: #ff453a; --bg-dark: #050508; 
+            --panel-bg: rgba(20, 20, 30, 0.85); --border-color: rgba(255, 255, 255, 0.15);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.5) 0%, rgba(5, 5, 8, 1) 100%), url('zongora-hatter-dark.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: var(--bg-dark); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; margin: 0; overflow: hidden;
+        }
+        .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Noto Music'; }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 10; backdrop-filter: blur(10px); transition: 0.3s; }
+        .back-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        h1 { color: var(--neon-orange); text-transform: uppercase; letter-spacing: 3px; margin: 0 0 10px 0; font-size: 26px; }
+
+        .master-panel { background: var(--panel-bg); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 8px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); }
+        .button-group { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; align-items: center; width: 100%; margin-bottom: 12px; }
+        
+        button.cfg-btn { padding: 6px 12px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; outline: none; }
+        button.cfg-btn.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+        button.clef-treble.active { border-color: var(--neon-purple); color: var(--neon-purple); background: rgba(191, 90, 242, 0.15); }
+        button.clef-bass.active { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
+        button.clef-mixed.active { border-color: var(--neon-orange); color: var(--neon-orange); background: rgba(255, 159, 10, 0.15); }
+        .toggle-btn.on { border-color: var(--success-green); color: var(--success-green); background: rgba(50, 215, 75, 0.15); }
+
+        /* Hangkeverő sáv */
+        .mixer-row { display: flex; gap: 15px; justify-content: center; align-items: center; width: 100%; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .mixer-control { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .mixer-control label { font-size: 10px; color: var(--neon-blue); text-transform: uppercase; font-weight: bold; letter-spacing: 1px; min-height: 12px;}
+        .mixer-control input[type=range] { width: 90px; cursor: pointer; accent-color: var(--neon-orange); }
+
+        /* Hangszer betöltési jelzés */
+        #loadingBar { width: 100%; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 8px; overflow: hidden; display: none; }
+        #loadingFill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); transition: width 0.3s ease; }
+        #loadingLabel { font-size: 10px; color: #888; text-align: center; margin-top: 4px; letter-spacing: 1px; display: none; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; width: 850px; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 10px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-label { font-size: 11px; color: #bbb; text-transform: uppercase; margin-bottom: 4px; }
+        .stat-value { font-size: 28px; font-weight: 700; font-family: 'Rajdhani', sans-serif; line-height: 1; }
+
+        #btnAction { padding: 14px 60px; background: var(--success-green); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 14px; margin-bottom: 5px; }
+        #btnAction.running { background: var(--error-red); color: #fff; }
+        
+        canvas { background: rgba(10, 10, 15, 0.7); border: 1px solid var(--border-color); border-radius: 12px; transition: box-shadow 0.2s ease, border-color 0.2s ease; position: relative; z-index: 5; }
+        canvas.flash-success { border-color: var(--success-green); box-shadow: 0 0 35px rgba(50, 215, 75, 0.4); }
+        canvas.flash-error { border-color: var(--error-red); box-shadow: 0 0 35px rgba(255, 69, 58, 0.5); }
+
+        #status { margin-top: 10px; font-size: 18px; font-weight: bold; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px; height: 24px; text-align: center; color: var(--neon-blue); }
+
+        /* VIRTUÁLIS ZONGORA */
+        #pianoWrapper { display: none; width: 850px; justify-content: center; margin-top: 15px; position: relative; z-index: 5; }
+        .piano-container { display: flex; background: #000; padding: 5px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .key { width: 20px; height: 80px; border: 1px solid #111; border-radius: 0 0 4px 4px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; font-size: 8px; color: #666; transition: 0.1s; user-select: none; }
+        .white { background: #eee; }
+        .white.pressed { background: var(--neon-blue) !important; color: #fff; }
+        .black { background: #111; width: 14px; height: 50px; margin-left: -7px; margin-right: -7px; z-index: 2; border-radius: 0 0 2px 2px; }
+        .black.pressed { background: var(--neon-orange) !important; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: rgba(20, 20, 30, 0.85); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; max-width: 600px; width: 90%; }
+    </style>
+</head>
+<body>
+    <div class="font-loader">𝄞𝄢</div>
+    <a href="index.html" class="back-btn">← AKADÉMIA</a>
+    <h1>KOTTA</h1>
+
+    <div class="master-panel">
+        <div class="button-group">
+            <button id="btnTreble" class="cfg-btn clef-treble active" onclick="setClef('treble')">VIOLIN</button>
+            <button id="btnBass" class="cfg-btn clef-bass" onclick="setClef('bass')">BASSZUS</button>
+            <button id="btnMixed" class="cfg-btn clef-mixed" onclick="setClef('mixed')">VEGYES</button>
+            <span style="color:#555;">|</span>
+            <button id="btnTimer" class="cfg-btn toggle-btn on" onclick="toggleTimer()">IDŐKORLÁT</button>
+            <button id="btnAccidental" class="cfg-btn toggle-btn on" onclick="toggleConfig('accidental')">ELŐJEGYZÉSEK</button>
+            <span style="color:#555;">|</span>
+            <button id="btnHint" class="cfg-btn toggle-btn" onclick="toggleConfig('hint')">SEGÉD</button>
+            <button id="btnAudioHint" class="cfg-btn toggle-btn" onclick="toggleAudioHint()">SÚGÓ HANG</button>
+            <button class="cfg-btn" onclick="openCheatSheet()">PUSKA</button>
+            <button id="btnKb" class="cfg-btn toggle-btn" onclick="toggleKeyboard()">BILLENTYŰ</button>
+        </div>
+
+        <div class="mixer-row">
+            <div class="mixer-control">
+                <label>&nbsp;</label>
+                <button id="btnMute" class="cfg-btn toggle-btn on" onclick="toggleAudioMute()" style="width: 70px;">HANG</button>
+            </div>
+            <div class="mixer-control">
+                <label>Hangszer</label>
+                <button id="btnInst" class="cfg-btn toggle-btn on" onclick="cycleInstrument()" style="min-width: 100px;">🎹 ZONGORA</button>
+            </div>
+            <div class="mixer-control">
+                <label>Hangerő</label>
+                <input type="range" id="mixVol" min="0" max="1" step="0.05" value="0.6" onchange="saveInstSettings()">
+            </div>
+            <div class="mixer-control">
+                <label>Lecsengés</label>
+                <input type="range" id="mixRel" min="0.1" max="4" step="0.1" value="1.5" onchange="saveInstSettings()">
+            </div>
+            <div class="mixer-control">
+                <label>Felfutás</label>
+                <input type="range" id="mixAtt" min="0.005" max="0.5" step="0.01" value="0.01" onchange="saveInstSettings()">
+            </div>
+            <div class="mixer-control">
+                <label>Fényesség</label>
+                <input type="range" id="mixFilt" min="300" max="8000" step="100" value="4000" onchange="saveInstSettings()">
+            </div>
+        </div>
+
+        <div id="loadingBar"><div id="loadingFill"></div></div>
+        <div id="loadingLabel">HANGMINTÁK BETÖLTÉSE...</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">Küldetés</div><div id="taskCount" class="stat-value" style="color:var(--neon-purple);">0 / 10</div></div>
+        <div class="stat-box"><div class="stat-label">Időkorlát</div><div class="stat-value"><span id="seconds">5.0</span>s</div></div>
+        <div class="stat-box"><div class="stat-label">Találat / Hiba</div><div class="stat-value"><span id="scoreOk" style="color:var(--success-green);">0</span> <span style="color:#555;">/</span> <span id="scoreBad" style="color:var(--error-red);">0</span></div></div>
+        <div class="stat-box"><div class="stat-label">Sorozat</div><div id="scoreCombo" class="stat-value" style="color:var(--neon-orange);">0</div></div>
+    </div>
+
+    <button id="btnAction" onclick="handleAction()">▶ GYAKORLAT INDÍTÁSA</button>
+    <div style="display:flex; flex-direction:column; align-items:center;">
+        <canvas id="staffCanvas" width="850" height="480"></canvas>
+        <div id="pianoWrapper"><div class="piano-container" id="piano"></div></div>
+        <div id="status">KÉSZEN ÁLL</div>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <h1 style="color: var(--neon-purple);">SZAKASZ LEZÁRVA</h1>
+            <h2 id="resPercent" style="font-size: 80px; color: var(--success-green); margin: 10px 0;">0%</h2>
+            <button onclick="startMission()" style="background: var(--success-green); padding: 15px 50px; border:none; border-radius: 8px; cursor:pointer; font-weight:bold; text-transform:uppercase;">Következő kör</button>
+            <button onclick="document.getElementById('resultModal').style.display='none';" style="background: rgba(255,255,255,0.1); color: #fff; padding: 15px 50px; border: 1px solid #555; border-radius: 8px; cursor:pointer; margin-top: 15px;">Bezárás</button>
+        </div>
+    </div>
+    <div id="hintModal" class="modal-overlay">
+        <div class="modal-content" style="max-width:880px;">
+            <canvas id="cheatCanvas" width="840" height="480"></canvas><br>
+            <button class="cfg-btn" style="margin-top:20px; padding:10px 30px;" onclick="closeCheatSheet()">Bezárás</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+        const imgSharp = new Image(), imgBe = new Image();
+        imgSharp.src = 'sharp.png'; imgBe.src = 'be.png';
+
+        let isMidiReady = false, isRunning = false, midiRequested = false;
+        
+        const MODES = ['piano', 'marimba', 'vibraphone', 'synth_tri', 'organ'];
+        const MODE_LABELS = { piano: '🎹 ZONGORA', marimba: '🪘 MARIMBA', vibraphone: '✨ VIBRAFON', synth_tri: '🎛 SZINTI', organ: '⛪ ORGONA' };
+        let currentInst = 'piano';
+        let audioMuted = false;
+
+        // --- HANGSZER MEMÓRIA ---
+        const instSettings = {
+            'piano': { vol: 0.6, rel: 1.5, att: 0.01, filt: 4000 },
+            'marimba': { vol: 0.8, rel: 0.5, att: 0.01, filt: 6000 },
+            'vibraphone': { vol: 0.7, rel: 3.0, att: 0.05, filt: 3000 },
+            'synth_tri': { vol: 0.5, rel: 0.8, att: 0.05, filt: 2500 },
+            'organ': { vol: 0.5, rel: 0.4, att: 0.1, filt: 5000 }
+        };
+
+        function saveInstSettings() {
+            instSettings[currentInst] = {
+                vol: document.getElementById('mixVol').value,
+                rel: document.getElementById('mixRel').value,
+                att: document.getElementById('mixAtt').value,
+                filt: document.getElementById('mixFilt').value
+            };
+        }
+
+        function loadInstSettings(inst) {
+            const s = instSettings[inst];
+            document.getElementById('mixVol').value = s.vol;
+            document.getElementById('mixRel').value = s.rel;
+            document.getElementById('mixAtt').value = s.att;
+            document.getElementById('mixFilt').value = s.filt;
+        }
+
+        // Tone.js Samplerek
+        const SAMPLE_BASE = 'https://tonejs.github.io/audio/salamander/';
+        let samplers = {}, Tone_started = false, audioCtx = null, activeNotes = {};
+        let toneGlobalFilter = null;
+
+        const PIANO_NOTES = {
+            'A0': SAMPLE_BASE + 'A0.mp3', 'C1': SAMPLE_BASE + 'C1.mp3', 'D#1': SAMPLE_BASE + 'Ds1.mp3', 'F#1': SAMPLE_BASE + 'Fs1.mp3', 'A1': SAMPLE_BASE + 'A1.mp3',
+            'C2': SAMPLE_BASE + 'C2.mp3', 'D#2': SAMPLE_BASE + 'Ds2.mp3', 'F#2': SAMPLE_BASE + 'Fs2.mp3', 'A2': SAMPLE_BASE + 'A2.mp3',
+            'C3': SAMPLE_BASE + 'C3.mp3', 'D#3': SAMPLE_BASE + 'Ds3.mp3', 'F#3': SAMPLE_BASE + 'Fs3.mp3', 'A3': SAMPLE_BASE + 'A3.mp3',
+            'C4': SAMPLE_BASE + 'C4.mp3', 'D#4': SAMPLE_BASE + 'Ds4.mp3', 'F#4': SAMPLE_BASE + 'Fs4.mp3', 'A4': SAMPLE_BASE + 'A4.mp3',
+            'C5': SAMPLE_BASE + 'C5.mp3', 'D#5': SAMPLE_BASE + 'Ds5.mp3', 'F#5': SAMPLE_BASE + 'Fs5.mp3', 'A5': SAMPLE_BASE + 'A5.mp3',
+            'C6': SAMPLE_BASE + 'C6.mp3', 'D#6': SAMPLE_BASE + 'Ds6.mp3', 'F#6': SAMPLE_BASE + 'Fs6.mp3', 'A6': SAMPLE_BASE + 'A6.mp3',
+            'C7': SAMPLE_BASE + 'C7.mp3', 'D#7': SAMPLE_BASE + 'Ds7.mp3', 'F#7': SAMPLE_BASE + 'Fs7.mp3', 'A7': SAMPLE_BASE + 'A7.mp3', 'C8': SAMPLE_BASE + 'C8.mp3'
+        };
+
+        function midiToToneName(midi) {
+            const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+            return names[midi % 12] + (Math.floor(midi / 12) - 1);
+        }
+
+        async function ensureSampler(mode) {
+            if (typeof Tone === 'undefined' || mode === 'synth_tri' || mode === 'organ') return null;
+            if (samplers[mode] && samplers[mode] !== 'loading') return samplers[mode];
+
+            samplers[mode] = 'loading';
+            document.getElementById('loadingBar').style.display = 'block';
+            document.getElementById('loadingLabel').style.display = 'block';
+            
+            try {
+                if (!Tone_started) { 
+                    await Tone.start(); Tone_started = true; 
+                    toneGlobalFilter = new Tone.Filter(parseFloat(document.getElementById('mixFilt').value), "lowpass").toDestination();
+                }
+
+                return new Promise((resolve) => {
+                    let urls = mode === 'piano' ? PIANO_NOTES : {};
+                    if (mode !== 'piano') {
+                        const BASE2 = `https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/${mode}-mp3/`;
+                        ['C2','F2','C3','F3','C4','F4','C5','F5','C6','F6'].forEach(k => { urls[k] = BASE2 + k + '.mp3'; });
+                    }
+
+                    const sampler = new Tone.Sampler({
+                        urls,
+                        onload: () => {
+                            if (toneGlobalFilter) sampler.connect(toneGlobalFilter);
+                            else sampler.toDestination();
+                            samplers[mode] = sampler;
+                            document.getElementById('loadingBar').style.display = 'none';
+                            document.getElementById('loadingLabel').style.display = 'none';
+                            resolve(sampler);
+                        },
+                        onerror: () => {
+                            samplers[mode] = null;
+                            document.getElementById('loadingBar').style.display = 'none';
+                            document.getElementById('loadingLabel').style.display = 'none';
+                            resolve(null);
+                        }
+                    });
+                    
+                    let prog = 5;
+                    const progInterval = setInterval(() => {
+                        prog = Math.min(prog + 15, 95);
+                        document.getElementById('loadingFill').style.width = prog + '%';
+                        if (samplers[mode] !== 'loading') clearInterval(progInterval);
+                    }, 200);
+                });
+            } catch (e) {
+                document.getElementById('loadingBar').style.display = 'none';
+                document.getElementById('loadingLabel').style.display = 'none';
+                return null;
+            }
+        }
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        document.getElementById('mixFilt').addEventListener('input', (e) => {
+            if (toneGlobalFilter) toneGlobalFilter.frequency.value = parseFloat(e.target.value);
+            saveInstSettings();
+        });
+
+        // --- HANGMOTOR ---
+        async function playTone(midi, velocity, isHint = false) {
+            if (audioMuted) return;
+            initAudio();
+
+            let vol = parseFloat(document.getElementById('mixVol').value);
+            if (!isHint) vol *= (velocity / 127); else vol *= 0.5;
+
+            const att = parseFloat(document.getElementById('mixAtt').value);
+            const filtFreq = parseFloat(document.getElementById('mixFilt').value);
+
+            if (['piano', 'marimba', 'vibraphone'].includes(currentInst)) {
+                if (typeof Tone !== 'undefined' && !Tone_started) { 
+                    await Tone.start(); Tone_started = true;
+                    toneGlobalFilter = new Tone.Filter(filtFreq, "lowpass").toDestination();
+                }
+                const sampler = samplers[currentInst];
+                if (sampler && sampler !== 'loading') {
+                    if (activeNotes[midi]) stopTone(midi);
+                    const noteName = midiToToneName(midi);
+                    if (toneGlobalFilter) toneGlobalFilter.frequency.value = filtFreq;
+
+                    try { sampler.attack = att; } catch(e) {}
+                    sampler.triggerAttack(noteName, Tone.now(), vol);
+                    
+                    if (isHint) setTimeout(() => sampler.triggerRelease(noteName, Tone.now()), 500);
+                    else activeNotes[midi] = { type: 'sampler', sampler, noteName };
+                    return;
+                }
+            }
+
+            if (activeNotes[midi]) stopTone(midi);
+            const now = audioCtx.currentTime;
+            const freq = 440 * Math.pow(2, (midi - 69) / 12);
+            const osc = audioCtx.createOscillator();
+            const filter = audioCtx.createBiquadFilter();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = (currentInst === 'organ') ? 'square' : 'triangle';
+            filter.type = 'lowpass'; filter.frequency.value = filtFreq;
+            
+            osc.connect(filter); filter.connect(gainNode); gainNode.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq, now);
+            
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(vol, now + att);
+            osc.start(now);
+            
+            if (isHint) {
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + att + 0.5);
+                osc.stop(now + att + 0.6);
+            } else {
+                activeNotes[midi] = { type: 'synth', osc, gainNode };
+            }
+        }
+
+        function stopTone(midi) {
+            if (activeNotes[midi]) {
+                const rel = parseFloat(document.getElementById('mixRel').value);
+                const noteObj = activeNotes[midi];
+                
+                if (noteObj.type === 'sampler') {
+                    try { noteObj.sampler.release = rel; } catch(e) {}
+                    noteObj.sampler.triggerRelease(noteObj.noteName, Tone.now());
+                } else if (noteObj.type === 'synth') {
+                    try {
+                        const now = audioCtx.currentTime;
+                        noteObj.gainNode.gain.cancelScheduledValues(now);
+                        noteObj.gainNode.gain.setValueAtTime(noteObj.gainNode.gain.value, now);
+                        noteObj.gainNode.gain.exponentialRampToValueAtTime(0.001, now + rel);
+                        noteObj.osc.stop(now + rel + 0.1);
+                    } catch(e) {}
+                }
+                delete activeNotes[midi];
+            }
+        }
+
+        // MIDI bejövő jelkezelők és Virtuális zongora összekötése
+        function handleNoteOn(midi, velocity) {
+            const k = document.getElementById(`key-${midi}`);
+            if(k) k.classList.add('pressed');
+
+            playTone(midi, velocity);
+
+            if(!isRunning || isTransitioning) return;
+
+            if(midi === currentNote.midi) {
+                isTransitioning = true; 
+                noteStatus = 'success';
+                canvas.classList.add('flash-success');
+                canvas.classList.remove('flash-error');
+                drawNote(currentNote);
+
+                if(!isWaitingForCorrection) { scoreOk++; combo++; }
+                document.getElementById('scoreOk').innerText=scoreOk; document.getElementById('scoreCombo').innerText=combo;
+                clearInterval(timerTicker); document.getElementById('status').innerHTML='<span style="color:var(--success-green)">HELYES!</span>';
+                
+                setTimeout(() => { 
+                    isTransitioning = false;
+                    canvas.classList.remove('flash-success');
+                    if(isRunning) nextTask(); 
+                }, 2000);
+
+            } else {
+                noteStatus = 'error';
+                canvas.classList.add('flash-error');
+                drawNote(currentNote);
+                setTimeout(() => canvas.classList.remove('flash-error'), 400);
+
+                if(!isWaitingForCorrection) { scoreBad++; combo=0; }
+                document.getElementById('scoreBad').innerText=scoreBad; document.getElementById('scoreCombo').innerText=combo;
+                document.getElementById('status').innerHTML='<span style="color:var(--error-red)">HIBÁS!</span>';
+            }
+        }
+
+        function handleNoteOff(midi) {
+            const k = document.getElementById(`key-${midi}`);
+            if(k) k.classList.remove('pressed');
+            stopTone(midi);
+        }
+
+        function onMIDIMessage(e) {
+            const cmd = e.data[0] >> 4;
+            const midi = e.data[1];
+            const velocity = e.data[2];
+
+            if (cmd === 9 && velocity > 0) {
+                handleNoteOn(midi, velocity);
+            } else if (cmd === 8 || (cmd === 9 && velocity === 0)) {
+                handleNoteOff(midi);
+            }
+        }
+
+        function cycleInstrument() {
+            saveInstSettings();
+            let idx = MODES.indexOf(currentInst);
+            currentInst = MODES[(idx + 1) % MODES.length];
+            document.getElementById('btnInst').innerText = MODE_LABELS[currentInst];
+            loadInstSettings(currentInst);
+            if (['piano', 'marimba', 'vibraphone'].includes(currentInst)) {
+                ensureSampler(currentInst).catch(e => console.warn(e));
+            }
+        }
+
+        function toggleAudioMute() {
+            audioMuted = !audioMuted;
+            document.getElementById('btnMute').classList.toggle('on', !audioMuted);
+            if (audioMuted) {
+                Object.keys(activeNotes).forEach(midi => stopTone(midi));
+            }
+        }
+
+        // --- VIRTUÁLIS ZONGORA ---
+        function toggleKeyboard() {
+            const w = document.getElementById('pianoWrapper');
+            const isVisible = w.style.display === 'flex';
+            w.style.display = isVisible ? 'none' : 'flex';
+            document.getElementById('btnKb').classList.toggle('on', !isVisible);
+        }
+
+        function createPiano() {
+            const pianoKeys = document.getElementById('piano');
+            for (let i = 36; i <= 84; i++) {
+                const isB = [1,3,6,8,10].includes(i%12);
+                const k = document.createElement('div');
+                k.className = `key ${isB?'black':'white'}`; k.id = `key-${i}`;
+                
+                k.addEventListener('mousedown', () => handleNoteOn(i, 100));
+                k.addEventListener('mouseup', () => handleNoteOff(i));
+                k.addEventListener('mouseleave', () => { if(k.classList.contains('pressed')) handleNoteOff(i); });
+                
+                // Mobilos érintés támogatás
+                k.addEventListener('touchstart', (e) => { e.preventDefault(); handleNoteOn(i, 100); });
+                k.addEventListener('touchend', (e) => { e.preventDefault(); handleNoteOff(i); });
+                k.addEventListener('touchcancel', (e) => { e.preventDefault(); handleNoteOff(i); });
+                
+                pianoKeys.appendChild(k);
+            }
+        }
+
+        // --- KOTTA & JÁTÉK LOGIKA ---
+        const trebleY = 140, bassY = 340;
+        let scoreOk=0, scoreBad=0, combo=0, totalTasks=0, timeLeft=5, timerTicker=null;
+        let currentClefMode='treble', visualClef='treble', useAccidentals=true, useQuickHint=false, useAudioHint=false, timerEnabled=true;
+        let currentNote=null, isWaitingForCorrection=false, isTransitioning=false;
+        let noteStatus = null; // 'success' vagy 'error'
+
+        function drawEmptyStaff() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2;
+            for(let i=-2; i<=2; i++){
+                ctx.beginPath(); ctx.moveTo(50, trebleY+i*24); ctx.lineTo(800, trebleY+i*24); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(50, bassY+i*24); ctx.lineTo(800, bassY+i*24); ctx.stroke();
+            }
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font='100px "Noto Music"';
+            ctx.fillStyle='#bf5af2'; ctx.fillText('\uD834\uDD1E', 95, trebleY + 20);
+            ctx.fillStyle='#0a84ff'; ctx.fillText('\uD834\uDD22', 95, bassY + 12);
+        }
+
+        function drawTintedImage(img, x, y, w, h, color) {
+            const tC = document.createElement('canvas'), tCtx = tC.getContext('2d');
+            tC.width = w; tC.height = h; tCtx.drawImage(img, 0, 0, w, h);
+            tCtx.globalCompositeOperation = 'source-in'; tCtx.fillStyle = color; tCtx.fillRect(0, 0, w, h);
+            ctx.drawImage(tC, x, y);
+        }
+
+        function drawNote(noteObj) {
+            drawEmptyStaff();
+            if(!noteObj) return;
+            const bY = visualClef === 'treble' ? trebleY : bassY;
+            const nY = bY - (noteObj.offset * 12), nX = canvas.width / 2;
+            
+            let mainColor = '#fff';
+            if (isWaitingForCorrection) mainColor = '#ff3b30'; 
+            if (noteStatus === 'success') mainColor = '#32d74b'; 
+            if (noteStatus === 'error') mainColor = '#ff453a'; 
+            
+            if (noteObj.offset <= -6 || noteObj.offset >= 6) {
+                ctx.strokeStyle = mainColor; ctx.lineWidth = 3;
+                let step = noteObj.offset <= -6 ? -2 : 2;
+                for (let p = (noteObj.offset <= -6 ? -6 : 6); (step > 0 ? p <= noteObj.offset : p >= noteObj.offset); p += step) {
+                    ctx.beginPath(); ctx.moveTo(nX-28, bY-p*12); ctx.lineTo(nX+28, bY-p*12); ctx.stroke();
+                }
+            }
+            
+            if (noteObj.symbol !== '') {
+                const isSharp = noteObj.symbol.includes('♯') || noteObj.symbol.includes('#');
+                const img = isSharp ? imgSharp : imgBe;
+                if (img && img.complete && img.naturalHeight > 0) {
+                    // PONTOSÍTOTT TÁVOLSÁG (nX - 60)
+                    drawTintedImage(img, nX - 60, nY - 21, 42, 42, mainColor);
+                } else {
+                    ctx.font = '36px Arial'; ctx.fillStyle = mainColor; ctx.fillText(isSharp ? '♯' : '♭', nX - 43, nY + 2);
+                }
+            }
+            
+            ctx.beginPath(); ctx.ellipse(nX, nY, 18, 13, Math.PI/8, 0, 2*Math.PI); ctx.fillStyle = mainColor; ctx.fill();
+            if (useQuickHint || isWaitingForCorrection || noteStatus !== null) { 
+                ctx.fillStyle = mainColor === '#fff' ? '#ff9f0a' : mainColor; 
+                ctx.font = 'bold 24px "Rajdhani"'; 
+                // PONTOSÍTOTT TÁVOLSÁG (nX + 45)
+                ctx.fillText(noteObj.name, nX + 45, nY); 
+            }
+        }
+
+        function handleAction() {
+            if (!isRunning) {
+                try {
+                    initAudio();
+                    if (!audioMuted) ensureSampler(currentInst).catch(e => console.warn(e));
+                    if (!midiRequested) {
+                        midiRequested = true;
+                        if (navigator.requestMIDIAccess) {
+                            navigator.requestMIDIAccess().then(access => {
+                                for (let input of access.inputs.values()) input.onmidimessage = onMIDIMessage;
+                                isMidiReady = true;
+                            }).catch(() => { isMidiReady = true; });
+                        }
+                    }
+                } catch(e) { console.warn("Audio/MIDI init error, continuing anyway."); }
+                startMission();
+            } else { stopMission(); }
+        }
+
+        function startMission() {
+            scoreOk=0; scoreBad=0; combo=0; totalTasks=0; noteStatus=null;
+            isRunning=true; isTransitioning=false;
+            document.getElementById('btnAction').innerText="◼ LEÁLLÍTÁS";
+            document.getElementById('btnAction').classList.add('running');
+            canvas.classList.remove('flash-success', 'flash-error');
+            nextTask();
+        }
+
+        function stopMission() {
+            isRunning=false; clearInterval(timerTicker);
+            document.getElementById('btnAction').innerText="▶ GYAKORLAT INDÍTÁSA";
+            document.getElementById('btnAction').classList.remove('running');
+            document.getElementById('status').innerText="KÉSZEN ÁLL";
+            canvas.classList.remove('flash-success', 'flash-error');
+            drawEmptyStaff();
+        }
+
+        function nextTask() {
+            if (totalTasks >= 10) { stopMission(); showResult(); return; }
+            totalTasks++; document.getElementById('taskCount').innerText = `${totalTasks} / 10`;
+            noteStatus = null;
+            generateNewNote(); startTimer();
+            if (useAudioHint && currentNote) playTone(currentNote.midi, 80, true);
+        }
+
+        function generateNewNote() {
+            visualClef = currentClefMode === 'mixed' ? (Math.random()>0.5?'treble':'bass') : currentClefMode;
+            const tN = [{name:'C4',o:-6,v:[{m:60,s:''},{m:61,s:'♯'}]},{name:'D4',o:-5,v:[{m:61,s:'♭'},{m:62,s:''},{m:63,s:'♯'}]},{name:'E4',o:-4,v:[{m:63,s:'♭'},{m:64,s:''}]},{name:'F4',o:-3,v:[{m:65,s:''},{m:66,s:'♯'}]},{name:'G4',o:-2,v:[{m:66,s:'♭'},{m:67,s:''},{m:68,s:'♯'}]},{name:'A4',o:-1,v:[{m:68,s:'♭'},{m:69,s:''},{m:70,s:'♯'}]},{name:'B4',o:0,v:[{m:70,s:'♭'},{m:71,s:''}]},{name:'C5',o:1,v:[{m:72,s:''},{m:73,s:'♯'}]},{name:'D5',o:2,v:[{m:73,s:'♭'},{m:74,s:''},{m:75,s:'♯'}]}];
+            const bN = [{name:'E2',o:-6,v:[{m:39,s:'♭'},{m:40,s:''}]},{name:'F2',o:-5,v:[{m:41,s:''},{m:42,s:'♯'}]},{name:'G2',o:-4,v:[{m:42,s:'♭'},{m:43,s:''},{m:44,s:'♯'}]},{name:'A2',o:-3,v:[{m:44,s:'♭'},{m:45,s:''},{m:46,s:'♯'}]},{name:'B2',o:-2,v:[{m:46,s:'♭'},{m:47,s:''}]},{name:'C3',o:-1,v:[{m:48,s:''},{m:49,s:'♯'}]},{name:'D3',o:0,v:[{m:49,s:'♭'},{m:50,s:''},{m:51,s:'♯'}]},{name:'E3',o:1,v:[{m:51,s:'♭'},{m:52,s:''}]},{name:'F3',o:2,v:[{m:53,s:''},{m:54,s:'♯'}]},{name:'G3',o:3,v:[{m:54,s:'♭'},{m:55,s:''},{m:56,s:'♯'}]},{name:'A3',o:4,v:[{m:56,s:'♭'},{m:57,s:''},{m:58,s:'♯'}]},{name:'B3',o:5,v:[{m:58,s:'♭'},{m:59,s:''}]},{name:'C4',o:6,v:[{m:60,s:''},{m:61,s:'♯'}]}];
+            let list = visualClef === 'treble' ? tN : bN;
+            let bNote = list[Math.floor(Math.random()*list.length)];
+            let v = useAccidentals ? bNote.v[Math.floor(Math.random()*bNote.v.length)] : bNote.v.find(x=>x.s==='');
+            currentNote = { name: bNote.name+(v.s?' '+v.s:''), offset: bNote.o, midi: v.m, symbol: v.s };
+            isWaitingForCorrection=false; document.getElementById('status').innerText="VÁRAKOZÁS..."; drawNote(currentNote);
+        }
+
+        function startTimer() {
+            clearInterval(timerTicker); if(!timerEnabled) return;
+            timeLeft=5.0; document.getElementById('seconds').innerText = timeLeft.toFixed(1);
+            timerTicker = setInterval(() => {
+                if(isWaitingForCorrection || !isRunning || isTransitioning) return;
+                timeLeft -= 0.1;
+                if(timeLeft<=0) { timeLeft=0; isWaitingForCorrection=true; document.getElementById('status').innerText="LEJÁRT IDŐ!"; drawNote(currentNote); }
+                document.getElementById('seconds').innerText = Math.max(0, timeLeft).toFixed(1);
+                document.getElementById('timer-bar').style.width = (timeLeft/5.0)*100+"%";
+            }, 100);
+        }
+
+        function showResult() { document.getElementById('resPercent').innerText = Math.round((scoreOk/10)*100)+"%"; document.getElementById('resultModal').style.display="flex"; }
+        
+        function setClef(clef) { currentClefMode = clef; document.querySelectorAll('.clef-treble, .clef-bass, .clef-mixed').forEach(b => b.classList.remove('active')); document.getElementById(clef==='treble'?'btnTreble':(clef==='bass'?'btnBass':'btnMixed')).classList.add('active'); if(isRunning) stopMission(); else drawEmptyStaff(); }
+        function toggleConfig(type) {
+            if (type === 'accidental') { useAccidentals = !useAccidentals; document.getElementById('btnAccidental').classList.toggle('on', useAccidentals); } 
+            else { useQuickHint = !useQuickHint; document.getElementById('btnHint').classList.toggle('on', useQuickHint); if (isRunning && currentNote) drawNote(currentNote); }
+            if (isRunning && type === 'accidental') { currentNote = null; generateNewNote(); }
+        }
+        function toggleAudioHint() { useAudioHint = !useAudioHint; document.getElementById('btnAudioHint').classList.toggle('on', useAudioHint); }
+        function toggleTimer() { timerEnabled=!timerEnabled; document.getElementById('btnTimer').classList.toggle('on', timerEnabled); if(!timerEnabled) document.getElementById('seconds').innerText = "--"; }
+        
+        function openCheatSheet() { document.getElementById('hintModal').style.display = 'flex'; drawCheatSheet(); }
+        function closeCheatSheet() { document.getElementById('hintModal').style.display = 'none'; }
+        function drawCheatSheet() {
+            const cCtx = document.getElementById('cheatCanvas').getContext('2d'); cCtx.clearRect(0, 0, 840, 480); cCtx.strokeStyle = '#555'; cCtx.lineWidth = 2;
+            for(let i=0; i<5; i++) { cCtx.beginPath(); cCtx.moveTo(40, 75 + i*15); cCtx.lineTo(800, 75 + i*15); cCtx.stroke(); cCtx.beginPath(); cCtx.moveTo(40, 165 + i*15); cCtx.lineTo(800, 165 + i*15); cCtx.stroke(); }
+            cCtx.textAlign = 'center'; cCtx.textBaseline = 'middle'; cCtx.fillStyle = '#bf5af2'; cCtx.font = '60px "Noto Music", serif'; cCtx.fillText('𝄞', 70, 105 + 12); cCtx.fillStyle = '#0a84ff'; cCtx.font = '60px "Noto Music", serif'; cCtx.fillText('𝄢', 70, 195 + 8);
+            const kY = 320, kH = 130, keyW = 30, startX = 100; const whiteKeys = ['F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5']; const noteYs = [232.5, 225, 217.5, 210, 202.5, 195, 187.5, 180, 172.5, 165, 157.5, 150, 142.5, 135, 127.5, 120, 112.5, 105, 97.5, 90, 82.5, 75, 67.5, 60];
+            cCtx.fillStyle = '#eee'; cCtx.strokeStyle = '#222'; for(let i=0; i<whiteKeys.length; i++) { cCtx.fillRect(startX + i*keyW, kY, keyW, kH); cCtx.strokeRect(startX + i*keyW, kY, keyW, kH); }
+            const blackIdxs = [0,1,2, 4,5, 7,8,9, 11,12, 14,15,16, 18,19, 21,22]; cCtx.fillStyle = '#111'; for(let b of blackIdxs) { cCtx.fillRect(startX + b*keyW + keyW - 10, kY, 20, kH * 0.6); }
+            for(let i=0; i<whiteKeys.length; i++) { let nx = startX + i*keyW + keyW/2, ny = noteYs[i]; let isC4 = (whiteKeys[i] === 'C4'); cCtx.strokeStyle = isC4 ? '#ff9f0a' : 'rgba(255,255,255,0.3)'; cCtx.beginPath(); cCtx.moveTo(nx, ny); cCtx.lineTo(nx, kY); cCtx.stroke(); if (ny === 150 || ny === 60 || ny === 240) { cCtx.strokeStyle = '#fff'; cCtx.beginPath(); cCtx.moveTo(nx-15, ny); cCtx.lineTo(nx+15, ny); cCtx.stroke(); } cCtx.fillStyle = isC4 ? '#ff9f0a' : '#fff'; cCtx.beginPath(); cCtx.ellipse(nx, ny, 11, 8, Math.PI / 8, 0, 2 * Math.PI); cCtx.fill(); cCtx.fillStyle = isC4 ? '#ff9f0a' : '#222'; cCtx.font = 'bold 12px "Rajdhani"'; cCtx.fillText(whiteKeys[i].charAt(0), nx, kY + 115); }
+        }
+
+        window.onload = () => { 
+            loadInstSettings('piano');
+            createPiano();
+            document.fonts.ready.then(drawEmptyStaff); 
+        };
+    </script>
+</body>
+</html>
