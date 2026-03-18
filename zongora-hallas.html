@@ -20,10 +20,11 @@
             height: 100vh; margin: 0; overflow: hidden;
         }
         .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Noto Music'; }
-        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 100; backdrop-filter: blur(10px); transition: 0.3s; }
+        .back-btn { position: fixed; top: 15px; left: 15px; color: #aaa; text-decoration: none; font-size: 14px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); z-index: 1000; backdrop-filter: blur(10px); transition: 0.3s; }
+        
         h1 { color: #fff; text-transform: uppercase; letter-spacing: 5px; margin: -20px 0 20px 0; font-size: 26px; text-shadow: 0 0 15px var(--neon-blue); }
 
-        .master-panel { background: var(--panel-bg); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 8px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); }
+        .master-panel { background: var(--panel-bg); padding: 12px 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 8px; width: 850px; box-sizing: border-box; backdrop-filter: blur(15px); position: relative; z-index: 100; }
         .button-group { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%; }
         .buttons-left { grid-column: 2; display: flex; gap: 8px; justify-content: center; align-items: center; }
         .help-right { grid-column: 3; display: flex; justify-content: flex-end; }
@@ -31,35 +32,52 @@
         button.cfg-btn { padding: 8px 16px; background: rgba(0,0,0,0.5); color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; text-transform: uppercase; outline: none; }
         button.cfg-btn.active, button.cfg-btn.on { border-color: var(--neon-blue); color: var(--neon-blue); background: rgba(10, 132, 255, 0.15); }
         #btnHelpMode { color: var(--neon-blue); border-color: #333; font-size: 20px; font-weight: bold; padding: 2px 14px; }
-        #btnHelpMode.active { border-color: var(--neon-blue); background: rgba(10, 132, 255, 0.2); }
 
         .help-tip { 
-            position: fixed; background: rgba(10, 15, 30, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
-            color: #fff; border: 1px solid rgba(10, 132, 255, 0.5); padding: 18px; border-radius: 12px; font-size: 16px; 
-            width: 320px; z-index: 100000; pointer-events: none; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-transform: none; line-height: 1.5;
+            position: fixed; background: rgba(10, 15, 30, 0.95); backdrop-filter: blur(12px); color: #fff; 
+            border: 1px solid var(--neon-blue); padding: 18px; border-radius: 12px; font-size: 15px; 
+            width: 320px; z-index: 99999; pointer-events: none; display: none; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            line-height: 1.5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; width: 850px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 8px; width: 850px; position: relative; z-index: 100; }
         .stat-box { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); text-align: center; }
-        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 1px; }
+        .stat-label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 4px; font-weight: bold; }
         .stat-value { font-size: 26px; font-weight: 700; font-family: 'Rajdhani', sans-serif; color: #eee; }
 
-        .game-panel { background: var(--panel-bg); padding: 20px 20px 0 20px; border-radius: 15px; border: 1px solid var(--border-color); width: 850px; text-align: center; box-sizing: border-box; backdrop-filter: blur(15px); position: relative; z-index: 5; }
-        #display-area { height: 180px; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
-        #miniStaff { margin: 0 auto; display: block; }
-
+        .game-panel { background: var(--panel-bg); padding: 20px 20px 0 20px; border-radius: 15px; border: 1px solid var(--border-color); width: 850px; text-align: center; box-sizing: border-box; backdrop-filter: blur(15px); position: relative; z-index: 100; }
+        
         #btnAction { padding: 14px 60px; background: rgba(10, 132, 255, 0.1); color: var(--neon-blue); border: 1px solid var(--neon-blue); border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 15px; margin-bottom: 10px; transition: 0.3s; }
-        #btnRepeat { background: rgba(10, 132, 255, 0.05); color: #aaa; border: 1px solid #333; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; transition: 0.2s; margin-bottom: 10px; }
-        #feedback-msg { font-size: 18px; font-weight: bold; height: 24px; text-align: center; color: var(--neon-blue); margin-bottom: 5px; font-family: 'Rajdhani', sans-serif; letter-spacing: 2px;}
+        #btnRepeat { background: transparent; border: 1px solid #444; color: #aaa; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; transition: 0.2s; }
+        #feedback-msg { font-size: 18px; font-weight: bold; height: 24px; text-align: center; color: var(--neon-blue); margin-bottom: 5px; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
 
-        #pianoWrapper { display: flex; width: 100%; justify-content: center; margin-top: 10px; position: relative; }
-        .piano-container { display: flex; background: #000; padding: 5px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none; width: 100%; box-sizing: border-box; }
-        .key { flex: 1; height: 100px; border: 1px solid #111; border-radius: 0 0 4px 4px; cursor: pointer; transition: 0.1s; position: relative; display: flex; align-items: flex-end; justify-content: center; font-size: 8px; color: #666; user-select: none; }
-        .white { background: #eee; }
-        .white.pressed { background: var(--neon-blue) !important; color: #fff; }
-        .black { background: #111; height: 65px; margin-left: -1.5%; margin-right: -1.5%; z-index: 2; border-radius: 0 0 2px 2px; min-width: 1.8%; }
-        .black.pressed { background: var(--neon-blue) !important; }
+        #pianoWrapper { 
+            width: 100%; height: 120px; margin-top: 10px; position: relative; 
+            background: url('piano-keys.png') no-repeat center; background-size: 100% 100%; 
+            border-radius: 0 0 10px 10px; overflow: hidden;
+        }
+        #piano { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        
+        .key-glow { position: absolute; top: 0; cursor: pointer; }
+        .key-glow.pressed::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; pointer-events: none; }
+
+        /* Fehér billentyű: Világosabb, finomabb szürke árnyék (kb. 25%-kal csökkentve) */
+        .white-glow.pressed::after { 
+            background: rgba(0, 0, 0, 0.15); 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3); 
+            filter: blur(2px); z-index: 30; 
+        }
+
+        /* Fekete billentyű: Még diszkrétebb lakk-csillanás (10%-kal csökkentve) */
+        .black-glow.pressed::after { 
+            height: 90%; 
+            width: 70%; left: 15%;
+            
+            background: rgba(255, 255, 255, 0.35); 
+            box-shadow: inset 0 0 12px rgba(255,255,255,0.1), 0 0 5px rgba(255,255,255,0.08); 
+            
+            filter: blur(1.5px); z-index: 40; 
+        }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 100000; justify-content: center; align-items: center; }
         .modal-content { background: #050508; padding: 40px; border-radius: 20px; border: 2px solid var(--neon-blue); text-align: center; width: 500px; box-shadow: 0 0 30px rgba(10, 132, 255, 0.3); }
@@ -83,23 +101,27 @@
                 <span style="color:#444;">|</span>
                 <button id="btnMute" class="cfg-btn on" onclick="toggleAudioMute()" data-help="HANG: Ezzel a gombbal tudod teljesen elnémítani vagy visszakapcsolni az oldal belső zongora hangját. Néma módban csak a külső MIDI eszközöd hangjára támaszkodhatsz.">HANG</button>
             </div>
-            <div class="help-right"><button id="btnHelpMode" class="cfg-btn" onclick="toggleHelpSystem()" data-help="INTERAKTÍV SÚGÓ MÓD: Kapcsold be ezt a kérdőjelet, majd vidd az egeret bármelyik gomb, statisztikai ablak vagy felirat fölé a részletes használati útmutatóért és tanácsokért!">?</button></div>
+            <div class="help-right">
+                <button id="btnHelpMode" class="cfg-btn" onclick="toggleHelpSystem()" data-help="INTERAKTÍV SÚGÓ MÓD: Kapcsold be ezt a kérdőjelet, majd vidd az egeret bármelyik gomb, statisztikai ablak vagy felirat fölé a részletes használati útmutatóért és tanácsokért!">?</button>
+            </div>
         </div>
     </div>
 
     <div class="stats-grid">
         <div class="stat-box" data-help="KÜLDETÉS: Egy-egy szakasz pontosan 10 feladatból áll. A sáv mutatja, hányadik hangnál tartasz éppen. A 10. hang után a rendszer kiértékeli a teljesítményedet és dönt a szintlépésről."><div class="stat-label">Küldetés</div><div id="taskCount" class="stat-value" style="color: #aaa;">0 / 10</div></div>
         <div class="stat-box" data-help="IDŐKORLÁT: Ennyi másodperced van felismerni és leütni a hangot. Ha 3 másodperc alá kerülsz, a szám pirosra vált. Ha eléri a nullát, a feladatot sikertelennek minősíti a rendszer."><div class="stat-label">Időkorlát</div><div id="countdown" class="stat-value">--</div></div>
-        <div class="stat-box" data-help="TALÁLAT / HIBA: A kék szám mutatja a hibátlan, elsőre eltalált hangokat. A piros szám a rontott leütéseket vagy a lejárt időt jelzi. A szakasz végén ebből számoljuk ki a százalékos eredményedet."><div class="stat-label">Találat / Hiba</div><div class="stat-value"><span id="scoreOk" style="color:var(--neon-blue);">0</span> <span style="color:#555;">/</span> <span id="scoreBad" style="color:var(--error-red);">0</span></div></div>
+        <div class="stat-box" data-help="TALÁLAT / HIBA: A kék szám mutatja a hibátlan, elsőre eltalált hangokat. A piros szám a rontott leütéseket vagy a lejárt időt jelzi. A szakasz végén ebből számoljuk ki a százalékos eredményedet."><div class="stat-label">Találat / Hiba</div><div class="stat-value"><span id="scoreOk" style="color:var(--neon-blue);">0</span> / <span id="scoreBad" style="color:var(--error-red);">0</span></div></div>
         <div class="stat-box" data-help="SOROZAT (COMBO): Ez a mutató azt méri, hány hangot sikerült egymás után, hiba nélkül eltalálnod. Amint elrontasz egy hangot vagy kifutsz az időből, a sorozat azonnal nullázódik."><div class="stat-label">Sorozat</div><div id="scoreCombo" class="stat-value" style="color:var(--neon-blue);">0</div></div>
     </div>
 
-    <div class="game-panel" id="mainContainer">
+    <div class="game-panel">
         <button id="btnAction" onclick="handleAction()">▶ Gyakorlat indítása</button>
-        <div id="display-area"><canvas id="miniStaff" width="400" height="180"></canvas></div>
-        <button id="btnRepeat" onclick="repeatTarget()" data-help="ÚJRAJÁTSZÁS: Ha nem hallottad tisztán a hangot, rákattintva a gép megismétli azt neked. Használd bátran, ha bizonytalan vagy a válaszban!">Újrajátszás 🔊</button>
+        <div style="height: 180px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="miniStaff" width="400" height="180"></canvas>
+        </div>
+        <button id="btnRepeat" onclick="repeatTarget()">Újrajátszás 🔊</button>
         <div id="feedback-msg">KÉSZEN ÁLL</div>
-        <div id="pianoWrapper"><div class="piano-container" id="piano"></div></div>
+        <div id="pianoWrapper"><div id="piano"></div></div>
     </div>
 
     <div id="resultModal" class="modal-overlay">
@@ -107,108 +129,112 @@
             <h1 style="color: var(--neon-blue);">SZAKASZ LEZÁRVA</h1>
             <h2 id="resPercent" style="font-size: 48px; color: #fff; margin: 10px 0;">0%</h2>
             <div id="resMessage" class="modal-msg"></div>
-            <button onclick="closeResult()" style="background: var(--neon-blue); color:#000; padding: 12px 40px; border:none; border-radius: 8px; cursor:pointer; font-weight:bold; text-transform:uppercase;">KÖVETKEZŐ KÖR</button>
+            <button onclick="closeResult()" style="background: var(--neon-blue); color:#000; padding:12px 40px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; text-transform:uppercase;">KÖVETKEZŐ KÖR</button>
         </div>
     </div>
 
     <script>
         let audioCtx, targetMidi, isRunning = false, isMidiInitialized = false, helpMode = false;
-        let scoreOk = 0, scoreBad = 0, combo = 0, tasksDone = 0;
-        let sessionTimer = 7, timeLeft = 7, timerTicker = null, audioMuted = false;
-        let useQuickHint = false, useTimer = true, useAccidentals = false;
-        let activeViolin = true, activeBass = false;
-        
-        const allNotes = { 60:'C4', 61:'C#4', 62:'D4', 63:'D#4', 64:'E4', 65:'F4', 66:'F#4', 67:'G4', 68:'G#4', 69:'A4', 70:'A#4', 71:'B4', 48:'C3', 49:'C#3', 50:'D3', 51:'D#3', 52:'E3', 53:'F3', 54:'F#3', 55:'G3', 56:'G#3', 57:'A3', 58:'A#3', 59:'B3' };
-        const whiteNotes = [60, 62, 64, 65, 67, 69, 71, 48, 50, 52, 53, 55, 57, 59];
-        const midiToNoteParams = {
-            48: {o:-1, c:'bass', s:''}, 49: {o:-1, c:'bass', s:'#'}, 50: {o:0, c:'bass', s:''}, 51: {o:0, c:'bass', s:'#'}, 52: {o:1, c:'bass', s:''}, 53: {o:2, c:'bass', s:''}, 54: {o:2, c:'bass', s:'#'}, 55: {o:3, c:'bass', s:''}, 56: {o:3, c:'bass', s:'#'}, 57: {o:4, c:'bass', s:''}, 58: {o:4, c:'bass', s:'#'}, 59: {o:5, c:'bass', s:''},
-            60: {o:-6, c:'treble', s:''}, 61: {o:-6, c:'treble', s:'#'}, 62: {o:-5, c:'treble', s:''}, 63: {o:-5, c:'treble', s:'#'}, 64: {o:-4, c:'treble', s:''}, 65: {o:-3, c:'treble', s:''}, 66: {o:-3, c:'treble', s:'#'}, 67: {o:-2, c:'treble', s:''}, 68: {o:-2, c:'treble', s:'#'}, 69: {o:-1, c:'treble', s:''}, 70: {o:-1, c:'treble', s:'#'}, 71: {o:0, c:'treble', s:''}
-        };
+        let scoreOk = 0, scoreBad = 0, combo = 0, tasksDone = 0, sessionTimer = 7, timeLeft = 7, timerTicker = null;
+        let useQuickHint = false, useTimer = true, useAccidentals = false, activeViolin = true, activeBass = false;
 
-        function toggleHelpSystem() { helpMode = !helpMode; document.getElementById('btnHelpMode').classList.toggle('active', helpMode); if (!helpMode) document.getElementById('tooltip').style.display = 'none'; }
+        const allNotes = { 36:'C2', 37:'C#2', 38:'D2', 39:'D#2', 40:'E2', 41:'F2', 42:'F#2', 43:'G2', 44:'G#2', 45:'A2', 46:'A#2', 47:'B2', 48:'C3', 49:'C#3', 50:'D3', 51:'D#3', 52:'E3', 53:'F3', 54:'F#3', 55:'G3', 56:'G#3', 57:'A3', 58:'A#3', 59:'B3', 60:'C4', 61:'C#4', 62:'D4', 63:'D#4', 64:'E4', 65:'F4', 66:'F#4', 67:'G4', 68:'G#4', 69:'A4', 70:'A#4', 71:'B4', 72:'C5', 73:'C#5', 74:'D5', 75:'D#5', 76:'E5', 77:'F5', 78:'F#5', 79:'G5', 80:'G#5', 81:'A5', 82:'A#5', 83:'B5' };
+        const whiteNotesMidi = [36,38,40,41,43,45,47,48,50,52,53,55,57,59,60,62,64,65,67,69,71,72,74,76,77,79,81,83];
+        const midiToNoteParams = { 48:{o:-1,c:'bass'}, 49:{o:-1,c:'bass',s:'#'}, 50:{o:0,c:'bass'}, 51:{o:0,c:'bass',s:'#'}, 52:{o:1,c:'bass'}, 53:{o:2,c:'bass'}, 54:{o:2,c:'bass',s:'#'}, 55:{o:3,c:'bass'}, 56:{o:3,c:'bass',s:'#'}, 57:{o:4,c:'bass'}, 58:{o:4,c:'bass',s:'#'}, 59:{o:5,c:'bass'}, 60:{o:-6,c:'treble'}, 61:{o:-6,c:'treble',s:'#'}, 62:{o:-5,c:'treble'}, 63:{o:-5,c:'treble',s:'#'}, 64:{o:-4,c:'treble'}, 65:{o:-3,c:'treble'}, 66:{o:-3,c:'treble',s:'#'}, 67:{o:-2,c:'treble'}, 68:{o:-2,c:'treble',s:'#'}, 69:{o:-1,c:'treble'}, 70:{o:-1,c:'treble',s:'#'}, 71:{o:0,c:'treble'} };
+
+        function createPiano() { 
+            const p = document.getElementById('piano'); p.innerHTML = ''; 
+            const totalWhiteKeys = 28;
+            const whiteWidth = 100 / totalWhiteKeys;
+            let wIdx = 0;
+
+            for (let i = 36; i <= 83; i++) { 
+                const k = document.createElement('div'); 
+                const isWhite = whiteNotesMidi.includes(i);
+                k.className = `key-glow ${isWhite ? 'white-glow' : 'black-glow'}`; 
+                k.id = `glow-${i}`;
+                
+                if (isWhite) {
+                    k.style.left = `${wIdx * whiteWidth}%`;
+                    k.style.width = `${whiteWidth}%`;
+                    k.style.height = `100%`;
+                    k.style.zIndex = `10`;
+                    wIdx++;
+                } else {
+                    const bWidth = whiteWidth * 0.6;
+                    k.style.left = `${(wIdx * whiteWidth) - (bWidth / 2)}%`;
+                    k.style.width = `${bWidth}%`;
+                    k.style.height = `62%`;
+                    k.style.zIndex = `20`;
+                }
+
+                k.onmousedown = (e) => { e.preventDefault(); handleKeyClick(i); };
+                k.onmouseup = () => k.classList.remove('pressed');
+                k.onmouseleave = () => k.classList.remove('pressed');
+                p.appendChild(k); 
+            } 
+        }
+
+        function toggleHelpSystem() { helpMode = !helpMode; document.getElementById('btnHelpMode').classList.toggle('active', helpMode); }
         document.addEventListener('mousemove', (e) => {
-            if (!helpMode) return;
-            const target = e.target.closest('[data-help]');
             const tip = document.getElementById('tooltip');
-            if (target) {
-                tip.innerText = target.dataset.help; tip.style.display = 'block';
-                let x = e.clientX + 20; let y = e.clientY + 20;
-                if (x + 320 > window.innerWidth) x = e.clientX - 340;
-                if (y + 150 > window.innerHeight) y = e.clientY - 160;
-                tip.style.left = x + 'px'; tip.style.top = y + 'px';
-            } else { tip.style.display = 'none'; }
+            if (!helpMode) { tip.style.display = 'none'; return; }
+            const target = e.target.closest('[data-help]');
+            if (target) { tip.innerText = target.dataset.help; tip.style.display = 'block'; tip.style.left = (e.clientX + 20) + 'px'; tip.style.top = (e.clientY + 20) + 'px'; }
+            else tip.style.display = 'none';
         });
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); if (!isMidiInitialized && navigator.requestMIDIAccess) { navigator.requestMIDIAccess().then(access => { for (var input of access.inputs.values()) input.onmidimessage = onMIDIMessage; }); isMidiInitialized = true; } }
-        function handleKeyClick(n) { initAudio(); if(document.getElementById(`key-${n}`)) document.getElementById(`key-${n}`).classList.add('pressed'); playNote(n); if(isRunning) checkNote(n); }
-        function createPiano() { const p = document.getElementById('piano'); p.innerHTML = ''; for (let i = 36; i <= 84; i++) { const isB = [1,3,6,8,10].includes(i%12); const k = document.createElement('div'); k.className = `key ${isB?'black':'white'}`; k.id = `key-${i}`; k.onmousedown = () => handleKeyClick(i); k.onmouseup = () => { if(document.getElementById(`key-${i}`)) document.getElementById(`key-${i}`).classList.remove('pressed'); }; p.appendChild(k); } }
-        function playNote(midi) { if (!audioCtx || audioMuted) return; const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12); osc.type = 'sine'; gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2); osc.start(); osc.stop(audioCtx.currentTime + 1.2); }
-        function onMIDIMessage(e) { const [s, n, v] = e.data; if ((s & 0xf0) === 0x90 && v > 0) handleKeyClick(n); else if ((s & 0xf0) === 0x80 || ((s & 0xf0) === 0x90 && v === 0)) { if(document.getElementById(`key-${n}`)) document.getElementById(`key-${n}`).classList.remove('pressed'); } }
+        function handleKeyClick(n) { initAudio(); const g = document.getElementById(`glow-${n}`); if(g) g.classList.add('pressed'); playNote(n); if(isRunning) checkNote(n); }
+        function playNote(midi) { if (!audioCtx) return; const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12); gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1); osc.start(); osc.stop(audioCtx.currentTime + 1); }
+        function onMIDIMessage(e) { const [s, n, v] = e.data; if ((s & 0xf0) === 0x90 && v > 0) handleKeyClick(n); else if ((s & 0xf0) === 0x80 || ((s & 0xf0) === 0x90 && v === 0)) { const g = document.getElementById(`glow-${n}`); if(g) g.classList.remove('pressed'); } }
 
         function drawMiniStaff(midi, revealNote, isSuccess = false) {
             const ctx = document.getElementById('miniStaff').getContext('2d'); ctx.clearRect(0, 0, 400, 180);
-            let params = midi ? midiToNoteParams[midi] : {c: 'treble', o: 0, s: ''};
+            let p = midi ? (midiToNoteParams[midi] || {c:'treble',o:-10,s:''}) : {c:'treble',o:0,s:''};
             ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 2;
-            for(let i=-2; i<=2; i++) { ctx.beginPath(); ctx.moveTo(40, 90 + i*20); ctx.lineTo(360, 90 + i*20); ctx.stroke(); }
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '80px "Noto Music"'; ctx.fillStyle = '#fff';
-            if (params.c === 'treble') ctx.fillText('\uD834\uDD1E', 80, 106); else ctx.fillText('\uD834\uDD22', 80, 98);
+            for(let i=-2; i<=2; i++) { ctx.beginPath(); ctx.moveTo(40, 90+i*20); ctx.lineTo(360, 90+i*20); ctx.stroke(); }
+            
+            ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#fff'; 
+            ctx.font='80px "Noto Music"';
+            ctx.fillText(p.c==='treble'?'\uD834\uDD1E':'\uD834\uDD22', 80, p.c==='treble'?106:98);
+            
             if (revealNote && midi) {
-                const nY = 90 - (params.o * 10); let mainColor = isSuccess ? '#0a84ff' : '#fff';
-                if (params.o <= -6 || params.o >= 6) { ctx.strokeStyle = mainColor; ctx.lineWidth = 2; let step = params.o <= -6 ? -2 : 2; for (let p = (params.o <= -6 ? -6 : 6); (step > 0 ? p <= params.o : p >= params.o); p += step) { ctx.beginPath(); ctx.moveTo(174, 90-p*10); ctx.lineTo(226, 90-p*10); ctx.stroke(); } }
-                if (params.s === '#') { ctx.font = '36px Arial'; ctx.fillStyle = mainColor; ctx.fillText('♯', 160, nY + 2); }
-                ctx.beginPath(); ctx.ellipse(200, nY, 15, 10, Math.PI/8, 0, 2*Math.PI); ctx.fillStyle = mainColor; ctx.fill();
-                ctx.font = 'bold 32px "Rajdhani"'; ctx.fillText(allNotes[midi], 270, nY);
-            } else { ctx.font = 'bold 80px "Rajdhani"'; ctx.fillStyle = '#222'; ctx.fillText('?', 200, 90); }
+                const nY = 90-(p.o*10); let color = isSuccess ? '#0a84ff' : '#fff';
+                if (p.o <= -6 || p.o >= 6) { ctx.strokeStyle = color; ctx.lineWidth = 2; let step = p.o <= -6 ? -2 : 2; for (let pl = (p.o <= -6 ? -6 : 6); (step > 0 ? pl <= p.o : pl >= p.o); pl += step) { ctx.beginPath(); ctx.moveTo(174, 90-pl*10); ctx.lineTo(226, 90-pl*10); ctx.stroke(); } }
+                if (p.s === '#') { ctx.font = '36px Arial'; ctx.fillStyle = color; ctx.fillText('♯', 160, nY + 2); }
+                ctx.beginPath(); ctx.ellipse(200, nY, 15, 10, Math.PI/8, 0, 2*Math.PI); ctx.fillStyle=color; ctx.fill();
+                ctx.font='bold 32px Rajdhani'; ctx.fillText(allNotes[midi], 270, nY);
+            } else { ctx.font='bold 80px Rajdhani'; ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fillText('?', 200, 90); }
         }
 
         function checkNote(n) { if (n === targetMidi) { scoreOk++; combo++; updateUI(); clearInterval(timerTicker); drawMiniStaff(targetMidi, true, true); document.getElementById('feedback-msg').innerText = "TÖKÉLETES!"; setTimeout(() => { if (isRunning) nextNote(); }, 1500); } else { combo = 0; scoreBad++; updateUI(); document.getElementById('feedback-msg').innerText = "KERESD " + (n < targetMidi ? "MAGASABB" : "ALACSONYABB") + "!"; } }
         function updateUI() { document.getElementById('scoreOk').innerText = scoreOk; document.getElementById('scoreBad').innerText = scoreBad; document.getElementById('scoreCombo').innerText = combo; document.getElementById('taskCount').innerText = `${tasksDone} / 10`; }
-        function toggleClef(type) { if(type === 'violin') activeViolin = !activeViolin; else activeBass = !activeBass; if(!activeViolin && !activeBass) activeViolin = true; document.getElementById('btnViolin').classList.toggle('active', activeViolin); document.getElementById('btnBass').classList.toggle('active', activeBass); if(isRunning) { tasksDone--; nextNote(); } }
-        function toggleAudioMute() { audioMuted = !audioMuted; document.getElementById('btnMute').classList.toggle('on', !audioMuted); }
-        function toggleAccidentals() { useAccidentals = !useAccidentals; document.getElementById('btnAccToggle').classList.toggle('on', useAccidentals); if (isRunning) { tasksDone--; nextNote(); } }
-        function toggleHint() { useQuickHint = !useQuickHint; document.getElementById('btnHint').classList.toggle('on', useQuickHint); drawMiniStaff(targetMidi, useQuickHint); }
-        function toggleTimerMode() { useTimer = !useTimer; document.getElementById('btnTimerToggle').classList.toggle('on', useTimer); if (!useTimer) { clearInterval(timerTicker); document.getElementById('countdown').innerText = "--"; document.getElementById('countdown').style.color = "#eee"; } }
-
-        function nextNote() { 
-            if (tasksDone >= 10) { stopMission(); finalizeSession(); return; }
-            tasksDone++; updateUI();
-            let pool = []; for (let midi in allNotes) { let m = parseInt(midi); let p = midiToNoteParams[m]; let matchClef = (p.c === 'treble' && activeViolin) || (p.c === 'bass' && activeBass); let matchAcc = useAccidentals ? true : whiteNotes.includes(m); if (matchClef && matchAcc) pool.push(m); } 
-            targetMidi = pool[Math.floor(Math.random() * pool.length)]; timeLeft = sessionTimer; drawMiniStaff(targetMidi, useQuickHint);
-            document.getElementById('feedback-msg').innerText = "HALLGASD..."; if (useTimer) startTimer(); repeatTarget(); 
-        }
-
+        function nextNote() { if (tasksDone >= 10) { isRunning = false; finalizeSession(); return; } tasksDone++; updateUI(); let pool = []; for (let m in allNotes) { let midi = parseInt(m); if (!useAccidentals && !whiteNotesMidi.includes(midi)) continue; if (activeViolin && (midiToNoteParams[midi]?.c === 'treble')) pool.push(midi); if (activeBass && (midiToNoteParams[midi]?.c === 'bass')) pool.push(midi); } if(pool.length===0) pool = [60]; targetMidi = pool[Math.floor(Math.random()*pool.length)]; timeLeft = sessionTimer; drawMiniStaff(targetMidi, useQuickHint); if (useTimer) startTimer(); repeatTarget(); }
+        
         function finalizeSession() {
-            let pct = Math.round((scoreOk/10)*100);
-            document.getElementById('resPercent').innerText = pct + "%";
-            let msg = "";
-            if (pct === 100) {
-                if (sessionTimer > 2) {
-                    sessionTimer--;
-                    msg = "Kiváló teljesítmény! Ezt a küldetést 100%-osan teljesítetted, így továbbléphetsz a következő szintre.<br>Innentől kezdve már csak <b>" + sessionTimer + " másodperced</b> lesz a hangok felismerésére.";
-                } else {
-                    msg = "Gratulálunk! Elérted a Piano Academy maximális sebességét (2 másodperc).<br>Hallásod most már professzionális szintű!";
-                }
-            } else {
-                msg = "Szép munka, de a szintlépéshez 100%-os találat szükséges.<br>Gyakorolj még a(z) " + sessionTimer + " másodperces tempónál!";
-            }
-            document.getElementById('resMessage').innerHTML = msg;
-            document.getElementById('resultModal').style.display = "flex";
+            let pct = Math.round((scoreOk/10)*100); document.getElementById('resPercent').innerText = pct + "%";
+            let msg = pct === 100 ? (sessionTimer > 2 ? `Kiváló teljesítmény! Ezt a küldetést 100%-osan teljesítetted, így továbbléphetsz a következő szintre.<br>Innentől kezdve már csak <b>${sessionTimer-1} másodperced</b> lesz a hangok felismerésére.` : "Gratulálunk! Elérted a Piano Academy maximális sebességét (2 másodperc).<br>Hallásod most már professzionális szintű!") : `Szép munka, de a szintlépéshez 100%-os találat szükséges.<br>Gyakorolj még a(z) ${sessionTimer} másodperces tempónál!`;
+            document.getElementById('resMessage').innerHTML = msg; document.getElementById('resultModal').style.display = "flex"; if(pct === 100 && sessionTimer > 2) sessionTimer--;
         }
 
-        function startTimer() { 
-            clearInterval(timerTicker); document.getElementById('countdown').innerText = timeLeft; document.getElementById('countdown').style.color = "#eee";
-            timerTicker = setInterval(() => { 
-                if (!isRunning || !useTimer) return; timeLeft -= 1; document.getElementById('countdown').innerText = timeLeft; 
-                if (timeLeft <= 3) document.getElementById('countdown').style.color = "var(--error-red)";
-                if (timeLeft <= 0) { clearInterval(timerTicker); scoreBad++; combo = 0; updateUI(); document.getElementById('feedback-msg').innerText = "IDŐ LEJÁRT! ÜSD LE A HANGOT!"; drawMiniStaff(targetMidi, true, false); } 
-            }, 1000); 
-        }
-
-        function handleAction() { initAudio(); if (!isRunning) { scoreOk = 0; scoreBad = 0; combo = 0; tasksDone = 0; isRunning = true; document.getElementById('btnAction').innerText = "◼ MEGSZAKÍTÁS"; nextNote(); } else stopMission(); }
-        function stopMission() { isRunning = false; clearInterval(timerTicker); document.getElementById('btnAction').innerText = "▶ Gyakorlat indítása"; drawMiniStaff(null, false); document.getElementById('countdown').innerText = "--"; document.getElementById('feedback-msg').innerText = "KÉSZEN ÁLL"; }
+        function startTimer() { clearInterval(timerTicker); document.getElementById('countdown').innerText = timeLeft; timerTicker = setInterval(() => { if (!isRunning) return; timeLeft--; document.getElementById('countdown').innerText = timeLeft; if (timeLeft <= 0) { clearInterval(timerTicker); scoreBad++; combo = 0; updateUI(); document.getElementById('feedback-msg').innerText = "IDŐ LEJÁRT! ÜSD LE A HANGOT!"; drawMiniStaff(targetMidi, true, false); } }, 1000); }
+        function handleAction() { initAudio(); if (!isRunning) { scoreOk = 0; scoreBad = 0; combo = 0; tasksDone = 0; isRunning = true; document.getElementById('btnAction').innerText = "◼ MEGSZAKÍTÁS"; nextNote(); } else { isRunning = false; clearInterval(timerTicker); document.getElementById('btnAction').innerText = "▶ Gyakorlat indítása"; drawMiniStaff(null, false); document.getElementById('countdown').innerText = "--"; document.getElementById('feedback-msg').innerText = "KÉSZEN ÁLL"; } }
         function closeResult() { document.getElementById('resultModal').style.display='none'; }
         function repeatTarget() { if (isRunning && targetMidi) playNote(targetMidi); }
-        window.onload = () => { createPiano(); document.fonts.ready.then(() => drawMiniStaff(null, false)); };
+        function toggleClef(t) { if(t==='violin') activeViolin=!activeViolin; else activeBass=!activeBass; document.getElementById('btnViolin').classList.toggle('active', activeViolin); document.getElementById('btnBass').classList.toggle('active', activeBass); if(isRunning){tasksDone--; nextNote();} }
+        function toggleAccidentals() { useAccidentals=!useAccidentals; document.getElementById('btnAccToggle').classList.toggle('on', useAccidentals); if(isRunning){tasksDone--; nextNote();} }
+        function toggleHint() { useQuickHint=!useQuickHint; document.getElementById('btnHint').classList.toggle('on', useQuickHint); drawMiniStaff(targetMidi, useQuickHint); }
+        function toggleTimerMode() { useTimer=!useTimer; document.getElementById('btnTimerToggle').classList.toggle('on', useTimer); if (!useTimer) { clearInterval(timerTicker); document.getElementById('countdown').innerText = "--"; } }
+        function toggleAudioMute() { audioMuted=!audioMuted; document.getElementById('btnMute').classList.toggle('on', !audioMuted); }
+
+        window.onload = () => { 
+            createPiano(); 
+            document.fonts.ready.then(() => {
+                drawMiniStaff(null, false);
+                setTimeout(() => drawMiniStaff(null, false), 150);
+            }); 
+        };
     </script>
 </body>
 </html>
