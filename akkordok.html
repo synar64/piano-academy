@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akíra Piano Academy | Studio Rack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Hardver színek */
+            --rack-bg: #1a1a1d; 
+            --rack-border: #2a2a2d;
+            --btn-dark: #101012; 
+            --btn-border: #050505;
+            
+            /* Kijelző és LED színek */
+            --lcd-bg: #222522; 
+            --lcd-text: #aaccaa; 
+            --lcd-dim: rgba(170, 204, 170, 0.55); 
+            --lcd-shadow: 0 0 6px rgba(170, 204, 170, 0.6);
+            --lcd-border: #080808;
+            
+            --led-on: #ffaa00; 
+            --led-play: #33ff33; 
+            --led-cyan: #00AACC; 
+            
+            --text-dim: #777; 
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #050508;
+            background-image: radial-gradient(circle at 50% 50%, #151518 0%, #050508 100%);
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+            color: #fff;
+        }
+
+        /* ── NAVIGÁCIÓ ── */
+        .top-nav {
+            width: 100%; background: #0a0a0c;
+            border-bottom: 2px solid #000; box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            display: flex; justify-content: center; padding: 12px 0; z-index: 1000;
+        }
+        .nav-content { width: 100%; max-width: 2450px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        
+        .logo-svg { height: 40px; cursor: pointer; transition: 0.2s; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+        
+        .main-menu { display: flex; gap: 12px; }
+        
+        .nav-btn { 
+            width: 110px; height: 40px; background-color: var(--btn-dark); color: var(--text-dim);
+            border: 1px solid var(--btn-border); border-radius: 4px; cursor: pointer;
+            font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.1s; display: flex; align-items: center; justify-content: center; text-decoration: none;
+            position: relative; box-shadow: 0 2px 0 #000, 0 4px 5px rgba(0,0,0,0.4);
+        }
+        .nav-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000, 0 1px 2px rgba(0,0,0,0.4); }
+        
+        .nav-btn.active { background-color: #121214; color: var(--text-dim); }
+        .nav-btn.active::after {
+            content: ''; position: absolute; top: 6px; right: 8px; width: 6px; height: 6px; border-radius: 50%;
+            background-color: var(--led-cyan); box-shadow: 0 0 10px var(--led-cyan);
+        }
+
+        /* ── A STÚDIÓ RACK PANEL ── */
+        .ui-container { width: 100%; max-width: 2450px; margin-top: 20px; z-index: 100; align-self: center; padding: 0 20px; box-sizing: border-box;}
+        
+        .master-dashboard { 
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px;
+            background-color: var(--rack-bg);
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 3px; border: 2px solid var(--rack-border);
+            border-radius: 8px; padding: 20px 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.05);
+            position: relative;
+        }
+        
+        .master-dashboard::before, .master-dashboard::after {
+            content: ''; position: absolute; width: 10px; height: 10px; background: #222; border-radius: 50%; border: 1px solid #000; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);
+        }
+        .master-dashboard::before { top: 12px; left: 12px; }
+        .master-dashboard::after { top: 12px; right: 12px; }
+
+        .control-group-left { display: flex; gap: 15px; justify-content: flex-start; align-items: center; flex-wrap: wrap;}
+        .control-group-center { display: flex; align-items: center; gap: 30px; padding: 0 20px; justify-content: center; flex-wrap: wrap;}
+        .control-group-right { display: flex; gap: 15px; justify-content: flex-end; align-items: center; flex-wrap: wrap;}
+
+        /* HARDVER GOMBOK */
+        .hardware-btn { 
+            width: 140px; height: 42px; background-color: var(--btn-dark); color: var(--text-dim);
+            border: 1px solid var(--btn-border); border-radius: 4px; cursor: pointer;
+            font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+            transition: all 0.1s; display: flex; align-items: center; justify-content: center;
+            position: relative; box-shadow: 0 2px 0 #000, 0 4px 5px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+        }
+        .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000, 0 1px 2px rgba(0,0,0,0.4); }
+        .hardware-btn.active { background-color: #121214; color: var(--text-dim); }
+        .hardware-btn.active::after {
+            content: ''; position: absolute; top: 6px; right: 8px; width: 6px; height: 6px; border-radius: 50%;
+            background-color: var(--led-on); box-shadow: 0 0 10px var(--led-on);
+        }
+
+        #btnStart { 
+            width: 180px; height: 50px; background-color: var(--btn-dark); color: var(--text-dim); 
+            border: 1px solid var(--btn-border); border-radius: 4px; 
+            font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 2px;
+            cursor: pointer; transition: 0.1s; box-shadow: 0 3px 0 #000, 0 5px 8px rgba(0,0,0,0.4);
+            flex-shrink: 0; position: relative;
+        }
+        #btnStart:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
+        #btnStart.running::after {
+            content: ''; position: absolute; top: 8px; right: 10px; width: 8px; height: 8px; border-radius: 50%;
+            background-color: var(--led-play); box-shadow: 0 0 12px var(--led-play);
+        }
+
+        /* ── KÖZÖS LCD STÍLUSOK ── */
+        .lcd-base {
+            background-color: var(--lcd-bg);
+            border: 3px solid var(--lcd-border); 
+            border-radius: 2px; box-sizing: border-box;
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.9); 
+            position: relative; overflow: hidden;
+        }
+        .lcd-base::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36z8gAFWNgYGBkgAsgC6ALoAtgAgC5XwYCh04S9AAAAABJRU5ErkJggg==');
+            opacity: 0.2; pointer-events: none; z-index: 20;
+        }
+        .lcd-label { font-size: 9px; color: #667766; font-family: 'Inter', sans-serif; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; margin-bottom: 2px; z-index: 2; position: relative; }
+        .lcd-text { font-family: 'Share Tech Mono', monospace; font-size: 16px; color: var(--lcd-text); text-shadow: var(--lcd-shadow); text-transform: uppercase; letter-spacing: 1px; z-index: 2; position: relative; }
+
+        /* ── OSZTOTT LCD (MODE / LEVEL) ── */
+        .lcd-display-module { display: flex; align-items: center; gap: 12px; }
+        .lcd-mode-level { width: 260px; height: 50px; display: flex; flex-direction: row; align-items: stretch; }
+        
+        .nav-disk-btn {
+            width: 32px; height: 32px; background: #222; border: 2px solid #111; border-radius: 50%;
+            color: #888; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.6); transition: 0.1s; flex-shrink: 0;
+        }
+        .nav-disk-btn:active { transform: translateY(2px); box-shadow: 0 0 1px rgba(0,0,0,0.6); }
+
+        .lcd-half { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2; position: relative; }
+        .lcd-divider { width: 1px; background: rgba(170, 204, 170, 0.15); margin: 5px 0; z-index: 2; position: relative; }
+
+        /* ── ZÖLD BPM LCD KIJELZŐ ── */
+        .bpm-screen { width: 90px; height: 50px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .bpm-screen .lcd-text { font-size: 18px; }
+
+        /* ── INFO BAR LCD ── */
+        .info-bar { 
+            width: 100%; margin: 15px auto 0 auto; height: 45px;
+            display: none; align-items: center; gap: 15px; padding: 0 25px;
+        }
+        .info-bar-title { color: #667766; font-family: 'Inter', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; min-width: 90px; border-right: 1px solid rgba(170, 204, 170, 0.2); padding-right: 15px; z-index: 2; position: relative;}
+        .info-bar-text { flex: 1; transition: text-align 0.2s; font-family: 'Share Tech Mono', monospace; font-size: 15px; color: var(--lcd-text); text-shadow: var(--lcd-shadow); text-transform: uppercase; z-index: 2; position: relative;}
+
+        /* ── HORIZONTÁLIS BEÁLLÍTÓ LCD SÁVOK (MIXER ÉS VISUAL) ── */
+        .settings-bar { 
+            width: 100%; margin: 15px auto 0 auto; height: 75px;
+            display: none; align-items: center; justify-content: space-around; padding: 0 25px;
+        }
+        
+        .settings-control { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; max-width: 250px; z-index: 2; position: relative; }
+        .settings-control label { font-size: 11px; color: var(--lcd-text); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-shadow: var(--lcd-shadow); letter-spacing: 1px; transition: 0.2s;}
+        .settings-control label:hover { color: #fff; }
+        
+        .settings-control input[type="range"] {
+            -webkit-appearance: none; width: 100%; height: 8px;
+            background: rgba(170, 204, 170, 0.15); border: 1px solid #112211; border-radius: 4px;
+            outline: none; cursor: pointer; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+        }
+        .settings-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 16px; height: 26px;
+            background: var(--lcd-text); border: 2px solid #112211; border-radius: 2px;
+            box-shadow: var(--lcd-shadow); cursor: grab;
+        }
+        .settings-control input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; background: #fff; }
+
+        body.help-mode-active { cursor: help; }
+        body.help-mode-active * { cursor: help !important; }
+
+        /* ── KOTTA LCD KIJELZŐ ── */
+        .granite-base { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: auto; }
+        .sheet-viewport { 
+            width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; 
+            margin-bottom: 30px; 
+        }
+        .sheet-image { width: 100%; height: 100%; object-fit: contain; opacity: 0.15; z-index: 1; position: absolute; pointer-events: none; transition: opacity 0.2s; }
+        #staffCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+
+        .piano-wrapper { width: 100%; max-width: 2560px; position: relative; aspect-ratio: 2500/284; background: #000; overflow: hidden; box-shadow: 0 -10px 50px rgba(0,0,0,0.9); border-top: 4px solid #111; }
+        .piano-img { width: 100%; height: 100%; display: block; pointer-events: none; filter: grayscale(100%); }
+        .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
+        .key-glow { position: absolute; top: 0; cursor: pointer; }
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255, 255, 255, 0.15); box-shadow: inset 0 -10px 15px rgba(255, 255, 255, 0.3); z-index: 40; }
+
+        .font-loader { position: absolute; left: -9999px; visibility: hidden; font-family: 'Share Tech Mono'; }
+
+        @media (max-width: 1400px) {
+            .master-dashboard { grid-template-columns: 1fr; justify-items: center; gap: 20px; }
+            .control-group-left, .control-group-right { justify-content: center; }
+            .nav-content { flex-direction: column; gap: 15px; padding: 15px; }
+            .main-menu { flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+    <div class="font-loader">𝄞𝄢</div>
+
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" style="text-decoration: none; display: block;">
+                <svg class="logo-svg" viewBox="0 0 400 95">
+                    <text x="190" y="55" fill="#555" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="end" letter-spacing="2">AK</text>
+                    <g filter="drop-shadow(0 0 3px rgba(0,0,0,0.5))">
+                        <path d="M 194 55 L 206 55 L 206 33 L 200 33 L 200 0 L 194 0 Z" fill="#888" stroke="#333" stroke-width="0.5"/>
+                    </g>
+                    <text x="210" y="55" fill="#555" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="start" letter-spacing="2">RA</text>
+                    <text x="200" y="85" fill="#444" font-family="'Inter', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="8">PIANO ACADEMY</text>
+                </svg>
+            </a>
+
+            <div class="main-menu">
+                <a href="hallasfejleszto.html" class="nav-btn" data-help="EAR TRAINING: PRACTICE RECOGNIZING INTERVALS AND CHORDS BY SOUND.">Ear Training</a>
+                <a href="kottaolvasas.html" class="nav-btn" data-help="SIGHT READ: PRACTICE READING AND PLAYING INDIVIDUAL NOTES QUICKLY.">Sight Read</a>
+                <a href="akkordok.html" class="nav-btn active" data-help="CHORDS: LEARN CHORD STRUCTURES, INVERSIONS, AND FUNCTIONAL HARMONY.">Chords</a>
+                <a href="skalak.html" class="nav-btn" data-help="SCALES: MASTER MUSICAL SCALES AND PROPER FINGERINGS IN ALL KEYS.">Scales</a>
+                <a href="hanon.html" class="nav-btn" data-help="HANON: VIRTUOSO FINGER EXERCISES TO BUILD STRENGTH AND DEXTERITY.">Hanon</a>
+                <a href="ritmus.html" class="nav-btn" data-help="RHYTHM: DEVELOP PRECISE TIMING AND COMPLEX RHYTHM PATTERNS.">Rhythm</a>
+                <a href="#" id="btnVisual" class="nav-btn" onclick="toggleVisual()" data-help="VISUAL PANEL: ADJUST THE BRIGHTNESS AND DISPLAY PARAMETERS OF THE LCD SHEET MUSIC.">Visual</a>
+                <a href="#" id="btnFullscreen" class="nav-btn" onclick="toggleFullScreen()" data-help="FULLSCREEN: TOGGLE FULL SCREEN MODE FOR AN IMMERSIVE STUDIO EXPERIENCE.">Fullscreen</a>
+                <a href="#" id="btnHelp" class="nav-btn" onclick="toggleHelp()" data-help="HELP MODE: TAP ANY ELEMENT TO READ INFO. CLICK HELP TO EXIT.">Help</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="ui-container">
+        <div class="master-dashboard">
+            <div class="control-group-left">
+                <button id="handRH" class="hardware-btn active" onclick="if(!document.body.classList.contains('help-mode-active')) toggleHand('RH')" data-help="TOP: TOGGLES SEQUENCE GENERATION FOR THE TREBLE CLEF.">Top</button>
+                <button id="handLH" class="hardware-btn active" onclick="if(!document.body.classList.contains('help-mode-active')) toggleHand('LH')" data-help="BOTTOM: TOGGLES SEQUENCE GENERATION FOR THE BASS CLEF.">Bottom</button>
+            </div>
+
+            <div class="control-group-center">
+                <button id="btnHintName" class="hardware-btn" onclick="if(!document.body.classList.contains('help-mode-active')) toggleHint()" data-help="HINTS: DISPLAYS THE EXPLICIT NOTE CONSTITUENTS ON THE LCD SCREEN.">Hints</button>
+                
+                <div class="lcd-base bpm-screen" data-help="BPM TRACKER: MEASURES YOUR PLAYING SPEED IN BEATS PER MINUTE.">
+                    <div class="lcd-label">BPM</div>
+                    <div class="lcd-text" id="bpm">0</div>
+                </div>
+
+                <div class="lcd-display-module">
+                    <button class="nav-disk-btn" onclick="if(!document.body.classList.contains('help-mode-active')) toggleMode()" data-help="MODE SELECTOR: SWITCHES BETWEEN NOTES, CHORDS, OR FUNCTIONAL.">◀</button>
+                    <div class="lcd-base lcd-mode-level" data-help="LCD SCREEN: DISPLAYS THE CURRENT GAME MODE AND DIFFICULTY LEVEL.">
+                        <div class="lcd-half">
+                            <div class="lcd-label">Mode</div>
+                            <div class="lcd-text" id="lcdModeText">NOTES</div>
+                        </div>
+                        <div class="lcd-divider"></div>
+                        <div class="lcd-half">
+                            <div class="lcd-label">Level</div>
+                            <div class="lcd-text" id="lcdLevelText">ROOT</div>
+                        </div>
+                    </div>
+                    <button class="nav-disk-btn" onclick="if(!document.body.classList.contains('help-mode-active')) toggleLevel()" data-help="LEVEL SELECTOR: INCREASES DIFFICULTY FROM ROOT TO 7TH CHORDS.">▶</button>
+                </div>
+                
+                <button id="btnStart" class="hardware-btn" onclick="if(!document.body.classList.contains('help-mode-active')) handleMainButton()" data-help="START | STOP: ENGAGES THE SEQUENCE GENERATOR OR STOPS THE SESSION.">START | STOP</button>
+            </div>
+
+            <div class="control-group-right">
+                <button id="audioToggle" class="hardware-btn active" onclick="if(!document.body.classList.contains('help-mode-active')) toggleAudio()" data-help="PIANO AUDIO: TOGGLES THE INTERNAL WEB AUDIO SYNTHESIZER.">Piano</button>
+                <button id="btnVst" class="hardware-btn" onclick="if(!document.body.classList.contains('help-mode-active')) toggleVst()" data-help="MIXER PANEL: OPENS THE LCD SLIDERS TO ADJUST THE ADSR SOUND ENVELOPE.">Mixer</button>
+            </div>
+        </div>
+
+        <div id="infoBar" class="lcd-base info-bar">
+            <div class="info-bar-title">INFO</div>
+            <div id="infoBarText" class="info-bar-text">SELECT ANY ELEMENT TO VIEW ITS FUNCTION.</div>
+        </div>
+
+        <div id="mixerBar" class="lcd-base settings-bar">
+            <div class="settings-control" data-help="ATTACK: CONTROLS HOW QUICKLY THE SOUND REACHES MAXIMUM VOLUME.">
+                <label onclick="document.getElementById('vst_a').value = 0.01;">Attack</label>
+                <input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.01">
+            </div>
+            <div class="settings-control" data-help="DECAY: CONTROLS HOW QUICKLY THE SOUND DROPS TO THE SUSTAIN LEVEL.">
+                <label onclick="document.getElementById('vst_e').value = 5.0;">Decay</label>
+                <input type="range" id="vst_e" min="1" max="10" step="0.1" value="5.0">
+            </div>
+            <div class="settings-control" data-help="RELEASE: CONTROLS HOW QUICKLY THE SOUND FADES AFTER THE KEY IS RELEASED.">
+                <label onclick="document.getElementById('vst_r').value = 0.8;">Release</label>
+                <input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.8">
+            </div>
+            <div class="settings-control" data-help="VELOCITY: OVERALL OUTPUT VOLUME OR STRENGTH OF THE SYNTHESIZER.">
+                <label onclick="document.getElementById('vst_d').value = 1.0;">Velocity</label>
+                <input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0">
+            </div>
+        </div>
+
+        <div id="visualBar" class="lcd-base settings-bar">
+            <div class="settings-control" data-help="NOTES & TEXT: ADJUST THE BRIGHTNESS OF THE MUSICAL NOTES AND HINT LABELS.">
+                <label onclick="document.getElementById('vis_notes').value = 0.75; draw();">Notes & Text Brightness</label>
+                <input type="range" id="vis_notes" min="0.1" max="1.0" step="0.05" value="0.75" oninput="draw()">
+            </div>
+            <div class="settings-control" data-help="BACKGROUND: ADJUST THE ILLUMINATION OF THE INACTIVE LCD GRID BACKGROUND.">
+                <label onclick="document.getElementById('vis_bg').value = 0.15; updateVisuals();">Background Illumination</label>
+                <input type="range" id="vis_bg" min="0.05" max="0.6" step="0.01" value="0.15" oninput="updateVisuals()">
+            </div>
+            <div class="settings-control" data-help="STAFF LINES: ADJUST THE BRIGHTNESS OF THE MUSICAL STAFF LINES.">
+                <label onclick="document.getElementById('vis_staff').value = 0.35; draw();">Staff Lines Brightness</label>
+                <input type="range" id="vis_staff" min="0.1" max="1.0" step="0.05" value="0.35" oninput="draw()">
+            </div>
+        </div>
+
+    </div>
+
+    <div class="granite-base">
+        <div class="lcd-base sheet-viewport">
+            <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
+            <canvas id="staffCanvas" width="2450" height="480"></canvas>
+        </div>
+        <div class="piano-wrapper">
+            <img src="grandpiano-keys.png" class="piano-img">
+            <div id="hb-wrap" class="hitbox-layer"></div>
+        </div>
+    </div>
+
+<script>
+    const CHORDS = {
+        treble: { 
+            "1": [
+                {name:"C", roman:"I", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"F", roman:"IV", notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Am", roman:"vi", notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
+                {name:"Dm", roman:"ii", notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                {name:"G", roman:"V", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
+                {name:"Em", roman:"iii", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}
+            ], 
+            "2": [
+                {name:"C", roman:"I", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"C", roman:"I", notes:[{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]}
+            ], 
+            "3": [
+                {name:"G7", roman:"V7", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]},
+                {name:"Cmaj7", roman:"Imaj7", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
+                {name:"Am7", roman:"vi7", notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''}]}
+            ] 
+        },
+        bass: { 
+            "1": [
+                {name:"C", roman:"I", notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
+                {name:"F", roman:"IV", notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]}
+            ], 
+            "2": [
+                {name:"G", roman:"V", notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''}]}
+            ], 
+            "3": [
+                {name:"D", roman:"II", notes:[{m:50,n:'D3',off:0,s:''},{m:54,n:'F#3',off:2,s:'♯'},{m:57,n:'A3',off:4,s:''}]}
+            ] 
+        }
+    };
+
+    const TREBLE_BASE_Y = 143; const TREBLE_SP_Y = 11.14;
+    const BASS_BASE_Y = 374.16; const BASS_SP_Y = 10.71;
+
+    let isRunning = false, showNames = false, helpActive = false, audioOn = true;
+    let visualActive = false, mixerActive = false;
+    let activeRH = true, activeLH = true;
+    let currentMode = 'sheet'; 
+    let currentLevel = 1; 
+
+    let seq = [], currentStep = 0, activeMidiNotes = new Set();
+    let audioCtx, sampleBuffers = {}, activeNodes = {};
+    let lastHitTime = 0, hitIntervals = [];
+    let waitingForRelease = false;
+
+    /* TELJES KÉPERNYŐ LOGIKA ÉS LED */
+    document.addEventListener('fullscreenchange', () => {
+        const isFull = !!document.fullscreenElement;
+        document.getElementById('btnFullscreen').classList.toggle('active', isFull);
+    });
+
+    function toggleFullScreen() {
+        if (helpActive) return;
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log(`Hiba a teljes képernyőnél: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    function updateLCD() {
+        const modeNames = { 'sheet': 'NOTES', 'lead': 'CHORDS', 'roman': 'FUNCTION' };
+        const levelNames = { 1: "ROOT", 2: "INVERSION", 3: "7THS" };
+        document.getElementById('lcdModeText').innerText = modeNames[currentMode];
+        document.getElementById('lcdLevelText').innerText = levelNames[currentLevel];
+    }
+
+    function updateVisuals() {
+        document.getElementById('sheetBg').style.opacity = document.getElementById('vis_bg').value;
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#btnHelp')) return; 
+        
+        if (document.body.classList.contains('help-mode-active')) {
+            e.preventDefault(); 
+            e.stopPropagation();
+            
+            const target = e.target.closest('[data-help]');
+            if (target) {
+                const infoBarText = document.getElementById('infoBarText');
+                infoBarText.innerHTML = target.dataset.help;
+                
+                const rect = target.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                if (centerX < window.innerWidth * 0.35) {
+                    infoBarText.style.textAlign = 'left';
+                } else if (centerX > window.innerWidth * 0.65) {
+                    infoBarText.style.textAlign = 'right';
+                } else {
+                    infoBarText.style.textAlign = 'center';
+                }
+                
+                let originalBg = target.style.backgroundColor;
+                target.style.backgroundColor = '#333';
+                setTimeout(() => { target.style.backgroundColor = originalBg; }, 200);
+            }
+        }
+    }, true);
+
+    function toggleHelp() { 
+        helpActive = !helpActive; 
+        const btnHelp = document.getElementById('btnHelp');
+        btnHelp.classList.toggle('active', helpActive); 
+        const infoBar = document.getElementById('infoBar');
+        
+        if (helpActive) {
+            if(visualActive) toggleVisual();
+            if(mixerActive) toggleVst();
+            
+            document.body.classList.add('help-mode-active');
+            document.getElementById('infoBarText').style.textAlign = 'right';
+            document.getElementById('infoBarText').innerHTML = btnHelp.dataset.help;
+            infoBar.style.display = 'flex';
+        } else {
+            document.body.classList.remove('help-mode-active');
+            infoBar.style.display = 'none';
+        }
+    }
+
+    function toggleVisual() {
+        if (helpActive) return;
+        visualActive = !visualActive;
+        document.getElementById('btnVisual').classList.toggle('active', visualActive);
+        if (visualActive) {
+            if(mixerActive) toggleVst();
+            document.getElementById('visualBar').style.display = 'flex';
+        } else {
+            document.getElementById('visualBar').style.display = 'none';
+        }
+    }
+
+    function toggleVst() { 
+        if (helpActive) return; 
+        mixerActive = !mixerActive;
+        document.getElementById('btnVst').classList.toggle('active', mixerActive);
+        if (mixerActive) {
+            if(visualActive) toggleVisual();
+            document.getElementById('mixerBar').style.display = 'flex';
+        } else {
+            document.getElementById('mixerBar').style.display = 'none';
+        }
+    }
+
+    function toggleHand(h) {
+        if (helpActive) return;
+        if(h === 'RH') activeRH = !activeRH; else activeLH = !activeLH;
+        if(!activeRH && !activeLH) { activeRH = true; activeLH = true; }
+        document.getElementById('handRH').classList.toggle('active', activeRH); 
+        document.getElementById('handLH').classList.toggle('active', activeLH);
+        if(isRunning) stopPractice();
+    }
+
+    function toggleMode() {
+        if (helpActive) return;
+        if (currentMode === 'sheet') currentMode = 'lead';
+        else if (currentMode === 'lead') currentMode = 'roman';
+        else currentMode = 'sheet';
+        updateLCD();
+        if(isRunning) stopPractice(); else draw();
+    }
+
+    function toggleLevel() {
+        if (helpActive) return;
+        currentLevel = currentLevel === 1 ? 2 : (currentLevel === 2 ? 3 : 1);
+        updateLCD();
+        if(isRunning) stopPractice();
+    }
+
+    function toggleHint() { if (helpActive) return; showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); draw(); }
+    function toggleAudio() { if (helpActive) return; audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
+
+    function buildSequence() {
+        seq = [];
+        for (let i = 0; i < 16; i++) {
+            let clef = 'treble';
+            if (activeRH && activeLH) clef = Math.random() > 0.5 ? 'treble' : 'bass';
+            else if (activeLH && !activeRH) clef = 'bass';
+
+            let pool = CHORDS[clef][currentLevel.toString()] || CHORDS[clef]["1"];
+            let chord = pool[Math.floor(Math.random() * pool.length)];
+            seq.push({ clef: clef, chord: chord, isError: false });
+        }
+        currentStep = 0;
+        waitingForRelease = false;
+    }
+
+    async function initAudio() {
+        if (audioCtx) return; audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const samples = {21:'A0', 36:'C2', 48:'C3', 60:'C4', 72:'C5', 84:'C6'};
+        for(let k in samples) { try { const r = await fetch(`https://tonejs.github.io/audio/salamander/${samples[k]}.mp3`); sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer()); } catch(e) {} }
+        if(navigator.requestMIDIAccess) { const m = await navigator.requestMIDIAccess(); m.inputs.forEach(input => input.onmidimessage = (msg) => { const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2]; if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); } else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); } }); }
+    }
+
+    function playTone(note, vel) {
+        if(!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
+        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e){} delete activeNodes[note]; }
+        const source = audioCtx.createBufferSource(); let closest = 36, minDiff = 999;
+        for(let b in sampleBuffers) { let diff = Math.abs(note-b); if(diff < minDiff){ minDiff=diff; closest=b; } }
+        source.buffer = sampleBuffers[closest]; source.playbackRate.value = Math.pow(2, (note-closest)/12);
+        const gain = audioCtx.createGain(); 
+        const v_a = parseFloat(document.getElementById('vst_a').value), v_e = parseFloat(document.getElementById('vst_e').value), v_d = parseFloat(document.getElementById('vst_d').value);
+        gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime((vel/127) * v_d, audioCtx.currentTime + v_a + 0.01); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + v_e);
+        source.connect(gain).connect(audioCtx.destination); source.start(); activeNodes[note] = { source, gain };
+    }
+
+    function handleNoteOff(midi) { 
+        activeMidiNotes.delete(midi);
+        if (activeNodes[midi]) {
+            const v_r = parseFloat(document.getElementById('vst_r').value); 
+            const gainNode = activeNodes[midi].gain; gainNode.gain.cancelScheduledValues(audioCtx.currentTime); 
+            gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + v_r); 
+            activeNodes[midi].source.stop(audioCtx.currentTime + v_r + 0.1); delete activeNodes[midi]; 
+        }
+        if (activeMidiNotes.size === 0 && waitingForRelease) { waitingForRelease = false; draw(); }
+        checkMatch();
+    }
+
+    function handleNoteOn(midi, vel = 100) {
+        activeMidiNotes.add(midi);
+        playTone(midi, vel);
+        checkMatch();
+    }
+
+    function checkMatch() {
+        if (!isRunning || seq.length === 0 || currentStep >= 16) return;
+        if (waitingForRelease || activeMidiNotes.size === 0) return; 
+
+        let targetChord = seq[currentStep].chord;
+        let expectedMidis = targetChord.notes.map(n => n.m);
+        
+        let allExpectedPresent = expectedMidis.every(m => activeMidiNotes.has(m));
+        let noExtraNotes = activeMidiNotes.size === expectedMidis.length;
+
+        if (allExpectedPresent && noExtraNotes) {
+            seq[currentStep].isError = false;
+            let now = performance.now();
+            if (lastHitTime > 0) { hitIntervals.push(now - lastHitTime); document.getElementById('bpm').innerText = Math.round(60000 / (now - lastHitTime)); }
+            lastHitTime = now;
+            
+            waitingForRelease = true; currentStep++;
+            if(currentStep >= 16) { setTimeout(() => { buildSequence(); lastHitTime = 0; hitIntervals = []; draw(); }, 1000); }
+        } else {
+            let hasWrongNote = Array.from(activeMidiNotes).some(m => !expectedMidis.includes(m));
+            if (hasWrongNote) seq[currentStep].isError = true;
+        }
+        draw();
+    }
+
+    function handleMainButton() { 
+        if (helpActive) return;
+        if(!isRunning) { 
+            initAudio(); buildSequence(); isRunning = true; hitIntervals = []; lastHitTime = 0; 
+            document.getElementById('btnStart').classList.add('running'); draw(); 
+        } else stopPractice(); 
+    }
+    
+    function stopPractice() { 
+        isRunning = false; waitingForRelease = false; 
+        document.getElementById('btnStart').classList.remove('running'); draw(); 
+    }
+
+    const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+    
+    function drawLedgers(x, offset, baseLineY, spacing, color) { 
+        let staffOp = parseFloat(document.getElementById('vis_staff').value);
+        let lineColor = `rgba(170, 204, 170, ${staffOp})`;
+        
+        ctx.strokeStyle = lineColor; ctx.lineWidth = 2.5; 
+        ctx.shadowBlur = 5; ctx.shadowColor = lineColor; 
+        if (offset <= -6) for (let p = -6; p >= offset; p -= 2) { let py = baseLineY - (p * spacing); ctx.beginPath(); ctx.moveTo(x - 22, py); ctx.lineTo(x + 22, py); ctx.stroke(); } 
+        if (offset >= 6) for (let p = 6; p <= offset; p += 2) { let py = baseLineY - (p * spacing); ctx.beginPath(); ctx.moveTo(x - 22, py); ctx.stroke(); } 
+        ctx.shadowBlur = 0;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, 2450, 480); 
+        if (!seq.length) return;
+        
+        let noteOp = parseFloat(document.getElementById('vis_notes').value);
+        const startX = 180, endX = 2380, xSpacing = (endX - startX) / 15;
+
+        seq.forEach((item, i) => {
+            let color = (isRunning && i === currentStep) ? "rgba(170, 204, 170, 1.0)" : `rgba(170, 204, 170, ${noteOp})`;
+            if (item.isError && i === currentStep) color = "#ff6666";
+            
+            ctx.globalAlpha = (isRunning && i === currentStep) ? 1.0 : 0.8;
+
+            let x = startX + i * xSpacing;
+            let baseLineY = item.clef === 'treble' ? TREBLE_BASE_Y : BASS_BASE_Y;
+            let spacing = item.clef === 'treble' ? TREBLE_SP_Y : BASS_SP_Y;
+            
+            let textY = item.clef === 'treble' ? TREBLE_BASE_Y - 55 : BASS_BASE_Y - 55;
+
+            if (currentMode === 'lead' || currentMode === 'roman') {
+                ctx.fillStyle = color; 
+                ctx.shadowBlur = (isRunning && i === currentStep) ? 6 : 2; 
+                ctx.shadowColor = color; 
+                ctx.font = '400 28px "Share Tech Mono"'; 
+                ctx.textAlign = 'center'; 
+                
+                let displayText = currentMode === 'roman' ? item.chord.roman : item.chord.name;
+                ctx.fillText(displayText, x, textY);
+                ctx.shadowBlur = 0;
+
+                let isSolved = (i < currentStep) || (i === currentStep && waitingForRelease);
+                if (currentMode === 'roman' && isSolved) {
+                    ctx.font = '400 14px "Share Tech Mono"';
+                    ctx.fillStyle = `rgba(170, 204, 170, ${noteOp - 0.2})`; 
+                    ctx.fillText(`(${item.chord.name})`, x, textY + 22);
+                }
+            }
+
+            let isSolved = (i < currentStep) || (i === currentStep && waitingForRelease);
+            let showNotes = (currentMode === 'sheet') || ((currentMode === 'lead' || currentMode === 'roman') && isSolved);
+
+            if (showNotes) {
+                item.chord.notes.forEach(n => {
+                    let noteY = baseLineY - (n.off * spacing);
+                    drawLedgers(x, n.off, baseLineY, spacing, color);
+                    
+                    ctx.fillStyle = color; 
+                    ctx.shadowBlur = (isRunning && i === currentStep) ? 6 : 2; 
+                    ctx.shadowColor = color; 
+                    
+                    if (n.s !== '') { 
+                        ctx.font = n.s === '♭' ? '46px Arial' : '34px Arial'; 
+                        ctx.fillText(n.s, x - 28, noteY + (n.s === '♭' ? 6 : 12)); 
+                    }
+                    ctx.beginPath(); 
+                    ctx.ellipse(x, noteY, 14, 10, -Math.PI/10, 0, 2*Math.PI); 
+                    ctx.fill();
+                    ctx.shadowBlur = 0; 
+                });
+            }
+
+            if (showNames) {
+                ctx.fillStyle = color; ctx.font = '400 16px "Share Tech Mono"'; ctx.textAlign = 'center';
+                let hintStr = item.chord.notes.map(n => n.n.replace('#','♯')).join(" + ");
+                let topY = Math.min(...item.chord.notes.map(n => baseLineY - (n.off * spacing)));
+                let hintY;
+                
+                if (currentMode === 'sheet') {
+                    hintY = item.clef === 'treble' ? TREBLE_BASE_Y - 55 : BASS_BASE_Y - 55;
+                    if (topY < hintY + 20) { hintY = topY - 20; }
+                } else {
+                    hintY = textY - 40; 
+                    if (topY < textY + 20 && showNotes) {
+                        let tolodas = (textY + 20) - topY;
+                        hintY -= tolodas; 
+                        
+                        ctx.clearRect(x - 50, 0, 100, textY + 5); 
+                        let feljebbTolTextY = textY - tolodas;
+                        
+                        ctx.fillStyle = color; ctx.shadowBlur = (isRunning && i === currentStep) ? 6 : 2; ctx.shadowColor = color;
+                        ctx.font = '400 28px "Share Tech Mono"'; 
+                        let displayText = currentMode === 'roman' ? item.chord.roman : item.chord.name;
+                        ctx.fillText(displayText, x, feljebbTolTextY);
+                        ctx.shadowBlur = 0;
+                        
+                        if (currentMode === 'roman' && isSolved) {
+                            ctx.font = '400 14px "Share Tech Mono"'; ctx.fillStyle = `rgba(170, 204, 170, ${noteOp - 0.2})`;
+                            ctx.fillText(`(${item.chord.name})`, x, feljebbTolTextY + 22);
+                        }
+                    }
+                }
+                
+                ctx.shadowBlur = (isRunning && i === currentStep) ? 4 : 1; 
+                ctx.shadowColor = color; 
+                ctx.fillText(hintStr, x, hintY);
+                ctx.shadowBlur = 0;
+            }
+        });
+        ctx.globalAlpha = 1.0;
+    }
+
+    window.onload = () => {
+        updateLCD(); 
+        updateVisuals();
+        document.fonts.ready.then(draw);
+        const wrap = document.getElementById('hb-wrap'); const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
+        for(let m=21; m<=108; m++) {
+            const k = document.createElement('div'); const isW = whites.includes(m%12);
+            k.id = `k-${m}`; k.className = `key-glow ${isW?'white-glow':'black-glow'}`;
+            if(isW) { k.style.left = (wIdx * 1.92307) + "%"; k.style.width = "1.92307%"; k.style.height="100%"; wIdx++; }
+            else { k.style.left = ((wIdx * 1.92307) - 0.6) + "%"; k.style.width = "1.2%"; k.style.height="65%"; k.style.zIndex="200"; }
+            k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); }; k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); }; k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
+            wrap.appendChild(k);
+        }
+    };
+</script>
+</body>
+</html>

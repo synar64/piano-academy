@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akíra Academy | Hanon Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --theme-cyan: #00AACC; 
+            --theme-cyan-dim: rgba(0, 170, 204, 0.15);
+            --theme-cyan-glow: rgba(0, 170, 204, 0.4);
+            --glass-bg: rgba(10, 10, 15, 0.6); 
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: #050508;
+            background-image: radial-gradient(circle at 50% 50%, rgba(20, 25, 30, 1) 0%, rgba(5, 5, 8, 1) 100%);
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            color: #fff;
+        }
+
+        /* ── FEJLÉC ÉS NAVIGÁCIÓ ── */
+        .top-nav {
+            width: 100%; background: rgba(5, 5, 10, 0.6); backdrop-filter: blur(25px);
+            border-bottom: 2px solid var(--glass-border); 
+            display: flex; justify-content: center; padding: 25px 0; 
+            z-index: 1000; box-shadow: 0 5px 30px rgba(0,0,0,0.8);
+        }
+        .nav-content { width: 100%; max-width: 2450px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        
+        .logo { font-size: 34px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; }
+        .logo span { color: var(--theme-cyan); text-shadow: 0 0 15px var(--theme-cyan-glow); }
+        
+        .main-menu { display: flex; gap: 20px; }
+        .nav-btn { 
+            background: rgba(255,255,255,0.03); color: #bbb; border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px 30px; border-radius: 12px; font-size: 15px; font-weight: 700; text-transform: uppercase; 
+            letter-spacing: 1px; cursor: pointer; transition: 0.3s;
+            font-family: 'Inter', sans-serif; text-decoration: none; display: inline-block;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateY(-2px); }
+        .nav-btn.active { 
+            background: var(--theme-cyan-dim); color: var(--theme-cyan); 
+            border-color: var(--theme-cyan); box-shadow: 0 0 20px var(--theme-cyan-dim); 
+            transform: translateY(-2px);
+        }
+
+        .help-btn {
+            background: rgba(0,0,0,0.5); color: var(--theme-cyan); border: 2px solid var(--theme-cyan);
+            width: 50px; height: 50px; border-radius: 12px; font-size: 24px; font-weight: 800; 
+            font-family: 'Inter', sans-serif; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center;
+        }
+        .help-btn.active { background: var(--theme-cyan); color: #000; box-shadow: 0 0 20px var(--theme-cyan-glow); }
+
+        /* ── MŰSZERFAL ── */
+        .ui-container { width: 100%; max-width: 2450px; margin-top: 20px; z-index: 100; }
+        .master-dashboard {
+            width: 100%; display: flex; justify-content: space-between; align-items: center;
+            background: var(--glass-bg); backdrop-filter: blur(25px);
+            border: 1px solid var(--theme-cyan); border-radius: 12px;
+            padding: 15px 30px; box-shadow: 0 0 30px rgba(0, 170, 204, 0.1); box-sizing: border-box;
+        }
+
+        .control-group { display: flex; gap: 10px; align-items: center; }
+        .divider { width: 1px; height: 35px; background: #444; margin: 0 15px; }
+
+        .glass-btn { 
+            padding: 12px 22px; background: rgba(0,0,0,0.5); color: #ccc; border: 1px solid #555; 
+            border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; 
+            text-transform: uppercase; font-family: 'Inter', sans-serif; transition: 0.2s; white-space: nowrap;
+        }
+        .glass-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .glass-btn.active, .glass-btn.on { border-color: var(--theme-cyan); color: var(--theme-cyan); background: var(--theme-cyan-dim); box-shadow: inset 0 0 10px var(--theme-cyan-dim); }
+
+        #btnStart { 
+            width: 200px; height: 60px; background: var(--theme-cyan); color: #000; border: none; 
+            font-size: 20px; border-radius: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; font-family: 'Inter', sans-serif;
+            box-shadow: 0 0 20px var(--theme-cyan-glow);
+        }
+        #btnStart.running { background: rgba(0,0,0,0.5); color: var(--theme-cyan); border: 2px solid var(--theme-cyan); box-shadow: none; }
+
+        .stat-box { background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 8px; border: 1px solid #444; text-align: center; min-width: 90px; }
+        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 2px; font-weight: 700; }
+        .stat-value { font-size: 26px; font-weight: 800; font-family: 'Inter', sans-serif; color: var(--theme-cyan); line-height: 1; }
+
+        /* ── EGYEDI ÜVEG DROPDOWN ── */
+        .custom-select-wrapper { position: relative; width: 220px; font-family: 'Inter', sans-serif; }
+        .custom-select { 
+            padding: 12px 15px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #555; 
+            border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; text-transform: uppercase; 
+            display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+        }
+        .custom-select:hover { background: rgba(255,255,255,0.15); }
+        .custom-select::after { content: '▼'; font-size: 10px; color: var(--theme-cyan); }
+        
+        .custom-options {
+            display: none; position: absolute; top: 110%; left: 0; width: 100%;
+            background: rgba(10, 10, 15, 0.95); border: 1px solid var(--theme-cyan); 
+            border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); backdrop-filter: blur(25px);
+            z-index: 3000; max-height: 400px; overflow-y: auto; overflow-x: hidden;
+        }
+        .custom-options.show { display: block; }
+        .opt-group-label { padding: 10px 15px; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; background: rgba(0,0,0,0.4); font-weight: 700;}
+        .custom-option { padding: 12px 15px; color: #ccc; cursor: pointer; font-size: 14px; font-weight: 700; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .custom-option:hover { background: var(--theme-cyan-dim); color: var(--theme-cyan); padding-left: 20px; }
+
+        /* VST MIXER */
+        .mixer-wrapper { position: relative; }
+        .mixer-panel { 
+            display: none; position: absolute; top: 120%; right: 0;
+            background: rgba(10, 10, 15, 0.98); border: 1px solid var(--theme-cyan); 
+            border-radius: 12px; padding: 25px; width: 600px; box-sizing: border-box;
+            backdrop-filter: blur(30px); grid-template-columns: repeat(4, 1fr); gap: 15px; z-index: 2000;
+        }
+        .mixer-panel.show { display: grid; }
+        .mixer-control { display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #333; }
+        .mixer-control label { font-size: 11px; color: var(--theme-cyan); font-weight: 700; text-transform: uppercase; }
+        .mixer-control input { width: 100%; accent-color: var(--theme-cyan); cursor: pointer; }
+
+        /* ── SÚGÓ TOOLTIP ── */
+        .help-tooltip { 
+            position: fixed; background: rgba(10, 15, 25, 0.98); color: #fff; 
+            border: 1px solid var(--theme-cyan); padding: 18px; border-radius: 10px; 
+            font-size: 14px; width: 340px; z-index: 99999; pointer-events: none; display: none; 
+            line-height: 1.6; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* ── MODÁLIS ABLAK (ANALÍZIS) ── */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: rgba(15, 20, 25, 0.95); padding: 40px; border-radius: 16px; border: 1px solid var(--theme-cyan); text-align: center; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,200,255,0.15); font-family: 'Inter', sans-serif; }
+        .modal-title { color: var(--theme-cyan); text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 24px; margin-top: 0; }
+        .modal-stats { font-size: 18px; margin: 20px 0; line-height: 1.6; color: #ddd; display: flex; justify-content: space-around;}
+        .modal-stat-box { display: flex; flex-direction: column; align-items: center; }
+        .modal-highlight { color: #fff; font-weight: 800; font-size: 32px; color: var(--theme-cyan); }
+        .modal-tip { background: rgba(0, 170, 204, 0.1); border-left: 4px solid var(--theme-cyan); padding: 15px; margin: 25px 0; text-align: left; font-size: 15px; color: #ccc; line-height: 1.5; border-radius: 0 8px 8px 0;}
+        .modal-btn { background: var(--theme-cyan); color: #000; padding: 14px 40px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-family: 'Inter', sans-serif; transition: 0.2s; font-size: 16px;}
+        .modal-btn:hover { background: #fff; box-shadow: 0 0 20px var(--theme-cyan-glow); }
+
+        /* ── KOTTA ÉS ZONGORA ── */
+        .granite-base { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: auto; }
+        
+        .sheet-viewport {
+            width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480;
+            background: rgba(5, 5, 10, 0.2); border: 1px solid var(--glass-border); border-bottom: none;
+            border-radius: 12px 12px 0 0; position: relative; display: flex; justify-content: center; align-items: center;
+            margin-bottom: 30px; box-sizing: border-box;
+        }
+        .sheet-image { width: 100%; height: 100%; object-fit: contain; opacity: 0.95; filter: grayscale(100%); }
+        #staffCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+
+        .piano-wrapper { 
+            width: 100%; max-width: 2560px; position: relative; aspect-ratio: 2500/284; 
+            background: #000; overflow: hidden; box-shadow: 0 -10px 50px rgba(0,0,0,0.9); border-top: 2px solid #222;
+        }
+        .piano-img { width: 100%; height: 100%; display: block; pointer-events: none; filter: grayscale(100%); }
+        .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
+        .key-glow { position: absolute; top: 0; cursor: pointer; }
+        
+        /* ── BILLENTYŰ CSILLANÁSOK ── */
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; }
+        .white-glow.pressed::after { 
+            top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; 
+            background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); 
+        }
+        .black-glow.pressed::after { 
+            top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; 
+            background: rgba(255, 255, 255, 0.15); box-shadow: inset 0 -10px 15px rgba(255, 255, 255, 0.3); z-index: 40; 
+        }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+    <div id="tooltip" class="help-tooltip"></div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">Gyakorlat Elemzés</div>
+            <div class="modal-stats">
+                <div class="modal-stat-box">
+                    <span style="font-size:12px; color:#888; text-transform:uppercase; font-weight:700;">Átlag Tempó</span>
+                    <span id="modalBpm" class="modal-highlight">0 BPM</span>
+                </div>
+                <div class="modal-stat-box">
+                    <span style="font-size:12px; color:#888; text-transform:uppercase; font-weight:700;">Átlag Stabilitás</span>
+                    <span id="modalUni" class="modal-highlight">100%</span>
+                </div>
+            </div>
+            <div id="modalTip" class="modal-tip">Kiváló munka!</div>
+            <button class="modal-btn" onclick="closeModal()">Rendben</button>
+        </div>
+    </div>
+
+    <nav class="top-nav">
+        <div class="nav-content">
+            <div class="logo">🎹 Akíra <span>Academy</span></div>
+            <div class="main-menu">
+                <a href="hallasfejleszto.html" class="nav-btn" data-help="Hallásfejlesztő: Fejleszti a zenei hallást és a hangmagasság-érzékelést. Gyakorold az intervallumok és akkordok felismerését pusztán hallás után.">Hallásfejlesztő</a>
+                <a href="kottaolvasas.html" class="nav-btn" data-help="Kottaolvasás: Gyakorold a lapról olvasást. Ismerd fel villámgyorsan és pontosan a hangjegyeket a Violin és Basszus kulcsokban.">Kottaolvasás</a>
+                <a href="akkordok.html" class="nav-btn" data-help="Akkordok: Tanuld meg az akkordok felépítését és fordításait. Gyakorold az akkordmeneteket és a harmóniai összefüggéseket a billentyűzeten.">Akkordok</a>
+                <a href="skalak.html" class="nav-btn" data-help="Skálák: Sajátítsd el az összes Dúr és Moll skálát tökéletes ujjrenddel. Építsd fel az izommemóriát és a sebességet egy vagy két oktávos terjedelemben.">Skálák</a>
+                <a href="hanon.html" class="nav-btn active" data-help="Hanon (Aktuális modul): A klasszikus Hanon ujjgyakorlatok interaktív változata. Fejleszti az ujjak függetlenségét, erejét és a zongoratechnikát.">Hanon</a>
+                <a href="ritmus.html" class="nav-btn" data-help="Ritmus: Fejleszti a ritmusérzéket és a pontos időzítést. Gyakorold a különböző metrumokat és a bonyolult ritmusképleteket.">Ritmus</a>
+            </div>
+            <button id="btnHelp" class="help-btn" onclick="toggleHelp()" data-help="SÚGÓ BEKAPCSOLVA: Mozgasd az egeret a gombok fölé!">?</button>
+        </div>
+    </nav>
+
+    <div class="ui-container">
+        <div class="master-dashboard">
+            <div class="control-group">
+                <button id="modeSPRINT" class="glass-btn active" onclick="setMode('SPRINT')" data-help="SPRINT MÓD: 1 alkalommal játssza le a gyakorlatot.">Sprint</button>
+                <button id="modeMARATHON" class="glass-btn" onclick="setMode('MARATHON')" data-help="MARATON MÓD: 3 alkalommal ismétli megszakítás nélkül.">Maraton</button>
+                <button id="modeTRAINING" class="glass-btn" onclick="setMode('TRAINING')" data-help="TRÉNING MÓD: Végtelen hurok bemelegítéshez.">Tréning</button>
+                <div class="divider"></div>
+                <button id="handRH" class="glass-btn active" onclick="toggleHand('RH')" data-help="JOBB KÉZ">Jobb</button>
+                <button id="handLH" class="glass-btn active" onclick="toggleHand('LH')" data-help="BAL KÉZ">Bal</button>
+                <div class="divider"></div>
+                
+                <div class="custom-select-wrapper" data-help="Gyakorlat kiválasztása. Jelenleg a Hanon No. 1 aktív.">
+                    <div class="custom-select" id="customHanonDisplay">Hanon No. 1</div>
+                    <div class="custom-options" id="customHanonOptions">
+                        <div class="opt-group-label">Első Szakasz (1-20)</div>
+                        <div class="custom-option" data-val="1">Hanon No. 1</div>
+                        <div class="custom-option" data-val="2" style="color:#555; cursor:not-allowed;">Hanon No. 2 (Hamarosan)</div>
+                        <div class="custom-option" data-val="3" style="color:#555; cursor:not-allowed;">Hanon No. 3 (Hamarosan)</div>
+                    </div>
+                </div>
+                <input type="hidden" id="hanonSelectValue" value="1">
+            </div>
+
+            <button id="btnStart" onclick="handleMainButton()">▶ INDÍTÁS</button>
+
+            <div class="control-group">
+                <button id="btnHintName" class="glass-btn" onclick="toggleHint('name')" data-help="SÚGÓ: Megjeleníti a hang nevét a kottafej felett.">Hang Név</button>
+                <button id="btnHintFinger" class="glass-btn" onclick="toggleHint('finger')" data-help="SÚGÓ: Megjeleníti a hivatalos ujjrendet (1-5) a kottafej alatt.">Ujjrend</button>
+                <div class="divider"></div>
+                <button id="audioToggle" class="glass-btn active" onclick="toggleAudio()" data-help="AUDIO: Ki/Be kapcsolja a beépített zongora hangot.">Zongora</button>
+                
+                <div class="mixer-wrapper">
+                    <button id="btnVst" class="glass-btn" onclick="toggleVst()" data-help="VST MIXER: Lenyitja a keverőpanelt, ahol a Sound Envelope beállításokat módosíthatod.">Mixer</button>
+                    <div id="vstPanel" class="mixer-panel" onclick="event.stopPropagation()">
+                        <div class="mixer-control"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.0"></div>
+                        <div class="mixer-control"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="5.0"></div>
+                        <div class="mixer-control"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.6"></div>
+                        <div class="mixer-control"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                <div style="display:flex; gap:10px;">
+                    <div class="stat-box"><div class="stat-label">BPM</div><div id="bpm" class="stat-value">0</div></div>
+                    <div class="stat-box"><div class="stat-label">Stabilitás</div><div id="uniformity" class="stat-value">100%</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="granite-base">
+        <div class="sheet-viewport">
+            <img src="kottavonal_feher.png" class="sheet-image" alt="Kotta">
+            <canvas id="staffCanvas" width="2450" height="480"></canvas>
+        </div>
+        <div class="piano-wrapper">
+            <img src="grandpiano-keys.png" class="piano-img">
+            <div id="hb-wrap" class="hitbox-layer"></div>
+        </div>
+    </div>
+
+<script>
+    // --- DROPDOWN LOGIKA ---
+    const customSelectDisplay = document.getElementById('customHanonDisplay');
+    const customHanonOptions = document.getElementById('customHanonOptions');
+    const hiddenHanonValue = document.getElementById('hanonSelectValue');
+
+    customSelectDisplay.addEventListener('click', (e) => {
+        e.stopPropagation();
+        customHanonOptions.classList.toggle('show');
+    });
+
+    document.querySelectorAll('.custom-option').forEach(opt => {
+        opt.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if(this.style.cursor === 'not-allowed') return;
+            customSelectDisplay.innerText = this.innerText;
+            hiddenHanonValue.value = this.dataset.val;
+            customHanonOptions.classList.remove('show');
+            if(isRunning) stopPractice(); buildSequence(); draw();
+        });
+    });
+
+    document.addEventListener('click', () => { customHanonOptions.classList.remove('show'); });
+
+    // =========================================================================
+    // KOTTA KALIBRÁCIÓ
+    // =========================================================================
+    const KOTTA_E4_Y = 187.6;       
+    const KOTTA_VONALKOZ_FEL_RH = 11.14; 
+    let KOTTA_G2_Y = 417;       
+    let KOTTA_VONALKOZ_FEL_LH = 10.71; 
+    // =========================================================================
+
+    let isRunning = false, activeRH = true, activeLH = true, currentNoteInBlock = 0, currentBlockIndex = 0;
+    let selectedMode = 'SPRINT';
+    let showNames = false, showFinger = false, helpActive = false;
+    let rhHit = false, lhHit = false, seqBlocks = [];
+    let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
+    
+    // --- STATISZTIKA VÁLTOZÓK ---
+    let lastHitTime = 0;
+    let hitIntervals = [];
+    let fingerTimes = {1:[], 2:[], 3:[], 4:[], 5:[]};
+
+    function setMode(mode) { selectedMode = mode; document.querySelectorAll('#modeSPRINT, #modeMARATHON, #modeTRAINING').forEach(b => b.classList.remove('active')); document.getElementById(`mode${mode}`).classList.add('active'); if(isRunning) stopPractice(); buildSequence(); draw(); }
+    function toggleHand(hand) { if(hand === 'RH') { activeRH = !activeRH; if(!activeRH && !activeLH) activeLH = true; } else { activeLH = !activeLH; if(!activeLH && !activeRH) activeRH = true; } document.getElementById('handRH').classList.toggle('active', activeRH); document.getElementById('handLH').classList.toggle('active', activeLH); if(isRunning) stopPractice(); buildSequence(); draw(); }
+    function toggleHint(type) { if(type === 'name') { showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); } else { showFinger = !showFinger; document.getElementById('btnHintFinger').classList.toggle('active', showFinger); } draw(); }
+    function toggleAudio() { audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
+    function toggleVst() { document.getElementById('vstPanel').classList.toggle('show'); document.getElementById('btnVst').classList.toggle('active'); }
+    function toggleHelp() { helpActive = !helpActive; document.getElementById('btnHelp').classList.toggle('active', helpActive); }
+    
+    document.addEventListener('mousemove', (e) => {
+        const tip = document.getElementById('tooltip');
+        if (!helpActive) { tip.style.display = 'none'; return; }
+        const target = e.target.closest('[data-help]');
+        if (target) { 
+            tip.innerText = target.dataset.help; tip.style.display = 'block'; 
+            let tx = e.clientX + 20, ty = e.clientY + 20;
+            if (tx + 360 > window.innerWidth) tx = e.clientX - 360;
+            if (ty + 120 > window.innerHeight) ty = e.clientY - 140;
+            tip.style.left = tx + 'px'; tip.style.top = ty + 'px'; 
+        } else tip.style.display = 'none';
+    });
+
+    // --- HANON 1. LOGIKA ---
+    const C_MAJOR_MIDI = [0, 2, 4, 5, 7, 9, 11];
+    const NOTE_NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'H'];
+
+    function getNoteInfo(diatonicStep) {
+        let octave = Math.floor(diatonicStep / 7);
+        let noteIndex = diatonicStep % 7;
+        let midi = (octave * 12) + 12 + C_MAJOR_MIDI[noteIndex]; 
+        let name = NOTE_NAMES[noteIndex];
+        return { midi, name };
+    }
+
+    function buildHanon1() {
+        let fullSeq = [];
+        let ascPattern = [0, 2, 3, 4, 5, 4, 3, 2];
+        let descPattern = [0, -2, -3, -4, -5, -4, -3, -2];
+
+        let f_rh_asc = [1, 2, 3, 4, 5, 4, 3, 2];
+        let f_lh_asc = [5, 4, 3, 2, 1, 2, 3, 4];
+        let f_rh_desc = [5, 4, 3, 2, 1, 2, 3, 4];
+        let f_lh_desc = [1, 2, 3, 4, 5, 4, 3, 2];
+
+        // Felfelé
+        for (let rootStep = 28; rootStep <= 34; rootStep++) {
+            for (let i = 0; i < 8; i++) {
+                let currentStepRH = rootStep + ascPattern[i];
+                let currentStepLH = (rootStep - 7) + ascPattern[i]; 
+                let infoRH = getNoteInfo(currentStepRH);
+                let infoLH = getNoteInfo(currentStepLH);
+
+                fullSeq.push({
+                    n: infoRH.name, s: '',
+                    m_rh: infoRH.midi, step_rh: currentStepRH,
+                    m_lh: infoLH.midi, step_lh: currentStepLH,
+                    f_rh: f_rh_asc[i], f_lh: f_lh_asc[i]
+                });
+            }
+        }
+
+        // Lefelé
+        for (let rootStep = 39; rootStep >= 31; rootStep--) {
+            for (let i = 0; i < 8; i++) {
+                let currentStepRH = rootStep + descPattern[i];
+                let currentStepLH = (rootStep - 7) + descPattern[i];
+                let infoRH = getNoteInfo(currentStepRH);
+                let infoLH = getNoteInfo(currentStepLH);
+
+                fullSeq.push({
+                    n: infoRH.name, s: '',
+                    m_rh: infoRH.midi, step_rh: currentStepRH,
+                    m_lh: infoLH.midi, step_lh: currentStepLH,
+                    f_rh: f_rh_desc[i], f_lh: f_lh_desc[i]
+                });
+            }
+        }
+
+        // Záróakkord / hang (C4)
+        let finRH = getNoteInfo(28);
+        let finLH = getNoteInfo(21);
+        fullSeq.push({
+            n: finRH.name, s: '', m_rh: finRH.midi, step_rh: 28, m_lh: finLH.midi, step_lh: 21, f_rh: 1, f_lh: 5
+        });
+
+        return fullSeq;
+    }
+
+    function buildSequence() {
+        let rawSeq = buildHanon1(); 
+        
+        let loops = (selectedMode === 'SPRINT') ? 1 : (selectedMode === 'MARATHON' ? 3 : 100);
+        let flatSeq = [];
+        for(let l=0; l<loops; l++) { flatSeq = flatSeq.concat(rawSeq); }
+
+        seqBlocks = [];
+        for(let i=0; i<flatSeq.length; i+=16) {
+            seqBlocks.push(flatSeq.slice(i, i+16));
+        }
+        currentBlockIndex = 0; currentNoteInBlock = 0;
+    }
+
+    async function initAudio() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = {21:'A0', 36:'C2', 48:'C3', 60:'C4', 72:'C5', 84:'C6'};
+        for(let k in notes) {
+            try {
+                const r = await fetch(`https://tonejs.github.io/audio/salamander/${notes[k]}.mp3`);
+                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
+            } catch(e) {}
+        }
+        if(navigator.requestMIDIAccess) {
+            const m = await navigator.requestMIDIAccess();
+            m.inputs.forEach(input => input.onmidimessage = (msg) => {
+                const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
+                if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
+                else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
+            });
+        }
+    }
+
+    function playTone(note, vel) {
+        if(!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
+        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e){} delete activeNodes[note]; }
+        const source = audioCtx.createBufferSource();
+        let closest = 36, minDiff = 999;
+        for(let b in sampleBuffers) { let diff = Math.abs(note-b); if(diff < minDiff){ minDiff=diff; closest=b; } }
+        source.buffer = sampleBuffers[closest];
+        source.playbackRate.value = Math.pow(2, (note-closest)/12);
+        
+        const gain = audioCtx.createGain(); 
+        const v_a = parseFloat(document.getElementById('vst_a').value);
+        const v_e = parseFloat(document.getElementById('vst_e').value);
+        const v_d = parseFloat(document.getElementById('vst_d').value);
+        
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime((vel/127) * v_d, audioCtx.currentTime + v_a + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + v_e);
+        source.connect(gain).connect(audioCtx.destination); source.start();
+        activeNodes[note] = { source: source, gain: gain };
+    }
+
+    function handleNoteOff(midi) {
+        if (!activeNodes[midi]) return;
+        const v_r = parseFloat(document.getElementById('vst_r').value);
+        const gainNode = activeNodes[midi].gain;
+        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + v_r);
+        activeNodes[midi].source.stop(audioCtx.currentTime + v_r + 0.1);
+        delete activeNodes[midi];
+    }
+
+    function handleMainButton() { 
+        if(!isRunning) { 
+            initAudio(); buildSequence(); isRunning=true; 
+            document.getElementById('btnStart').innerText="◼ LEÁLLÍTÁS"; 
+            document.getElementById('btnStart').classList.add('running');
+            
+            // STATISZTIKÁK NULLÁZÁSA
+            lastHitTime = 0; hitIntervals = []; 
+            fingerTimes = {1:[], 2:[], 3:[], 4:[], 5:[]};
+            document.getElementById('bpm').innerText = "0";
+            document.getElementById('uniformity').innerText = "100%";
+            draw(); 
+        } 
+        else stopPractice();
+    }
+
+    function stopPractice() {
+        isRunning=false; currentNoteInBlock=0; currentBlockIndex=0;
+        document.getElementById('btnStart').innerText="▶ INDÍTÁS"; document.getElementById('btnStart').classList.remove('running');
+        draw();
+    }
+
+    function showResults() {
+        isRunning = false;
+        document.getElementById('btnStart').innerText="▶ INDÍTÁS"; 
+        document.getElementById('btnStart').classList.remove('running');
+
+        if (hitIntervals.length === 0) {
+            stopPractice(); return;
+        }
+
+        // Átlagok számítása
+        let avgDiff = hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
+        let avgBpm = Math.round(60000 / avgDiff);
+        let finalUniformity = document.getElementById('uniformity').innerText;
+
+        // Leglassabb ujj megkeresése
+        let weakestFinger = 0;
+        let maxAvgTime = 0;
+        for (let f = 1; f <= 5; f++) {
+            if (fingerTimes[f].length > 0) {
+                let avg = fingerTimes[f].reduce((a,b)=>a+b)/fingerTimes[f].length;
+                if (avg > maxAvgTime) {
+                    maxAvgTime = avg;
+                    weakestFinger = f;
+                }
+            }
+        }
+
+        const fingerNames = ["", "Hüvelykujj (1)", "Mutatóujj (2)", "Középső ujj (3)", "Gyűrűsujj (4)", "Kisujj (5)"];
+        let tipText = "Kiváló munka! Az ujjaid mozgása egyenletes volt.";
+        
+        if (weakestFinger === 4 || weakestFinger === 5) {
+            tipText = `A statisztika alapján a <b>${fingerNames[weakestFinger]}</b> volt a leglassabb a váltásoknál. Ez teljesen természetes a Hanon gyakorlatoknál! Próbálj meg rá fókuszálni a következő körben, és emeld feljebb az ujjad a leütés előtt.`;
+        } else if (weakestFinger > 0) {
+            tipText = `A statisztika alapján a <b>${fingerNames[weakestFinger]}</b> okozta a legtöbb lassulást. Figyelj a kéztartásodra és a csuklód lazaságára ennél az ujjnál!`;
+        }
+
+        // Modal feltöltése
+        document.getElementById('modalBpm').innerText = avgBpm + " BPM";
+        document.getElementById('modalUni').innerText = finalUniformity;
+        document.getElementById('modalTip').innerHTML = tipText;
+
+        document.getElementById('resultModal').style.display = 'flex';
+        draw();
+    }
+
+    function closeModal() {
+        document.getElementById('resultModal').style.display = 'none';
+        stopPractice();
+    }
+
+    function handleNoteOn(midi, vel = 100) {
+        playTone(midi, vel);
+        if (!isRunning || seqBlocks.length === 0) return;
+        let note = seqBlocks[currentBlockIndex][currentNoteInBlock];
+        
+        if (activeRH && midi === note.m_rh) rhHit = true;
+        if (activeLH && midi === note.m_lh) lhHit = true;
+        
+        let hit = false;
+        if (activeRH && !activeLH && rhHit) hit = true;
+        else if (!activeRH && activeLH && lhHit) hit = true;
+        else if (activeRH && activeLH && rhHit && lhHit) hit = true;
+
+        if (hit) {
+            rhHit = false; lhHit = false; 
+
+            // --- STATISZTIKA ÉS UJJREND ELEMZÉS MENTÉSE ---
+            let now = performance.now();
+            if (lastHitTime > 0) {
+                let diff = now - lastHitTime;
+                hitIntervals.push(diff);
+                
+                // Ujjak idejének rögzítése
+                if (activeRH && note.f_rh) fingerTimes[note.f_rh].push(diff);
+                if (activeLH && note.f_lh) fingerTimes[note.f_lh].push(diff);
+
+                // UI statisztika frissítése
+                let currentBpm = Math.round(60000 / diff);
+                document.getElementById('bpm').innerText = currentBpm;
+                
+                let avg = hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
+                let dev = Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avg,2),0)/hitIntervals.length);
+                let uniformity = Math.round(Math.max(0, 100-(dev/3)));
+                document.getElementById('uniformity').innerText = uniformity + '%';
+            }
+            lastHitTime = now;
+            // ----------------------------------------------
+
+            currentNoteInBlock++;
+            if(currentNoteInBlock >= seqBlocks[currentBlockIndex].length) {
+                currentNoteInBlock=0; currentBlockIndex++;
+                if(currentBlockIndex >= seqBlocks.length) { 
+                    showResults(); // Vége a gyakorlatnak, jöhet a modal!
+                    return; 
+                }
+            }
+            draw();
+        }
+    }
+
+    // --- KOTTA RAJZOLÁSA ---
+    const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+    function draw() {
+        ctx.clearRect(0, 0, 2450, 480);
+        if (seqBlocks.length === 0) return;
+        let block = seqBlocks[currentBlockIndex];
+        let totalNotes = block.length; 
+        
+        let startX = 180;
+        let endX = 2380; 
+        let spacingX = totalNotes > 1 ? (endX - startX) / (totalNotes - 1) : 0;
+        
+        block.forEach((n, i) => {
+            let targetAlpha = (isRunning && i < currentNoteInBlock) ? 0.2 : (isRunning && i === currentNoteInBlock ? 1.0 : 0.6);
+            if(!isRunning && i === 0 && currentBlockIndex === 0) targetAlpha = 1.0;
+            
+            let x = startX + (i * spacingX); 
+            
+            if (activeRH) {
+                ctx.globalAlpha = targetAlpha; 
+                let colorRH = (isRunning && i === currentNoteInBlock) ? "#00AACC" : "#FFFFFF"; 
+                let y = KOTTA_E4_Y - ((n.step_rh-30) * KOTTA_VONALKOZ_FEL_RH);
+                
+                ctx.save(); ctx.strokeStyle = colorRH; ctx.lineWidth = 2;
+                if (n.step_rh <= 28) { for (let s=28; s>=n.step_rh; s-=2) { let ly = KOTTA_E4_Y - ((s-30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                if (n.step_rh >= 40) { for (let s=40; s<=n.step_rh; s+=2) { let ly = KOTTA_E4_Y - ((s-30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                ctx.restore();
+                
+                ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fillStyle = colorRH; ctx.fill();
+                
+                if (showNames || showFinger) { 
+                    ctx.globalAlpha = 1.0; 
+                    if(showNames) { 
+                        ctx.save(); ctx.font = 'bold 18px "Inter"'; ctx.fillStyle = '#00AACC'; 
+                        ctx.shadowColor = '#000'; ctx.shadowBlur = 4; ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+                        ctx.textAlign = 'center'; ctx.fillText(n.n, x, y-22); ctx.restore();
+                    }
+                    if(showFinger) { ctx.font = 'bold 18px "Inter"'; ctx.fillStyle = '#00AACC'; ctx.textAlign = 'center'; ctx.fillText(n.f_rh, x, y+34); }
+                }
+            }
+            
+            if (activeLH) {
+                ctx.globalAlpha = targetAlpha; 
+                let colorLH = (isRunning && i === currentNoteInBlock) ? "#00AACC" : "#FFFFFF"; 
+                let y = KOTTA_G2_Y - ((n.step_lh-18) * KOTTA_VONALKOZ_FEL_LH);
+                
+                ctx.save(); ctx.strokeStyle = colorLH; ctx.lineWidth = 2;
+                if (n.step_lh <= 16) { for (let s=16; s>=n.step_lh; s-=2) { let ly = KOTTA_G2_Y - ((s-18) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                if (n.step_lh >= 28) { for (let s=28; s<=n.step_lh; s+=2) { let ly = KOTTA_G2_Y - ((s-18) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                ctx.restore();
+                
+                ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fillStyle = colorLH; ctx.fill();
+                
+                if (showNames || showFinger) { 
+                    ctx.globalAlpha = 1.0; 
+                    if(showNames) { 
+                        ctx.save(); ctx.font = 'bold 18px "Inter"'; ctx.fillStyle = '#00AACC'; 
+                        ctx.shadowColor = '#000'; ctx.shadowBlur = 4; ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+                        ctx.textAlign = 'center'; ctx.fillText(n.n, x, y-22); ctx.restore();
+                    }
+                    if(showFinger) { ctx.font = 'bold 18px "Inter"'; ctx.fillStyle = '#00AACC'; ctx.textAlign = 'center'; ctx.fillText(n.f_lh, x, y+34); }
+                }
+            }
+        });
+        ctx.globalAlpha = 1.0;
+    }
+
+    function create88() {
+        const wrap = document.getElementById('hb-wrap');
+        const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
+        for(let m=21; m<=108; m++) {
+            const k = document.createElement('div'); const isW = whites.includes(m%12);
+            k.id = `k-${m}`; k.className = `key-glow ${isW?'white-glow':'black-glow'}`;
+            if(isW) { k.style.left = (wIdx * 1.92307) + "%"; k.style.width = "1.92307%"; k.style.height="100%"; wIdx++; }
+            else { k.style.left = ((wIdx * 1.92307) - 0.6) + "%"; k.style.width = "1.2%"; k.style.height="65%"; k.style.zIndex="200"; }
+            k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); }; 
+            k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); }; 
+            k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
+            wrap.appendChild(k);
+        }
+    }
+    window.onload = () => { create88(); buildSequence(); draw(); };
+</script>
+</body>
+</html>

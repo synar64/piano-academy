@@ -3,317 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zongora Akadémia | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <title>Akíra Piano Academy | Start</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
+            --theme-cyan: #00AACC;
+            --theme-cyan-glow: rgba(0, 170, 204, 0.4);
             --bg-dark: #050508;
-            --panel-bg: rgba(20, 20, 30, 0.8);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-gold: #d4af37;
-            --accent-purple: #bf5af2;
-            --accent-blue: #0a84ff;
-            --accent-green: #32d74b;
-            --accent-rose: #ff2d55;
-            --text-main: #ffffff;
-            --text-muted: #9999aa;
+            --glass-bg: rgba(10, 15, 20, 0.6); 
+            --glass-border: rgba(255, 255, 255, 0.06);
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0; padding: 20px 40px; min-height: 100vh;
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg-dark);
+            color: #fff; font-family: 'Inter', sans-serif;
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('zongora-hatter-dark.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        .ambient-bg::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(5,5,8,0.7) 0%, rgba(5,5,8,0.9) 100%);
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-container {
+            position: relative; z-index: 10;
             display: flex; flex-direction: column; align-items: center;
-            background-image: radial-gradient(circle at 50% 50%, rgba(20, 20, 40, 0.5) 0%, rgba(5, 5, 8, 1) 100%), url('zongora-hatter-dark.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
-            background-color: var(--bg-dark); color: var(--text-main);
-        }
-
-        .brand h1 { 
-            margin: 40px 0; font-size: 42px; letter-spacing: 8px; 
-            text-transform: uppercase; color: #fff; text-align: center;
-        }
-
-        .main-wrapper { width: 100%; max-width: 1400px; z-index: 1; display: flex; flex-direction: column; align-items: center; }
-
-        .dashboard-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .module-card {
-            background: var(--panel-bg); border: 1px solid var(--border-color);
-            border-radius: 20px; padding: 45px 20px;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            backdrop-filter: blur(15px); position: relative;
-            display: flex; flex-direction: column; align-items: center; 
             justify-content: flex-start; 
-            cursor: pointer; border-top: 6px solid var(--card-color);
-            aspect-ratio: 4 / 5; text-align: center; box-sizing: border-box;
-        }
-
-        .module-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.4);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-
-        .card-kotta { --card-color: var(--accent-gold); }
-        .card-akkord { --card-color: var(--accent-purple); }
-        .card-hanon { --card-color: var(--accent-blue); }
-        .card-skala { --card-color: var(--accent-green); }
-        .card-hallas { --card-color: var(--accent-rose); }
-
-        .card-icon { font-size: 50px; height: 60px; margin-bottom: 20px; display: flex; align-items: center; }
-        .card-title { font-size: 22px; font-weight: 900; height: 55px; margin: 0 0 10px 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; width: 100%; }
-        .card-desc { color: var(--text-muted); font-size: 13px; line-height: 1.5; text-align: center; margin: 0; }
-
-        /* FIX INFO ABLAK */
-        .info-display-area {
-            margin-top: 20px; padding: 40px; background: rgba(255,255,255,0.03);
-            border-radius: 24px; border: 1px solid var(--border-color); width: 100%;
-            box-sizing: border-box; text-align: left; 
-            height: 390px; overflow: hidden; 
-            backdrop-filter: blur(10px); display: block; margin-bottom: 40px;
-        }
-
-        .info-display-area h2 { color: #fff; text-transform: uppercase; letter-spacing: 3px; border-bottom: 1px solid #333; padding-bottom: 15px; margin-top: 0; }
-        .info-display-area p { line-height: 1.8; color: #ccc; font-size: 16px; margin-bottom: 15px; }
-        .info-display-area ul { line-height: 2; color: #bbb; font-size: 15px; margin-top: 0; }
-        .info-display-area .highlight { color: #fff; font-weight: bold; }
-
-        /* ÁTLÁTSZÓ DIÁK SZEKCIÓJA */
-        .slides-wrapper {
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 60px;
-            margin-bottom: 60px;
-        }
-
-        .presentation-slide {
-            width: 100%;
-            max-width: 1000px;
-            display: block;
-            object-fit: contain;
-        }
-
-        /* ÚJ: FIX PIXELMÉRETŰ VIDEÓ KONTÉNER */
-        .video-wrapper {
-            /* VÍZSZINTES ÖSSZETOLÁS: Csökkentsd ezt a 880px-et, ha még van fekete csík oldalt! */
-            width: 880px; 
-            /* MAGASSÁG: Ezt is szabadon állíthatod a tökéletes vágáshoz! */
-            height: 520px; 
-            
-            background: transparent; 
-            border-radius: 24px;
-            overflow: hidden; 
-            border: 1px solid var(--border-color);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.8);
-            margin-bottom: 80px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .video-wrapper video {
-            width: 100%;
-            height: 100%;
-            /* Ez a parancs biztosítja, hogy a videó kitölti az általad megadott fix méretet, levágva a felesleget */
-            object-fit: cover; 
-            display: block;
-        }
-
-        /* NAGY KÖZÉPSŐ LEJÁTSZÓ GOMB */
-        .custom-play-btn {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: rgba(10, 132, 255, 0.85);
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 45px;
-            cursor: pointer;
-            box-shadow: 0 0 30px rgba(10, 132, 255, 0.6);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 10;
-            padding-left: 8px;
+            height: 100vh; width: 100%; max-width: 1200px; margin: 0 auto;
+            padding-top: 12vh; 
             box-sizing: border-box;
         }
 
-        .custom-play-btn:hover {
-            transform: scale(1.15);
-            background: rgba(255, 45, 85, 0.9);
-            box-shadow: 0 0 40px rgba(255, 45, 85, 0.8);
+        .main-logo {
+            margin-bottom: 50px;
+            filter: drop-shadow(0 0 15px var(--theme-cyan-glow));
+            transform: scale(1.2);
+            opacity: 0; 
+            animation: fadeInContent 1s cubic-bezier(0.2, 1, 0.3, 1) forwards;
         }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            padding: 0 40px;
+            box-sizing: border-box;
+            opacity: 0;
+            animation: fadeInContent 1s cubic-bezier(0.2, 1, 0.3, 1) 0.3s forwards;
+        }
+
+        /* JAVÍTVA: A kártyák most <div> elemek lesznek, hogy ne ugorjon fel az URL sáv, 
+           ezért hozzáadtuk a kurzor formázást. */
+        .module-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer; /* Fontos a klikkelhetőség érzetéhez! */
+        }
+
+        .module-card:hover {
+            border-color: var(--theme-cyan);
+            background: rgba(0, 170, 204, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 170, 204, 0.15);
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .module-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--theme-cyan), transparent);
+            opacity: 0; transition: 0.4s;
+        }
+        .module-card:hover::before { opacity: 1; }
+
+        .module-title {
+            color: #fff;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            transition: 0.4s;
+        }
+        
+        .module-card:hover .module-title {
+            color: var(--theme-cyan);
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--theme-cyan-glow);
+        }
+
+        .module-desc {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.6;
+            transition: 0.4s;
+        }
+
+        .module-card:hover .module-desc {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="brand"><h1>Zongora Akadémia</h1></div>
+    <div class="ambient-bg"></div>
 
-    <div class="main-wrapper">
-        <div class="dashboard-grid">
-            <div class="module-card card-kotta" onclick="window.location.href='zongora-kotta.html'" onmouseover="updateInfo('kotta')" onmouseout="updateInfo('general')">
-                <div class="card-icon">📖</div>
-                <h2 class="card-title">Kottaolvasás</h2>
-                <p class="card-desc">Gyorsasági kottaolvasó tréner Violin és Basszus kulcsban, vizuális visszajelzéssel.</p>
-            </div>
-
-            <div class="module-card card-akkord" onclick="window.location.href='zongora-akkord.html'" onmouseover="updateInfo('akkord')" onmouseout="updateInfo('general')">
-                <div class="card-icon">🎹</div>
-                <h2 class="card-title">Akkord Mester</h2>
-                <p class="card-desc">Akkordfelismerés és elméleti tudás tesztelése. Helyes billentyűzet-leütés és dinamika elemzése.</p>
-            </div>
-
-            <div class="module-card card-hanon" onclick="window.location.href='zongora-hanon.html'" onmouseover="updateInfo('hanon')" onmouseout="updateInfo('general')">
-                <div class="card-icon">🏃‍♂️</div>
-                <h2 class="card-title">Hanon No. 1</h2>
-                <p class="card-desc">Ujjgyakorlat a sebesség és függetlenség fejlesztésére. Valós idejű ritmusstabilitás mérés.</p>
-            </div>
-
-            <div class="module-card card-skala" onclick="window.location.href='zongora-skala.html'" onmouseover="updateInfo('skala')" onmouseout="updateInfo('general')">
-                <div class="card-icon">🎶</div>
-                <h2 class="card-title">Skála</h2>
-                <p class="card-desc">Gyakorold a Dúr és Moll skálákat oda-vissza, egy vagy két oktávon, intelligens előjegyzésekkel.</p>
-            </div>
-
-            <div class="module-card card-hallas" onclick="window.location.href='zongora-hallas.html'" onmouseover="updateInfo('hallas')" onmouseout="updateInfo('general')">
-                <div class="card-icon">🎧</div>
-                <h2 class="card-title">Hallás</h2>
-                <p class="card-desc">Abszolút és relatív hallásfejlesztés. Ismerd fel a lejátszott hangokat vakon.</p>
-            </div>
+    <div class="main-container">
+        
+        <div class="main-logo">
+            <svg width="450" height="110" viewBox="0 0 400 95">
+                <text x="190" y="55" fill="#00AACC" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="end" letter-spacing="2">AK</text>
+                <g filter="drop-shadow(0 0 8px rgba(255,255,255,0.3))">
+                    <path d="M 194 55 L 206 55 L 206 33 L 200 33 L 200 0 L 194 0 Z" fill="#FFFFFF" stroke="#aaa" stroke-width="0.5" stroke-linejoin="round"/>
+                </g>
+                <text x="210" y="55" fill="#00AACC" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="start" letter-spacing="2">RA</text>
+                <text x="200" y="85" fill="#00AACC" font-family="'Inter', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="8">PIANO ACADEMY</text>
+            </svg>
         </div>
 
-        <div id="infoArea" class="info-display-area">
-            <h2 id="infoTitle">Rendszer Ismertető</h2>
-            <div id="infoBody">
-                <p>A Zongora Akadémia egy böngészőből futó interaktív oktatási környezet kezdőknek, amely a WebMIDI API technológiát használva közvetlenül és zéró késleltetéssel kommunikál a digitális zongoráddal vagy MIDI billentyűzeteddel.</p>
-                <p><span class="highlight">A koncepció:</span> A rendszer nem elméleti tananyagokat kínál, hanem reflex- és izommemória-fejlesztő gyakorlatokat. Az agyad és az ujjaid közötti reakcióidő minimalizálására épít.</p>
-                <ul>
-                    <li><span class="highlight">MIDI kapcsolat:</span> Engedélyezned kell a böngészőnek a MIDI eszközökhöz való hozzáférést a felugró ablakban a kezdéshez.</li>
-                    <li><span class="highlight">Gyakorlási javaslat:</span> A modulok úgy lettek felépítve, hogy akár napi 15 perc szisztematikus használat is mérhető fejlődést hozzon.</li>
-                </ul>
+        <div class="modules-grid">
+            <div class="module-card" onclick="window.location.href='hallasfejleszto.html'">
+                <div class="module-title">Hallásfejlesztő</div>
+                <div class="module-desc">Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.</div>
+            </div>
+            
+            <div class="module-card" onclick="window.location.href='kottaolvasas.html'">
+                <div class="module-title">Kottaolvasás</div>
+                <div class="module-desc">Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.</div>
+            </div>
+            
+            <div class="module-card" onclick="window.location.href='akkordok.html'">
+                <div class="module-title">Akkordok</div>
+                <div class="module-desc">Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.</div>
+            </div>
+            
+            <div class="module-card" onclick="window.location.href='skalak.html'">
+                <div class="module-title">Skálák</div>
+                <div class="module-desc">Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.</div>
+            </div>
+            
+            <div class="module-card" onclick="window.location.href='hanon.html'">
+                <div class="module-title">Hanon</div>
+                <div class="module-desc">Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.</div>
+            </div>
+            
+            <div class="module-card" onclick="window.location.href='ritmus.html'">
+                <div class="module-title">Ritmus</div>
+                <div class="module-desc">Fejleszti az időzítést és a komplex ritmusképletek megértését.</div>
             </div>
         </div>
-
-        <div class="slides-wrapper">
-            <img src="Dia1.png" class="presentation-slide" alt="Bemutató Dia 1">
-            <img src="Dia2.png" class="presentation-slide" alt="Bemutató Dia 2">
-            <img src="Dia3.png" class="presentation-slide" alt="Bemutató Dia 3">
-            <img src="Dia4.png" class="presentation-slide" alt="Bemutató Dia 4">
-            <img src="Dia5.png" class="presentation-slide" alt="Bemutató Dia 5">
-            <img src="Dia6.png" class="presentation-slide" alt="Bemutató Dia 6">
-            <img src="Dia7.png" class="presentation-slide" alt="Bemutató Dia 7">
-            <img src="Dia8.png" class="presentation-slide" alt="Bemutató Dia 8">
-        </div>
-
-        <div class="video-wrapper">
-            <video id="promoVideo" preload="metadata">
-                <source src="Zongora_Akadémia.mp4#t=0.001" type="video/mp4">
-                A böngésződ nem támogatja a videót.
-            </video>
-            <div class="custom-play-btn" id="playBtn" onclick="startVideo()">▶</div>
-        </div>
-
     </div>
 
-    <script>
-        // --- VIDEÓ INDÍTÁSA ---
-        function startVideo() {
-            const video = document.getElementById('promoVideo');
-            const playBtn = document.getElementById('playBtn');
-            
-            // Vezérlők bekapcsolása
-            video.setAttribute('controls', 'controls');
-            // Gomb eltüntetése
-            playBtn.style.display = 'none';
-            // Videó lejátszása
-            video.play();
-        }
-
-        // --- MIDI ÉS INFO PANEL ---
-        window.onload = function() {
-            if (navigator.requestMIDIAccess) {
-                navigator.requestMIDIAccess().then(
-                    () => console.log("MIDI OK"),
-                    () => console.log("MIDI ERROR")
-                );
-            }
-        };
-
-        const infoData = {
-            general: {
-                title: "Rendszer Ismertető",
-                text: `<p>A Zongora Akadémia egy böngészőből futó interaktív oktatási környezet kezdőknek, amely a WebMIDI API technológiát használva közvetlenül és zéró késleltetéssel kommunikál a digitális zongoráddal vagy MIDI billentyűzeteddel.</p>
-                       <p><span class="highlight">A koncepció:</span> A rendszer nem elméleti tananyagokat kínál, hanem reflex- és izommemória-fejlesztő gyakorlatokat. Az agyad és az ujjaid közötti reakcióidő minimalizálására épít.</p>
-                       <ul>
-                           <li><span class="highlight">MIDI kapcsolat:</span> Engedélyezned kell a böngészőnek a MIDI eszközökhöz való hozzáférést a felugró ablakban a kezdéshez.</li>
-                           <li><span class="highlight">Gyakorlási javaslat:</span> A modulok úgy lettek felépítve, hogy akár napi 15 perc szisztematikus használat is mérhető fejlődést hozzon.</li>
-                       </ul>`
-            },
-            kotta: {
-                title: "Kottaolvasás (Lapról Olvasás Tréner)",
-                text: `<p>Ennek a modulnak a kizárólagos célja a vizuális jel (a kotta) és a fizikai cselekvés (a billentyű leütése) közötti reakcióidő lerövidítése kezdőknek. A kottát nem "kiszámolni" kell, hanem automatizmus szintjén felismerni.</p>
-                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
-                       <ul>
-                           <li><span class="highlight">Kulcsok:</span> Gyakorolhatsz dedikáltan Violin kulcsban (jobb kéz), Basszus kulcsban (bal kéz), vagy Vegyes módban.</li>
-                           <li><span class="highlight">Előjegyzések:</span> Alapértelmezetten csak a törzshangokat kéri a rendszer. Bekapcsolva a skála kiterjed a módosított hangokra (♯ és ♭) is.</li>
-                           <li><span class="highlight">Időkorlát:</span> Minden küldetés 10 hangból áll. Hibátlan teljesítés esetén a rendszer szintet lép és csökkenti a rendelkezésre álló időt.</li>
-                           <li><span class="highlight">Súgó:</span> A "Puska" egy vizuális térképet nyit meg a zongora billentyűzetről és a hozzá tartozó vonalrendszerről.</li>
-                       </ul>`
-            },
-            akkord: {
-                title: "Akkord Mester (Polifónia Tréner)",
-                text: `<p>Ez a modul az elméleti akkordépítést és a többszólamú látásmódot teszteli kezdő szinten.</p>
-                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
-                       <ul>
-                           <li><span class="highlight">Oktatási Módok:</span> A Kottaolvasó módban vonalrendszerben, a Lead módban csak nemzetközi akkordjelekkel (pl. C, Dm) találkozol.</li>
-                           <li><span class="highlight">Nehézségi Szintek:</span> Alaphelyzetű hármashangzatok, fordítások, majd haladóbb szinten a szeptimakkordok (pl. G7) gyakorlása.</li>
-                           <li><span class="highlight">Kiértékelés:</span> A rendszer csak akkor fogadja el a találatot, ha az akkord összes hangját egyszerre szólaltatod meg.</li>
-                       </ul>`
-            },
-            hanon: {
-                title: "Hanon No. 1 (Technikai Tréner)",
-                text: `<p>Charles-Louis Hanon híres gyakorlata modern formában. Cél az ujjak függetlenítése és a csukló lazaságának fejlesztése.</p>
-                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
-                       <ul>
-                           <li><span class="highlight">Gyakorlási kiterjedés:</span> Választható 1 oktávos vagy 2 oktávos futam.</li>
-                           <li><span class="highlight">Kézválasztó:</span> Izolálhatod a jobb vagy a bal kezet a célzott erősítésre.</li>
-                           <li><span class="highlight">Analitika:</span> Kiszámítja a pillanatnyi és átlagos BPM-et, valamint a ritmus-egyenletességet mutató Stabilitás %-ot.</li>
-                       </ul>`
-            },
-            skala: {
-                title: "Skála (Hangsor Tréner)",
-                text: `<p>A legfontosabb Dúr és Moll skálák begyakorlása, ami elengedhetetlen a biztos zongoratudáshoz, a hangnemek megértéséhez és a helyes ujjrendek elsajátításához.</p>
-                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
-                       <ul>
-                           <li><span class="highlight">Hangnemi gazdagság:</span> 7 Dúr és 7 természetes Moll skála választható ki a legördülő menüből.</li>
-                           <li><span class="highlight">Intelligens előjegyzések:</span> A rendszer automatikusan és dinamikusan teszi ki a szükséges kereszteket (♯) és béket (♭) a kottába.</li>
-                           <li><span class="highlight">Gyakorlási módok:</span> Gyakorolj 1 vagy 2 oktávon, jobb vagy bal kézzel, megszakítás nélküli folyamatos (Maraton) módban.</li>
-                       </ul>`
-            },
-            hallas: {
-                title: "Ear Training (Hallásfejlesztő)",
-                text: `<p>A füled és a kezed közötti kapcsolat erősítése. Ebben a modulban a gép által generált hangokat kell vakon megtalálnod.</p>
-                       <p><span class="highlight">Funkciók és Beállítások:</span></p>
-                       <ul>
-                           <li><span class="highlight">Előjegyzések:</span> Kezdő szinten csak törzshangok, bekapcsolva a teljes kromatikus skála.</li>
-                           <li><span class="highlight">Visszajelzés:</span> Hiba esetén a rendszer azonnali instrukciót ad: a célhang magasabban vagy alacsonyabban található-e.</li>
-                           <li><span class="highlight">Időkorlát:</span> Kikapcsolható a stresszmentes, keresgélő gyakorláshoz.</li>
-                       </ul>`
-            }
-        };
-
-        function updateInfo(type) {
-            document.getElementById('infoTitle').innerText = infoData[type].title;
-            document.getElementById('infoBody').innerHTML = infoData[type].text;
-        }
-    </script>
 </body>
 </html>

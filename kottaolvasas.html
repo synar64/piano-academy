@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akíra Piano Academy | Kottaolvasás Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --theme-cyan: #00AACC; 
+            --theme-cyan-dim: rgba(0, 170, 204, 0.15);
+            --theme-cyan-glow: rgba(0, 170, 204, 0.4);
+            --theme-error: #ff453a;
+            --glass-bg: rgba(10, 10, 15, 0.6); 
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-dim: #bbb;
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: #050508;
+            background-image: radial-gradient(circle at 50% 50%, rgba(20, 25, 30, 1) 0%, rgba(5, 5, 8, 1) 100%);
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            color: #fff;
+        }
+
+        /* ── FEJLÉC ÉS ÚJ LOGÓ ── */
+        .top-nav {
+            width: 100%; background: rgba(5, 5, 10, 0.6); backdrop-filter: blur(25px);
+            border-bottom: 2px solid var(--glass-border); 
+            display: flex; justify-content: center; padding: 20px 0; 
+            z-index: 1000; box-shadow: 0 5px 30px rgba(0,0,0,0.8);
+        }
+        .nav-content { width: 100%; max-width: 2450px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        
+        .logo-svg { 
+            height: 55px; width: auto; 
+            filter: drop-shadow(0 0 12px rgba(0, 170, 204, 0.5)); 
+            cursor: pointer; transition: 0.3s;
+        }
+        .logo-svg:hover { filter: drop-shadow(0 0 20px rgba(0, 170, 204, 0.8)); transform: scale(1.02); }
+
+        .main-menu { display: flex; gap: 20px; }
+        .nav-btn { 
+            background: rgba(255,255,255,0.03); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px 30px; border-radius: 12px; font-size: 15px; font-weight: 700; text-transform: uppercase; 
+            letter-spacing: 1px; cursor: pointer; transition: 0.3s; text-decoration: none;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateY(-2px); }
+        .nav-btn.active { background: var(--theme-cyan-dim); color: var(--theme-cyan); border-color: var(--theme-cyan); box-shadow: 0 0 20px var(--theme-cyan-dim); transform: translateY(-2px); }
+
+        .help-btn { background: rgba(0,0,0,0.5); color: var(--theme-cyan); border: 2px solid var(--theme-cyan); width: 50px; height: 50px; border-radius: 12px; font-size: 24px; font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
+        .help-btn.active { background: var(--theme-cyan); color: #000; box-shadow: 0 0 20px var(--theme-cyan-glow); }
+
+        /* ── MŰSZERFAL ── */
+        .ui-container { width: 100%; max-width: 2450px; margin-top: 20px; z-index: 100; }
+        .master-dashboard { width: 100%; display: flex; justify-content: space-between; align-items: center; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--theme-cyan); border-radius: 12px; padding: 15px 30px; box-sizing: border-box; }
+        .control-group { display: flex; gap: 10px; align-items: center; }
+        .divider { width: 1px; height: 35px; background: #444; margin: 0 15px; }
+
+        .glass-btn { padding: 12px 22px; background: rgba(0,0,0,0.5); color: var(--text-dim); border: 1px solid #555; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; text-transform: uppercase; transition: 0.2s; white-space: nowrap; }
+        .glass-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .glass-btn.active { border-color: var(--theme-cyan); color: var(--theme-cyan); background: var(--theme-cyan-dim); }
+
+        #btnStart { width: 200px; height: 60px; background: var(--theme-cyan); color: #000; border: none; font-size: 20px; border-radius: 10px; cursor: pointer; font-weight: 800; text-transform: uppercase; box-shadow: 0 0 20px var(--theme-cyan-glow); }
+        #btnStart.running { background: rgba(0,0,0,0.5); color: var(--theme-cyan); border: 2px solid var(--theme-cyan); box-shadow: none; }
+
+        .stat-box { background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 8px; border: 1px solid #444; text-align: center; min-width: 90px; }
+        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+        .stat-value { font-size: 26px; font-weight: 800; color: var(--theme-cyan); line-height: 1; }
+
+        /* ── EGYEDI DROPDOWN ── */
+        .custom-select-wrapper { position: relative; width: 220px; }
+        .custom-select { padding: 12px 15px; background: rgba(0,0,0,0.5); color: var(--text-dim); border: 1px solid #555; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; text-transform: uppercase; display: flex; justify-content: center; align-items: center; white-space: nowrap; text-align: center; }
+        .custom-select::after { content: '▼'; font-size: 10px; color: var(--theme-cyan); margin-left: 10px; position: absolute; right: 15px; }
+        .custom-options { display: none; position: absolute; top: 110%; left: 0; width: 100%; background: rgba(10, 10, 15, 0.95); border: 1px solid var(--theme-cyan); border-radius: 8px; z-index: 3000; backdrop-filter: blur(25px); }
+        .custom-options.show { display: block; }
+        .custom-option { padding: 12px 15px; color: var(--text-dim); cursor: pointer; font-size: 14px; font-weight: 700; transition: 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; white-space: nowrap; }
+        .custom-option:hover { background: var(--theme-cyan-dim); color: var(--theme-cyan); }
+
+        .help-tooltip { position: fixed; background: rgba(10, 15, 25, 0.98); color: #fff; border: 1px solid var(--theme-cyan); padding: 18px; border-radius: 10px; font-size: 14px; width: 340px; z-index: 99999; pointer-events: none; display: none; line-height: 1.6; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: rgba(15, 20, 25, 0.95); padding: 40px; border-radius: 16px; border: 1px solid var(--theme-cyan); text-align: center; max-width: 500px; width: 90%; }
+        .modal-highlight { color: var(--theme-cyan); font-weight: 800; font-size: 32px; }
+
+        .granite-base { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: auto; }
+        .sheet-viewport { width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; background: rgba(5, 5, 10, 0.2); border: 1px solid var(--glass-border); position: relative; margin-bottom: 30px; border-radius: 12px 12px 0 0; overflow: hidden; }
+        .sheet-image { width: 100%; height: 100%; object-fit: contain; opacity: 0.95; filter: grayscale(100%); }
+        #staffCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        
+        .piano-wrapper { width: 100%; max-width: 2560px; position: relative; aspect-ratio: 2500/284; background: #000; overflow: hidden; box-shadow: 0 -10px 50px rgba(0,0,0,0.9); border-top: 2px solid #222; }
+        .piano-img { width: 100%; height: 100%; display: block; pointer-events: none; filter: grayscale(100%); }
+        .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
+        .key-glow { position: absolute; top: 0; cursor: pointer; }
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255, 255, 255, 0.15); box-shadow: inset 0 -10px 15px rgba(255, 255, 255, 0.3); z-index: 40; }
+
+        .mixer-wrapper { position: relative; }
+        .mixer-panel { display: none; position: absolute; top: 120%; right: 0; background: rgba(10, 10, 15, 0.98); border: 1px solid var(--theme-cyan); border-radius: 12px; padding: 25px; width: 600px; box-sizing: border-box; backdrop-filter: blur(30px); grid-template-columns: repeat(4, 1fr); gap: 15px; z-index: 2000; }
+        .mixer-panel.show { display: grid; }
+        .mixer-control { display: flex; flex-direction: column; align-items: center; gap: 5px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid #333; }
+        .mixer-control label { font-size: 11px; color: var(--theme-cyan); font-weight: 700; text-transform: uppercase; }
+        .mixer-control input { width: 100%; accent-color: var(--theme-cyan); cursor: pointer; }
+    </style>
+</head>
+<body onclick="initAudio()">
+
+    <div id="tooltip" class="help-tooltip"></div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="color:var(--theme-cyan); text-transform:uppercase;">Kiértékelés</h2>
+            <div style="display:flex; justify-content:space-around; margin:30px 0;">
+                <div><div style="font-size:12px; color:#888;">SEBESSÉG</div><div id="modalBpm" class="modal-highlight">0 BPM</div></div>
+                <div><div style="font-size:12px; color:#888;">PONTOSSÁG</div><div id="modalUni" class="modal-highlight">100%</div></div>
+            </div>
+            <p id="modalTip" style="color:#ccc; margin-bottom:30px;"></p>
+            <button class="glass-btn active" style="padding:15px 40px;" onclick="closeModal()">Következő kör</button>
+        </div>
+    </div>
+
+    <nav class="top-nav">
+        <div class="nav-content">
+            <a href="index.html" style="text-decoration: none; display: block;">
+                <svg class="logo-svg" viewBox="0 0 400 95">
+                    <text x="200" y="55" fill="white" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="middle" letter-spacing="4">
+                        AK<tspan fill="#00AACC">Í</tspan>RA
+                    </text>
+                    <text x="200" y="85" fill="#00AACC" font-family="'Inter', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="8">PIANO ACADEMY</text>
+                    <rect x="194" y="8" width="12" height="5" fill="#00AACC" rx="1"/>
+                </svg>
+            </a>
+
+            <div class="main-menu">
+                <a href="hallasfejleszto.html" class="nav-btn" data-help="Hallásfejlesztő: Fejleszti a zenei hallást.">Hallásfejlesztő</a>
+                <a href="kottaolvasas.html" class="nav-btn active" data-help="Kottaolvasás: Gyakorold a lapról olvasást.">Kottaolvasás</a>
+                <a href="akkordok.html" class="nav-btn" data-help="Akkordok: Tanuld meg az akkordokat.">Akkordok</a>
+                <a href="skalak.html" class="nav-btn" data-help="Skálák: Sajátítsd el az összes skálát.">Skálák</a>
+                <a href="hanon.html" class="nav-btn" data-help="Hanon: Erősítsd az ujjaidat.">Hanon</a>
+                <a href="ritmus.html" class="nav-btn" data-help="Ritmus: Fejleszti az időzítést.">Ritmus</a>
+            </div>
+            <button id="btnHelp" class="help-btn" onclick="toggleHelp()" data-help="SÚGÓ BEKAPCSOLVA: Mozgasd az egeret a gombok fölé!">?</button>
+        </div>
+    </nav>
+
+    <div class="ui-container">
+        <div class="master-dashboard">
+            <div class="control-group">
+                <button id="modeAUTO" class="glass-btn" onclick="toggleAutoNext()" data-help="FOLYAMATOS: Ha aktív, a gép automatikusan sorsolja a következő kört, nem áll meg az elemzésnél.">Folyamatos</button>
+                <div class="divider"></div>
+                <button id="handRH" class="glass-btn active" onclick="toggleHand('RH')" data-help="JOBB KÉZ: Violin kulcs hangjai.">Jobb</button>
+                <button id="handLH" class="glass-btn active" onclick="toggleHand('LH')" data-help="BAL KÉZ: Basszus kulcs hangjai.">Bal</button>
+                <div class="divider"></div>
+                <div class="custom-select-wrapper" data-help="NEHÉZSÉG: Állítsd be a hangértékeket és előjegyzéseket.">
+                    <div class="custom-select" id="customLevelDisplay">Csak egész hangok</div>
+                    <div class="custom-options" id="customLevelOptions">
+                        <div class="custom-option" data-val="1">Csak egész hangok</div>
+                        <div class="custom-option" data-val="2">Többféle hangérték</div>
+                        <div class="custom-option" data-val="3">Előjegyzésekkel</div>
+                    </div>
+                </div>
+                <input type="hidden" id="levelSelectValue" value="1">
+            </div>
+
+            <button id="btnStart" onclick="handleMainButton()">▶ INDÍTÁS</button>
+
+            <div class="control-group">
+                <button id="btnHintName" class="glass-btn" onclick="toggleHint()" data-help="HANG NÉV SÚGÓ: Megjeleníti a hang nevét és oktávját a kottafej mellett.">Hang Név</button>
+                <div class="divider"></div>
+                <button id="audioToggle" class="glass-btn active" onclick="toggleAudio()" data-help="ZONGORA: Hang ki/be.">Zongora</button>
+                <div class="mixer-wrapper">
+                    <button id="btnVst" class="glass-btn" onclick="toggleVst()" data-help="MIXER: Sound Envelope beállítások.">Mixer</button>
+                    <div id="vstPanel" class="mixer-panel">
+                        <div class="mixer-control"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.0"></div>
+                        <div class="mixer-control"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="5.0"></div>
+                        <div class="mixer-control"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.6"></div>
+                        <div class="mixer-control"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; margin-left:15px;">
+                    <div class="stat-box"><div class="stat-label">BPM</div><div id="bpm" class="stat-value">0</div></div>
+                    <div class="stat-box"><div class="stat-label">Hibák</div><div id="mistakeCount" class="stat-value">0</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="granite-base">
+        <div class="sheet-viewport">
+            <img src="kottavonal_feher.png" class="sheet-image">
+            <canvas id="staffCanvas" width="2450" height="480"></canvas>
+        </div>
+        <div class="piano-wrapper">
+            <img src="grandpiano-keys.png" class="piano-img">
+            <div id="hb-wrap" class="hitbox-layer"></div>
+        </div>
+    </div>
+
+<script>
+    const KOTTA_E4_Y = 187.6, KOTTA_VONALKOZ_FEL_RH = 11.14, KOTTA_G2_Y = 417, KOTTA_VONALKOZ_FEL_LH = 10.71;
+    const NOTE_NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'H'], DIATONIC_TO_MIDI = [0, 2, 4, 5, 7, 9, 11];
+
+    let isRunning = false, activeRH = true, activeLH = true, showNames = false, helpActive = false, autoNext = false;
+    let currentNoteIndex = 0, mistakes = 0, lastHitTime = 0, hitIntervals = [], seq = [];
+    let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
+
+    document.addEventListener('mousemove', (e) => {
+        const tip = document.getElementById('tooltip');
+        if (!helpActive) { tip.style.display = 'none'; return; }
+        const target = e.target.closest('[data-help]');
+        if (target) { tip.innerText = target.dataset.help; tip.style.display = 'block'; tip.style.left = e.clientX + 20 + 'px'; tip.style.top = e.clientY + 20 + 'px'; } else tip.style.display = 'none';
+    });
+
+    const customDisplay = document.getElementById('customLevelDisplay');
+    const customOptions = document.getElementById('customLevelOptions');
+    customDisplay.onclick = (e) => { e.stopPropagation(); customOptions.classList.toggle('show'); };
+    document.querySelectorAll('.custom-option').forEach(opt => {
+        opt.onclick = () => { customDisplay.innerText = opt.innerText; document.getElementById('levelSelectValue').value = opt.dataset.val; customOptions.classList.remove('show'); if(isRunning) stopPractice(); };
+    });
+    document.onclick = () => customOptions.classList.remove('show');
+
+    function toggleHand(h) {
+        if(h === 'RH') activeRH = !activeRH; else activeLH = !activeLH;
+        if(!activeRH && !activeLH) { activeRH = true; activeLH = true; }
+        document.getElementById('handRH').classList.toggle('active', activeRH); document.getElementById('handLH').classList.toggle('active', activeLH);
+        if(isRunning) stopPractice();
+    }
+    function toggleAutoNext() { autoNext = !autoNext; document.getElementById('modeAUTO').classList.toggle('active', autoNext); }
+    function toggleHint() { showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); draw(); }
+    function toggleHelp() { helpActive = !helpActive; document.getElementById('btnHelp').classList.toggle('active', helpActive); }
+    function toggleAudio() { audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
+    function toggleVst() { document.getElementById('vstPanel').classList.toggle('show'); document.getElementById('btnVst').classList.toggle('active'); }
+
+    function buildSequence() {
+        let level = parseInt(document.getElementById('levelSelectValue').value);
+        seq = [];
+        for (let i = 0; i < 16; i++) {
+            let isRH = activeRH;
+            if (activeRH && activeLH) isRH = Math.random() > 0.5;
+            else if (activeLH) isRH = false;
+
+            let step = isRH ? (26 + Math.floor(Math.random() * 16)) : (14 + Math.floor(Math.random() * 12));
+            let noteIdx = step % 7;
+            let midi = (Math.floor(step/7) * 12) + 12 + DIATONIC_TO_MIDI[noteIdx];
+            let s = '', dur = 4;
+            if (level === 3 && Math.random() > 0.7) { if (Math.random() > 0.5) { s = '♯'; midi++; } else { s = '♭'; midi--; } }
+            if (level >= 2) { let d = Math.random(); dur = d < 0.4 ? 1 : (d < 0.8 ? 2 : 4); }
+            seq.push({ isRH, step, s, midi, dur, name: NOTE_NAMES[noteIdx], oct: Math.floor(step/7), isError: false });
+        }
+        currentNoteIndex = 0;
+    }
+
+    async function initAudio() {
+        if (audioCtx) return; audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const samples = {21:'A0', 36:'C2', 48:'C3', 60:'C4', 72:'C5', 84:'C6'};
+        for(let k in samples) { try { const r = await fetch(`https://tonejs.github.io/audio/salamander/${samples[k]}.mp3`); sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer()); } catch(e) {} }
+        if(navigator.requestMIDIAccess) { const m = await navigator.requestMIDIAccess(); m.inputs.forEach(input => input.onmidimessage = (msg) => { const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2]; if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); } else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); } }); }
+    }
+
+    function playTone(note, vel) {
+        if(!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
+        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e){} delete activeNodes[note]; }
+        const source = audioCtx.createBufferSource(); let closest = 36, minDiff = 999;
+        for(let b in sampleBuffers) { let diff = Math.abs(note-b); if(diff < minDiff){ minDiff=diff; closest=b; } }
+        source.buffer = sampleBuffers[closest]; source.playbackRate.value = Math.pow(2, (note-closest)/12);
+        const gain = audioCtx.createGain(); 
+        const v_a = parseFloat(document.getElementById('vst_a').value), v_e = parseFloat(document.getElementById('vst_e').value), v_d = parseFloat(document.getElementById('vst_d').value);
+        gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime((vel/127) * v_d, audioCtx.currentTime + v_a + 0.01); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + v_e);
+        source.connect(gain).connect(audioCtx.destination); source.start(); activeNodes[note] = { source, gain };
+    }
+
+    function handleNoteOff(midi) { if (!activeNodes[midi]) return; const v_r = parseFloat(document.getElementById('vst_r').value); const gainNode = activeNodes[midi].gain; gainNode.gain.cancelScheduledValues(audioCtx.currentTime); gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + v_r); activeNodes[midi].source.stop(audioCtx.currentTime + v_r + 0.1); delete activeNodes[midi]; }
+
+    function handleNoteOn(midi, vel = 100) {
+        playTone(midi, vel);
+        if (!isRunning || seq.length === 0) return;
+        let note = seq[currentNoteIndex];
+        if (midi === note.midi) {
+            note.isError = false; let now = performance.now();
+            if (lastHitTime > 0) { hitIntervals.push(now - lastHitTime); document.getElementById('bpm').innerText = Math.round(60000 / (now - lastHitTime)); }
+            lastHitTime = now; currentNoteIndex++;
+            if(currentNoteIndex >= 16) { if(autoNext) { buildSequence(); mistakes = 0; hitIntervals = []; lastHitTime = 0; document.getElementById('bpm').innerText = "0"; document.getElementById('mistakeCount').innerText = "0"; draw(); } else showResults(); }
+        } else { note.isError = true; mistakes++; document.getElementById('mistakeCount').innerText = mistakes; }
+        draw();
+    }
+
+    function handleMainButton() { if(!isRunning) { initAudio(); buildSequence(); isRunning = true; mistakes = 0; hitIntervals = []; lastHitTime = 0; document.getElementById('btnStart').innerText = "◼ LEÁLLÍTÁS"; document.getElementById('btnStart').classList.add('running'); draw(); } else stopPractice(); }
+    function stopPractice() { isRunning = false; document.getElementById('btnStart').innerText = "▶ INDÍTÁS"; document.getElementById('btnStart').classList.remove('running'); draw(); }
+    function showResults() {
+        let avgBpm = hitIntervals.length ? Math.round(60000 / (hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length)) : 0;
+        let accuracy = Math.round(Math.max(0, ((16-mistakes)/16)*100));
+        document.getElementById('modalBpm').innerText = avgBpm + " BPM";
+        document.getElementById('modalUni').innerText = accuracy + "%";
+        document.getElementById('modalTip').innerText = accuracy > 80 ? "Kiváló olvasási készség!" : "Gyakorold még a felismerést!";
+        document.getElementById('resultModal').style.display = 'flex'; stopPractice();
+    }
+    function closeModal() { document.getElementById('resultModal').style.display = 'none'; handleMainButton(); }
+
+    const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+    function draw() {
+        ctx.clearRect(0, 0, 2450, 480); if (!seq.length) return;
+        const startX = 180, endX = 2380, spacing = (endX - startX) / 15;
+        seq.forEach((n, i) => {
+            let targetAlpha = (isRunning && i < currentNoteIndex) ? 0.2 : (i === currentNoteIndex ? 1.0 : 0.6);
+            ctx.globalAlpha = targetAlpha;
+            let x = startX + i * spacing, y, color = (isRunning && i === currentNoteIndex) ? "#00AACC" : "#FFFFFF";
+            if (n.isError && i === currentNoteIndex) color = "#ff453a";
+            let stemUp = n.isRH ? (n.step < 34) : (n.step < 22);
+
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2;
+            if (n.isRH) {
+                y = KOTTA_E4_Y - ((n.step - 30) * KOTTA_VONALKOZ_FEL_RH);
+                for (let s=28; s>=n.step; s-=2) { let ly = KOTTA_E4_Y - ((s-30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); }
+                for (let s=40; s<=n.step; s+=2) { let ly = KOTTA_E4_Y - ((s-30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); }
+            } else {
+                y = KOTTA_G2_Y - ((n.step - 18) * KOTTA_VONALKOZ_FEL_LH);
+                for (let s=16; s>=n.step; s-=2) { let ly = KOTTA_G2_Y - ((s-18) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); }
+                for (let s=28; s<=n.step; s+=2) { let ly = KOTTA_G2_Y - ((s-18) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); }
+            }
+            ctx.restore();
+
+            if (n.s !== '') { ctx.fillStyle = color; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.font = n.s === '♭' ? '52px Arial' : '38px Arial'; ctx.fillText(n.s, x-22, y + (n.s==='♭'?8:14)); }
+            if (n.dur <= 2) { ctx.beginPath(); ctx.lineWidth = 2.5; ctx.strokeStyle = color; if(stemUp) { ctx.moveTo(x+13, y+2); ctx.lineTo(x+13, y-66); } else { ctx.moveTo(x-13, y-2); ctx.lineTo(x-13, y+66); } ctx.stroke(); }
+            ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI/10, 0, 2*Math.PI);
+            if (n.dur === 1) { ctx.fillStyle = color; ctx.fill(); } else { ctx.fillStyle = '#050508'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = color; ctx.stroke(); }
+
+            if (showNames) { ctx.save(); ctx.globalAlpha = targetAlpha; ctx.font = 'bold 20px Inter'; ctx.fillStyle = '#00AACC'; ctx.shadowColor = '#000'; ctx.shadowBlur = 4; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(n.name + n.oct, x + 28, y); ctx.restore(); }
+        });
+    }
+
+    window.onload = () => {
+        const wrap = document.getElementById('hb-wrap'); const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
+        for(let m=21; m<=108; m++) {
+            const k = document.createElement('div'); const isW = whites.includes(m%12);
+            k.id = `k-${m}`; k.className = `key-glow ${isW?'white-glow':'black-glow'}`;
+            if(isW) { k.style.left = (wIdx * 1.92307) + "%"; k.style.width = "1.92307%"; k.style.height="100%"; wIdx++; }
+            else { k.style.left = ((wIdx * 1.92307) - 0.6) + "%"; k.style.width = "1.2%"; k.style.height="65%"; k.style.zIndex="200"; }
+            k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); }; k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); }; k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
+            wrap.appendChild(k);
+        }
+    };
+</script>
+</body>
+</html>
