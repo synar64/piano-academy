@@ -4,481 +4,352 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
-    <title>Akíra Piano Academy | Workstation - Scales</title>
+    <title>Akíra Piano Academy | Workstation Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Hardver alapok */
             --rack-bg: #1a1a1d; 
             --rack-border: #2a2a2d;
             --btn-dark: #101012; 
             --btn-border: #050505;
-            --text-dim: #777; 
-            
-            /* TÉMA VÁLTOZÓK (Alap: GREEN) */
+            --text-dim: #555; 
+            --lcd-bg-dark: #111211; 
+            --lcd-label-color: #557799; 
             --theme-r: 170; --theme-g: 204; --theme-b: 170;
-            --lcd-bg-dark: #222522; 
-            --lcd-label-color: #667766; 
-            
-            --led-play: #33ff33; 
-            --led-sys: #00AACC;
+            --oled-text: #b3e6ff;
         }
-
-        body.theme-cyan { --theme-r: 136; --theme-g: 221; --theme-b: 255; --lcd-bg-dark: #182226; --lcd-label-color: #557788; --led-play: #00ffff; }
-        body.theme-amber { --theme-r: 255; --theme-g: 204; --theme-b: 102; --lcd-bg-dark: #262218; --lcd-label-color: #887755; --led-play: #ffcc00; }
-        body.theme-orange { --theme-r: 255; --theme-g: 136; --theme-b: 68; --lcd-bg-dark: #261b15; --lcd-label-color: #886655; --led-play: #ff6600; }
-        body.theme-mono { --theme-r: 221; --theme-g: 221; --theme-b: 221; --lcd-bg-dark: #222222; --lcd-label-color: #777777; --led-play: #ffffff; }
         
         body { 
             font-family: 'Inter', sans-serif; background-color: #050508;
             background-image: radial-gradient(circle at 50% 50%, #151518 0%, #050508 100%);
             margin: 0; padding: 0; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; justify-content: space-between; color: #fff;
-            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+            -webkit-user-select: none; user-select: none;
         }
 
         .lcd-text-color { color: rgb(var(--theme-r), var(--theme-g), var(--theme-b)); }
-        .lcd-shadow-effect { text-shadow: 0 0 6px rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.6); }
-        .lcd-box-shadow { box-shadow: 0 0 6px rgba(var(--theme-r), var(--theme-g), var(--theme-b), 0.6); }
-
-        /* ── FEJLÉC ── */
-        .top-nav { width: 100%; background: #0a0a0c; border-bottom: 2px solid #000; box-shadow: 0 5px 15px rgba(0,0,0,0.8); display: flex; justify-content: center; padding: 12px 0; z-index: 1000; }
-        .nav-content { width: 100%; max-width: 2450px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        .logo-svg { height: 40px; cursor: pointer; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
-
-        .main-menu { display: flex; gap: 15px; flex: 1; justify-content: center; margin: 0 40px;}
-        .sys-menu { display: flex; gap: 15px; flex: 0 0 auto; border-left: 2px solid #1a1a1d; padding-left: 20px; }
-        
-        .nav-btn { 
-            width: 120px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim);
-            border: 1px solid var(--btn-border); border-radius: 4px; cursor: pointer;
-            font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-            transition: transform 0.1s, box-shadow 0.1s; display: flex; align-items: center; justify-content: center; text-decoration: none;
-            position: relative; box-shadow: 0 3px 0 #000, 0 4px 6px rgba(0,0,0,0.5);
-        }
-        .nav-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000, 0 1px 2px rgba(0,0,0,0.4); }
-        .nav-btn.active { color: var(--text-dim); background-color: #121214; }
-        .main-menu .nav-btn.active::after { content: ''; position: absolute; top: 6px; right: 8px; width: 6px; height: 6px; border-radius: 50%; background-color: rgb(var(--theme-r), var(--theme-g), var(--theme-b)); box-shadow: 0 0 10px rgb(var(--theme-r), var(--theme-g), var(--theme-b)); }
-        .sys-menu .nav-btn.active::after { content: ''; position: absolute; top: 6px; right: 8px; width: 6px; height: 6px; border-radius: 50%; background-color: var(--led-sys); box-shadow: 0 0 10px var(--led-sys); }
-
-        /* ── A STÚDIÓ RACK PANEL ── */
-        .ui-container { width: 100%; max-width: 2450px; margin-top: 20px; z-index: 100; align-self: center; padding: 0 20px; box-sizing: border-box;}
-        
-        .master-dashboard { 
-            display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;
-            background-color: var(--rack-bg); background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 100% 3px; border: 2px solid var(--rack-border); border-radius: 8px; padding: 25px 30px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.05); position: relative;
-        }
-        .master-dashboard::before, .master-dashboard::after { content: ''; position: absolute; width: 10px; height: 10px; background: #222; border-radius: 50%; border: 1px solid #000; box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); }
-        .master-dashboard::before { top: 12px; left: 12px; } .master-dashboard::after { top: 12px; right: 12px; }
-
-        .control-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
-
-        /* HARDVER GOMBOK */
-        .hardware-btn { 
-            width: 120px; height: 42px; background-color: var(--btn-dark); color: var(--text-dim);
-            border: 1px solid var(--btn-border); border-radius: 4px; cursor: pointer;
-            font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-            transition: transform 0.1s, box-shadow 0.1s; display: flex; align-items: center; justify-content: center;
-            position: relative; box-shadow: 0 3px 0 #000, 0 5px 6px rgba(0,0,0,0.5); flex-shrink: 0;
-        }
-        .hardware-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000, 0 2px 3px rgba(0,0,0,0.4); }
-        .hardware-btn.active { color: var(--text-dim); background-color: #121214; }
-        .hardware-btn.active::after {
-            content: ''; position: absolute; top: 6px; right: 8px; width: 6px; height: 6px; border-radius: 50%;
-            background-color: rgb(var(--theme-r), var(--theme-g), var(--theme-b)); box-shadow: 0 0 10px rgb(var(--theme-r), var(--theme-g), var(--theme-b));
-        }
-
-        #btnStart { 
-            width: 150px; height: 50px; background-color: var(--btn-dark); color: var(--text-dim); 
-            border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;
-            cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; box-shadow: 0 3px 0 #000, 0 5px 8px rgba(0,0,0,0.4);
-            flex-shrink: 0; position: relative; margin-left: 10px; margin-right: 10px;
-        }
-        #btnStart:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
-        #btnStart.running::after { content: ''; position: absolute; top: 8px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--led-play); box-shadow: 0 0 12px var(--led-play); }
-
-        /* ── KÖZÖS LCD STÍLUSOK ── */
-        .lcd-base { background-color: var(--lcd-bg-dark); border: 3px solid #080808; border-radius: 2px; box-sizing: border-box; box-shadow: inset 0 3px 8px rgba(0,0,0,0.9); position: relative; overflow: hidden; }
-        .lcd-base::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36z8gAFWNgYGBkgAsgC6ALoAtgAgC5XwYCh04S9AAAAABJRU5ErkJggg=='); opacity: 0.2; pointer-events: none; z-index: 20; }
-        .lcd-label { font-size: 9px; color: var(--lcd-label-color); font-family: 'Inter', sans-serif; text-transform: uppercase; font-weight: 800; letter-spacing: 2px; margin-bottom: 2px; z-index: 2; position: relative; pointer-events: none;}
-        .lcd-text { font-family: 'Share Tech Mono', monospace; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; z-index: 2; position: relative; pointer-events: none;}
-
-        /* OSZTOTT LCD MODULOK */
-        .lcd-display-module { display: flex; align-items: center; gap: 12px; }
-        .lcd-config-panel { width: 360px; height: 50px; display: flex; flex-direction: row; align-items: stretch; }
-        .lcd-stat-panel { width: 180px; height: 42px; display: flex; flex-direction: row; align-items: stretch; }
-        
-        .lcd-half { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2; position: relative; }
-        .lcd-half.clickable { cursor: pointer; transition: background 0.1s; }
-        .lcd-half.clickable:active { background: rgba(0,0,0,0.3); }
-        .lcd-divider { width: 1px; background: rgba(255,255,255,0.1); margin: 5px 0; z-index: 2; position: relative; }
-
-        .nav-disk-btn { width: 32px; height: 32px; background: #222; border: 2px solid #111; border-radius: 50%; color: #888; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 2px rgba(0,0,0,0.6); transition: 0.1s; flex-shrink: 0; }
-        .nav-disk-btn:active { transform: translateY(2px); box-shadow: 0 0 1px rgba(0,0,0,0.6); }
-
-        /* ── INFO BAR & SETTINGS BARS ── */
-        .info-bar { width: 100%; margin: 15px auto 0 auto; height: 45px; display: none; align-items: center; gap: 15px; padding: 0 25px; }
-        .info-bar-title { color: var(--lcd-label-color); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; min-width: 90px; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 15px; z-index: 2; position: relative;}
-        .info-bar-text { flex: 1; font-family: 'Share Tech Mono', monospace; font-size: 15px; text-transform: uppercase; z-index: 2; position: relative;}
-
-        .settings-bar { width: 100%; margin: 15px auto 0 auto; height: 75px; display: none; align-items: center; justify-content: space-around; padding: 0 25px; flex-wrap: wrap; }
-        .settings-control { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 180px; z-index: 2; position: relative; }
-        .settings-control label { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-shadow: none; letter-spacing: 1px; transition: color 0.1s; }
-        .settings-control label:hover { color: #fff; }
-        .settings-control input[type="range"] { -webkit-appearance: none; width: 100%; height: 8px; background: #111; border: 1px solid #222; border-radius: 4px; outline: none; cursor: pointer; box-shadow: inset 0 1px 4px rgba(0,0,0,0.9); }
-        .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 24px; background: #888; border: 1px solid #111; border-radius: 2px; box-shadow: 0 3px 5px rgba(0,0,0,0.7); cursor: grab; background-image: linear-gradient(to right, transparent 45%, #222 45%, #222 55%, transparent 55%); margin-top: -9px; }
-
-        .theme-btn { width: 160px; height: 34px; background: #111; border: 2px solid #222; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
-
-        body.help-mode-active { cursor: help; } body.help-mode-active * { cursor: help !important; }
-
-        /* ── MODÁLIS ABLAKOK (Eredmény & Patch Browser) ── */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; text-align: center; max-width: 450px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.05); }
-        .modal-title-bar { border-bottom: 2px solid #111; padding-bottom: 15px; margin-bottom: 20px; }
-        .modal-title { color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 14px; margin: 0; }
-        
-        .modal-lcd { margin: 0 auto 20px auto; width: 100%; height: 100px; display: flex; }
-        .modal-stat-box { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2;}
-        .modal-highlight { font-size: 32px; line-height: 1.2; }
-        .modal-tip { background: #111; border-left: 4px solid var(--btn-border); padding: 15px; margin: 20px 0; text-align: left; font-size: 13px; color: #aaa; line-height: 1.5; border-radius: 0 4px 4px 0; font-family: 'Inter', sans-serif;}
-        
-        .modal-btn { background-color: var(--btn-dark); color: var(--text-dim); border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000, 0 5px 6px rgba(0,0,0,0.5); transition: 0.1s; letter-spacing: 1px;}
-        .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
-
-        /* Patch Browser Mátrix */
-        .patch-browser-content { max-width: 750px; }
-        .patch-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 25px; }
-        .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 5px; font-family: 'Share Tech Mono', monospace; font-size: 15px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: center; }
-        .patch-btn:hover { background: #222; border-color: rgb(var(--theme-r), var(--theme-g), var(--theme-b)); color: #fff; }
-        .patch-btn:active { transform: translateY(2px); }
 
         /* ── KOTTA KIJELZŐ ── */
-        .granite-base { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: auto; }
-        .sheet-viewport { width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; margin-bottom: 30px; position: relative; overflow: hidden; }
-        .sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; pointer-events: none; filter: invert(0); opacity: 0.25; }
-        #staffCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
-
-        .piano-wrapper { width: 100%; max-width: 2560px; position: relative; aspect-ratio: 2500/284; background: #000; overflow: visible; box-shadow: 0 -10px 50px rgba(0,0,0,0.9); border-top: 4px solid #111; }
-        .piano-img { width: 100%; height: 100%; display: block; pointer-events: none; filter: grayscale(100%); }
+        .sheet-container {
+            flex-grow: 1; display: flex; align-items: center; justify-content: center; 
+            padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible;
+        }
+        .sheet-viewport { 
+            width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; position: relative; overflow: visible; 
+            background: #080808; border-radius: 6px; box-shadow: inset 0 0 40px #000;
+        }
+        .sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; opacity: 0.35; pointer-events: none; }
         
+        /* A KIBŐVÍTETT VÁSZON A LEVÁGÁS ELLEN */
+        #staffCanvas { 
+            position: absolute; top: 50%; left: 0; width: 100%; height: 140%; transform: translateY(-50%);
+            z-index: 10; pointer-events: none; 
+        }
+
+        /* ── WORKSTATION CHASSIS ── */
+        .lower-section { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; margin-bottom: 0; }
+        .workstation-chassis {
+            display: flex; width: 100%; max-width: 2560px; position: relative;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0;
+        }
+        .wood-cheek {
+            width: 24px; background: linear-gradient(to right, #3a1c0d, #1a0c05);
+            box-shadow: inset 1px 0 2px rgba(255,255,255,0.1), inset -2px 0 5px rgba(0,0,0,0.8);
+            border-radius: 6px 0 0 0; z-index: 10;
+        }
+        .wood-cheek.right { border-radius: 0 6px 0 0; background: linear-gradient(to left, #3a1c0d, #1a0c05); }
+        .synth-core { flex-grow: 1; display: flex; flex-direction: column; background: var(--rack-bg); position: relative;}
+
+        /* ── INFO SÁV ── */
+        .info-bar-integrated {
+            width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808;
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+            box-shadow: inset 0 3px 10px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .info-bar-text { 
+            font-family: 'Share Tech Mono', monospace; font-size: 22px; font-weight: bold;
+            color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        /* ── BEÁLLÍTÓ SÁVOK (VISUAL / MIXER) mint OVERLAY ── */
+        .settings-bar { 
+            position: absolute; bottom: 100%; left: 0; width: 100%; height: 85px; background: var(--lcd-bg-dark); 
+            display: none; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #333; 
+            box-shadow: 0 -10px 30px #000; padding: 0 20px; box-sizing: border-box; 
+        }
+        .settings-control { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; z-index: 2; position: relative; }
+        .settings-control label { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-transform: uppercase; font-weight: bold;}
+        .settings-control input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: #111; border-radius: 3px; outline: none; cursor: pointer; box-shadow: inset 0 1px 3px #000; }
+        .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 20px; background: #888; border: 1px solid #111; border-radius: 2px; box-shadow: 0 2px 4px #000; cursor: grab; }
+        .theme-btn { width: 140px; height: 32px; background: #111; border: 2px solid #222; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.1s; color: rgb(var(--theme-r), var(--theme-g), var(--theme-b));}
+
+        /* ── MASTER DASHBOARD ── */
+        .master-dashboard { 
+            display: flex; justify-content: space-between; align-items: center;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 3px; padding: 15px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box;
+        }
+        .dashboard-logo { position: absolute; top: -35px; left: 30px; z-index: 5; pointer-events: none;}
+        .control-group { display: flex; align-items: center; gap: 8px; z-index: 10; }
+
+        /* HARDVER GOMBOK (Zéró glow, tiszta fehér aktívan) */
+        .hardware-btn { 
+            width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim);
+            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
+            font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none;
+            box-shadow: 0 3px 0 #000; transition: transform 0.1s;
+        }
+        .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .hardware-btn.active { color: #ffffff; text-shadow: none !important; }
+        #btnStart { width: 110px; font-weight: 800; font-size: 14px; letter-spacing: 1px; box-shadow: 0 4px 0 #000; margin-left: 20px;}
+        #btnStart:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
+
+        /* ── 4-RÉSZES LCD + NYILAK ── */
+        .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
+        .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px;}
+        .arrow-row { display: flex; width: 100%; justify-content: space-around; margin: 4px 0; }
+        .nav-disk-btn { width: 22px; height: 22px; background: #222; border: 1px solid #111; border-radius: 50%; color: #888; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 2px rgba(0,0,0,0.6); transition: 0.1s; flex-shrink: 0; }
+        .nav-disk-btn:active { transform: translateY(2px); box-shadow: 0 0 1px rgba(0,0,0,0.6); }
+
+        .oled-wrapper { background: #111; padding: 2px; border-radius: 4px; width: 100%; box-shadow: 0 2px 4px rgba(255,255,255,0.1); box-sizing: border-box;}
+        .oled-screen { background: var(--lcd-bg-dark); border: 2px solid #222; border-radius: 2px; display: flex; box-shadow: inset 0 3px 8px rgba(0,0,0,0.9); overflow: hidden; }
+        .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; cursor: pointer; }
+        .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
+        .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px;}
+        .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: 0 0 5px rgba(179,230,255,0.4);}
+
+        /* ── PIANO (2500/248 Egzakt Méretarány!) ── */
+        .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: hidden; border-top: 2px solid #000; }
+        .piano-inner { width: 100%; aspect-ratio: 2500/284; position: absolute; top: 0; left: 0; }
+        .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none;}
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        
-        /* ── ÚJ: Stúdió LED Szalag (15 pixellel a billentyűk fölé tolva) ── */
-        .key-led {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: rgb(var(--theme-r), var(--theme-g), var(--theme-b));
-            box-shadow: 0 0 10px rgb(var(--theme-r), var(--theme-g), var(--theme-b));
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-            z-index: 200;
-        }
-        
-        .key-glow.scale-hint .key-led {
-            opacity: 1; 
-        }
-
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; }
-        .white-glow.pressed::after { top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255, 255, 255, 0.15); box-shadow: inset 0 -10px 15px rgba(255, 255, 255, 0.3); z-index: 40; }
+
+        /* ── MODÁLIS ABLAKOK ── */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; text-align: center; max-width: 550px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.05); }
+        .modal-title { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 16px; margin-top: 0; margin-bottom: 25px; }
+        .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; transition: 0.1s; letter-spacing: 1px;}
+        .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
+        .patch-browser-content { max-width: 750px; }
+        .patch-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 25px; }
+        .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 5px; font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: center; }
+        .patch-btn:hover { background: #222; color: #fff; }
+        .patch-btn:active { transform: translateY(2px); }
+
+        body.help-mode-active { cursor: help; } body.help-mode-active * { cursor: help !important; }
     </style>
 </head>
 <body class="theme-green" onclick="initAudio()">
 
-    <div id="resultModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-title-bar">
-                <h2 class="modal-title">Scale Analysis</h2>
-            </div>
-            <div class="lcd-base modal-lcd">
-                <div class="modal-stat-box">
-                    <div class="lcd-label">Avg Tempo</div>
-                    <div id="modalBpm" class="lcd-text lcd-text-color lcd-shadow-effect modal-highlight">0 BPM</div>
-                </div>
-                <div class="lcd-divider"></div>
-                <div class="modal-stat-box">
-                    <div class="lcd-label">Stability</div>
-                    <div id="modalUni" class="lcd-text lcd-text-color lcd-shadow-effect modal-highlight">100%</div>
-                </div>
-            </div>
-            <div id="modalTip" class="modal-tip">Excellent work!</div>
-            <button class="modal-btn" onclick="closeModal()">Acknowledge</button>
-        </div>
-    </div>
-
     <div id="patchBrowserModal" class="modal-overlay">
         <div class="modal-content patch-browser-content">
-            <div class="modal-title-bar">
-                <h2 class="modal-title">SCALE PATCH BROWSER</h2>
-            </div>
-            
+            <h2 class="modal-title" style="border-bottom: 2px solid #111; padding-bottom: 15px;">SCALE BROWSER</h2>
             <div style="text-align: left; margin-bottom: 10px; color: var(--text-dim); font-size: 11px; font-weight: bold; letter-spacing: 1px;">MAJOR SCALES</div>
             <div class="patch-grid">
-                <button class="patch-btn" onclick="selectPatch('C_DUR', 'C MAJOR')">C Maj</button>
-                <button class="patch-btn" onclick="selectPatch('DB_DUR', 'DB MAJOR')">Db Maj</button>
-                <button class="patch-btn" onclick="selectPatch('D_DUR', 'D MAJOR')">D Maj</button>
-                <button class="patch-btn" onclick="selectPatch('EB_DUR', 'EB MAJOR')">Eb Maj</button>
-                <button class="patch-btn" onclick="selectPatch('E_DUR', 'E MAJOR')">E Maj</button>
-                <button class="patch-btn" onclick="selectPatch('F_DUR', 'F MAJOR')">F Maj</button>
-                <button class="patch-btn" onclick="selectPatch('FS_DUR', 'F# MAJOR')">F# Maj</button>
-                <button class="patch-btn" onclick="selectPatch('G_DUR', 'G MAJOR')">G Maj</button>
-                <button class="patch-btn" onclick="selectPatch('AB_DUR', 'AB MAJOR')">Ab Maj</button>
-                <button class="patch-btn" onclick="selectPatch('A_DUR', 'A MAJOR')">A Maj</button>
-                <button class="patch-btn" onclick="selectPatch('B_FLAT_DUR', 'BB MAJOR')">Bb Maj</button>
-                <button class="patch-btn" onclick="selectPatch('H_DUR', 'B MAJOR')">B Maj</button>
+                <button class="patch-btn" onclick="selectPatch('C_DUR', 'C MAJOR')">C Maj</button><button class="patch-btn" onclick="selectPatch('DB_DUR', 'DB MAJOR')">Db Maj</button>
+                <button class="patch-btn" onclick="selectPatch('D_DUR', 'D MAJOR')">D Maj</button><button class="patch-btn" onclick="selectPatch('EB_DUR', 'EB MAJOR')">Eb Maj</button>
+                <button class="patch-btn" onclick="selectPatch('E_DUR', 'E MAJOR')">E Maj</button><button class="patch-btn" onclick="selectPatch('F_DUR', 'F MAJOR')">F Maj</button>
+                <button class="patch-btn" onclick="selectPatch('FS_DUR', 'F# MAJOR')">F# Maj</button><button class="patch-btn" onclick="selectPatch('G_DUR', 'G MAJOR')">G Maj</button>
+                <button class="patch-btn" onclick="selectPatch('AB_DUR', 'AB MAJOR')">Ab Maj</button><button class="patch-btn" onclick="selectPatch('A_DUR', 'A MAJOR')">A Maj</button>
+                <button class="patch-btn" onclick="selectPatch('B_FLAT_DUR', 'BB MAJOR')">Bb Maj</button><button class="patch-btn" onclick="selectPatch('H_DUR', 'B MAJOR')">B Maj</button>
             </div>
-
             <div style="text-align: left; margin-bottom: 10px; color: var(--text-dim); font-size: 11px; font-weight: bold; letter-spacing: 1px;">MINOR SCALES</div>
             <div class="patch-grid" style="margin-bottom: 10px;">
-                <button class="patch-btn" onclick="selectPatch('C_MOLL', 'C MINOR')">C Min</button>
-                <button class="patch-btn" onclick="selectPatch('CS_MOLL', 'C# MINOR')">C# Min</button>
-                <button class="patch-btn" onclick="selectPatch('D_MOLL', 'D MINOR')">D Min</button>
-                <button class="patch-btn" onclick="selectPatch('EB_MOLL', 'EB MINOR')">Eb Min</button>
-                <button class="patch-btn" onclick="selectPatch('E_MOLL', 'E MINOR')">E Min</button>
-                <button class="patch-btn" onclick="selectPatch('F_MOLL', 'F MINOR')">F Min</button>
-                <button class="patch-btn" onclick="selectPatch('FS_MOLL', 'F# MINOR')">F# Min</button>
-                <button class="patch-btn" onclick="selectPatch('G_MOLL', 'G MINOR')">G Min</button>
-                <button class="patch-btn" onclick="selectPatch('GS_MOLL', 'G# MINOR')">G# Min</button>
-                <button class="patch-btn" onclick="selectPatch('A_MOLL', 'A MINOR')">A Min</button>
-                <button class="patch-btn" onclick="selectPatch('B_FLAT_MOLL', 'BB MINOR')">Bb Min</button>
-                <button class="patch-btn" onclick="selectPatch('H_MOLL', 'B MINOR')">B Min</button>
+                <button class="patch-btn" onclick="selectPatch('C_MOLL', 'C MINOR')">C Min</button><button class="patch-btn" onclick="selectPatch('CS_MOLL', 'C# MINOR')">C# Min</button>
+                <button class="patch-btn" onclick="selectPatch('D_MOLL', 'D MINOR')">D Min</button><button class="patch-btn" onclick="selectPatch('EB_MOLL', 'EB MINOR')">Eb Min</button>
+                <button class="patch-btn" onclick="selectPatch('E_MOLL', 'E MINOR')">E Min</button><button class="patch-btn" onclick="selectPatch('F_MOLL', 'F MINOR')">F Min</button>
+                <button class="patch-btn" onclick="selectPatch('FS_MOLL', 'F# MINOR')">F# Min</button><button class="patch-btn" onclick="selectPatch('G_MOLL', 'G MINOR')">G Min</button>
+                <button class="patch-btn" onclick="selectPatch('GS_MOLL', 'G# MINOR')">G# Min</button><button class="patch-btn" onclick="selectPatch('A_MOLL', 'A MINOR')">A Min</button>
+                <button class="patch-btn" onclick="selectPatch('B_FLAT_MOLL', 'BB MINOR')">Bb Min</button><button class="patch-btn" onclick="selectPatch('H_MOLL', 'B MINOR')">B Min</button>
             </div>
-
-            <button class="modal-btn" onclick="document.getElementById('patchBrowserModal').style.display='none'">CANCEL</button>
+            <button class="modal-btn" onclick="closePatchBrowser()">CANCEL</button>
         </div>
     </div>
 
-    <nav class="top-nav">
-        <div class="nav-content">
-            <div class="logo-section">
-                <a href="index.html" style="text-decoration: none; display: block;">
-                    <svg class="logo-svg" viewBox="0 0 400 95">
-                        <text x="190" y="55" fill="#555" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="end" letter-spacing="2">AK</text>
-                        <g filter="drop-shadow(0 0 3px rgba(0,0,0,0.5))">
-                            <path d="M 194 55 L 206 55 L 206 33 L 200 33 L 200 0 L 194 0 Z" fill="#888" stroke="#333" stroke-width="0.5"/>
-                        </g>
-                        <text x="210" y="55" fill="#555" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="start" letter-spacing="2">RA</text>
-                        <text x="200" y="85" fill="#444" font-family="'Inter', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="8">WORKSTATION</text>
-                    </svg>
-                </a>
-            </div>
-
-            <div class="main-menu">
-                <a href="hallasfejleszto.html" class="nav-btn" data-help="EAR TRAINING: PRACTICE RECOGNIZING INTERVALS AND CHORDS BY SOUND.">Ear Train</a>
-                <a href="kottaolvasas.html" class="nav-btn" data-help="SIGHT READ: PRACTICE READING AND PLAYING INDIVIDUAL NOTES QUICKLY.">Sight Read</a>
-                <a href="akkordok.html" class="nav-btn" data-help="CHORDS: LEARN CHORD STRUCTURES, INVERSIONS, AND FUNCTIONAL HARMONY.">Chords</a>
-                <a href="skalak.html" class="nav-btn active" data-help="SCALES: MASTER MUSICAL SCALES AND PROPER FINGERINGS IN ALL KEYS.">Scales</a>
-                <a href="hanon.html" class="nav-btn" data-help="HANON: VIRTUOSO FINGER EXERCISES TO BUILD STRENGTH AND DEXTERITY.">Hanon</a>
-                <a href="ritmus.html" class="nav-btn" data-help="RHYTHM: DEVELOP PRECISE TIMING AND COMPLEX RHYTHM PATTERNS.">Rhythm</a>
-            </div>
-
-            <div class="sys-menu">
-                <button id="btnVisual" class="nav-btn" onclick="if(!helpActive) toggleVisual()" data-help="VISUAL PANEL: ADJUST DISPLAY THEME, BACKLIGHT AND CONTRAST.">Visual</button>
-                <button id="btnFullscreen" class="nav-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN: HIDE THE BROWSER UI FOR AN IMMERSIVE STUDIO EXPERIENCE.">Fullscreen</button>
-                <button id="btnHelp" class="nav-btn" onclick="toggleHelp()" data-help="HELP MODE: CLICK ANY ELEMENT TO READ INFO. CLICK HELP AGAIN TO EXIT.">Help</button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="ui-container">
-        <div class="master-dashboard">
-            
-            <div class="control-group">
-                <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP: TOGGLES SEQUENCE GENERATION FOR THE TREBLE CLEF.">Top</button>
-                <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM: TOGGLES SEQUENCE GENERATION FOR THE BASS CLEF.">Bottom</button>
-                <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: DISPLAYS NOTE NAMES AND ACTIVATES THE LIGHT GUIDE LEDS ON THE KEYBOARD.">Hints</button>
-                <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: DISPLAYS THE OFFICIAL SCALE FINGERING ON THE SHEET.">Fingers</button>
-            </div>
-
-            <div class="control-group">
-                <div class="lcd-display-module">
-                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode()" data-help="MODE SELECTOR: SWITCHES BETWEEN SPRINT, MARATHON, OR TRAINING.">◀</button>
-                    <div class="lcd-base lcd-config-panel">
-                        <div class="lcd-half clickable" id="modeSelector" onclick="if(!helpActive) cycleMode()" data-help="MODE: SPRINT (1X), MARATHON (3X) OR TRAINING (INFINITE LOOP).">
-                            <div class="lcd-label">Mode</div>
-                            <div class="lcd-text lcd-text-color lcd-shadow-effect" id="lcdModeText">SPRINT</div>
-                        </div>
-                        
-                        <div class="lcd-divider"></div>
-                        
-                        <div class="lcd-half clickable" style="flex: 1.5;" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE PATCH: OPENS THE BROWSER TO SELECT THE TARGET SCALE.">
-                            <div class="lcd-label">Scale</div>
-                            <div class="lcd-text lcd-text-color lcd-shadow-effect" id="lcdScaleText">C MAJOR</div>
-                        </div>
-                        <input type="hidden" id="scaleSelectValue" value="C_DUR">
-
-                        <div class="lcd-divider"></div>
-                        
-                        <div class="lcd-half clickable" id="octaveSelector" onclick="if(!helpActive) cycleOctave()" data-help="OCTAVE: SWITCHES BETWEEN 1 OR 2 OCTAVE SCALE RUNS.">
-                            <div class="lcd-label">Octave</div>
-                            <div class="lcd-text lcd-text-color lcd-shadow-effect" id="lcdOctaveText">1 OCT</div>
-                        </div>
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">SESSION COMPLETE</h2>
+            <div class="oled-wrapper" style="margin: 0 auto 20px auto; width: 350px; display: block;">
+                <div class="oled-screen" style="padding: 15px; display: flex; justify-content: space-around;">
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="oled-header">AVG TEMPO</div>
+                        <div id="modalBpm" class="oled-main" style="font-size: 24px;">0 BPM</div>
                     </div>
-                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave()" data-help="OCTAVE SELECTOR: TOGGLES 1 OR 2 OCTAVE RANGES.">▶</button>
-                </div>
-                
-                <button id="btnStart" onclick="if(!helpActive) handleMainButton()" data-help="START | STOP: ENGAGES THE SEQUENCE GENERATOR OR STOPS THE SESSION.">START | STOP</button>
-            </div>
-
-            <div class="control-group">
-                <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLES THE INTERNAL WEB AUDIO SYNTHESIZER.">Piano</button>
-                <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER PANEL: OPENS THE LCD SLIDERS TO ADJUST THE ADSR SOUND ENVELOPE AND REVERB.">Mixer</button>
-                
-                <div class="lcd-base lcd-stat-panel" data-help="METRICS: DISPLAYS REAL-TIME TEMPO (BPM) AND TIMING STABILITY.">
-                    <div class="lcd-half">
-                        <div class="lcd-label">BPM</div>
-                        <div class="lcd-text lcd-text-color lcd-shadow-effect" id="statBpm" style="font-size: 14px;">0</div>
-                    </div>
-                    <div class="lcd-divider"></div>
-                    <div class="lcd-half">
-                        <div class="lcd-label">Stability</div>
-                        <div class="lcd-text lcd-text-color lcd-shadow-effect" id="statUni" style="font-size: 14px;">100%</div>
+                    <div class="oled-divider"></div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="oled-header">STABILITY</div>
+                        <div id="modalUni" class="oled-main" style="font-size: 24px;">100%</div>
                     </div>
                 </div>
             </div>
-            
-        </div>
-
-        <div id="infoBar" class="lcd-base info-bar">
-            <div class="info-bar-title">INFO</div>
-            <div id="infoBarText" class="info-bar-text lcd-text-color lcd-shadow-effect">SELECT ANY ELEMENT TO VIEW ITS FUNCTION.</div>
-        </div>
-
-        <div id="mixerBar" class="lcd-base settings-bar">
-            <div class="settings-control" data-help="ATTACK: CONTROLS HOW QUICKLY THE SOUND REACHES MAXIMUM VOLUME.">
-                <label>Attack</label>
-                <input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.01">
-            </div>
-            <div class="settings-control" data-help="DECAY: CONTROLS HOW QUICKLY THE SOUND DROPS TO THE SUSTAIN LEVEL.">
-                <label>Decay</label>
-                <input type="range" id="vst_e" min="1" max="10" step="0.1" value="10.0">
-            </div>
-            <div class="settings-control" data-help="RELEASE: CONTROLS HOW QUICKLY THE SOUND FADES AFTER THE KEY IS RELEASED.">
-                <label>Release</label>
-                <input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.8">
-            </div>
-            <div class="settings-control" data-help="VELOCITY: OVERALL OUTPUT VOLUME OR STRENGTH OF THE SYNTHESIZER.">
-                <label>Velocity</label>
-                <input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0">
-            </div>
-            <div class="settings-control" data-help="REVERB: CONTROLS THE AMOUNT OF ROOM ECHO/REVERBERATION.">
-                <label>Reverb</label>
-                <input type="range" id="vst_rev" min="0" max="1" step="0.05" value="0">
-            </div>
-            <div class="settings-control" data-help="STEREO WIDE: CONTROLS THE STEREO SPREAD OF THE KEYBOARD.">
-                <label>Stereo Wide</label>
-                <input type="range" id="vst_wide" min="0" max="1" step="0.05" value="0">
-            </div>
-        </div>
-
-        <div id="visualBar" class="lcd-base settings-bar">
-            <div class="settings-control" data-help="THEME SELECTOR: CHANGES THE GLOBAL COLOR SCHEME OF ALL LCD SCREENS.">
-                <button class="theme-btn lcd-text-color lcd-box-shadow" id="btnTheme" onclick="cycleTheme()">THEME: GREEN</button>
-            </div>
-            <div style="width:1px; height: 40px; background: rgba(255, 255, 255, 0.1); z-index:2;"></div>
-            <div class="settings-control" data-help="BACKLIGHT: INVERTS AND ILLUMINATES THE SHEET MUSIC DISPLAY.">
-                <label onclick="document.getElementById('vis_backlight').value=0; draw();">Backlight</label>
-                <input type="range" id="vis_backlight" min="0" max="1" step="0.05" value="0" oninput="draw()">
-            </div>
-            <div class="settings-control" data-help="STAFF LINES: ADJUST THE INTENSITY OF THE MUSICAL STAFF FROM BLACK TO BRIGHT.">
-                <label onclick="document.getElementById('vis_staff').value=0.25; draw();">Staff Lines</label>
-                <input type="range" id="vis_staff" min="0" max="1" step="0.05" value="0.25" oninput="draw()">
-            </div>
-            <div class="settings-control" data-help="NOTES CONTRAST: ADJUST THE BRIGHTNESS/OPACITY OF THE ACTIVE SHEET MUSIC NOTES.">
-                <label onclick="document.getElementById('vis_notes').value=1.0; draw();">Notes Intensity</label>
-                <input type="range" id="vis_notes" min="0.1" max="1.0" step="0.05" value="1.0" oninput="draw()">
-            </div>
+            <div id="modalTip" style="color: #888; font-size: 13px; margin-bottom: 25px; font-family: 'Inter', sans-serif;">Excellent work!</div>
+            <button class="modal-btn" onclick="closeModal()">ACKNOWLEDGE</button>
         </div>
     </div>
 
-    <div class="granite-base">
+    <div class="sheet-container">
         <div id="sheetViewport" class="sheet-viewport">
             <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
-            <canvas id="staffCanvas" width="2450" height="480"></canvas>
+            <canvas id="staffCanvas" width="2450" height="680"></canvas>
         </div>
-        <div class="piano-wrapper">
-            <img src="grandpiano-keys.png" class="piano-img">
-            <div id="hb-wrap" class="hitbox-layer"></div>
+    </div>
+
+    <div class="lower-section">
+        <div class="workstation-chassis">
+            <div class="wood-cheek"></div>
+            <div class="synth-core">
+                
+                <div id="mixerBar" class="settings-bar">
+                    <div class="settings-control" data-help="ATTACK: ENVELOPE CONTROL"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.01"></div>
+                    <div class="settings-control" data-help="DECAY: ENVELOPE CONTROL"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="10.0"></div>
+                    <div class="settings-control" data-help="RELEASE: ENVELOPE CONTROL"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.8"></div>
+                    <div class="settings-control" data-help="VELOCITY: GLOBAL VOLUME"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
+                    <div class="settings-control" data-help="REVERB: ROOM ECHO"><label>Reverb</label><input type="range" id="vst_rev" min="0" max="1" step="0.05" value="0"></div>
+                    <div class="settings-control" data-help="STEREO: PANNING"><label>Stereo Wide</label><input type="range" id="vst_wide" min="0" max="1" step="0.05" value="0"></div>
+                </div>
+
+                <div id="visualBar" class="settings-bar">
+                    <div class="settings-control" data-help="THEME SELECTOR"><button class="theme-btn" id="btnTheme" onclick="cycleTheme()">THEME: GREEN</button></div>
+                    <div style="width:1px; height: 40px; background: rgba(255, 255, 255, 0.1); z-index:2;"></div>
+                    <div class="settings-control" data-help="BACKLIGHT"><label onclick="document.getElementById('vis_backlight').value=0; draw();">Backlight</label><input type="range" id="vis_backlight" min="0" max="1" step="0.05" value="0" oninput="draw()"></div>
+                    <div class="settings-control" data-help="STAFF LINES"><label onclick="document.getElementById('vis_staff').value=0.25; draw();">Staff Lines</label><input type="range" id="vis_staff" min="0" max="1" step="0.05" value="0.25" oninput="draw()"></div>
+                    <div class="settings-control" data-help="NOTES CONTRAST"><label onclick="document.getElementById('vis_notes').value=1.0; draw();">Notes Intensity</label><input type="range" id="vis_notes" min="0.1" max="1.0" step="0.05" value="1.0" oninput="draw()"></div>
+                </div>
+
+                <div id="infoBar" class="info-bar-integrated">
+                    <div id="infoBarText" class="info-bar-text">SYSTEM READY - SELECT SCALE OR PRESS START ▼</div>
+                </div>
+
+                <div class="master-dashboard">
+                    <div class="dashboard-logo">
+                        <svg viewBox="0 0 300 40" style="height: 25px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8));">
+                            <text x="60" y="30" fill="#666" font-family="'Inter', sans-serif" font-weight="800" font-size="32" text-anchor="end">AK</text>
+                            <path d="M 64 30 L 72 30 L 72 12 L 68 12 L 68 0 L 64 0 Z" fill="#555"/>
+                            <text x="76" y="30" fill="#666" font-family="'Inter', sans-serif" font-weight="800" font-size="32" text-anchor="start">RA</text>
+                            <text x="135" y="28" fill="#444" font-family="'Inter', sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
+                        </svg>
+                    </div>
+
+                    <div class="control-group">
+                        <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
+                        <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP CLEF: TOGGLE RIGHT HAND">Top</button>
+                        <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM CLEF: TOGGLE LEFT HAND">Bottom</button>
+                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: SHOW NOTE NAMES">Hints</button>
+                        <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: SHOW FINGERINGS">Fingers</button>
+                    </div>
+
+                    <div class="center-console">
+                        <div class="lcd-arrow-wrapper">
+                            <div class="arrow-row">
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button></div>
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button></div>
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(-1)">▲</button></div>
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(1)">▲</button></div>
+                            </div>
+                            
+                            <div class="oled-wrapper">
+                                <div class="oled-screen">
+                                    <div class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO LOAD">
+                                        <div class="oled-header">Module</div><div class="oled-main" id="lcdModuleText">SCALES</div>
+                                    </div>
+                                    <div class="oled-divider"></div>
+                                    <div class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT, MARATHON">
+                                        <div class="oled-header">Mode</div><div class="oled-main" id="lcdModeText">SPRINT</div>
+                                    </div>
+                                    <div class="oled-divider"></div>
+                                    <div class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE: CLICK TO BROWSE">
+                                        <div class="oled-header">Scale</div><div class="oled-main" id="lcdScaleText">C MAJOR</div>
+                                    </div>
+                                    <div class="oled-divider"></div>
+                                    <div class="oled-section" onclick="if(!helpActive) cycleOctave(1)" data-help="OCTAVE: 1 OR 2 OCTAVES">
+                                        <div class="oled-header">Octave</div><div class="oled-main" id="lcdOctaveText">1 OCT</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="scaleSelectValue" value="C_DUR">
+
+                            <div class="arrow-row">
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button></div>
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button></div>
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(1)">▼</button></div>
+                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(-1)">▼</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP THE SEQUENCE">START</button>
+                        <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO">Piano</button>
+                        <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER: OPEN ADSR PANEL">Mixer</button>
+                        <button id="btnVisual" class="hardware-btn" onclick="if(!helpActive) toggleVisual()" data-help="VISUAL: OPEN THEME PANEL">Visual</button>
+                        <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE">Fullscr</button>
+                        <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: TOGGLE INFO MODE">Help</button>
+                    </div>
+                </div>
+
+                <div class="piano-crop-wrapper">
+                    <div class="piano-inner">
+                        <img src="grandpiano-keys.png" class="piano-img">
+                        <div id="hb-wrap" class="hitbox-layer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="wood-cheek right"></div>
         </div>
     </div>
 
 <script>
-    // --- SÚGÓ (HELP MODE) LOGIKA ---
+    function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.log(err)); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
+
     let helpActive = false;
     function toggleHelp() { 
         helpActive = !helpActive; 
         const btnHelp = document.getElementById('btnHelp');
-        btnHelp.classList.toggle('active', helpActive); 
-        const infoBar = document.getElementById('infoBar');
-        
         if (helpActive) {
-            if(document.getElementById('visualBar').style.display === 'flex') toggleVisual();
-            if(document.getElementById('mixerBar').style.display === 'flex') toggleVst();
-            document.body.classList.add('help-mode-active');
-            document.getElementById('infoBarText').style.textAlign = 'right';
-            document.getElementById('infoBarText').innerHTML = btnHelp.dataset.help;
-            infoBar.style.display = 'flex';
+            btnHelp.classList.add('active');
+            document.body.style.cursor = 'help';
+            document.getElementById('infoBarText').innerHTML = "CLICK ON ANY BUTTON TO SEE ITS FUNCTIONALITY";
         } else {
-            document.body.classList.remove('help-mode-active');
-            infoBar.style.display = 'none';
+            btnHelp.classList.remove('active');
+            document.body.style.cursor = 'default';
+            document.getElementById('infoBarText').innerHTML = "SYSTEM READY - SELECT SCALE OR PRESS START ▼";
         }
     }
 
     document.addEventListener('click', (e) => {
         if (e.target.closest('#btnHelp')) return; 
-        if (document.body.classList.contains('help-mode-active')) {
+        if (helpActive) {
             e.preventDefault(); e.stopPropagation();
             const target = e.target.closest('[data-help]');
-            if (target) {
-                const infoBarText = document.getElementById('infoBarText');
-                infoBarText.innerHTML = target.dataset.help;
-                
-                const rect = target.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                if (centerX < window.innerWidth * 0.35) infoBarText.style.textAlign = 'left';
-                else if (centerX > window.innerWidth * 0.65) infoBarText.style.textAlign = 'right';
-                else infoBarText.style.textAlign = 'center';
-            }
+            if (target) { document.getElementById('infoBarText').innerHTML = target.dataset.help; }
         }
     }, true);
 
-    // --- PATCH BROWSER LOGIKA ---
-    function openPatchBrowser() {
-        document.getElementById('patchBrowserModal').style.display = 'flex';
+    function openPatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'flex'; }
+    function closePatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'none'; }
+
+    const modules = [
+        {name: 'EAR TRAIN', url: 'hallasfejleszto.html'},
+        {name: 'SIGHT READ', url: 'kottaolvasas.html'},
+        {name: 'CHORDS', url: 'akkordok.html'},
+        {name: 'SCALES', url: 'skalak.html'},
+        {name: 'HANON', url: 'hanon.html'},
+        {name: 'RHYTHM', url: 'ritmus.html'}
+    ];
+    let currentModuleIdx = 3; 
+    function cycleModule(dir) {
+        if (helpActive) return;
+        currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length;
+        document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name;
     }
-    
-    function closePatchBrowser() {
-        document.getElementById('patchBrowserModal').style.display = 'none';
+    function loadModule() {
+        if (helpActive) return;
+        if (currentModuleIdx !== 3) window.location.href = modules[currentModuleIdx].url;
     }
 
-    function selectPatch(val, name) {
-        document.getElementById('lcdScaleText').innerText = name;
-        document.getElementById('scaleSelectValue').value = val;
-        closePatchBrowser();
-        if(isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    // --- TÉMÁK ÉS PANELEK ---
-    const THEMES = ['green', 'cyan', 'amber', 'orange', 'mono'];
-    let currentThemeIdx = 0;
-    function cycleTheme() { if (helpActive) return; currentThemeIdx = (currentThemeIdx + 1) % THEMES.length; document.body.className = `theme-${THEMES[currentThemeIdx]}`; document.getElementById('btnTheme').innerText = `THEME: ${THEMES[currentThemeIdx].toUpperCase()}`; draw(); }
-    
-    function toggleVisual() { if (helpActive) return; document.getElementById('visualBar').style.display = document.getElementById('visualBar').style.display === 'flex' ? 'none' : 'flex'; document.getElementById('btnVisual').classList.toggle('active'); if(document.getElementById('visualBar').style.display === 'flex') { document.getElementById('mixerBar').style.display = 'none'; document.getElementById('btnVst').classList.remove('active'); } }
-    function toggleVst() { if (helpActive) return; document.getElementById('mixerBar').style.display = document.getElementById('mixerBar').style.display === 'flex' ? 'none' : 'flex'; document.getElementById('btnVst').classList.toggle('active'); if(document.getElementById('mixerBar').style.display === 'flex') { document.getElementById('visualBar').style.display = 'none'; document.getElementById('btnVisual').classList.remove('active'); } }
-    function toggleFullScreen() { if (helpActive) return; if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.log(err)); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
-    document.addEventListener('fullscreenchange', () => { document.getElementById('btnFullscreen').classList.toggle('active', !!document.fullscreenElement); });
-
-    // --- SKÁLA LOGIKA ÉS ÁLLAPOTOK ---
     const scaleDefs = {
         'C_DUR': { midi:[0,2,4,5,7,9,11,12], n:['C','D','E','F','G','A','H','C'], s:['','','','','','','',''] },
         'DB_DUR': { midi:[1,3,5,6,8,10,12,13], n:['D','E','F','G','A','H','C','D'], s:['♭','♭','','♭','♭','♭','','♭'] },
@@ -515,19 +386,59 @@
         }
     };
 
+    const scaleOrder = Object.keys(scaleDefs).map(k => ({ v: k, n: k.replace('_', ' ') }));
+    let currentScaleIdx = 0;
+
+    function cycleScale(dir) {
+        if (helpActive) return;
+        currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length;
+        let s = scaleOrder[currentScaleIdx];
+        document.getElementById('lcdScaleText').innerText = s.n;
+        document.getElementById('scaleSelectValue').value = s.v;
+        if(isRunning) stopPractice(); buildSequence(); draw();
+    }
+
+    function selectPatch(val, name) {
+        currentScaleIdx = scaleOrder.findIndex(s => s.v === val);
+        document.getElementById('lcdScaleText').innerText = name;
+        document.getElementById('scaleSelectValue').value = val;
+        closePatchBrowser();
+        if(isRunning) stopPractice(); buildSequence(); draw();
+    }
+
+    const THEMES = ['green', 'cyan', 'amber', 'orange', 'mono'];
+    let currentThemeIdx = 0;
+    function cycleTheme() { if (helpActive) return; currentThemeIdx = (currentThemeIdx + 1) % THEMES.length; document.body.className = `theme-${THEMES[currentThemeIdx]}`; document.getElementById('btnTheme').innerText = `THEME: ${THEMES[currentThemeIdx].toUpperCase()}`; draw(); }
+    
+    function toggleVisual() { 
+        if (helpActive) return; 
+        let vb = document.getElementById('visualBar');
+        if(vb.style.display === 'flex') {
+            vb.style.display = 'none'; document.getElementById('btnVisual').classList.remove('active');
+        } else {
+            vb.style.display = 'flex'; document.getElementById('btnVisual').classList.add('active');
+            document.getElementById('mixerBar').style.display = 'none'; document.getElementById('btnVst').classList.remove('active');
+        }
+    }
+    
+    function toggleVst() { 
+        if (helpActive) return; 
+        let mb = document.getElementById('mixerBar');
+        if(mb.style.display === 'flex') {
+            mb.style.display = 'none'; document.getElementById('btnVst').classList.remove('active');
+        } else {
+            mb.style.display = 'flex'; document.getElementById('btnVst').classList.add('active');
+            document.getElementById('visualBar').style.display = 'none'; document.getElementById('btnVisual').classList.remove('active');
+        }
+    }
+
     let isRunning = false, activeRH = true, activeLH = true, currentNoteInBlock = 0;
-    
     const MODES = ['SPRINT', 'MARATHON', 'TRAINING'];
-    let currentModeIdx = 0;
-    
-    let selectedOctaves = 1;
+    let currentModeIdx = 0, selectedOctaves = 1;
     let showNames = false, showFinger = false;
     let rhHit = false, lhHit = false, seqBlocks = [];
     let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
-
-    // Statisztika
-    let lastHitTime = 0, hitIntervals = [];
-    let fingerTimes = {1:[], 2:[], 3:[], 4:[], 5:[]};
+    let lastHitTime = 0, hitIntervals = [], fingerTimes = {1:[], 2:[], 3:[], 4:[], 5:[]};
 
     function updateKeyboardHints() {
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('scale-hint'));
@@ -544,14 +455,14 @@
         }
     }
 
-    function cycleMode() {
+    function cycleMode(dir) {
         if (helpActive) return;
-        currentModeIdx = (currentModeIdx + 1) % MODES.length;
+        currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length;
         document.getElementById('lcdModeText').innerText = MODES[currentModeIdx];
         if(isRunning) stopPractice(); buildSequence(); draw();
     }
 
-    function cycleOctave() {
+    function cycleOctave(dir) {
         if (helpActive) return;
         selectedOctaves = selectedOctaves === 1 ? 2 : 1;
         document.getElementById('lcdOctaveText').innerText = selectedOctaves + " OCT";
@@ -581,20 +492,37 @@
         draw(); 
     }
     
-    function toggleAudio() { if (helpActive) return; audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
+    function toggleAudio() { 
+        if (helpActive) return; 
+        audioOn = !audioOn; 
+        document.getElementById('audioToggle').classList.toggle('active', audioOn); 
+        if(audioOn && !audioCtx) initAudio(); 
+    }
 
     const KOTTA_E4_Y = 187.6; const KOTTA_VONALKOZ_FEL_RH = 11.14; 
     let KOTTA_G2_Y = 417; let KOTTA_VONALKOZ_FEL_LH = 10.71; 
+    const NOTE_LETTER_STEP = {'C':0,'D':1,'E':2,'F':3,'G':4,'A':5,'H':6};
+
+    function midiToStaffStep(midiNote, clef) {
+        const WHITE_KEY_MAP = [0,0,1,1,2,3,3,4,4,5,5,6]; 
+        let semitone = midiNote % 12;
+        let octave = Math.floor(midiNote / 12) - 1; 
+        let diatonicInOctave = WHITE_KEY_MAP[semitone];
+        let absoluteDiatonic = octave * 7 + diatonicInOctave;
+        if (clef === 'treble') return absoluteDiatonic + 2;  
+        else                   return absoluteDiatonic - 3;  
+    }
 
     function generateScaleNotes(key) {
         let def = scaleDefs[key] || scaleDefs['C_DUR'];
-        const noteSteps = {'C':0,'D':1,'E':2,'F':3,'G':4,'A':5,'H':6};
-        let startStepRH = 28 + noteSteps[def.n[0]];
-        let startStepLH = 21 + noteSteps[def.n[0]];
         let rh=[], lh=[];
+        let rhBase = (60 + def.midi[0] > 64) ? 48 : 60;
+        let lhBase = (48 + def.midi[0] > 52) ? 36 : 48;
         for(let i=0; i<def.midi.length; i++) {
-            rh.push({ n: def.n[i], s: def.s[i], midi: 60+def.midi[i], step: startStepRH+i });
-            lh.push({ n: def.n[i], s: def.s[i], midi: 48+def.midi[i], step: startStepLH+i });
+            let midiRH = rhBase + def.midi[i];
+            let midiLH = lhBase + def.midi[i];
+            rh.push({ n: def.n[i], s: def.s[i], midi: midiRH, step: midiToStaffStep(midiRH, 'treble') });
+            lh.push({ n: def.n[i], s: def.s[i], midi: midiLH, step: midiToStaffStep(midiLH, 'bass') });
         }
         return { rh, lh };
     }
@@ -629,7 +557,10 @@
     }
 
     async function initAudio() {
-        if (audioCtx) return;
+        if (audioCtx) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            return;
+        }
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const notes = {21:'A0', 36:'C2', 48:'C3', 60:'C4', 72:'C5', 84:'C6'};
         for(let k in notes) {
@@ -650,6 +581,7 @@
 
     function playTone(note, vel) {
         if(!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
+        if(audioCtx.state === 'suspended') audioCtx.resume();
         if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e){} delete activeNodes[note]; }
         const source = audioCtx.createBufferSource();
         let closest = 36, minDiff = 999;
@@ -658,9 +590,9 @@
         source.playbackRate.value = Math.pow(2, (note-closest)/12);
         
         const gain = audioCtx.createGain(); 
-        const v_a = parseFloat(document.getElementById('vst_a').value);
-        const v_e = parseFloat(document.getElementById('vst_e').value);
-        const v_d = parseFloat(document.getElementById('vst_d').value);
+        const v_a = parseFloat(document.getElementById('vst_a').value) || 0.01;
+        const v_e = parseFloat(document.getElementById('vst_e').value) || 10.0;
+        const v_d = parseFloat(document.getElementById('vst_d').value) || 1.0;
         
         gain.gain.setValueAtTime(0, audioCtx.currentTime);
         gain.gain.linearRampToValueAtTime((vel/127) * v_d, audioCtx.currentTime + v_a + 0.01);
@@ -671,7 +603,7 @@
 
     function handleNoteOff(midi) {
         if (!activeNodes[midi]) return;
-        const v_r = parseFloat(document.getElementById('vst_r').value);
+        const v_r = parseFloat(document.getElementById('vst_r').value) || 0.8;
         const gainNode = activeNodes[midi].gain;
         gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
         gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
@@ -685,9 +617,8 @@
         if(!isRunning) { 
             initAudio(); buildSequence(); isRunning=true; 
             document.getElementById('btnStart').classList.add('running'); 
+            document.getElementById('btnStart').innerText = 'STOP';
             lastHitTime = 0; hitIntervals = []; fingerTimes = {1:[], 2:[], 3:[], 4:[], 5:[]};
-            document.getElementById('statBpm').innerText = "0";
-            document.getElementById('statUni').innerText = "100%";
             draw(); 
         } 
         else stopPractice();
@@ -696,33 +627,22 @@
     function stopPractice() {
         isRunning=false; currentNoteInBlock=0; currentBlockIndex=0;
         document.getElementById('btnStart').classList.remove('running');
+        document.getElementById('btnStart').innerText = 'START';
         draw();
     }
 
     function showResults() {
         isRunning = false; document.getElementById('btnStart').classList.remove('running');
+        document.getElementById('btnStart').innerText = 'START';
         if (hitIntervals.length === 0) { stopPractice(); return; }
 
         let avgDiff = hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
         let avgBpm = Math.round(60000 / avgDiff);
-        let finalUniformity = document.getElementById('statUni').innerText;
-
-        let weakestFinger = 0; let maxAvgTime = 0;
-        for (let f = 1; f <= 5; f++) {
-            if (fingerTimes[f].length > 0) {
-                let avg = fingerTimes[f].reduce((a,b)=>a+b)/fingerTimes[f].length;
-                if (avg > maxAvgTime) { maxAvgTime = avg; weakestFinger = f; }
-            }
-        }
-
-        const fingerNames = ["", "Thumb (1)", "Index (2)", "Middle (3)", "Ring (4)", "Pinky (5)"];
-        let tipText = "Excellent work! Your finger movement was highly consistent across the scale.";
-        if (weakestFinger > 0) { tipText = `The data shows your <b>${fingerNames[weakestFinger]}</b> was the slowest during the scale run. This is often due to hand positioning changes (passing under or over). Try to keep your wrist relaxed and movement fluid!`; }
+        let dev = Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avgDiff,2),0)/hitIntervals.length);
+        let uniformity = Math.round(Math.max(0, 100-(dev/3))) + '%';
 
         document.getElementById('modalBpm').innerText = avgBpm + " BPM";
-        document.getElementById('modalUni').innerText = finalUniformity;
-        document.getElementById('modalTip').innerHTML = tipText;
-
+        document.getElementById('modalUni').innerText = uniformity;
         document.getElementById('resultModal').style.display = 'flex';
         draw();
     }
@@ -751,14 +671,6 @@
                 let currentF_rh = parseInt(note.f_rh); let currentF_lh = parseInt(note.f_lh);
                 if (activeRH && !isNaN(currentF_rh)) fingerTimes[currentF_rh].push(diff);
                 if (activeLH && !isNaN(currentF_lh)) fingerTimes[currentF_lh].push(diff);
-
-                let currentBpm = Math.round(60000 / diff);
-                document.getElementById('statBpm').innerText = currentBpm;
-                
-                let avg = hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
-                let dev = Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avg,2),0)/hitIntervals.length);
-                let uniformity = Math.round(Math.max(0, 100-(dev/3)));
-                document.getElementById('statUni').innerText = uniformity + '%';
             }
             lastHitTime = now;
 
@@ -778,24 +690,15 @@
 
     const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
     function draw() {
-        ctx.clearRect(0, 0, 2450, 480);
-        
-        let backlight = parseFloat(document.getElementById('vis_backlight').value) || 0;
-        let staffOp = parseFloat(document.getElementById('vis_staff').value) || 0.25;
-        let notesOp = parseFloat(document.getElementById('vis_notes').value) || 1.0;
-        
-        let sheetImg = document.getElementById('sheetBg');
-        sheetImg.style.filter = `invert(${backlight})`;
-        sheetImg.style.opacity = staffOp + (backlight * 0.2); 
+        ctx.clearRect(0, 0, 2450, 680); 
+        ctx.save();
+        ctx.translate(0, 100); 
 
-        if (seqBlocks.length === 0) return;
+        if (seqBlocks.length === 0) { ctx.restore(); return; }
         
         let tc = getThemeColor();
-        let noteR = Math.round(tc.r * (1 - backlight) + 10 * backlight);
-        let noteG = Math.round(tc.g * (1 - backlight) + 20 * backlight);
-        let noteB = Math.round(tc.b * (1 - backlight) + 10 * backlight);
-        const activeColor = `rgba(${noteR}, ${noteG}, ${noteB}, ${notesOp})`;
-        const inactiveColor = `rgba(${noteR}, ${noteG}, ${noteB}, ${notesOp * 0.3})`;
+        let activeColor = `rgba(${tc.r}, ${tc.g}, ${tc.b}, 1.0)`;
+        let inactiveColor = `rgba(${tc.r}, ${tc.g}, ${tc.b}, 0.3)`;
         
         let block = seqBlocks[currentBlockIndex];
         let totalNotes = block.length; 
@@ -809,13 +712,13 @@
             let x = startX + (i * spacingX); 
             
             if (activeRH) {
-                let y = KOTTA_E4_Y - ((n.step_rh-30) * KOTTA_VONALKOZ_FEL_RH);
-                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = (backlight > 0.5) ? 0 : 5; ctx.shadowColor = color;
-                if (n.step_rh <= 28) { for (let s=28; s>=n.step_rh; s-=2) { let ly = KOTTA_E4_Y - ((s-30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                if (n.step_rh >= 40) { for (let s=40; s<=n.step_rh; s+=2) { let ly = KOTTA_E4_Y - ((s-30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                let y = KOTTA_E4_Y - ((n.step_rh - 32) * KOTTA_VONALKOZ_FEL_RH);
+                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 5; ctx.shadowColor = color;
+                if (n.step_rh <= 30) { for (let s=30; s>=n.step_rh; s-=2) { let ly = KOTTA_E4_Y - ((s-32) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                if (n.step_rh >= 42) { for (let s=42; s<=n.step_rh; s+=2) { let ly = KOTTA_E4_Y - ((s-32) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
                 ctx.restore();
 
-                ctx.fillStyle = color; ctx.shadowBlur = (backlight > 0.5) ? 0 : 4; ctx.shadowColor = color;
+                ctx.fillStyle = color; ctx.shadowBlur = 4; ctx.shadowColor = color;
                 if (n.s !== '') { 
                     ctx.textAlign = 'center'; 
                     if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
@@ -824,29 +727,20 @@
                 ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
                 
                 if (showNames || showFinger) { 
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.shadowBlur = 0;
-                    if(showNames) { 
-                        ctx.font = 'bold 20px Inter'; 
-                        ctx.fillText(n.n + n.s, x, y - 32); 
-                    }
-                    if(showFinger) { 
-                        ctx.font = 'bold 20px Inter'; 
-                        ctx.fillText(n.f_rh, x, y + 32); 
-                    }
-                }
-                ctx.shadowBlur = 0;
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 0; ctx.fillStyle = "white";
+                    if(showNames) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.n + n.s, x, y - 32); }
+                    if(showFinger) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.f_rh, x, y + 32); }
+                } ctx.shadowBlur = 0;
             }
             
             if (activeLH) {
-                let y = KOTTA_G2_Y - ((n.step_lh-18) * KOTTA_VONALKOZ_FEL_LH);
-                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = (backlight > 0.5) ? 0 : 5; ctx.shadowColor = color;
-                if (n.step_lh <= 16) { for (let s=16; s>=n.step_lh; s-=2) { let ly = KOTTA_G2_Y - ((s-18) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                if (n.step_lh >= 28) { for (let s=28; s<=n.step_lh; s+=2) { let ly = KOTTA_G2_Y - ((s-18) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                let y = KOTTA_G2_Y - ((n.step_lh - 15) * KOTTA_VONALKOZ_FEL_LH);
+                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 5; ctx.shadowColor = color;
+                if (n.step_lh <= 13) { for (let s=13; s>=n.step_lh; s-=2) { let ly = KOTTA_G2_Y - ((s-15) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                if (n.step_lh >= 25) { for (let s=25; s<=n.step_lh; s+=2) { let ly = KOTTA_G2_Y - ((s-15) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
                 ctx.restore();
 
-                ctx.fillStyle = color; ctx.shadowBlur = (backlight > 0.5) ? 0 : 4; ctx.shadowColor = color;
+                ctx.fillStyle = color; ctx.shadowBlur = 4; ctx.shadowColor = color;
                 if (n.s !== '') { 
                     ctx.textAlign = 'center';
                     if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
@@ -855,21 +749,14 @@
                 ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
                 
                 if (showNames || showFinger) { 
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.shadowBlur = 0;
-                    if(showNames) { 
-                        ctx.font = 'bold 20px Inter'; 
-                        ctx.fillText(n.n + n.s, x, y - 32); 
-                    }
-                    if(showFinger) { 
-                        ctx.font = 'bold 20px Inter'; 
-                        ctx.fillText(n.f_lh, x, y + 32); 
-                    }
-                }
-                ctx.shadowBlur = 0;
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 0; ctx.fillStyle = "white";
+                    if(showNames) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.n + n.s, x, y - 32); }
+                    if(showFinger) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.f_lh, x, y + 32); }
+                } ctx.shadowBlur = 0;
             }
         });
+        
+        ctx.restore(); 
     }
 
     function create88() {
@@ -879,11 +766,6 @@
             k.id = `k-${m}`; k.className = `key-glow ${isW?'white-glow':'black-glow'}`;
             if(isW) { k.style.left = (wIdx * 1.92307) + "%"; k.style.width = "1.92307%"; k.style.height="100%"; wIdx++; }
             else { k.style.left = ((wIdx * 1.92307) - 0.6) + "%"; k.style.width = "1.2%"; k.style.height="65%"; k.style.zIndex="200"; }
-            
-            const led = document.createElement('div');
-            led.className = 'key-led';
-            k.appendChild(led);
-
             k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); }; 
             k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); }; 
             k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
