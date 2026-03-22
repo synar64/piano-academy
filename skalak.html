@@ -19,28 +19,26 @@
             --oled-text: #b3e6ff;
         }
         
+        /* TISZTA FEKETE HÁTTÉR, ÁTMENET NÉLKÜL */
         body { 
-            font-family: 'Inter', sans-serif; background-color: #050508;
-            background-image: radial-gradient(circle at 50% 50%, #151518 0%, #050508 100%);
+            font-family: 'Inter', sans-serif; background: #000;
             margin: 0; padding: 0; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; justify-content: space-between; color: #fff;
             -webkit-user-select: none; user-select: none;
         }
-
-        .lcd-text-color { color: rgb(var(--theme-r), var(--theme-g), var(--theme-b)); }
 
         /* ── KOTTA KIJELZŐ ── */
         .sheet-container {
             flex-grow: 1; display: flex; align-items: center; justify-content: center; 
             padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible;
         }
+        /* ÁTLÁTSZÓ KOTTA HÁTTÉR, ÁRNYÉK NÉLKÜL */
         .sheet-viewport { 
             width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; position: relative; overflow: visible; 
-            background: #080808; border-radius: 6px; box-shadow: inset 0 0 40px #000;
+            background: transparent; border-radius: 6px; box-shadow: none;
         }
         .sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; opacity: 0.35; pointer-events: none; }
         
-        /* A KIBŐVÍTETT VÁSZON A LEVÁGÁS ELLEN */
         #staffCanvas { 
             position: absolute; top: 50%; left: 0; width: 100%; height: 140%; transform: translateY(-50%);
             z-index: 10; pointer-events: none; 
@@ -50,7 +48,7 @@
         .lower-section { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; margin-bottom: 0; }
         .workstation-chassis {
             display: flex; width: 100%; max-width: 2560px; position: relative;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0; background: var(--rack-bg);
         }
         .wood-cheek {
             width: 24px; background: linear-gradient(to right, #3a1c0d, #1a0c05);
@@ -58,7 +56,7 @@
             border-radius: 6px 0 0 0; z-index: 10;
         }
         .wood-cheek.right { border-radius: 0 6px 0 0; background: linear-gradient(to left, #3a1c0d, #1a0c05); }
-        .synth-core { flex-grow: 1; display: flex; flex-direction: column; background: var(--rack-bg); position: relative;}
+        .synth-core { flex-grow: 1; display: flex; flex-direction: column; position: relative;}
 
         /* ── INFO SÁV ── */
         .info-bar-integrated {
@@ -66,12 +64,13 @@
             display: flex; align-items: center; justify-content: center; z-index: 10;
             box-shadow: inset 0 3px 10px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.5);
         }
+        /* BETŰMÉRET CSÖKKENTVE 18px-re */
         .info-bar-text { 
-            font-family: 'Share Tech Mono', monospace; font-size: 22px; font-weight: bold;
+            font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
             color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
         }
 
-        /* ── BEÁLLÍTÓ SÁVOK (VISUAL / MIXER) mint OVERLAY ── */
+        /* ── MIXER OVERLAY ── */
         .settings-bar { 
             position: absolute; bottom: 100%; left: 0; width: 100%; height: 85px; background: var(--lcd-bg-dark); 
             display: none; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #333; 
@@ -81,30 +80,32 @@
         .settings-control label { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-transform: uppercase; font-weight: bold;}
         .settings-control input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: #111; border-radius: 3px; outline: none; cursor: pointer; box-shadow: inset 0 1px 3px #000; }
         .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 20px; background: #888; border: 1px solid #111; border-radius: 2px; box-shadow: 0 2px 4px #000; cursor: grab; }
-        .theme-btn { width: 140px; height: 32px; background: #111; border: 2px solid #222; border-radius: 4px; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.1s; color: rgb(var(--theme-r), var(--theme-g), var(--theme-b));}
 
         /* ── MASTER DASHBOARD ── */
         .master-dashboard { 
             display: flex; justify-content: space-between; align-items: center;
             background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 100% 3px; padding: 15px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box;
+            background-size: 100% 3px; 
+            /* MEGNÖVELT MAGASSÁG: 25px 30px */
+            padding: 25px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box;
         }
         .dashboard-logo { position: absolute; top: -35px; left: 30px; z-index: 5; pointer-events: none;}
         .control-group { display: flex; align-items: center; gap: 8px; z-index: 10; }
 
-        /* HARDVER GOMBOK (Zéró glow, tiszta fehér aktívan) */
+        /* HARDVER GOMBOK (Zéró glow) */
         .hardware-btn { 
             width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim);
             border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
             font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s;
+            box-shadow: 0 3px 0 #000; transition: transform 0.1s; text-shadow: none !important;
         }
         .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .hardware-btn.active { color: #ffffff; text-shadow: none !important; }
+        .hardware-btn.active { color: #ffffff; background-color: #121214; }
         #btnStart { width: 110px; font-weight: 800; font-size: 14px; letter-spacing: 1px; box-shadow: 0 4px 0 #000; margin-left: 20px;}
         #btnStart:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
+        #btnStart.running { color: #ffffff; background-color: #1a1a1c; border-color: #333; }
 
-        /* ── 4-RÉSZES LCD + NYILAK ── */
+        /* ── 4-RÉSZES LCD + NYILAK (Visszatéve!) ── */
         .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
         .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px;}
         .arrow-row { display: flex; width: 100%; justify-content: space-around; margin: 4px 0; }
@@ -116,7 +117,7 @@
         .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; cursor: pointer; }
         .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
         .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px;}
-        .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: 0 0 5px rgba(179,230,255,0.4);}
+        .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important;}
 
         /* ── PIANO (2500/248 Egzakt Méretarány!) ── */
         .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: hidden; border-top: 2px solid #000; }
@@ -126,6 +127,10 @@
         .key-glow { position: absolute; top: 0; cursor: pointer; }
         .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255, 255, 255, 0.15); box-shadow: inset 0 -10px 15px rgba(255, 255, 255, 0.3); z-index: 40; }
+
+        /* LED POZÍCIÓ: Még 10 pixellel feljebb (-22px) */
+        .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: rgb(var(--theme-r), var(--theme-g), var(--theme-b)); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
+        .key-glow.scale-hint .key-led { opacity: 1; }
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
@@ -178,11 +183,6 @@
                         <div class="oled-header">AVG TEMPO</div>
                         <div id="modalBpm" class="oled-main" style="font-size: 24px;">0 BPM</div>
                     </div>
-                    <div class="oled-divider"></div>
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <div class="oled-header">STABILITY</div>
-                        <div id="modalUni" class="oled-main" style="font-size: 24px;">100%</div>
-                    </div>
                 </div>
             </div>
             <div id="modalTip" style="color: #888; font-size: 13px; margin-bottom: 25px; font-family: 'Inter', sans-serif;">Excellent work!</div>
@@ -211,14 +211,6 @@
                     <div class="settings-control" data-help="STEREO: PANNING"><label>Stereo Wide</label><input type="range" id="vst_wide" min="0" max="1" step="0.05" value="0"></div>
                 </div>
 
-                <div id="visualBar" class="settings-bar">
-                    <div class="settings-control" data-help="THEME SELECTOR"><button class="theme-btn" id="btnTheme" onclick="cycleTheme()">THEME: GREEN</button></div>
-                    <div style="width:1px; height: 40px; background: rgba(255, 255, 255, 0.1); z-index:2;"></div>
-                    <div class="settings-control" data-help="BACKLIGHT"><label onclick="document.getElementById('vis_backlight').value=0; draw();">Backlight</label><input type="range" id="vis_backlight" min="0" max="1" step="0.05" value="0" oninput="draw()"></div>
-                    <div class="settings-control" data-help="STAFF LINES"><label onclick="document.getElementById('vis_staff').value=0.25; draw();">Staff Lines</label><input type="range" id="vis_staff" min="0" max="1" step="0.05" value="0.25" oninput="draw()"></div>
-                    <div class="settings-control" data-help="NOTES CONTRAST"><label onclick="document.getElementById('vis_notes').value=1.0; draw();">Notes Intensity</label><input type="range" id="vis_notes" min="0.1" max="1.0" step="0.05" value="1.0" oninput="draw()"></div>
-                </div>
-
                 <div id="infoBar" class="info-bar-integrated">
                     <div id="infoBarText" class="info-bar-text">SYSTEM READY - SELECT SCALE OR PRESS START ▼</div>
                 </div>
@@ -235,19 +227,19 @@
 
                     <div class="control-group">
                         <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
-                        <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP CLEF: TOGGLE RIGHT HAND">Top</button>
-                        <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM CLEF: TOGGLE LEFT HAND">Bottom</button>
-                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: SHOW NOTE NAMES">Hints</button>
-                        <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: SHOW FINGERINGS">Fingers</button>
+                        <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP CLEF: TOGGLES GENERATION FOR THE RIGHT HAND">Top</button>
+                        <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM CLEF: TOGGLES GENERATION FOR THE LEFT HAND">Bottom</button>
+                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: DISPLAYS NOTE NAMES AND ACTIVATES LIGHT GUIDE LEDS">Hints</button>
+                        <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: DISPLAYS THE OFFICIAL SCALE FINGERING ON THE SHEET">Fingers</button>
                     </div>
 
                     <div class="center-console">
                         <div class="lcd-arrow-wrapper">
                             <div class="arrow-row">
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button></div>
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button></div>
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(-1)">▲</button></div>
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(1)">▲</button></div>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(-1)">▲</button>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(1)">▲</button>
                             </div>
                             
                             <div class="oled-wrapper">
@@ -256,15 +248,15 @@
                                         <div class="oled-header">Module</div><div class="oled-main" id="lcdModuleText">SCALES</div>
                                     </div>
                                     <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT, MARATHON">
+                                    <div class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT, MARATHON OR TRAINING">
                                         <div class="oled-header">Mode</div><div class="oled-main" id="lcdModeText">SPRINT</div>
                                     </div>
                                     <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE: CLICK TO BROWSE">
+                                    <div class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE: CLICK TO BROWSE OR USE ARROWS">
                                         <div class="oled-header">Scale</div><div class="oled-main" id="lcdScaleText">C MAJOR</div>
                                     </div>
                                     <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleOctave(1)" data-help="OCTAVE: 1 OR 2 OCTAVES">
+                                    <div class="oled-section" onclick="if(!helpActive) cycleOctave(1)" data-help="OCTAVE: SWITCHES BETWEEN 1 OR 2 OCTAVES">
                                         <div class="oled-header">Octave</div><div class="oled-main" id="lcdOctaveText">1 OCT</div>
                                     </div>
                                 </div>
@@ -272,19 +264,18 @@
                             <input type="hidden" id="scaleSelectValue" value="C_DUR">
 
                             <div class="arrow-row">
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button></div>
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button></div>
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(1)">▼</button></div>
-                                <div class="arrow-col"><button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(-1)">▼</button></div>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(1)">▼</button>
+                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(-1)">▼</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="control-group">
-                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP THE SEQUENCE">START</button>
-                        <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO">Piano</button>
+                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE PRACTICE SEQUENCE">START</button>
+                        <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH">Piano</button>
                         <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER: OPEN ADSR PANEL">Mixer</button>
-                        <button id="btnVisual" class="hardware-btn" onclick="if(!helpActive) toggleVisual()" data-help="VISUAL: OPEN THEME PANEL">Visual</button>
                         <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE">Fullscr</button>
                         <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: TOGGLE INFO MODE">Help</button>
                     </div>
@@ -302,6 +293,33 @@
     </div>
 
 <script>
+    let audioInited = false, midiInited = false;
+    let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
+
+    async function initAudio() {
+        if(audioInited) return; audioInited = true;
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === 'suspended') await audioCtx.resume();
+        const s = {36:'C2',48:'C3',60:'C4',72:'C5'};
+        for(let k in s){
+            try {
+                const r = await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);
+                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
+            } catch(e){}
+        }
+    }
+
+    function initMidi() {
+        if(midiInited || !navigator.requestMIDIAccess) return; midiInited = true;
+        navigator.requestMIDIAccess().then(m => {
+            m.inputs.forEach(input => input.onmidimessage = (msg) => {
+                const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
+                if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
+                else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
+            });
+        }).catch(e => console.log(e));
+    }
+
     function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.log(err)); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
 
     let helpActive = false;
@@ -331,24 +349,10 @@
     function openPatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'flex'; }
     function closePatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'none'; }
 
-    const modules = [
-        {name: 'EAR TRAIN', url: 'hallasfejleszto.html'},
-        {name: 'SIGHT READ', url: 'kottaolvasas.html'},
-        {name: 'CHORDS', url: 'akkordok.html'},
-        {name: 'SCALES', url: 'skalak.html'},
-        {name: 'HANON', url: 'hanon.html'},
-        {name: 'RHYTHM', url: 'ritmus.html'}
-    ];
+    const modules = [ {name: 'EAR TRAIN', url: 'hallasfejleszto.html'}, {name: 'SIGHT READ', url: 'kottaolvasas.html'}, {name: 'CHORDS', url: 'akkordok.html'}, {name: 'SCALES', url: 'skalak.html'}, {name: 'HANON', url: 'hanon.html'}, {name: 'RHYTHM', url: 'ritmus.html'} ];
     let currentModuleIdx = 3; 
-    function cycleModule(dir) {
-        if (helpActive) return;
-        currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length;
-        document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name;
-    }
-    function loadModule() {
-        if (helpActive) return;
-        if (currentModuleIdx !== 3) window.location.href = modules[currentModuleIdx].url;
-    }
+    function cycleModule(dir) { if (helpActive) return; currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length; document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name; }
+    function loadModule() { if (helpActive) return; if (currentModuleIdx !== 3) window.location.href = modules[currentModuleIdx].url; }
 
     const scaleDefs = {
         'C_DUR': { midi:[0,2,4,5,7,9,11,12], n:['C','D','E','F','G','A','H','C'], s:['','','','','','','',''] },
@@ -376,7 +380,7 @@
         'B_FLAT_MOLL': { midi:[10,12,13,15,17,18,20,22], n:['H','C','D','E','F','G','A','H'], s:['♭','','♭','♭','','♭','♭','♭'] },
         'H_MOLL': { midi:[11,13,14,16,18,19,21,23], n:['H','C','D','E','F','G','A','H'], s:['','♯','','','♯','','',''] }
     };
-
+    
     const fingerings = {
         std: { 
             rh1: [1,2,3,1,2,3,4,5, 4,3,2,1,3,2,1], 
@@ -389,47 +393,14 @@
     const scaleOrder = Object.keys(scaleDefs).map(k => ({ v: k, n: k.replace('_', ' ') }));
     let currentScaleIdx = 0;
 
-    function cycleScale(dir) {
-        if (helpActive) return;
-        currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length;
-        let s = scaleOrder[currentScaleIdx];
-        document.getElementById('lcdScaleText').innerText = s.n;
-        document.getElementById('scaleSelectValue').value = s.v;
-        if(isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    function selectPatch(val, name) {
-        currentScaleIdx = scaleOrder.findIndex(s => s.v === val);
-        document.getElementById('lcdScaleText').innerText = name;
-        document.getElementById('scaleSelectValue').value = val;
-        closePatchBrowser();
-        if(isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    const THEMES = ['green', 'cyan', 'amber', 'orange', 'mono'];
-    let currentThemeIdx = 0;
-    function cycleTheme() { if (helpActive) return; currentThemeIdx = (currentThemeIdx + 1) % THEMES.length; document.body.className = `theme-${THEMES[currentThemeIdx]}`; document.getElementById('btnTheme').innerText = `THEME: ${THEMES[currentThemeIdx].toUpperCase()}`; draw(); }
-    
-    function toggleVisual() { 
-        if (helpActive) return; 
-        let vb = document.getElementById('visualBar');
-        if(vb.style.display === 'flex') {
-            vb.style.display = 'none'; document.getElementById('btnVisual').classList.remove('active');
-        } else {
-            vb.style.display = 'flex'; document.getElementById('btnVisual').classList.add('active');
-            document.getElementById('mixerBar').style.display = 'none'; document.getElementById('btnVst').classList.remove('active');
-        }
-    }
+    function cycleScale(dir) { if (helpActive) return; currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length; let s = scaleOrder[currentScaleIdx]; document.getElementById('lcdScaleText').innerText = s.n; document.getElementById('scaleSelectValue').value = s.v; if(isRunning) stopPractice(); buildSequence(); draw(); }
+    function selectPatch(val, name) { currentScaleIdx = scaleOrder.findIndex(s => s.v === val); document.getElementById('lcdScaleText').innerText = name; document.getElementById('scaleSelectValue').value = val; closePatchBrowser(); if(isRunning) stopPractice(); buildSequence(); draw(); }
     
     function toggleVst() { 
         if (helpActive) return; 
         let mb = document.getElementById('mixerBar');
-        if(mb.style.display === 'flex') {
-            mb.style.display = 'none'; document.getElementById('btnVst').classList.remove('active');
-        } else {
-            mb.style.display = 'flex'; document.getElementById('btnVst').classList.add('active');
-            document.getElementById('visualBar').style.display = 'none'; document.getElementById('btnVisual').classList.remove('active');
-        }
+        mb.style.display = (mb.style.display === 'flex') ? 'none' : 'flex';
+        document.getElementById('btnVst').classList.toggle('active');
     }
 
     let isRunning = false, activeRH = true, activeLH = true, currentNoteInBlock = 0;
@@ -437,80 +408,28 @@
     let currentModeIdx = 0, selectedOctaves = 1;
     let showNames = false, showFinger = false;
     let rhHit = false, lhHit = false, seqBlocks = [];
-    let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
-    let lastHitTime = 0, hitIntervals = [], fingerTimes = {1:[], 2:[], 3:[], 4:[], 5:[]};
+    let lastHitTime = 0, hitIntervals = [];
 
     function updateKeyboardHints() {
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('scale-hint'));
-        if (showNames && seqBlocks.length > 0) {
-            let uniqueMidis = new Set();
+        if ((showNames || showFinger) && seqBlocks.length > 0) {
             seqBlocks[0].forEach(note => {
-                if (activeRH) uniqueMidis.add(note.m_rh);
-                if (activeLH) uniqueMidis.add(note.m_lh);
-            });
-            uniqueMidis.forEach(m => {
-                let key = document.getElementById(`k-${m}`);
-                if (key) key.classList.add('scale-hint');
+                if (activeRH) document.getElementById(`k-${note.m_rh}`)?.classList.add('scale-hint');
+                if (activeLH) document.getElementById(`k-${note.m_lh}`)?.classList.add('scale-hint');
             });
         }
     }
 
-    function cycleMode(dir) {
-        if (helpActive) return;
-        currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length;
-        document.getElementById('lcdModeText').innerText = MODES[currentModeIdx];
-        if(isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    function cycleOctave(dir) {
-        if (helpActive) return;
-        selectedOctaves = selectedOctaves === 1 ? 2 : 1;
-        document.getElementById('lcdOctaveText').innerText = selectedOctaves + " OCT";
-        if(isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    function toggleHand(hand) {
-        if (helpActive) return;
-        if(hand === 'RH') { activeRH = !activeRH; if(!activeRH && !activeLH) activeLH = true; } 
-        else { activeLH = !activeLH; if(!activeLH && !activeRH) activeRH = true; } 
-        document.getElementById('handRH').classList.toggle('active', activeRH); 
-        document.getElementById('handLH').classList.toggle('active', activeLH); 
-        if(isRunning) stopPractice(); buildSequence(); draw(); 
-    }
-
-    function toggleHint(type) { 
-        if (helpActive) return;
-        if(type === 'name') { 
-            showNames = !showNames; 
-            document.getElementById('btnHintName').classList.toggle('active', showNames); 
-            updateKeyboardHints();
-        } 
-        else { 
-            showFinger = !showFinger; 
-            document.getElementById('btnHintFinger').classList.toggle('active', showFinger); 
-        } 
-        draw(); 
-    }
-    
-    function toggleAudio() { 
-        if (helpActive) return; 
-        audioOn = !audioOn; 
-        document.getElementById('audioToggle').classList.toggle('active', audioOn); 
-        if(audioOn && !audioCtx) initAudio(); 
-    }
-
-    const KOTTA_E4_Y = 187.6; const KOTTA_VONALKOZ_FEL_RH = 11.14; 
-    let KOTTA_G2_Y = 417; let KOTTA_VONALKOZ_FEL_LH = 10.71; 
-    const NOTE_LETTER_STEP = {'C':0,'D':1,'E':2,'F':3,'G':4,'A':5,'H':6};
+    function cycleMode(dir) { if (helpActive) return; currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length; document.getElementById('lcdModeText').innerText = MODES[currentModeIdx]; if(isRunning) stopPractice(); buildSequence(); draw(); }
+    function cycleOctave(dir) { if (helpActive) return; selectedOctaves = selectedOctaves === 1 ? 2 : 1; document.getElementById('lcdOctaveText').innerText = selectedOctaves + " OCT"; if(isRunning) stopPractice(); buildSequence(); draw(); }
+    function toggleHand(hand) { if (helpActive) return; if(hand === 'RH') { activeRH = !activeRH; if(!activeRH && !activeLH) activeLH = true; } else { activeLH = !activeLH; if(!activeLH && !activeRH) activeRH = true; } document.getElementById('handRH').classList.toggle('active', activeRH); document.getElementById('handLH').classList.toggle('active', activeLH); if(isRunning) stopPractice(); buildSequence(); draw(); }
+    function toggleHint(type) { if (helpActive) return; if(type === 'name') { showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); } else { showFinger = !showFinger; document.getElementById('btnHintFinger').classList.toggle('active', showFinger); } updateKeyboardHints(); draw(); }
+    function toggleAudio() { if (helpActive) return; audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
 
     function midiToStaffStep(midiNote, clef) {
-        const WHITE_KEY_MAP = [0,0,1,1,2,3,3,4,4,5,5,6]; 
-        let semitone = midiNote % 12;
-        let octave = Math.floor(midiNote / 12) - 1; 
-        let diatonicInOctave = WHITE_KEY_MAP[semitone];
-        let absoluteDiatonic = octave * 7 + diatonicInOctave;
-        if (clef === 'treble') return absoluteDiatonic + 2;  
-        else                   return absoluteDiatonic - 3;  
+        const MAP = [0,0,1,1,2,3,3,4,4,5,5,6]; 
+        let s = midiNote % 12, o = Math.floor(midiNote / 12) - 1; 
+        return (clef === 'treble') ? (o * 7 + MAP[s]) + 2 : (o * 7 + MAP[s]) - 3;  
     }
 
     function generateScaleNotes(key) {
@@ -543,6 +462,7 @@
             }
         }
         for (let i = fullCycle.length - 2; i >= 0; i--) { fullCycle.push({ ...fullCycle[i] }); }
+        
         for (let i = 0; i < fullCycle.length; i++) { 
             fullCycle[i].f_rh = fingerings.std['rh'+selectedOctaves][i] || ''; 
             fullCycle[i].f_lh = fingerings.std['lh'+selectedOctaves][i] || ''; 
@@ -556,33 +476,11 @@
         updateKeyboardHints();
     }
 
-    async function initAudio() {
-        if (audioCtx) {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            return;
-        }
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const notes = {21:'A0', 36:'C2', 48:'C3', 60:'C4', 72:'C5', 84:'C6'};
-        for(let k in notes) {
-            try {
-                const r = await fetch(`https://tonejs.github.io/audio/salamander/${notes[k]}.mp3`);
-                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
-            } catch(e) {}
-        }
-        if(navigator.requestMIDIAccess) {
-            const m = await navigator.requestMIDIAccess();
-            m.inputs.forEach(input => input.onmidimessage = (msg) => {
-                const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
-                if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
-                else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
-            });
-        }
-    }
-
     function playTone(note, vel) {
         if(!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
         if(audioCtx.state === 'suspended') audioCtx.resume();
         if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e){} delete activeNodes[note]; }
+        
         const source = audioCtx.createBufferSource();
         let closest = 36, minDiff = 999;
         for(let b in sampleBuffers) { let diff = Math.abs(note-b); if(diff < minDiff){ minDiff=diff; closest=b; } }
@@ -590,13 +488,10 @@
         source.playbackRate.value = Math.pow(2, (note-closest)/12);
         
         const gain = audioCtx.createGain(); 
-        const v_a = parseFloat(document.getElementById('vst_a').value) || 0.01;
-        const v_e = parseFloat(document.getElementById('vst_e').value) || 10.0;
         const v_d = parseFloat(document.getElementById('vst_d').value) || 1.0;
         
-        gain.gain.setValueAtTime(0, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime((vel/127) * v_d, audioCtx.currentTime + v_a + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + v_e);
+        gain.gain.setValueAtTime((vel/127) * v_d, audioCtx.currentTime);
+        
         source.connect(gain).connect(audioCtx.destination); source.start();
         activeNodes[note] = { source: source, gain: gain };
     }
@@ -615,11 +510,10 @@
     function handleMainButton() { 
         if (helpActive) return;
         if(!isRunning) { 
-            initAudio(); buildSequence(); isRunning=true; 
+            initAudio(); initMidi(); buildSequence(); isRunning=true; 
             document.getElementById('btnStart').classList.add('running'); 
             document.getElementById('btnStart').innerText = 'STOP';
-            lastHitTime = 0; hitIntervals = []; fingerTimes = {1:[], 2:[], 3:[], 4:[], 5:[]};
-            draw(); 
+            lastHitTime = 0; hitIntervals = []; draw(); 
         } 
         else stopPractice();
     }
@@ -642,9 +536,8 @@
         let uniformity = Math.round(Math.max(0, 100-(dev/3))) + '%';
 
         document.getElementById('modalBpm').innerText = avgBpm + " BPM";
-        document.getElementById('modalUni').innerText = uniformity;
         document.getElementById('resultModal').style.display = 'flex';
-        draw();
+        currentBlockIndex = 0; currentNoteInBlock = 0; draw();
     }
 
     function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
@@ -666,11 +559,7 @@
             rhHit = false; lhHit = false; 
             let now = performance.now();
             if (lastHitTime > 0) {
-                let diff = now - lastHitTime;
-                hitIntervals.push(diff);
-                let currentF_rh = parseInt(note.f_rh); let currentF_lh = parseInt(note.f_lh);
-                if (activeRH && !isNaN(currentF_rh)) fingerTimes[currentF_rh].push(diff);
-                if (activeLH && !isNaN(currentF_lh)) fingerTimes[currentF_lh].push(diff);
+                hitIntervals.push(now - lastHitTime);
             }
             lastHitTime = now;
 
@@ -683,11 +572,6 @@
         }
     }
 
-    function getThemeColor() {
-        let rs = getComputedStyle(document.body);
-        return { r: parseInt(rs.getPropertyValue('--theme-r')), g: parseInt(rs.getPropertyValue('--theme-g')), b: parseInt(rs.getPropertyValue('--theme-b')) };
-    }
-
     const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
     function draw() {
         ctx.clearRect(0, 0, 2450, 680); 
@@ -695,10 +579,8 @@
         ctx.translate(0, 100); 
 
         if (seqBlocks.length === 0) { ctx.restore(); return; }
-        
-        let tc = getThemeColor();
-        let activeColor = `rgba(${tc.r}, ${tc.g}, ${tc.b}, 1.0)`;
-        let inactiveColor = `rgba(${tc.r}, ${tc.g}, ${tc.b}, 0.3)`;
+        if (currentBlockIndex >= seqBlocks.length) currentBlockIndex = 0; 
+        if (!seqBlocks[currentBlockIndex]) { ctx.restore(); return; }
         
         let block = seqBlocks[currentBlockIndex];
         let totalNotes = block.length; 
@@ -707,18 +589,18 @@
         let spacingX = totalNotes > 1 ? (endX - startX) / (totalNotes - 1) : 0;
         
         block.forEach((n, i) => {
-            let color = (isRunning && i === currentNoteInBlock) ? activeColor : inactiveColor;
-            if(!isRunning && i === 0 && currentBlockIndex === 0) color = activeColor;
+            let isActive = (isRunning && i === currentNoteInBlock) || (!isRunning && i === 0 && currentBlockIndex === 0);
+            
+            /* 1. JAVÍTÁS: A zöldes árnyalat visszaállítva a kék helyett! */
+            let color = isActive ? "rgba(170, 204, 170, 1.0)" : "rgba(170, 204, 170, 0.3)";
             let x = startX + (i * spacingX); 
             
             if (activeRH) {
-                let y = KOTTA_E4_Y - ((n.step_rh - 32) * KOTTA_VONALKOZ_FEL_RH);
-                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 5; ctx.shadowColor = color;
-                if (n.step_rh <= 30) { for (let s=30; s>=n.step_rh; s-=2) { let ly = KOTTA_E4_Y - ((s-32) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                if (n.step_rh >= 42) { for (let s=42; s<=n.step_rh; s+=2) { let ly = KOTTA_E4_Y - ((s-32) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                ctx.restore();
+                let y = 187.6 - ((n.step_rh - 32) * 11.14);
+                ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 0;
+                if (n.step_rh <= 30) { for (let s=30; s>=n.step_rh; s-=2) { let ly = 187.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                if (n.step_rh >= 42) { for (let s=42; s<=n.step_rh; s+=2) { let ly = 187.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
 
-                ctx.fillStyle = color; ctx.shadowBlur = 4; ctx.shadowColor = color;
                 if (n.s !== '') { 
                     ctx.textAlign = 'center'; 
                     if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
@@ -727,20 +609,21 @@
                 ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
                 
                 if (showNames || showFinger) { 
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 0; ctx.fillStyle = "white";
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = "white";
                     if(showNames) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.n + n.s, x, y - 32); }
                     if(showFinger) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.f_rh, x, y + 32); }
-                } ctx.shadowBlur = 0;
+                }
             }
             
             if (activeLH) {
-                let y = KOTTA_G2_Y - ((n.step_lh - 15) * KOTTA_VONALKOZ_FEL_LH);
-                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 5; ctx.shadowColor = color;
-                if (n.step_lh <= 13) { for (let s=13; s>=n.step_lh; s-=2) { let ly = KOTTA_G2_Y - ((s-15) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                if (n.step_lh >= 25) { for (let s=25; s<=n.step_lh; s+=2) { let ly = KOTTA_G2_Y - ((s-15) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                ctx.restore();
+                let y = 417 - ((n.step_lh - 15) * 10.71);
+                
+                /* Újra be kell állítani a színt, hogy ne vigye át a fehér szöveg színét az alsó sorra! */
+                ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 0;
+                
+                if (n.step_lh <= 13) { for (let s=13; s>=n.step_lh; s-=2) { let ly = 417 - ((s-15) * 10.71); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                if (n.step_lh >= 25) { for (let s=25; s<=n.step_lh; s+=2) { let ly = 417 - ((s-15) * 10.71); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
 
-                ctx.fillStyle = color; ctx.shadowBlur = 4; ctx.shadowColor = color;
                 if (n.s !== '') { 
                     ctx.textAlign = 'center';
                     if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
@@ -749,10 +632,10 @@
                 ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
                 
                 if (showNames || showFinger) { 
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 0; ctx.fillStyle = "white";
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = "white";
                     if(showNames) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.n + n.s, x, y - 32); }
                     if(showFinger) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.f_lh, x, y + 32); }
-                } ctx.shadowBlur = 0;
+                }
             }
         });
         
@@ -766,7 +649,14 @@
             k.id = `k-${m}`; k.className = `key-glow ${isW?'white-glow':'black-glow'}`;
             if(isW) { k.style.left = (wIdx * 1.92307) + "%"; k.style.width = "1.92307%"; k.style.height="100%"; wIdx++; }
             else { k.style.left = ((wIdx * 1.92307) - 0.6) + "%"; k.style.width = "1.2%"; k.style.height="65%"; k.style.zIndex="200"; }
-            k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); }; 
+            const led = document.createElement('div'); led.className = 'key-led'; k.appendChild(led);
+            k.onmousedown = async (e) => { 
+                e.preventDefault(); 
+                if(!helpActive) {
+                    if(!audioInited) initAudio(); 
+                    k.classList.add('pressed'); handleNoteOn(m, 100); 
+                }
+            }; 
             k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); }; 
             k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
             wrap.appendChild(k);
