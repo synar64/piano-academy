@@ -120,7 +120,7 @@
         .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important;}
 
         /* ── PIANO (2500/248 Egzakt Méretarány!) ── */
-        .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: hidden; border-top: 2px solid #000; }
+        .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: visible; border-top: 2px solid #000; }
         .piano-inner { width: 100%; aspect-ratio: 2500/284; position: absolute; top: 0; left: 0; }
         .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none;}
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
@@ -129,8 +129,8 @@
         .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255, 255, 255, 0.15); box-shadow: inset 0 -10px 15px rgba(255, 255, 255, 0.3); z-index: 40; }
 
         /* LED POZÍCIÓ: Még 10 pixellel feljebb (-22px) */
-        .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: rgb(var(--theme-r), var(--theme-g), var(--theme-b)); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
-        .key-glow.scale-hint .key-led { opacity: 1; }
+        .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
+.key-glow.scale-hint .key-led { opacity: 1; }
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
@@ -411,19 +411,35 @@
     let lastHitTime = 0, hitIntervals = [];
 
     function updateKeyboardHints() {
-        document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('scale-hint'));
-        if ((showNames || showFinger) && seqBlocks.length > 0) {
-            seqBlocks[0].forEach(note => {
-                if (activeRH) document.getElementById(`k-${note.m_rh}`)?.classList.add('scale-hint');
-                if (activeLH) document.getElementById(`k-${note.m_lh}`)?.classList.add('scale-hint');
-            });
-        }
+    // Összes LED leoltása
+    document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('scale-hint'));
+    
+    // Ha a Hints (showNames) VAGY a Fingers (showFinger) aktív, gyújtsuk meg a LED-eket
+    if ((showNames || showFinger) && seqBlocks.length > 0) { 
+        seqBlocks[0].forEach(n => { 
+            if(activeRH) document.getElementById(`k-${n.m_rh}`)?.classList.add('scale-hint'); 
+            if(activeLH) document.getElementById(`k-${n.m_lh}`)?.classList.add('scale-hint'); 
+        }); 
     }
+}
 
     function cycleMode(dir) { if (helpActive) return; currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length; document.getElementById('lcdModeText').innerText = MODES[currentModeIdx]; if(isRunning) stopPractice(); buildSequence(); draw(); }
     function cycleOctave(dir) { if (helpActive) return; selectedOctaves = selectedOctaves === 1 ? 2 : 1; document.getElementById('lcdOctaveText').innerText = selectedOctaves + " OCT"; if(isRunning) stopPractice(); buildSequence(); draw(); }
     function toggleHand(hand) { if (helpActive) return; if(hand === 'RH') { activeRH = !activeRH; if(!activeRH && !activeLH) activeLH = true; } else { activeLH = !activeLH; if(!activeLH && !activeRH) activeRH = true; } document.getElementById('handRH').classList.toggle('active', activeRH); document.getElementById('handLH').classList.toggle('active', activeLH); if(isRunning) stopPractice(); buildSequence(); draw(); }
-    function toggleHint(type) { if (helpActive) return; if(type === 'name') { showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); } else { showFinger = !showFinger; document.getElementById('btnHintFinger').classList.toggle('active', showFinger); } updateKeyboardHints(); draw(); }
+    function toggleHint(type) { 
+    if(helpActive) return; 
+    if(type === 'name') { 
+        showNames = !showNames; 
+        document.getElementById('btnHintName').classList.toggle('active', showNames); 
+    } 
+    else { 
+        showFinger = !showFinger; 
+        document.getElementById('btnHintFinger').classList.toggle('active', showFinger); 
+    } 
+    // Ez a sor kapcsolja fel a LED-eket a gombnyomás pillanatában:
+    updateKeyboardHints(); 
+    draw(); 
+}
     function toggleAudio() { if (helpActive) return; audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
 
     function midiToStaffStep(midiNote, clef) {
