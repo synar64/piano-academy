@@ -13,7 +13,7 @@
             --btn-dark: #101012;
             --btn-border: #050505;
             --text-dim: #555;
-            --lcd-bg-dark: #111211;
+            --lcd-bg-dark: #111213;
             --lcd-label-color: #557799;
             --oled-text: #b3e6ff;
         }
@@ -52,14 +52,15 @@
         .synth-core { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
 
         /* ── INFO SÁV ── */
+        /* ── INFO SÁV ── */
         .info-bar-integrated {
             width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808;
-            display: flex; align-items: center; justify-content: center; z-index: 10;
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden;
         }
         .info-bar-text {
             font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
-            color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px; transition: 0.2s;
+            color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
+            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s;
         }
 
         /* ── MIXER OVERLAY ── */
@@ -93,9 +94,61 @@
         .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .hardware-btn.active { color: #ffffff; background-color: #121214; }
 
-        #btnStart { width: 110px; font-weight: 800; font-size: 14px; letter-spacing: 1px; box-shadow: 0 4px 0 #000; margin-left: 20px; }
-        #btnStart:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
-        #btnStart.running { color: #ffffff; background-color: #1a1a1c; border-color: #333; }
+        /* START|STOP SPLIT */
+        .start-split {
+            display:flex; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000;
+            overflow:hidden; transition:transform 0.1s; cursor:pointer;
+        }
+        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .start-split span {
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif;
+            color:#444; transition:color 0.15s; text-transform:uppercase;
+        }
+        .start-split span#startLabel { padding: 0 12px 0 22px; }
+        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
+        .start-split span.active { color:#fff; }
+        .start-split .split-div { width:1px; background:#333; margin:6px 0; flex-shrink:0; }
+
+        /* KIS NÉGYZETES GOMBOK */
+        .sq-btn {
+            width: 38px; height: 38px; background-color: var(--btn-dark); color: #444;
+            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
+            font-size: 16px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0;
+        }
+        .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .sq-btn.active { color: #fff; background-color: #121214; }
+
+        /* KULCS SPLIT GOMB */
+        .clef-split {
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
+            overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s;
+        }
+        .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .clef-split span {
+            flex:1; display:flex; align-items:center; justify-content:center;
+            color:#444; transition:color 0.15s; padding:0;
+        }
+        .clef-split span.active { color:#fff; }
+        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+
+        /* LANG SPLIT GOMB */
+        .lang-split {
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
+        }
+        .lang-split button {
+            flex:1; background:transparent; border:none; cursor:pointer;
+            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
+        }
+        .lang-split button.active { color:#fff; }
+        .lang-split button:active { background: rgba(255,255,255,0.05); }
+        .lang-divider { width:1px; background:#222; margin:6px 0; }
+
+        body.help-mode-active, body.help-mode-active * { cursor: help !important; }
 
         /* ── CENTER CONSOLE ── */
         .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
@@ -109,7 +162,7 @@
         .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; cursor: pointer; }
         .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
         .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
-        .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; }
+        .oled-main { font-size: 20px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; }
 
         /* ── ZONGORA ── */
         .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: visible; border-top: 2px solid #000; }
@@ -130,12 +183,27 @@
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
         .key-glow.chord-hint .key-led { opacity: 1; }
 
-        body.help-mode-active { cursor: help; } body.help-mode-active * { cursor: help !important; }
     </style>
 </head>
 <body>
 
     <!-- KOTTA -->
+    <!-- INFO MODAL -->
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content" style="max-width:640px;text-align:left;">
+            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Chords — Module Guide</h2>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">16 chords appear on the staff. Hold all the correct notes of each chord simultaneously on the piano. Release to advance to the next chord. Wrong notes are highlighted in red.</p></div>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Notes (sheet only), Chords (name + notes after solving), Roman (numeral).</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Level ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Root position → Inversions → 7th chords.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Top / Bottom</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Toggle treble and bass clef chord generation independently.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Shows individual note names within each chord and activates LED guides.</span></div>
+            </div>
+            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">In <strong style="color:var(--oled-text);">Roman</strong> mode, the chord name is hidden until you solve it — great for training functional harmony recognition.</p></div>
+            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
+        </div>
+    </div>
+
     <div class="sheet-container">
         <div id="sheetViewport" class="sheet-viewport">
             <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
@@ -161,7 +229,7 @@
 
                 <!-- INFO SÁV -->
                 <div class="info-bar-integrated">
-                    <div id="infoBarText" class="info-bar-text">SYSTEM READY — PRESS START TO BEGIN</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">PRESS START TO BEGIN</div>
                 </div>
 
                 <!-- MASTER DASHBOARD -->
@@ -175,64 +243,92 @@
                         </svg>
                     </div>
 
-                    <!-- BAL CSOPORT -->
+                    <!-- BAL — modul-specifikus -->
                     <div class="control-group">
-                        <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
-                        <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP CLEF: TOGGLE TREBLE CLEF CHORD GENERATION">Top</button>
-                        <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM CLEF: TOGGLE BASS CLEF CHORD GENERATION">Bottom</button>
+                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                            <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
+                            <div class="clef-divider"></div>
+                            <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
+                        </button>
                         <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint()" data-help="HINTS: DISPLAYS NOTE NAMES WITHIN EACH CHORD">Hints</button>
+                        <button id="btnKeys" class="hardware-btn" onclick="if(!helpActive) toggleKeys()" data-help="KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE PIANO KEYBOARD">Keys</button>
                     </div>
 
-                    <!-- KÖZÉP: OLED + NYILAK -->
+                    <!-- KÖZÉP: OLED + START -->
                     <div class="center-console">
-                        <div class="lcd-arrow-wrapper">
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▲</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+                        <div style="display:flex; align-items:center; gap:32px;">
+                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE CHORD PRACTICE SESSION">
+                                <span id="startLabel" class="active">START</span>
+                                <div class="split-div"></div>
+                                <span id="stopLabel">STOP</span>
                             </div>
-
-                            <div class="oled-wrapper">
-                                <div class="oled-screen">
-                                    <div class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
-                                        <div class="oled-header">Module</div>
-                                        <div class="oled-main" id="lcdModuleText">CHORDS</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) toggleMode()" data-help="MODE: NOTES (SHEET ONLY) → CHORDS (NAME + NOTES) → ROMAN (NUMERAL + NOTES)">
-                                        <div class="oled-header">Mode</div>
-                                        <div class="oled-main" id="lcdModeText">NOTES</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleLevel(1)" data-help="LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS">
-                                        <div class="oled-header">Level</div>
-                                        <div class="oled-main" id="lcdLevelText">ROOT</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" data-help="PROGRESS: CURRENT CHORD OUT OF 16 IN THE SEQUENCE">
-                                        <div class="oled-header">Progress</div>
-                                        <div class="oled-main" id="lcdProgress" style="font-size:14px;">0 / 16</div>
+                            <div class="lcd-arrow-wrapper">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▲</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+                                </div>
+                                <div class="oled-wrapper">
+                                    <div class="oled-screen">
+                                        <div id="oledModule" class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
+                                            <div class="oled-header">Module</div>
+                                            <div class="oled-main" id="lcdModuleText">CHORDS</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) toggleMode()" data-help="MODE: NOTES (SHEET ONLY) → CHORDS (NAME + NOTES) → ROMAN (NUMERAL)">
+                                            <div class="oled-header">Mode</div>
+                                            <div class="oled-main" id="lcdModeText">NOTES</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledLevel" class="oled-section" onclick="if(!helpActive) cycleLevel(1)" data-help="LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS">
+                                            <div class="oled-header">Level</div>
+                                            <div class="oled-main" id="lcdLevelText">ROOT</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledProgress" class="oled-section" data-help="PROGRESS: CURRENT CHORD OUT OF 16 IN THE SEQUENCE">
+                                            <div class="oled-header">Progress</div>
+                                            <div class="oled-main" id="lcdProgress">0 / 16</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▼</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▼</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- JOBB CSOPORT -->
+                    <!-- JOBB — globális + home + info -->
                     <div class="control-group">
-                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE CHORD PRACTICE SESSION">START</button>
-                        <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTHESIZER">Piano</button>
-                        <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER: OPEN ADSR ENVELOPE PANEL">Mixer</button>
-                        <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN: IMMERSIVE STUDIO MODE">Fullscr</button>
-                        <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO SEE ITS DESCRIPTION">Help</button>
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
+                            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/>
+                                <rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
+                                <rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
+                                <line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
+                                <line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
+                            </svg>
+                        </button>
+                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        </button>
+                        <div class="lang-split">
+                            <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
+                            <div class="lang-divider"></div>
+                            <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
+                        </div>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
+                        <div style="width:16px;"></div>
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                        </button>
                     </div>
                 </div>
 
@@ -250,6 +346,119 @@
     </div>
 
 <script>
+    let currentLang = 'EN';
+    const MODULE_NAMES = {
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
+    };
+    const AKKORD_T = {
+        EN: {
+            infoTitle:'Chords — Module Guide', howTitle:'How It Works',
+            howBody:'16 chords appear on the staff. Hold all the correct notes of each chord simultaneously on the piano. Release to advance to the next chord. Wrong notes are highlighted in red.',
+            ctrlTitle:'Controls', gotIt:'Got It',
+            ctrl1:'Notes (sheet only), Chords (name + notes after solving), Roman (numeral).',
+            ctrl2:'Root position → Inversions → 7th chords.',
+            ctrl3:'Toggle treble and bass clef chord generation independently.',
+            ctrl4:'Shows individual note names within each chord and activates LED guides.',
+            tipTitle:'Learning Tip',
+            tipBody:'In <strong style="color:var(--oled-text);">Roman</strong> mode, the chord name is hidden until you solve it — great for training functional harmony recognition.',
+            ready:'SYSTEM READY — PRESS START TO BEGIN',
+            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnKeys:'Keys',
+            btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
+            hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLE TREBLE CLEF CHORDS',
+            hBottom:'BOTTOM CLEF: TOGGLE BASS CLEF CHORDS', hHints:'HINTS: SHOWS NOTE NAMES WITHIN EACH CHORD', hKeys:'KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE KEYBOARD',
+            hStart:'START/STOP: BEGIN OR END THE CHORD PRACTICE', hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI',
+            hMixer:'MIXER: OPEN ADSR PANEL', hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',
+            hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
+            hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
+            hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
+            hMode:'MODE: NOTES (SHEET ONLY) → CHORDS (NAME REVEALED) → ROMAN (NUMERAL)',
+            hLevel:'LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS',
+            hProgress:'PROGRESS: CURRENT CHORD NUMBER OUT OF 16',
+            oledNotes:'NOTES', oledChords:'CHORDS', oledRoman:'ROMAN',
+            oledRoot:'ROOT', oledInv:'INVERSION', oled7th:'7THS',
+        },
+        HU: {
+            infoTitle:'Akkordok — Modul útmutató', howTitle:'Hogyan működik',
+            howBody:'16 akkord jelenik meg a kottán. Nyomd le egyszerre az akkord összes hangját a zongorán. Engedd fel a folytatáshoz. A téves hangok pirossal jelennek meg.',
+            ctrlTitle:'Vezérlők', gotIt:'Értettem',
+            ctrl1:'Hangok (csak kotta), Akkordok (név + hangok megoldás után), Római (szám).',
+            ctrl2:'Alap helyzet → Fordítások → Szeptim akkordok.',
+            ctrl3:'Violin és basszus kulcsos akkordok külön-külön be/ki.',
+            ctrl4:'Megjeleníti az egyes hangneveket az akkordon belül és aktiválja a LED vezétőket.',
+            tipTitle:'Tanulási tipp',
+            tipBody:'A <strong style="color:var(--oled-text);">Római</strong> módban az akkord neve rejtve marad a megoldásig — kiváló a funkcionális harmónia felismerés fejlesztésére.',
+            ready:'RENDSZER KÉSZ — NYOMJ STARTOT A KEZDÉSHEZ',
+            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnem', btnKeys:'Billentyű',
+            btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
+            hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE', hTop:'FELSŐ KULCS: VIOLIN KULCSOS AKKORDOK BE/KI',
+            hBottom:'ALSÓ KULCS: BASSZUS KULCSOS AKKORDOK BE/KI', hHints:'HANGNEM: HANGNEVEKET MUTAT AZ AKKORDON BELÜL', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKKORD HANGJAIT A ZONGORÁN',
+            hStart:'START/STOP: AKKORD GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA', hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI — MIDI-VEL IS MŰKÖDIK',
+            hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA', hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',
+            hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ — HOGYAN MŰKÖDIK',
+            hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
+            hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
+            hMode:'MÓD: HANGOK (CSAK KOTTA) → AKKORDOK (NÉV FELTÁRUL) → RÓMAI (SZÁM)',
+            hLevel:'SZINT: ALAP HELYZET → FORDÍTÁSOK → SZEPTIM AKKORDOK',
+            hProgress:'HALADÁS: AKTUÁLIS AKKORD SORSZÁMA 16-BÓL',
+            oledNotes:'HANGOK', oledChords:'AKKORDOK', oledRoman:'RÓMAI',
+            oledRoot:'ALAP', oledInv:'FORDÍTÁS', oled7th:'SZEPTIM',
+        }
+    };
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
+        document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
+        document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
+        const T = AKKORD_T[lang];
+        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.tipTitle,T.tipBody,T.gotIt];
+        ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
+        // Csak szöveges gombok
+        const btnMap={'btnHintName':T.btnHints,'btnKeys':T.btnKeys};
+        Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
+        const helpMap={
+            'btnHome':T.hHome,'btnClef':T.hClef,'btnHintName':T.hHints,'btnKeys':T.hKeys,
+            'btnStart':T.hStart,'audioToggle':T.hPiano,
+            'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
+            'oledModule':T.hModule,'oledMode':T.hMode,'oledLevel':T.hLevel,'oledProgress':T.hProgress
+        };
+        Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
+        // OLED
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][2];
+        const modeNames={'sheet':T.oledNotes,'lead':T.oledChords,'roman':T.oledRoman};
+        document.getElementById('lcdModeText').innerText = modeNames[currentMode] || T.oledNotes;
+        const levelNames={1:T.oledRoot,2:T.oledInv,3:T.oled7th};
+        document.getElementById('lcdLevelText').innerText = levelNames[currentLevel] || T.oledRoot;
+        if(helpActive) setInfoBar(T.helpMode, null);
+        else if(!isRunning) setInfoBar(T.ready, null);
+    }
+
+    function setInfoBar(text, targetEl) {
+        const bar = document.getElementById('infoBarText');
+        if (!targetEl) {
+            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
+            bar.innerHTML = text; return;
+        }
+        const barRect = bar.parentElement.getBoundingClientRect();
+        const elRect = targetEl.getBoundingClientRect();
+        const cx = elRect.left + elRect.width / 2 - barRect.left;
+        bar.innerHTML = text;
+        if (cx / barRect.width < 0.5) {
+            bar.style.left=(cx+18)+'px'; bar.style.right='auto'; bar.style.transform='none';
+        } else {
+            bar.style.right=(barRect.width-cx+18)+'px'; bar.style.left='auto'; bar.style.transform='none';
+        }
+    }
+
+    function updateStartStop(running) {
+        document.getElementById('startLabel').classList.toggle('active', !running);
+        document.getElementById('stopLabel').classList.toggle('active', running);
+    }
     // ── AKKORD ADATOK (eredeti, érintetlen) ──
     const CHORDS = {
         treble: {
@@ -268,7 +477,7 @@
     const BASS_BASE_Y = 376.16, BASS_SP_Y = 10.71;
 
     // ── ÁLLAPOTOK ──
-    let isRunning = false, showNames = false, helpActive = false, audioOn = true;
+    let isRunning = false, showNames = false, showKeys = false, helpActive = false, audioOn = true;
     let activeRH = true, activeLH = true;
     let currentMode = 'sheet', currentLevel = 1;
     let seq = [], currentStep = 0, activeMidiNotes = new Set();
@@ -276,6 +485,19 @@
     let audioInited = false;
     let audioCtx, sampleBuffers = {}, activeNodes = {};
     let masterReverb, reverbGain;
+
+    // Kulcs váltó
+    let clefState = 0;
+    function cycleClef() {
+        if (helpActive) return;
+        clefState = (clefState + 1) % 3;
+        activeRH = clefState !== 2;
+        activeLH = clefState !== 1;
+        document.getElementById('clefRH').style.color = activeRH ? '#fff' : '#444';
+        document.getElementById('clefLH').style.color = activeLH ? '#fff' : '#444';
+        if (isRunning) stopPractice();
+        buildSequence(); draw();
+    }
 
     // ── MODULE VÁLTÓ ──
     const modules = [
@@ -299,10 +521,9 @@
 
     // ── LCD ──
     function updateLCD() {
-        const modeNames = { 'sheet':'NOTES', 'lead':'CHORDS', 'roman':'ROMAN' };
-        const levelNames = { 1:'ROOT', 2:'INVERSION', 3:'7THS' };
-        document.getElementById('lcdModeText').innerText = modeNames[currentMode];
-        document.getElementById('lcdLevelText').innerText = levelNames[currentLevel];
+        const T = AKKORD_T[currentLang];
+        document.getElementById('lcdModeText').innerText = {'sheet':T.oledNotes,'lead':T.oledChords,'roman':T.oledRoman}[currentMode];
+        document.getElementById('lcdLevelText').innerText = {1:T.oledRoot,2:T.oledInv,3:T.oled7th}[currentLevel];
     }
     function updateProgress() {
         document.getElementById('lcdProgress').innerText = `${currentStep} / 16`;
@@ -310,7 +531,7 @@
 
     function updateInfoBar(msg) {
         if (helpActive) return;
-        document.getElementById('infoBarText').innerHTML = msg || 'SYSTEM READY — PRESS START TO BEGIN';
+        setInfoBar(msg || AKKORD_T[currentLang].ready, null);
     }
 
     // ── HELP ──
@@ -319,12 +540,10 @@
         document.getElementById('btnHelp').classList.toggle('active', helpActive);
         if (helpActive) {
             document.body.classList.add('help-mode-active');
-            document.getElementById('infoBarText').innerHTML = 'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION';
+            setInfoBar(AKKORD_T[currentLang].helpMode, null);
         } else {
             document.body.classList.remove('help-mode-active');
-            document.getElementById('infoBarText').innerHTML = isRunning
-                ? 'PLAYING — HOLD THE CORRECT CHORD NOTES SIMULTANEOUSLY'
-                : 'SYSTEM READY — PRESS START TO BEGIN';
+            updateInfoBar();
         }
     }
     document.addEventListener('click', (e) => {
@@ -332,7 +551,15 @@
         if (helpActive) {
             e.preventDefault(); e.stopPropagation();
             const target = e.target.closest('[data-help]');
-            if (target) document.getElementById('infoBarText').innerHTML = target.dataset.help;
+            if (target) {
+                const bar = document.getElementById('infoBarText');
+                const txt = target.dataset.help;
+                const barRect = bar.parentElement.getBoundingClientRect();
+                const cx = target.getBoundingClientRect().left + target.getBoundingClientRect().width/2 - barRect.left;
+                bar.innerHTML = txt;
+                if (cx/barRect.width < 0.5) { bar.style.left=(cx+18)+'px'; bar.style.right='auto'; bar.style.transform='none'; }
+                else { bar.style.right=(barRect.width-cx+18)+'px'; bar.style.left='auto'; bar.style.transform='none'; }
+            }
         }
     }, true);
 
@@ -346,14 +573,7 @@
     });
 
     // ── GOMBOK ──
-    function toggleHand(h) {
-        if (helpActive) return;
-        if (h === 'RH') activeRH = !activeRH; else activeLH = !activeLH;
-        if (!activeRH && !activeLH) { activeRH = true; activeLH = true; }
-        document.getElementById('handRH').classList.toggle('active', activeRH);
-        document.getElementById('handLH').classList.toggle('active', activeLH);
-        if (isRunning) stopPractice(); else { buildSequence(); draw(); }
-    }
+    // toggleHand replaced by cycleClef
     function toggleMode() {
         if (helpActive) return;
         if (currentMode === 'sheet') currentMode = 'lead';
@@ -370,7 +590,7 @@
     }
     function updateKeyboardHints() {
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
-        if (showNames && seq.length > 0 && currentStep < seq.length) {
+        if (showKeys && seq.length > 0 && currentStep < seq.length) {
             seq[currentStep].chord.notes.forEach(n => {
                 document.getElementById(`k-${n.m}`)?.classList.add('chord-hint');
             });
@@ -381,8 +601,13 @@
         if (helpActive) return;
         showNames = !showNames;
         document.getElementById('btnHintName').classList.toggle('active', showNames);
-        updateKeyboardHints();
         draw();
+    }
+    function toggleKeys() {
+        if (helpActive) return;
+        showKeys = !showKeys;
+        document.getElementById('btnKeys').classList.toggle('active', showKeys);
+        updateKeyboardHints();
     }
     function toggleAudio() {
         audioOn = !audioOn;
@@ -416,21 +641,17 @@
     function handleMainButton() {
         if (!isRunning) {
             initAudio(); buildSequence(); isRunning = true;
-            document.getElementById('btnStart').innerText = 'STOP';
-            document.getElementById('btnStart').classList.add('running');
+            updateStartStop(true);
             updateInfoBar('PLAYING — HOLD THE CORRECT CHORD NOTES SIMULTANEOUSLY');
             draw();
         } else stopPractice();
     }
     function stopPractice() {
         isRunning = false; waitingForRelease = false;
-        document.getElementById('btnStart').innerText = 'START';
-        document.getElementById('btnStart').classList.remove('running');
+        updateStartStop(false);
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
         updateInfoBar(); draw();
     }
-
-    // ── AUDIO ──
     async function initAudio() {
         if (audioInited) return; audioInited = true;
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -534,6 +755,10 @@
         draw();
     }
 
+    // H → B konverzió EN módban
+    function noteName(n) { return currentLang === 'EN' ? n.replace(/\bH\b/g, 'B') : n; }
+    function chordName(name) { return currentLang === 'EN' ? name.replace(/H/g, 'B') : name; }
+
     // ── KOTTA RAJZOLÁS (eredeti logika) ──
     const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
 
@@ -568,14 +793,14 @@
             if (currentMode === 'lead' || currentMode === 'roman') {
                 ctx.fillStyle = color; ctx.shadowBlur = 0;
                 ctx.font = '400 28px "Share Tech Mono"'; ctx.textAlign = 'center';
-                let displayText = currentMode === 'roman' ? item.chord.roman : item.chord.name;
+                let displayText = currentMode === 'roman' ? item.chord.roman : chordName(item.chord.name);
                 ctx.fillText(displayText, x, textY);
 
                 let isSolved = (i < currentStep) || (i === currentStep && waitingForRelease);
                 if (currentMode === 'roman' && isSolved) {
                     ctx.font = '400 14px "Share Tech Mono"';
                     ctx.fillStyle = inactiveColor;
-                    ctx.fillText(`(${item.chord.name})`, x, textY + 22);
+                    ctx.fillText(`(${chordName(item.chord.name)})`, x, textY + 22);
                 }
             }
 
@@ -602,7 +827,7 @@
             if (showNames) {
                 ctx.fillStyle = color; ctx.font = '400 16px "Share Tech Mono"'; ctx.textAlign = 'center';
                 ctx.textBaseline = 'alphabetic';
-                let hintStr = item.chord.notes.map(n => n.n.replace('#','♯')).join(' + ');
+                let hintStr = item.chord.notes.map(n => noteName(n.n).replace('#','♯')).join(' + ');
                 let topY = Math.min(...item.chord.notes.map(n => baseLineY - (n.off * spacing)));
                 let hintY;
                 if (currentMode === 'sheet') {
