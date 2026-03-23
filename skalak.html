@@ -13,9 +13,9 @@
             --btn-dark: #101012; 
             --btn-border: #050505;
             --text-dim: #555; 
-            --lcd-bg-dark: #111211; 
+            --lcd-bg-dark: #111213; 
             --lcd-label-color: #557799; 
-            --theme-r: 170; --theme-g: 204; --theme-b: 170;
+            --theme-r: 179; --theme-g: 230; --theme-b: 255;
             --oled-text: #b3e6ff;
         }
         
@@ -61,13 +61,17 @@
         /* ── INFO SÁV ── */
         .info-bar-integrated {
             width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808;
-            display: flex; align-items: center; justify-content: center; z-index: 10;
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden;
         }
-        /* BETŰMÉRET CSÖKKENTVE 18px-re */
         .info-bar-text { 
             font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
             color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
+            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s;
+        }
+        #helpTriangle {
+            font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold;
+            color: var(--oled-text); position: absolute; transition: left 0.15s;
+            pointer-events: none;
         }
 
         /* ── MIXER OVERLAY ── */
@@ -101,9 +105,23 @@
         }
         .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .hardware-btn.active { color: #ffffff; background-color: #121214; }
-        #btnStart { width: 110px; font-weight: 800; font-size: 14px; letter-spacing: 1px; box-shadow: 0 4px 0 #000; margin-left: 20px;}
-        #btnStart:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
-        #btnStart.running { color: #ffffff; background-color: #1a1a1c; border-color: #333; }
+        /* START|STOP SPLIT */
+        .start-split {
+            display:flex; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000;
+            overflow:hidden; transition:transform 0.1s; cursor:pointer;
+        }
+        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .start-split span {
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif;
+            color:#444; transition:color 0.15s; text-transform:uppercase;
+            padding: 0 22px;
+        }
+        .start-split span#startLabel { padding: 0 12px 0 22px; }
+        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
+        .start-split span.active { color:#fff; }
+        .start-split .split-div { width:1px; background:#333; margin:6px 0; flex-shrink:0; }
 
         /* ── 4-RÉSZES LCD + NYILAK (Visszatéve!) ── */
         .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
@@ -144,10 +162,40 @@
         .patch-btn:hover { background: #222; color: #fff; }
         .patch-btn:active { transform: translateY(2px); }
 
-        body.help-mode-active { cursor: help; } body.help-mode-active * { cursor: help !important; }
+        /* KULCS SPLIT GOMB */
+        .clef-split {
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
+            overflow:hidden; cursor:pointer; padding:0; align-items:center;
+            transition:transform 0.1s;
+        }
+        .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+        .sq-btn {
+            width: 38px; height: 38px; background-color: var(--btn-dark); color: #444;
+            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
+            font-size: 16px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0;
+        }
+        .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .sq-btn.active { color: #fff; background-color: #121214; }
+
+        /* LANG SPLIT GOMB */
+        .lang-split {
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
+        }
+        .lang-split button {
+            flex:1; background:transparent; border:none; cursor:pointer;
+            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
+        }
+        .lang-split button.active { color:#fff; }
+        .lang-split button:active { background: rgba(255,255,255,0.05); }
+        .lang-divider { width:1px; background:#222; margin:6px 0; }
+        body.help-mode-active, body.help-mode-active * { cursor: help !important; }
     </style>
 </head>
-<body class="theme-green" onclick="initAudio()">
+<body onclick="initAudio()">
 
     <div id="patchBrowserModal" class="modal-overlay">
         <div class="modal-content patch-browser-content">
@@ -190,6 +238,23 @@
         </div>
     </div>
 
+    <!-- INFO MODAL -->
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content" style="max-width:640px;text-align:left;">
+            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Scales — Module Guide</h2>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note is highlighted. Complete the scale up and down to finish the round.</p></div>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Scale ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Cycle through all 24 major and minor scales.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Sprint (1×), Marathon (3×), Training (endless loop).</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Octave ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Switch between 1 and 2 octave scale runs.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Shows note names and activates the LED light guide on the keyboard.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays the official scale fingering (1–5) on the sheet.</span></div>
+            </div>
+            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p></div>
+            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
+        </div>
+    </div>
+
     <div class="sheet-container">
         <div id="sheetViewport" class="sheet-viewport">
             <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
@@ -212,7 +277,8 @@
                 </div>
 
                 <div id="infoBar" class="info-bar-integrated">
-                    <div id="infoBarText" class="info-bar-text">SYSTEM READY - SELECT SCALE OR PRESS START ▼</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%; transform:translateX(-50%);">SELECT SCALE OR PRESS START</div>
+                    <div id="helpTriangle" style="display:none;">▼</div>
                 </div>
 
                 <div class="master-dashboard">
@@ -225,59 +291,90 @@
                         </svg>
                     </div>
 
+                    <!-- BAL — modul-specifikus -->
                     <div class="control-group">
-                        <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
-                        <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP CLEF: TOGGLES GENERATION FOR THE RIGHT HAND">Top</button>
-                        <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM CLEF: TOGGLES GENERATION FOR THE LEFT HAND">Bottom</button>
-                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: DISPLAYS NOTE NAMES AND ACTIVATES LIGHT GUIDE LEDS">Hints</button>
-                        <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: DISPLAYS THE OFFICIAL SCALE FINGERING ON THE SHEET">Fingers</button>
+                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                            <span id="clefRH" style="font-size:28px; flex:1; display:flex; align-items:center; justify-content:center; color:#fff;">𝄞</span>
+                            <div class="clef-divider"></div>
+                            <span id="clefLH" style="font-size:22px; flex:1; display:flex; align-items:center; justify-content:center; color:#fff;">𝄢</span>
+                        </button>
+                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: NOTE NAMES APPEAR NEXT TO EACH NOTEHEAD ON THE STAFF">Hints</button>
+                        <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: OFFICIAL SCALE FINGERING (1–5) SHOWN ON THE STAFF">Fingers</button>
+                        <button id="btnKeys" class="hardware-btn" onclick="if(!helpActive) toggleKeys()" data-help="KEYS: BLUE LED LIGHTS UP THE CURRENT NOTE ON THE PIANO KEYBOARD">Keys</button>
                     </div>
 
                     <div class="center-console">
-                        <div class="lcd-arrow-wrapper">
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(-1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(1)">▲</button>
+                        <div style="display:flex; align-items:center; gap:32px;">
+                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE SCALE PRACTICE">
+                                <span id="startLabel" class="active">START</span>
+                                <div class="split-div"></div>
+                                <span id="stopLabel">STOP</span>
                             </div>
-                            
-                            <div class="oled-wrapper">
-                                <div class="oled-screen">
-                                    <div class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO LOAD">
-                                        <div class="oled-header">Module</div><div class="oled-main" id="lcdModuleText">SCALES</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT, MARATHON OR TRAINING">
-                                        <div class="oled-header">Mode</div><div class="oled-main" id="lcdModeText">SPRINT</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE: CLICK TO BROWSE OR USE ARROWS">
-                                        <div class="oled-header">Scale</div><div class="oled-main" id="lcdScaleText">C MAJOR</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleOctave(1)" data-help="OCTAVE: SWITCHES BETWEEN 1 OR 2 OCTAVES">
-                                        <div class="oled-header">Octave</div><div class="oled-main" id="lcdOctaveText">1 OCT</div>
+                            <div class="lcd-arrow-wrapper">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(1)">▲</button>
+                                </div>
+                                <div class="oled-wrapper">
+                                    <div class="oled-screen">
+                                        <div id="oledModule" class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO SWITCH — USE ARROWS TO BROWSE">
+                                            <div class="oled-header">Module</div><div class="oled-main" id="lcdModuleText">SCALES</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1X) = ONE RUN | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP">
+                                            <div class="oled-header">Mode</div><div class="oled-main" id="lcdModeText">SPRINT</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledScale" class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE: CLICK TO BROWSE — CHOOSE FROM 24 MAJOR AND MINOR SCALES">
+                                            <div class="oled-header">Scale</div><div class="oled-main" id="lcdScaleText">C MAJOR</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledOctave" class="oled-section" onclick="if(!helpActive) cycleOctave(1)" data-help="OCTAVE: 1 OCTAVE = BASIC EXERCISE | 2 OCTAVES = EXTENDED RUN">
+                                            <div class="oled-header">Octave</div><div class="oled-main" id="lcdOctaveText">1 OCT</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <input type="hidden" id="scaleSelectValue" value="C_DUR">
-
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(-1)">▼</button>
+                                <input type="hidden" id="scaleSelectValue" value="C_DUR">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleScale(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleOctave(-1)">▼</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- JOBB — globális + home + info -->
                     <div class="control-group">
-                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE PRACTICE SEQUENCE">START</button>
-                        <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH">Piano</button>
-                        <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER: OPEN ADSR PANEL">Mixer</button>
-                        <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE">Fullscr</button>
-                        <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: TOGGLE INFO MODE">Help</button>
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
+                            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/>
+                                <rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
+                                <rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
+                                <line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
+                                <line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
+                                <rect x="2" y="3" width="20" height="18" rx="1" fill="none" stroke="none"/>
+                            </svg>
+                        </button>
+                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        </button>
+                        <div class="lang-split">
+                            <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
+                            <div class="lang-divider"></div>
+                            <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
+                        </div>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
+                        <div style="width:16px;"></div>
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                        </button>
                     </div>
                 </div>
 
@@ -293,6 +390,99 @@
     </div>
 
 <script>
+    // ── NYELVVÁLTÓ ──
+    let currentLang = 'EN';
+    const MODULE_NAMES = {
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
+    };
+    const SKALAK_T = {
+        EN: {
+            infoTitle:'Scales — Module Guide', howTitle:'How It Works',
+            howBody:'Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note is highlighted. Complete the scale up and down to finish the round.',
+            ctrlTitle:'Controls', gotIt:'Got It',
+            ctrl1:'Cycle through all 24 major and minor scales.',
+            ctrl2:'Sprint (1×), Marathon (3×), Training (endless loop).',
+            ctrl3:'Switch between 1 and 2 octave scale runs.',
+            ctrl4:'Shows note names and activates the LED light guide on the keyboard.',
+            ctrl5:'Displays the official scale fingering (1–5) on the sheet.',
+            tipTitle:'Learning Tip',
+            tipBody:'Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',
+            ready:'SELECT SCALE OR PRESS START',
+            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnFingers:'Fingers', btnKeys:'Keys',
+            btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
+            hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLES RIGHT HAND NOTES',
+            hBottom:'BOTTOM CLEF: TOGGLES LEFT HAND NOTES', hHints:'HINTS: SHOWS NOTE NAMES AND LED GUIDE',
+            hFingers:'FINGERS: DISPLAYS OFFICIAL SCALE FINGERING', hKeys:'KEYS: BLUE LED LIGHTS UP THE CURRENT NOTE ON THE KEYBOARD', hStart:'START/STOP: BEGIN OR END THE PRACTICE',
+            hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD', hMixer:'MIXER: OPEN ADSR PANEL',
+            hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT', hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
+            hModule:'MODULE: CLICK TO SWITCH — USE ARROWS TO BROWSE',
+            hMode:'MODE: SPRINT (1X) = ONE RUN | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',
+            hScale:'SCALE: CLICK TO BROWSE — CHOOSE FROM 24 MAJOR AND MINOR SCALES',
+            hOctave:'OCTAVE: 1 OCTAVE = BASIC EXERCISE | 2 OCTAVES = EXTENDED RUN',
+            hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
+            oledSprint:'SPRINT', oledMarathon:'MARATHON', oledTraining:'TRAINING',
+            oled1oct:'1 OCT', oled2oct:'2 OCT',
+        },
+        HU: {
+            infoTitle:'Skálák — Modul útmutató', howTitle:'Hogyan működik',
+            howBody:'Válassz skálát és nyomj Startot. A hangok megjelennek a kottán — játszd le őket sorban a zongorán. Az aktív hang kiemelve jelenik meg. Felfelé és lefelé is lejátszva zárul a kör.',
+            ctrlTitle:'Vezérlők', gotIt:'Értettem',
+            ctrl1:'Váltás a 24 dúr és moll skála között.',
+            ctrl2:'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',
+            ctrl3:'Váltás 1 és 2 oktáv terjedelemű skálafutam között.',
+            ctrl4:'Megjeleníti a hangneveket és aktiválja a LED fényvezetőt a billentyűzeten.',
+            ctrl5:'Megjeleníti a hivatalos skálaujjrendet (1–5) a kottán.',
+            tipTitle:'Tanulási tipp',
+            tipBody:'Kezdj <strong style="color:var(--oled-text);">Sprint</strong> móddal és 1 oktávval. Ha már tisztán tudod a skálát, válts 2 oktávra és Maratonra az izommemória építéséhez.',
+            ready:'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT',
+            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnem', btnFingers:'Ujjrend', btnKeys:'Billentyű',
+            btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
+            hHome:'FŐOLDAL: VISSZA A FŐMENÜBE', hTop:'FELSŐ KULCS: JOBB KÉZ HANGOK BE/KI',
+            hBottom:'ALSÓ KULCS: BAL KÉZ HANGOK BE/KI', hHints:'HANGNEM: HANGNEVEK ÉS LED VEZETŐ',
+            hFingers:'UJJREND: HIVATALOS SKÁLAUJJREND', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKTUÁLIS HANGOT A ZONGORÁN', hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
+            hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI', hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA',
+            hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ', hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',
+            hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
+            hMode:'MÓD: SPRINT (1×) = EGY FUTAM | MARATON (3×) = HÁROMSZOROS | TRAINING = VÉGTELEN HUROK',
+            hScale:'SKÁLA: KATTINTS A BÖNGÉSZŐHÖZ — 24 DÚR ÉS MOLL SKÁLA KÖZÜL VÁLASZTHATSZ',
+            hOctave:'OKTÁV: 1 OKTÁV = ALAPGYAKORLAT | 2 OKTÁV = KIBŐVÍTETT FUTAM',
+            hClef:'KULCS: KÖRKÖRÖSEN VÁLt — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
+            oledSprint:'SPRINT', oledMarathon:'MARATON', oledTraining:'TRÉNING',
+            oled1oct:'1 OKT', oled2oct:'2 OKT',
+        }
+    };
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
+        const T = SKALAK_T[lang];
+        // Info modal
+        const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.gotIt];
+        ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
+        // Gombok
+        const btnMap={'handRH':T.btnTop,'handLH':T.btnBottom,'btnHintName':T.btnHints,'btnHintFinger':T.btnFingers,'btnKeys':T.btnKeys};
+        Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
+        // Help szövegek
+        const helpMap={
+            'btnHome':T.hHome,'handRH':T.hTop,'handLH':T.hBottom,
+            'btnHintName':T.hHints,'btnHintFinger':T.hFingers,'btnKeys':T.hKeys,
+            'btnStart':T.hStart,'audioToggle':T.hPiano,
+            'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
+            'oledModule':T.hModule,'oledMode':T.hMode,'oledScale':T.hScale,
+            'oledOctave':T.hOctave,'btnClef':T.hClef
+        };
+        Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
+        // OLED modul név
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][3];
+        // Info sáv
+        if(helpActive) setInfoBar(T.helpMode, null);
+        else if(!isRunning) setInfoBar(T.ready, null);
+    }
     let audioInited = false, midiInited = false;
     let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
 
@@ -321,6 +511,9 @@
     }
 
     function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.log(err)); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
+    document.addEventListener('fullscreenchange', () => {
+        document.getElementById('btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
+    });
 
     let helpActive = false;
     function toggleHelp() { 
@@ -328,21 +521,55 @@
         const btnHelp = document.getElementById('btnHelp');
         if (helpActive) {
             btnHelp.classList.add('active');
-            document.body.style.cursor = 'help';
-            document.getElementById('infoBarText').innerHTML = "CLICK ON ANY BUTTON TO SEE ITS FUNCTIONALITY";
+            document.body.classList.add('help-mode-active');
+            setInfoBar(SKALAK_T[currentLang].helpMode, null);
         } else {
             btnHelp.classList.remove('active');
-            document.body.style.cursor = 'default';
-            document.getElementById('infoBarText').innerHTML = "SYSTEM READY - SELECT SCALE OR PRESS START ▼";
+            document.body.classList.remove('help-mode-active');
+            setInfoBar(SKALAK_T[currentLang].ready, null);
+        }
+    }
+
+    function setInfoBar(text, targetEl) {
+        const bar = document.getElementById('infoBarText');
+        const tri = document.getElementById('helpTriangle');
+        if (!targetEl) {
+            // normál állapot: középre, háromszög nélkül
+            tri.style.display = 'none';
+            bar.style.left = '50%';
+            bar.style.right = 'auto';
+            bar.style.transform = 'translateX(-50%)';
+            bar.innerHTML = text;
+            return;
+        }
+        const barRect = document.getElementById('infoBar').getBoundingClientRect();
+        const elRect = targetEl.getBoundingClientRect();
+        const cx = elRect.left + elRect.width / 2 - barRect.left;
+        const cxPct = cx / barRect.width;
+        // Háromszög az elem felett
+        tri.style.display = 'block';
+        tri.style.left = cx + 'px';
+        tri.style.transform = 'translateX(-50%)';
+        bar.innerHTML = text;
+        if (cxPct < 0.5) {
+            // elem bal oldalon — szöveg a háromszögtől jobbra
+            bar.style.left = (cx + 18) + 'px';
+            bar.style.right = 'auto';
+            bar.style.transform = 'none';
+        } else {
+            // elem jobb oldalon — szöveg a háromszögtől balra
+            bar.style.right = (barRect.width - cx + 18) + 'px';
+            bar.style.left = 'auto';
+            bar.style.transform = 'none';
         }
     }
 
     document.addEventListener('click', (e) => {
-        if (e.target.closest('#btnHelp')) return; 
+        if (e.target.closest('#btnHelp')) return;
         if (helpActive) {
             e.preventDefault(); e.stopPropagation();
             const target = e.target.closest('[data-help]');
-            if (target) { document.getElementById('infoBarText').innerHTML = target.dataset.help; }
+            if (target) setInfoBar(target.dataset.help, target);
         }
     }, true);
 
@@ -406,7 +633,7 @@
     let isRunning = false, activeRH = true, activeLH = true, currentNoteInBlock = 0;
     const MODES = ['SPRINT', 'MARATHON', 'TRAINING'];
     let currentModeIdx = 0, selectedOctaves = 1;
-    let showNames = false, showFinger = false;
+    let showNames = false, showFinger = false, showKeys = false;
     let rhHit = false, lhHit = false, seqBlocks = [];
     let lastHitTime = 0, hitIntervals = [];
 
@@ -414,8 +641,8 @@
     // Összes LED leoltása
     document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('scale-hint'));
     
-    // Ha a Hints (showNames) VAGY a Fingers (showFinger) aktív, gyújtsuk meg a LED-eket
-    if ((showNames || showFinger) && seqBlocks.length > 0) { 
+    // Ha a Keys gomb aktív, gyújtsuk meg a LED-eket
+    if (showKeys && seqBlocks.length > 0) { 
         seqBlocks[0].forEach(n => { 
             if(activeRH) document.getElementById(`k-${n.m_rh}`)?.classList.add('scale-hint'); 
             if(activeLH) document.getElementById(`k-${n.m_lh}`)?.classList.add('scale-hint'); 
@@ -425,21 +652,39 @@
 
     function cycleMode(dir) { if (helpActive) return; currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length; document.getElementById('lcdModeText').innerText = MODES[currentModeIdx]; if(isRunning) stopPractice(); buildSequence(); draw(); }
     function cycleOctave(dir) { if (helpActive) return; selectedOctaves = selectedOctaves === 1 ? 2 : 1; document.getElementById('lcdOctaveText').innerText = selectedOctaves + " OCT"; if(isRunning) stopPractice(); buildSequence(); draw(); }
-    function toggleHand(hand) { if (helpActive) return; if(hand === 'RH') { activeRH = !activeRH; if(!activeRH && !activeLH) activeLH = true; } else { activeLH = !activeLH; if(!activeLH && !activeRH) activeRH = true; } document.getElementById('handRH').classList.toggle('active', activeRH); document.getElementById('handLH').classList.toggle('active', activeLH); if(isRunning) stopPractice(); buildSequence(); draw(); }
+    // clef állapot: 0=mindkettő, 1=csak violin, 2=csak basszus
+    let clefState = 0;
+    function cycleClef() {
+        if (helpActive) return;
+        clefState = (clefState + 1) % 3;
+        activeRH = clefState !== 2;
+        activeLH = clefState !== 1;
+        const DIM = '#444', ON = '#fff';
+        document.getElementById('clefRH').style.color = activeRH ? ON : DIM;
+        document.getElementById('clefLH').style.color = activeLH ? ON : DIM;
+        if (isRunning) stopPractice();
+        buildSequence(); draw();
+    }
     function toggleHint(type) { 
-    if(helpActive) return; 
-    if(type === 'name') { 
-        showNames = !showNames; 
-        document.getElementById('btnHintName').classList.toggle('active', showNames); 
-    } 
-    else { 
-        showFinger = !showFinger; 
-        document.getElementById('btnHintFinger').classList.toggle('active', showFinger); 
-    } 
-    // Ez a sor kapcsolja fel a LED-eket a gombnyomás pillanatában:
-    updateKeyboardHints(); 
-    draw(); 
-}
+        if(helpActive) return; 
+        if(type === 'name') { 
+            showNames = !showNames; 
+            document.getElementById('btnHintName').classList.toggle('active', showNames); 
+        } 
+        else { 
+            showFinger = !showFinger; 
+            document.getElementById('btnHintFinger').classList.toggle('active', showFinger); 
+        } 
+        updateKeyboardHints(); 
+        draw(); 
+    }
+
+    function toggleKeys() {
+        if(helpActive) return;
+        showKeys = !showKeys;
+        document.getElementById('btnKeys').classList.toggle('active', showKeys);
+        updateKeyboardHints();
+    }
     function toggleAudio() { if (helpActive) return; audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
 
     function midiToStaffStep(midiNote, clef) {
@@ -523,12 +768,16 @@
         delete activeNodes[midi];
     }
 
+    function updateStartStop(running) {
+        document.getElementById('startLabel').classList.toggle('active', !running);
+        document.getElementById('stopLabel').classList.toggle('active', running);
+    }
+
     function handleMainButton() { 
         if (helpActive) return;
         if(!isRunning) { 
-            initAudio(); initMidi(); buildSequence(); isRunning=true; 
-            document.getElementById('btnStart').classList.add('running'); 
-            document.getElementById('btnStart').innerText = 'STOP';
+            initAudio(); initMidi(); buildSequence(); isRunning=true;
+            updateStartStop(true);
             lastHitTime = 0; hitIntervals = []; draw(); 
         } 
         else stopPractice();
@@ -536,14 +785,12 @@
 
     function stopPractice() {
         isRunning=false; currentNoteInBlock=0; currentBlockIndex=0;
-        document.getElementById('btnStart').classList.remove('running');
-        document.getElementById('btnStart').innerText = 'START';
+        updateStartStop(false);
         draw();
     }
 
     function showResults() {
-        isRunning = false; document.getElementById('btnStart').classList.remove('running');
-        document.getElementById('btnStart').innerText = 'START';
+        isRunning = false; updateStartStop(false);
         if (hitIntervals.length === 0) { stopPractice(); return; }
 
         let avgDiff = hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
@@ -608,14 +855,17 @@
             let isActive = (isRunning && i === currentNoteInBlock) || (!isRunning && i === 0 && currentBlockIndex === 0);
             
             /* 1. JAVÍTÁS: A zöldes árnyalat visszaállítva a kék helyett! */
-            let color = isActive ? "rgba(170, 204, 170, 1.0)" : "rgba(170, 204, 170, 0.3)";
+            let color = isActive ? "rgba(179, 230, 255, 1.0)" : "rgba(179, 230, 255, 0.3)";
             let x = startX + (i * spacingX); 
             
             if (activeRH) {
-                let y = 187.6 - ((n.step_rh - 32) * 11.14);
+                let y = 186.6 - ((n.step_rh - 32) * 11.14);
                 ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 0;
-                if (n.step_rh <= 30) { for (let s=30; s>=n.step_rh; s-=2) { let ly = 187.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                if (n.step_rh >= 42) { for (let s=42; s<=n.step_rh; s+=2) { let ly = 187.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                // Segédvonalak: desaturált, azonos fényerőn
+                ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : 'rgba(210,210,210,0.3)';
+                if (n.step_rh <= 30) { for (let s=30; s>=n.step_rh; s-=2) { let ly = 186.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                if (n.step_rh >= 42) { for (let s=42; s<=n.step_rh; s+=2) { let ly = 186.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                ctx.strokeStyle = color;
 
                 if (n.s !== '') { 
                     ctx.textAlign = 'center'; 
@@ -634,11 +884,12 @@
             if (activeLH) {
                 let y = 417 - ((n.step_lh - 15) * 10.71);
                 
-                /* Újra be kell állítani a színt, hogy ne vigye át a fehér szöveg színét az alsó sorra! */
                 ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 0;
-                
+                // Segédvonalak: desaturált, azonos fényerőn
+                ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : 'rgba(210,210,210,0.3)';
                 if (n.step_lh <= 13) { for (let s=13; s>=n.step_lh; s-=2) { let ly = 417 - ((s-15) * 10.71); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
                 if (n.step_lh >= 25) { for (let s=25; s<=n.step_lh; s+=2) { let ly = 417 - ((s-15) * 10.71); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
+                ctx.strokeStyle = color;
 
                 if (n.s !== '') { 
                     ctx.textAlign = 'center';
