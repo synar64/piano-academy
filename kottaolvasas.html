@@ -22,8 +22,8 @@
         .wood-cheek { width:24px; background:linear-gradient(to right,#3a1c0d,#1a0c05); box-shadow:inset 1px 0 2px rgba(255,255,255,0.1),inset -2px 0 5px rgba(0,0,0,0.8); border-radius:6px 0 0 0; z-index:10; }
         .wood-cheek.right { border-radius:0 6px 0 0; background:linear-gradient(to left,#3a1c0d,#1a0c05); }
         .synth-core { flex-grow:1; display:flex; flex-direction:column; position:relative; }
-        .info-bar-integrated { width:100%; height:45px; background-color:var(--lcd-bg-dark); border-bottom:2px solid #080808; display:flex; align-items:center; justify-content:center; z-index:10; box-shadow:inset 0 3px 10px rgba(0,0,0,0.9); }
-        .info-bar-text { font-family:'Share Tech Mono',monospace; font-size:18px; font-weight:bold; color:var(--oled-text); text-transform:uppercase; letter-spacing:2px; }
+        .info-bar-integrated { width:100%; height:45px; background-color:var(--lcd-bg-dark); border-bottom:2px solid #080808; display:flex; align-items:center; z-index:10; position:relative; overflow:hidden; }
+        .info-bar-text { font-family:'Share Tech Mono',monospace; font-size:18px; font-weight:bold; color:var(--oled-text); text-transform:uppercase; letter-spacing:2px; position:absolute; white-space:nowrap; }
         .settings-bar { position:absolute; bottom:100%; left:0; width:100%; height:85px; background:var(--lcd-bg-dark); display:none; align-items:center; justify-content:space-around; z-index:50; border-top:2px solid #333; box-shadow:0 -10px 30px #000; padding:0 20px; box-sizing:border-box; }
         .settings-control { display:flex; flex-direction:column; align-items:center; gap:8px; width:150px; z-index:2; position:relative; }
         .settings-control label { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono',monospace; cursor:pointer; text-transform:uppercase; font-weight:bold; }
@@ -35,9 +35,28 @@
         .hardware-btn { width:95px; height:38px; background-color:var(--btn-dark); color:var(--text-dim); border:1px solid var(--btn-border); border-radius:3px; cursor:pointer; font-weight:700; font-size:12px; text-transform:uppercase; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 3px 0 #000; transition:transform 0.1s; }
         .hardware-btn:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
         .hardware-btn.active { color:#fff; background-color:#121214; }
-        #btnStart { width:110px; font-weight:800; font-size:14px; letter-spacing:1px; box-shadow:0 4px 0 #000; margin-left:20px; }
-        #btnStart:active { transform:translateY(4px); box-shadow:0 0 0 #000; }
-        #btnStart.running { color:#fff; background-color:#1a1a1c; border-color:#333; }
+
+        .start-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000; overflow:hidden; cursor:pointer; transition:transform 0.1s; }
+        .start-split:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .start-split span { display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif; color:#444; text-transform:uppercase; }
+        .start-split span#startLabel { padding:0 12px 0 22px; }
+        .start-split span#stopLabel  { padding:0 20px 0 12px; }
+        .start-split span.active { color:#fff; }
+        .start-split .split-div { width:1px; background:#333; margin:6px 0; }
+        .sq-btn { width:38px; height:38px; background-color:var(--btn-dark); color:#444; border:1px solid var(--btn-border); border-radius:3px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 #000; transition:transform 0.1s, color 0.15s; flex-shrink:0; }
+        .sq-btn:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .sq-btn.active { color:#fff; background-color:#121214; }
+        .lang-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
+        .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim); }
+        .lang-split button.active { color:#fff; }
+        .lang-divider { width:1px; background:#222; margin:6px 0; }
+        .clef-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s; }
+        .clef-split:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .clef-split span { flex:1; display:flex; align-items:center; justify-content:center; color:#444; transition:color 0.15s; }
+        .clef-split span.active { color:#fff; }
+        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+        body.help-mode-active, body.help-mode-active * { cursor:help !important; }
+        /* start-split handles btnStart styling */
         .center-console { flex:1; display:flex; justify-content:center; position:relative; }
         .lcd-arrow-wrapper { display:flex; flex-direction:column; align-items:center; width:620px; }
         .arrow-row { display:flex; width:100%; justify-content:space-around; margin:4px 0; }
@@ -56,6 +75,8 @@
         .key-glow { position:absolute; top:0; cursor:pointer; }
         .key-glow.pressed::after { content:''; position:absolute; pointer-events:none; z-index:150; top:0; left:0; width:100%; height:100%; border-radius:0 0 4px 4px; background:rgba(0,0,0,0.11); box-shadow:inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top:3px; left:3px; width:calc(100% - 6px); height:calc(100% - 13px); border-radius:3px; background:rgba(255,255,255,0.15); box-shadow:inset 0 -10px 15px rgba(255,255,255,0.3); z-index:40; }
+        .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:#b3e6ff; opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:9999; }
+        .key-glow.note-hint .key-led { opacity:1; }
         .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; }
         .modal-content { background:var(--rack-bg); padding:30px; border:2px solid var(--rack-border); border-radius:6px; text-align:center; max-width:550px; width:90%; box-shadow:0 20px 50px rgba(0,0,0,1); }
         .modal-title { color:#aaa; text-transform:uppercase; letter-spacing:2px; font-weight:800; font-size:16px; margin-top:0; margin-bottom:25px; border-bottom:2px solid #111; padding-bottom:15px; }
@@ -82,6 +103,30 @@
         </div>
     </div>
 
+    <!-- INFO MODAL -->
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content" style="max-width:640px; text-align:left;">
+            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Sight Read — Module Guide</h2>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">16 notes appear on the staff one at a time. Play the correct note on the piano as quickly as possible. Wrong notes are highlighted in red — keep trying until you hit the right one.</p>
+            </div>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Top / Bottom</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Toggle Treble clef (C4–G5) and Bass clef (F2–C4) note pools.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Shows the note name next to each notehead on the staff.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Keys</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Lights up the target key on the piano keyboard with a blue LED.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Session: one round then results. Flow: endless auto-continue.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Level ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Diatonic (white keys) → Rhythm (note values) → Chromatic (all keys).</span></div>
+            </div>
+            <div style="margin-bottom:22px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Use <strong style="color:var(--oled-text);">Hints</strong> to learn note names on the staff, and <strong style="color:var(--oled-text);">Keys</strong> to learn their position on the keyboard — but try not to use both at once, as the real skill is connecting the two yourself.</p>
+            </div>
+            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
+        </div>
+    </div>
+
     <div class="sheet-container">
         <div class="sheet-viewport">
             <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
@@ -101,8 +146,9 @@
                     <div class="settings-control"><label onclick="document.getElementById('vst_rev').value=0;if(reverbGain)reverbGain.gain.value=0;">Reverb</label><input type="range" id="vst_rev" min="0" max="1" step="0.05" value="0"></div>
                     <div class="settings-control"><label onclick="document.getElementById('vst_wide').value=0">Stereo Wide</label><input type="range" id="vst_wide" min="0" max="1" step="0.05" value="0"></div>
                 </div>
+                <!-- INFO SÁV -->
                 <div class="info-bar-integrated">
-                    <div id="infoBarText" class="info-bar-text">SYSTEM READY — SELECT MODE AND PRESS START</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">SYSTEM READY — SELECT MODE AND PRESS START</div>
                 </div>
                 <div class="master-dashboard">
                     <div class="dashboard-logo">
@@ -113,53 +159,80 @@
                             <text x="135" y="28" fill="#444" font-family="'Inter',sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
                         </svg>
                     </div>
+                    <!-- BAL -->
                     <div class="control-group">
-                        <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
-                        <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP CLEF: TOGGLES TREBLE CLEF NOTE GENERATION">Top</button>
-                        <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM CLEF: TOGGLES BASS CLEF NOTE GENERATION">Bottom</button>
+                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                            <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
+                            <div class="clef-divider"></div>
+                            <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
+                        </button>
                         <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint()" data-help="HINTS: DISPLAYS NOTE NAMES NEXT TO NOTEHEADS">Hints</button>
+                        <button id="btnKeys" class="hardware-btn" onclick="if(!helpActive) toggleKeys()" data-help="KEYS: LIGHTS UP THE TARGET KEY ON THE PIANO KEYBOARD">Keys</button>
                     </div>
+                    <!-- KÖZÉP -->
                     <div class="center-console">
-                        <div class="lcd-arrow-wrapper">
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▲</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+                        <div style="display:flex;align-items:center;gap:32px;">
+                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE SIGHT READING SESSION">
+                                <span id="startLabel" class="active">START</span>
+                                <div class="split-div"></div>
+                                <span id="stopLabel">STOP</span>
                             </div>
-                            <div class="oled-wrapper">
-                                <div class="oled-screen">
-                                    <div class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
-                                        <div class="oled-header">Module</div><div class="oled-main" id="lcdModuleText">SIGHT READ</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) toggleMode()" data-help="MODE: SESSION (ONE ROUND + RESULTS) OR FLOW (ENDLESS AUTO-CONTINUE)">
-                                        <div class="oled-header">Mode</div><div class="oled-main" id="lcdModeText">SESSION</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleLevel(1)" data-help="LEVEL: DIATONIC → RHYTHM → CHROMATIC (ACCIDENTALS)">
-                                        <div class="oled-header">Level</div><div class="oled-main" id="lcdLevelText">DIATONIC</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" data-help="STATS: REAL-TIME BPM AND MISTAKE COUNTER">
-                                        <div class="oled-header">BPM / ERR</div><div class="oled-main" id="lcdStats" style="font-size:14px;">0 / 0</div>
+                            <div class="lcd-arrow-wrapper">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▲</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+                                </div>
+                                <div class="oled-wrapper">
+                                    <div class="oled-screen">
+                                        <div id="oledModule" class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
+                                            <div class="oled-header">Module</div><div class="oled-main" id="lcdModuleText">SIGHT READ</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) toggleMode()" data-help="MODE: SESSION (ONE ROUND + RESULTS) OR FLOW (ENDLESS AUTO-CONTINUE)">
+                                            <div class="oled-header">Mode</div><div class="oled-main" id="lcdModeText">SESSION</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledLevel" class="oled-section" onclick="if(!helpActive) cycleLevel(1)" data-help="LEVEL: DIATONIC → RHYTHM → CHROMATIC (ACCIDENTALS)">
+                                            <div class="oled-header">Level</div><div class="oled-main" id="lcdLevelText">DIATONIC</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledStats" class="oled-section" data-help="STATS: REAL-TIME BPM AND MISTAKE COUNTER">
+                                            <div class="oled-header">BPM / ERR</div><div class="oled-main" id="lcdStats">0 / 0</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▼</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▼</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- JOBB -->
                     <div class="control-group">
-                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE SIGHT READING SESSION">START</button>
-                        <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTHESIZER">Piano</button>
-                        <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER: OPEN ADSR + REVERB PANEL">Mixer</button>
-                        <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN: IMMERSIVE STUDIO MODE">Fullscr</button>
-                        <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION">Help</button>
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
+                            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
+                        </button>
+                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        </button>
+                        <div class="lang-split">
+                            <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
+                            <div class="lang-divider"></div>
+                            <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
+                        </div>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;">?</button>
+                        <div style="width:16px;"></div>
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                        </button>
                     </div>
                 </div>
                 <div class="piano-crop-wrapper">
@@ -178,36 +251,214 @@
     const BASS_NOTES=[{off:-5,m:41,n:'F2'},{off:-4,m:43,n:'G2'},{off:-3,m:45,n:'A2'},{off:-2,m:47,n:'H2'},{off:-1,m:48,n:'C3'},{off:0,m:50,n:'D3'},{off:1,m:52,n:'E3'},{off:2,m:53,n:'F3'},{off:3,m:55,n:'G3'},{off:4,m:57,n:'A3'},{off:5,m:59,n:'H3'},{off:6,m:60,n:'C4'}];
     const TREBLE_BASE_Y=141.5, TREBLE_SP_Y=11.14, BASS_BASE_Y=376.16, BASS_SP_Y=10.71;
     const LEVEL_NAMES=['DIATONIC','RHYTHM','CHROMATIC'];
-    const modules=[{name:'EAR TRAIN',url:'hallasfejleszto.html'},{name:'SIGHT READ',url:'kottaolvasas.html'},{name:'CHORDS',url:'akkordok.html'},{name:'SCALES',url:'skalak.html'},{name:'HANON',url:'hanon.html'},{name:'RHYTHM',url:'ritmus.html'}];
+    const MODULE_NAMES = {
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
+    };
+    const modules=[{url:'hallasfejleszto.html'},{url:'kottaolvasas.html'},{url:'akkordok.html'},{url:'skalak.html'},{url:'hanon.html'},{url:'ritmus.html'}];
 
-    let isRunning=false, showNames=false, helpActive=false, audioOn=true;
+    let isRunning=false, showNames=false, showKeys=false, helpActive=false, audioOn=true;
     let activeRH=true, activeLH=true, currentMode='manual', currentLevel=1;
-    let currentModuleIdx=1;
+    function cycleClef(){
+        if(helpActive)return;
+        if(activeRH&&activeLH){activeRH=true;activeLH=false;}
+        else if(activeRH&&!activeLH){activeRH=false;activeLH=true;}
+        else{activeRH=true;activeLH=true;}
+        document.getElementById('clefRH').style.color=activeRH?'#fff':'#444';
+        document.getElementById('clefLH').style.color=activeLH?'#fff':'#444';
+        if(isRunning)stopPractice();else{buildSequence();draw();}
+    }
+    let currentModuleIdx=1, currentLang='EN';
     let seq=[], currentStep=0, activeMidiNotes=new Set();
     let audioCtx, sampleBuffers={}, activeNodes={}, masterReverb, reverbGain;
     let mistakes=0, hitIntervals=[], lastHitTime=0;
 
-    function cycleModule(dir){if(helpActive)return;currentModuleIdx=(currentModuleIdx+dir+modules.length)%modules.length;document.getElementById('lcdModuleText').innerText=modules[currentModuleIdx].name;}
+    // ── NYELVVÁLTÓ ──
+    const TRANSLATIONS = {
+        EN: {
+            'txt-infoTitle':'Sight Read — Module Guide',
+            'txt-howTitle':'How It Works',
+            'txt-howBody':'16 notes appear on the staff one at a time. Play the correct note on the piano as quickly as possible. Wrong notes are highlighted in red — keep trying until you hit the right one.',
+            'txt-ctrlTitle':'Controls',
+            'txt-ctrl1':'Toggle Treble clef (C4–G5) and Bass clef (F2–C4) note pools.',
+            'txt-ctrl2':'Shows the note name next to each notehead on the staff.',
+            'txt-ctrl3':'Lights up the target key on the piano keyboard with a blue LED.',
+            'txt-ctrl4':'Session: one round then results. Flow: endless auto-continue.',
+            'txt-ctrl5':'Diatonic (white keys) → Rhythm (note values) → Chromatic (all keys).',
+            'txt-tipTitle':'Learning Tip',
+            'txt-tipBody':'Use <strong style="color:var(--oled-text);">Hints</strong> to learn note names on the staff, and <strong style="color:var(--oled-text);">Keys</strong> to learn their position on the keyboard — but try not to use both at once, as the real skill is connecting the two yourself.',
+            'txt-gotIt':'Got It',
+            ready:'SYSTEM READY — SELECT MODE AND PRESS START',
+            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            // gomb feliratok
+            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnKeys:'Keys',
+            btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
+            // help szövegek
+            hHome:'HOME: RETURN TO MAIN MENU',
+            hTop:'TOP CLEF: TOGGLES TREBLE CLEF NOTE GENERATION',
+            hBottom:'BOTTOM CLEF: TOGGLES BASS CLEF NOTE GENERATION',
+            hHints:'HINTS: DISPLAYS NOTE NAMES NEXT TO NOTEHEADS',
+            hKeys:'KEYS: LIGHTS UP THE TARGET KEY ON THE PIANO KEYBOARD',
+            hStart:'START/STOP: BEGIN OR END THE SIGHT READING SESSION',
+            hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTHESIZER',
+            hMixer:'MIXER: OPEN ADSR + REVERB PANEL',
+            hFullscr:'FULLSCREEN: IMMERSIVE STUDIO MODE',
+            hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            hInfo:'INFO: OPEN THE MODULE GUIDE',
+            hModule:'MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE',
+            hMode:'MODE: SESSION (ONE ROUND + RESULTS) OR FLOW (ENDLESS AUTO-CONTINUE)',
+            hLevel:'LEVEL: DIATONIC → RHYTHM → CHROMATIC (ACCIDENTALS)',
+            hStats:'STATS: REAL-TIME BPM AND MISTAKE COUNTER',
+            hLang:'LANGUAGE: SWITCH INTERFACE LANGUAGE',
+            // OLED
+            oledMode:'SESSION', oledFlow:'FLOW',
+            oledDiatonic:'DIATONIC', oledRhythm:'RHYTHM', oledChromatic:'CHROMATIC',
+            // result modal
+            resTitle:'Session Complete', resSpeed:'Speed', resAccu:'Accuracy', resContinue:'Continue',
+        },
+        HU: {
+            'txt-infoTitle':'Kottaolvasás — Modul útmutató',
+            'txt-howTitle':'Hogyan működik',
+            'txt-howBody':'16 hangjegy jelenik meg egyenként a kottán. Üsd le a helyes billentyűt a zongorán a lehető leggyorsabban. A téves leütések pirossal jelennek meg — próbáld addig, amíg el nem találod.',
+            'txt-ctrlTitle':'Vezérlők',
+            'txt-ctrl1':'Violin kulcsos (C4–G5) és Basszus kulcsos (F2–C4) hangkészlet be/ki.',
+            'txt-ctrl2':'Megjeleníti a hang nevét a kottafej mellett.',
+            'txt-ctrl3':'Kék LED-del kiemeli a keresett billentyűt a zongorán.',
+            'txt-ctrl4':'Vizsga: egy kör, majd eredmény. Folyamat: végtelen automatikus folytatás.',
+            'txt-ctrl5':'Diatonikus (fehér billentyűk) → Ritmus (hanghosszak) → Kromatikus (összes).',
+            'txt-tipTitle':'Tanulási tipp',
+            'txt-tipBody':'A <strong style="color:var(--oled-text);">Hints</strong> a hangneveket mutatja a kottán, a <strong style="color:var(--oled-text);">Keys</strong> a billentyű helyét emeli ki — de ne használd egyszerre a kettőt, mert az igazi tudás a kettő önálló összekapcsolása.',
+            'txt-gotIt':'Értettem',
+            ready:'RENDSZER KÉSZ — VÁLASSZ MÓDOT ÉS NYOMJ STARTOT',
+            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            // gomb feliratok
+            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnKeys:'Billentyű',
+            btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
+            // help szövegek
+            hHome:'FŐOLDAL: VISSZA A FŐMENÜBE',
+            hTop:'FELSŐ KULCS: VIOLIN KULCSOS HANGOK BE/KI',
+            hBottom:'ALSÓ KULCS: BASSZUS KULCSOS HANGOK BE/KI',
+            hHints:'HANGNEM: MEGJELENÍTI A HANGNEVET A KOTTAFEJ MELLETT',
+            hKeys:'BILLENTYŰ: KÉMKÉKKEL KIEMELI A KERESETT BILLENTYŰT',
+            hStart:'START/STOP: KOTTAOLVASÓ GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
+            hPiano:'ZONGORA HANG: BELSŐ SZINTETIZÁTOR BE/KI',
+            hMixer:'KEVERŐ: ADSR + ZENGÉS PANEL MEGNYITÁSA',
+            hFullscr:'TELJES KÉPERNYŐ: STÚDIÓ ÉLMÉNY',
+            hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',
+            hModule:'MODUL: KATTINTS A NAVIGÁLÁSHOZ',
+            hMode:'MÓD: VIZSGA (EGY KÖR + EREDMÉNY) VAGY FOLYAMAT (VÉGTELEN)',
+            hLevel:'SZINT: DIATONIKUS → RITMUS → KROMATIKUS',
+            hStats:'STATISZTIKA: VALÓS IDEJŰ BPM ÉS HIBASZÁMLÁLÓ',
+            hLang:'NYELV: FELÜLET NYELVÉNEK VÁLTÁSA',
+            // OLED
+            oledMode:'VIZSGA', oledFlow:'FOLYAMAT',
+            oledDiatonic:'DIATONIKUS', oledRhythm:'RITMUS', oledChromatic:'KROMATIKUS',
+            // result modal
+            resTitle:'Kör lezárva', resSpeed:'Sebesség', resAccu:'Pontosság', resContinue:'Folytatás',
+        }
+    };
+
+    function setLang(lang) {
+        localStorage.setItem('akira_lang', lang);
+        currentLang = lang;
+        document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
+        const T = TRANSLATIONS[lang];
+        // Info modal szövegek
+        ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2',
+         'txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-gotIt'].forEach(id=>{
+            const el=document.getElementById(id); if(el) el.innerHTML=T[id];
+        });
+        // Gomb feliratok
+        const btnMap = {
+            'btnHintName':T.btnHints,'btnKeys':T.btnKeys
+        };
+        Object.entries(btnMap).forEach(([id,txt])=>{
+            const el=document.getElementById(id); if(el) el.innerText=txt;
+        });
+        const helpMap = {
+            'btnHome':T.hHome,'handRH':T.hTop,'handLH':T.hBottom,
+            'btnHintName':T.hHints,'btnKeys':T.hKeys,'btnStart':T.hStart,
+            'audioToggle':T.hPiano,'btnFullscreen':T.hFullscr,
+            'btnHelp':T.hHelp,'btnInfo':T.hInfo,
+            'oledModule':T.hModule||'MODULE: CLICK TO NAVIGATE',
+            'oledMode':T.hMode||'MODE: SESSION OR FLOW',
+            'oledLevel':T.hLevel||'LEVEL: DIATONIC → CHROMATIC',
+            'oledStats':T.hStats||'STATS: BPM AND MISTAKES'
+        };
+        Object.entries(helpMap).forEach(([id,txt])=>{
+            const el=document.getElementById(id); if(el) el.dataset.help=txt;
+        });
+        // OLED szövegek
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][currentModuleIdx];
+        document.getElementById('lcdModeText').innerText = currentMode==='manual' ? T.oledMode : T.oledFlow;
+        document.getElementById('lcdLevelText').innerText = [T.oledDiatonic,T.oledRhythm,T.oledChromatic][currentLevel-1];
+        // Result modal
+        const rTitle=document.getElementById('modalTitle'); if(rTitle) rTitle.innerText=T.resTitle;
+        const rSpeed=document.getElementById('lblSpeed'); if(rSpeed) rSpeed.innerText=T.resSpeed;
+        const rAccu=document.getElementById('lblAccu'); if(rAccu) rAccu.innerText=T.resAccu;
+        const rCont=document.getElementById('btnContinue'); if(rCont) rCont.innerText=T.resContinue;
+        // Info sáv
+        if(!isRunning && !helpActive) document.getElementById('infoBarText').innerText=T.ready;
+    }
+
+    function cycleModule(dir){if(helpActive)return;currentModuleIdx=(currentModuleIdx+dir+modules.length)%modules.length;document.getElementById('lcdModuleText').innerText=MODULE_NAMES[currentLang][currentModuleIdx];}
     function loadModule(){if(helpActive)return;if(currentModuleIdx!==1)window.location.href=modules[currentModuleIdx].url;}
-    function toggleHelp(){helpActive=!helpActive;document.getElementById('btnHelp').classList.toggle('active',helpActive);if(helpActive){document.body.classList.add('help-mode-active');document.getElementById('infoBarText').innerHTML="HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION";}else{document.body.classList.remove('help-mode-active');updateInfoBar();}}
-    document.addEventListener('click',(e)=>{if(e.target.closest('#btnHelp'))return;if(helpActive){e.preventDefault();e.stopPropagation();const t=e.target.closest('[data-help]');if(t)document.getElementById('infoBarText').innerHTML=t.dataset.help;}},true);
+
+    function setInfoBar(text, targetEl) {
+        const bar = document.getElementById('infoBarText');
+        if (!targetEl) {
+            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
+            bar.innerHTML = text; return;
+        }
+        const barRect = bar.parentElement.getBoundingClientRect();
+        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
+        if (cx / barRect.width < 0.5) {
+            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>' + text;
+            bar.style.left = Math.max(cx - 10, 20) + 'px'; bar.style.right='auto'; bar.style.transform='none';
+        } else {
+            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';
+            bar.style.right = Math.max(barRect.width - cx - 10, 20) + 'px'; bar.style.left='auto'; bar.style.transform='none';
+        }
+    }
+    function toggleHelp(){
+        helpActive=!helpActive;
+        document.getElementById('btnHelp').classList.toggle('active',helpActive);
+        if(helpActive){document.body.classList.add('help-mode-active');setInfoBar(TRANSLATIONS[currentLang].helpMode,null);}
+        else{document.body.classList.remove('help-mode-active');updateInfoBar();}
+    }
+    document.addEventListener('click',(e)=>{
+        if(e.target.closest('#btnHelp'))return;
+        if(helpActive){e.preventDefault();e.stopPropagation();const t=e.target.closest('[data-help]');if(t)setInfoBar(t.dataset.help,t);}
+    },true);
     function toggleFullScreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen();}
     document.addEventListener('fullscreenchange',()=>{document.getElementById('btnFullscreen').classList.toggle('active',!!document.fullscreenElement);});
-    function toggleHand(h){if(h==='RH')activeRH=!activeRH;else activeLH=!activeLH;if(!activeRH&&!activeLH){activeRH=true;activeLH=true;}document.getElementById('handRH').classList.toggle('active',activeRH);document.getElementById('handLH').classList.toggle('active',activeLH);if(isRunning)stopPractice();else{buildSequence();draw();}}
-    function toggleMode(){if(helpActive)return;currentMode=currentMode==='manual'?'auto':'manual';document.getElementById('lcdModeText').innerText=currentMode==='manual'?'SESSION':'FLOW';if(isRunning)stopPractice();else draw();}
-    function cycleLevel(dir){if(helpActive)return;currentLevel=((currentLevel-1+dir+3)%3)+1;document.getElementById('lcdLevelText').innerText=LEVEL_NAMES[currentLevel-1];if(isRunning)stopPractice();}
+    function toggleHand(h){cycleClef();}
+    function toggleMode(){if(helpActive)return;currentMode=currentMode==='manual'?'auto':'manual';const T=TRANSLATIONS[currentLang];document.getElementById('lcdModeText').innerText=currentMode==='manual'?T.oledMode:T.oledFlow;if(isRunning)stopPractice();else draw();}
+    function cycleLevel(dir){if(helpActive)return;currentLevel=((currentLevel-1+dir+3)%3)+1;const T=TRANSLATIONS[currentLang];document.getElementById('lcdLevelText').innerText=[T.oledDiatonic,T.oledRhythm,T.oledChromatic][currentLevel-1];if(isRunning)stopPractice();}
+
+    function updateKeyLed(){
+        document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('note-hint'));
+        if(showKeys && isRunning && seq.length>0 && currentStep<seq.length){
+            document.getElementById(`k-${seq[currentStep].m}`)?.classList.add('note-hint');
+        }
+    }
     function toggleHint(){if(helpActive)return;showNames=!showNames;document.getElementById('btnHintName').classList.toggle('active',showNames);draw();}
+    function toggleKeys(){if(helpActive)return;showKeys=!showKeys;document.getElementById('btnKeys').classList.toggle('active',showKeys);updateKeyLed();}
     function toggleAudio(){audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn&&!audioCtx)initAudio();}
-    function toggleVst(){if(helpActive)return;let mb=document.getElementById('mixerBar');mb.style.display=(mb.style.display==='flex')?'none':'flex';document.getElementById('btnVst').classList.toggle('active');}
+    function toggleVst(){if(helpActive)return;let mb=document.getElementById('mixerBar');mb.style.display=(mb.style.display==='flex')?'none':'flex';}
 
     function updateInfoBar(){
         if(helpActive)return;
+        const bar = document.getElementById('infoBarText');
+        bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
         if(isRunning){
             let bpm=hitIntervals.length>0?Math.round(60000/(hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length)):0;
-            document.getElementById('infoBarText').innerHTML=`BPM: <span style="color:var(--oled-text)">${bpm}</span> &nbsp;&nbsp;&nbsp; MISTAKES: <span style="color:#ff4444">${mistakes}</span> &nbsp;&nbsp;&nbsp; NOTE: <span style="color:var(--oled-text)">${currentStep+1} / 16</span>`;
+            bar.innerHTML=`BPM: <span style="color:var(--oled-text)">${bpm}</span> &nbsp;&nbsp;&nbsp; MISTAKES: <span style="color:#ff4444">${mistakes}</span> &nbsp;&nbsp;&nbsp; NOTE: <span style="color:var(--oled-text)">${currentStep+1} / 16</span>`;
             document.getElementById('lcdStats').innerText=`${bpm} / ${mistakes}`;
         } else {
-            document.getElementById('infoBarText').innerText='SYSTEM READY — SELECT MODE AND PRESS START';
+            bar.innerText=TRANSLATIONS[currentLang]?.ready||'SYSTEM READY — SELECT MODE AND PRESS START';
             document.getElementById('lcdStats').innerText='0 / 0';
         }
     }
@@ -238,13 +489,14 @@
         masterReverb=audioCtx.createConvolver();masterReverb.buffer=impulse;
         reverbGain=audioCtx.createGain();reverbGain.gain.value=parseFloat(document.getElementById('vst_rev').value)||0;
         masterReverb.connect(reverbGain).connect(audioCtx.destination);
-        const s={21:'A0',36:'C2',48:'C3',60:'C4',72:'C5',84:'C6'};
+        const s={36:'C2',48:'C3',60:'C4',72:'C5'};
         for(let k in s){try{const r=await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);sampleBuffers[k]=await audioCtx.decodeAudioData(await r.arrayBuffer());}catch(e){}}
         if(navigator.requestMIDIAccess){navigator.requestMIDIAccess().then(m=>{m.inputs.forEach(input=>input.onmidimessage=(msg)=>{const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}});}).catch(()=>{});}
     }
 
     function playTone(note,vel){
         if(!audioCtx||!audioOn||Object.keys(sampleBuffers).length===0)return;
+        if(audioCtx.state==='suspended')audioCtx.resume();
         if(activeNodes[note]){try{activeNodes[note].source.stop();}catch(e){}delete activeNodes[note];}
         const source=audioCtx.createBufferSource();let closest=36,minDiff=999;
         for(let b in sampleBuffers){let d=Math.abs(note-b);if(d<minDiff){minDiff=d;closest=b;}}
@@ -252,14 +504,9 @@
         const gain=audioCtx.createGain();const panner=audioCtx.createStereoPanner();
         let wide=parseFloat(document.getElementById('vst_wide').value)||0;
         panner.pan.setValueAtTime(Math.max(-1,Math.min(1,((note-60)/30)*wide)),audioCtx.currentTime);
-        let atk=parseFloat(document.getElementById('vst_a').value)||0.01;
-        let dec=parseFloat(document.getElementById('vst_e').value)||10;
         let velo=parseFloat(document.getElementById('vst_d').value)||1;
         if(reverbGain)reverbGain.gain.value=parseFloat(document.getElementById('vst_rev').value)||0;
-        gain.gain.setValueAtTime(0,audioCtx.currentTime);
-        if(atk>0.05)gain.gain.linearRampToValueAtTime((vel/127)*velo,audioCtx.currentTime+atk);
-        else gain.gain.setValueAtTime((vel/127)*velo,audioCtx.currentTime);
-        if(dec<9.5)gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dec);
+        gain.gain.setValueAtTime((vel/127)*velo,audioCtx.currentTime);
         source.connect(gain);gain.connect(panner);panner.connect(audioCtx.destination);gain.connect(masterReverb);
         source.start();activeNodes[note]={source,gain};
     }
@@ -278,17 +525,21 @@
         if(midi===target.m){
             target.isError=false;
             let now=performance.now();if(lastHitTime>0)hitIntervals.push(now-lastHitTime);lastHitTime=now;
-            currentStep++;updateInfoBar();
-            if(currentStep>=16){if(currentMode==='auto'){setTimeout(()=>{buildSequence();draw();},400);}else{setTimeout(()=>{showResults();},400);}}
+            currentStep++;updateKeyLed();updateInfoBar();
+            if(currentStep>=16){if(currentMode==='auto'){setTimeout(()=>{buildSequence();updateKeyLed();draw();},400);}else{setTimeout(()=>{showResults();},400);}}
         } else {target.isError=true;mistakes++;updateInfoBar();}
         draw();
     }
 
+        function updateStartStop(running) {
+        document.getElementById('startLabel').classList.toggle('active', !running);
+        document.getElementById('stopLabel').classList.toggle('active', running);
+    }
     function handleMainButton(){
-        if(!isRunning){initAudio();buildSequence();isRunning=true;document.getElementById('btnStart').innerText='STOP';document.getElementById('btnStart').classList.add('running');updateInfoBar();draw();}
+        if(!isRunning){initAudio();buildSequence();isRunning=true;updateStartStop(true);updateInfoBar();draw();}
         else stopPractice();
     }
-    function stopPractice(){isRunning=false;currentStep=0;document.getElementById('btnStart').innerText='START';document.getElementById('btnStart').classList.remove('running');updateInfoBar();draw();}
+    function stopPractice(){isRunning=false;currentStep=0;document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('note-hint'));updateStartStop(false);updateInfoBar();draw();}
     function showResults(){
         let avgBpm=hitIntervals.length?Math.round(60000/(hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length)):0;
         let accuracy=Math.round(Math.max(0,((16-mistakes)/16)*100));
@@ -296,7 +547,7 @@
         document.getElementById('modalUni').innerText=accuracy+'%';
         document.getElementById('modalMistakes').innerText=mistakes;
         document.getElementById('resultModal').style.display='flex';
-        isRunning=false;document.getElementById('btnStart').innerText='START';document.getElementById('btnStart').classList.remove('running');
+        isRunning=false;updateStartStop(false);
     }
     function closeModal(){document.getElementById('resultModal').style.display='none';handleMainButton();}
 
@@ -333,8 +584,9 @@
     }
 
     window.onload=()=>{
+        const sl=localStorage.getItem('akira_lang')||'EN'; setLang(sl);
         const wrap=document.getElementById('hb-wrap');const whites=[0,2,4,5,7,9,11];let wIdx=0;
-        for(let m=21;m<=108;m++){const k=document.createElement('div');const isW=whites.includes(m%12);k.id=`k-${m}`;k.className=`key-glow ${isW?'white-glow':'black-glow'}`;if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}else{k.style.left=((wIdx*1.92307)-0.6)+'%';k.style.width='1.2%';k.style.height='65%';k.style.zIndex='200';}k.onmousedown=(e)=>{e.preventDefault();k.classList.add('pressed');handleNoteOn(m,100);};k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};wrap.appendChild(k);}
+        for(let m=21;m<=108;m++){const k=document.createElement('div');const isW=whites.includes(m%12);k.id=`k-${m}`;k.className=`key-glow ${isW?'white-glow':'black-glow'}`;if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}else{k.style.left=((wIdx*1.92307)-0.6)+'%';k.style.width='1.2%';k.style.height='65%';k.style.zIndex='200';}k.onmousedown=(e)=>{e.preventDefault();k.classList.add('pressed');handleNoteOn(m,100);};k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};const led=document.createElement('div');led.className='key-led';k.appendChild(led);wrap.appendChild(k);}
         buildSequence();draw();
         window.addEventListener('pointerdown',()=>initAudio(),{once:true});
     };

@@ -91,9 +91,7 @@
         }
         .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .hardware-btn.active { color: #ffffff; background-color: #121214; }
-        #btnStart { width: 110px; font-weight: 800; font-size: 14px; letter-spacing: 1px; box-shadow: 0 4px 0 #000; margin-left: 20px; }
-        #btnStart:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
-        #btnStart.running { color: #ffffff; background-color: #1a1a1c; border-color: #333; }
+        /* start-split handles btnStart styling */
 
         /* ── CENTER CONSOLE ── */
         .center-console { flex: 1; display: flex; justify-content: center; }
@@ -104,13 +102,31 @@
 
         /* KIS NÉGYZETES GOMBOK (Info + Lang) */
         .sq-btn {
-            width: 38px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim);
+            width: 38px; height: 38px; background-color: var(--btn-dark); color: #444;
             border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
-            font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s; flex-shrink: 0;
+            font-size: 16px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0;
         }
         .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .sq-btn.active { color: #ffffff; background-color: #121214; }
+
+        .start-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000; overflow:hidden; cursor:pointer; transition:transform 0.1s; }
+        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .start-split span { display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif; color:#444; text-transform:uppercase; }
+        .start-split span#startLabel { padding: 0 12px 0 22px; }
+        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
+        .start-split span.active { color:#fff; }
+        .start-split .split-div { width:1px; background:#333; margin:6px 0; }
+        .lang-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
+        .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim); }
+        .lang-split button.active { color:#fff; }
+        .lang-divider { width:1px; background:#222; margin:6px 0; }
+        .clef-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s; }
+        .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .clef-split span { flex:1; display:flex; align-items:center; justify-content:center; color:#444; transition:color 0.15s; }
+        .clef-split span.active { color:#fff; }
+        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+        body.help-mode-active, body.help-mode-active * { cursor: help !important; }
 
         /* INFO MODAL — nagyobb betűk */
         .info-modal-content { max-width: 680px; text-align: left; }
@@ -233,20 +249,6 @@
                     <div id="infoBarText" class="info-bar-text">SYSTEM READY — PRESS START TO BEGIN</div>
                 </div>
 
-                <!-- INFO GOMB — bal oldalt, Home fölött -->
-                <div style="position:absolute; top:55px; left:30px; z-index:20;">
-                    <button id="btnInfo" class="hardware-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN THE MODULE GUIDE">Info</button>
-                </div>
-
-                <!-- NYELV GOMB — jobb oldalt, Help fölött -->
-                <div style="position:absolute; top:55px; right:30px; z-index:20;">
-                    <div style="display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;">
-                        <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" data-help="LANGUAGE: SWITCH INTERFACE TO ENGLISH" style="flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; color:#fff; font-family:'Inter',sans-serif;">EN</button>
-                        <div style="width:1px; background:#222; margin:6px 0;"></div>
-                        <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')" data-help="LANGUAGE: FELÜLETET MAGYARRA VÁLT" style="flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; color:var(--text-dim); font-family:'Inter',sans-serif;">HU</button>
-                    </div>
-                </div>
-
                 <!-- MASTER DASHBOARD -->
                 <div class="master-dashboard">
                     <div class="dashboard-logo">
@@ -260,62 +262,82 @@
 
                     <!-- BAL CSOPORT -->
                     <div class="control-group">
-                        <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
-                        <button id="btnViolin" class="hardware-btn active" onclick="if(!helpActive) toggleClef('treble')" data-help="TOP: INCLUDE TREBLE CLEF NOTES (C4–G5) IN THE EXERCISE">Top</button>
-                        <button id="btnBass" class="hardware-btn" onclick="if(!helpActive) toggleClef('bass')" data-help="BOTTOM: INCLUDE BASS CLEF NOTES (F2–C4) IN THE EXERCISE">Bottom</button>
-                        <button id="btnAcc" class="hardware-btn" onclick="if(!helpActive) toggleAccidentals()" data-help="CHROMATIC: ADD BLACK KEY NOTES (SHARPS/FLATS) TO THE POOL">Chromatic</button>
-                        <button id="btnHint" class="hardware-btn" onclick="if(!helpActive) toggleHint()" data-help="HINTS: SHOWS THE NOTE NAME ON THE STAFF BEFORE YOU PLAY IT">Hints</button>
+                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                            <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
+                            <div class="clef-divider"></div>
+                            <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
+                        </button>
+                        <button id="btnAcc"    class="hardware-btn"        onclick="if(!helpActive) toggleAccidentals()"  data-help="CHROMATIC: ADD BLACK KEY NOTES (SHARPS/FLATS) TO THE POOL">Chromatic</button>
+                        <button id="btnHint"   class="hardware-btn"        onclick="if(!helpActive) toggleHint()"         data-help="HINTS: SHOWS THE NOTE NAME ON THE STAFF BEFORE YOU PLAY IT">Hints</button>
                     </div>
 
-                    <!-- KÖZÉP: OLED + NYILAK -->
+                    <!-- KÖZÉP: START + OLED -->
                     <div class="center-console">
-                        <div class="lcd-arrow-wrapper">
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleTimer(1)" data-help="TIMER: INCREASE TIME LIMIT">▲</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+                        <div style="display:flex; align-items:center; gap:32px;">
+                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EAR TRAINING SESSION">
+                                <span id="startLabel" class="active">START</span>
+                                <div class="split-div"></div>
+                                <span id="stopLabel">STOP</span>
                             </div>
-
-                            <div class="oled-wrapper">
-                                <div class="oled-screen">
-                                    <div class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE">
-                                        <div class="oled-header">Module</div>
-                                        <div class="oled-main" id="lcdModuleText">EAR TRAIN</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleTimer(1)" data-help="TIMER: SECONDS PER NOTE. REACH 100% TO SPEED UP AUTOMATICALLY">
-                                        <div class="oled-header">Timer</div>
-                                        <div class="oled-main" id="lcdTimer">10 SEC</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" data-help="PROGRESS: CURRENT NOTE IN THE 10-NOTE ROUND">
-                                        <div class="oled-header">Progress</div>
-                                        <div class="oled-main" id="lcdProgress">0 / 10</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" data-help="SCORE: CORRECT HITS / MISTAKES THIS ROUND">
-                                        <div class="oled-header">Hit / Miss</div>
-                                        <div class="oled-main" id="lcdScore">0 / 0</div>
+                            <div class="lcd-arrow-wrapper">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTimer(1)" data-help="TIMER: INCREASE TIME LIMIT">▲</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+                                </div>
+                                <div class="oled-wrapper">
+                                    <div class="oled-screen">
+                                        <div id="oledModule" class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
+                                            <div class="oled-header">Module</div>
+                                            <div class="oled-main" id="lcdModuleText">EAR TRAIN</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledTimer" class="oled-section" onclick="if(!helpActive) cycleTimer(1)" data-help="TIMER: SECONDS PER NOTE — REACH 100% TO SPEED UP AUTOMATICALLY">
+                                            <div class="oled-header">Timer</div>
+                                            <div class="oled-main" id="lcdTimer">10 SEC</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledProgress" class="oled-section" data-help="PROGRESS: CURRENT NOTE IN THE 10-NOTE ROUND">
+                                            <div class="oled-header">Progress</div>
+                                            <div class="oled-main" id="lcdProgress">0 / 10</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledScore" class="oled-section" data-help="SCORE: CORRECT HITS / MISTAKES THIS ROUND">
+                                            <div class="oled-header">Hit / Miss</div>
+                                            <div class="oled-main" id="lcdScore">0 / 0</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleTimer(-1)" data-help="TIMER: DECREASE TIME LIMIT">▼</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
-                                <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTimer(-1)" data-help="TIMER: DECREASE TIME LIMIT">▼</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- JOBB CSOPORT -->
                     <div class="control-group">
-                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EAR TRAINING SESSION">START</button>
                         <button id="btnRepeat" class="hardware-btn" onclick="if(!helpActive) repeatNote()" data-help="REPLAY: PLAY THE CURRENT NOTE AGAIN">Replay</button>
-                        <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN: IMMERSIVE STUDIO MODE">Fullscr</button>
-                        <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO SEE ITS DESCRIPTION">Help</button>
+                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        </button>
+                        <div class="lang-split">
+                            <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
+                            <div class="lang-divider"></div>
+                            <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
+                        </div>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;">?</button>
+                        <div style="width:16px;"></div>
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                        </button>
                     </div>
                 </div>
 
@@ -500,9 +522,10 @@
     };
 
     function setLang(lang) {
+        localStorage.setItem('akira_lang', lang);
         currentLang = lang;
-        document.getElementById('btnLangEN').style.color = lang === 'EN' ? '#ffffff' : 'var(--text-dim)';
-        document.getElementById('btnLangHU').style.color = lang === 'HU' ? '#ffffff' : 'var(--text-dim)';
+        document.getElementById('btnLangEN').classList.toggle('active', lang==='EN'); document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
+        document.getElementById('btnLangHU').classList.toggle('active', lang==='HU'); document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
         applyTranslations();
     }
 
@@ -518,14 +541,19 @@
             const el = document.getElementById(id);
             if (el) el.innerHTML = T[id];
         });
-        // Gombok szövege
-        ['btnViolin','btnBass','btnAcc','btnHint','btnRepeat','btnVst','btnFullscreen','btnHelp'].forEach(id => {
+        // Csak szöveges gombok fordítása (ikonos sq-btn-eket kihagyjuk)
+        ['btnAcc','btnHint','btnRepeat'].forEach(id => {
             const el = document.getElementById(id);
-            if (el) el.innerText = T[id];
+            if (el && T[id]) el.innerText = T[id];
         });
+        // Clef help szövegek
+        const btnClef = document.getElementById('btnClef');
+        if (btnClef) btnClef.dataset.help = currentLang === 'EN'
+            ? 'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY'
+            : 'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS';
         // Info sáv — csak ha nem fut
         if (!isRunning && !helpActive) {
-            document.getElementById('infoBarText').innerText = T['ready'];
+            setInfoBar(T['ready'], null);
         }
     }
 
@@ -535,10 +563,10 @@
         document.getElementById('btnHelp').classList.toggle('active', helpActive);
         if (helpActive) {
             document.body.classList.add('help-mode-active');
-            setInfo(TRANSLATIONS[currentLang]['helpMode'], '');
+            setInfoBar(TRANSLATIONS[currentLang]['helpMode'], null);
         } else {
             document.body.classList.remove('help-mode-active');
-            setInfo(TRANSLATIONS[currentLang]['ready'], '');
+            setInfoBar(TRANSLATIONS[currentLang]['ready'], null);
         }
     }
     document.addEventListener('click', (e) => {
@@ -546,7 +574,7 @@
         if (helpActive) {
             e.preventDefault(); e.stopPropagation();
             const t = e.target.closest('[data-help]');
-            if (t) setInfo(t.dataset.help, '');
+            if (t) setInfoBar(t.dataset.help, t);
         }
     }, true);
 
@@ -559,26 +587,42 @@
     });
 
     // ── INFO SÁV ──
+    function setInfoBar(text, targetEl) {
+        const bar = document.getElementById('infoBarText');
+        if (!targetEl) {
+            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
+            bar.className = 'info-bar-text'; bar.innerHTML = text; return;
+        }
+        const barRect = bar.parentElement.getBoundingClientRect();
+        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
+        bar.className = 'info-bar-text';
+        if (cx / barRect.width < 0.5) {
+            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>' + text;
+            bar.style.left = Math.max(cx - 10, 20) + 'px'; bar.style.right='auto'; bar.style.transform='none';
+        } else {
+            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';
+            bar.style.right = Math.max(barRect.width - cx - 10, 20) + 'px'; bar.style.left='auto'; bar.style.transform='none';
+        }
+    }
     function setInfo(msg, cls) {
         const el = document.getElementById('infoBarText');
+        el.style.left='50%'; el.style.right='auto'; el.style.transform='translateX(-50%)';
         el.className = 'info-bar-text' + (cls ? ' ' + cls : '');
         el.innerHTML = msg;
     }
 
     // ── GOMBOK ──
-    function toggleClef(clef) {
+    function cycleClef() {
         if (helpActive) return;
-        if (clef === 'treble') {
-            activeTreble = !activeTreble;
-            if (!activeTreble && !activeBass) activeTreble = true;
-        } else {
-            activeBass = !activeBass;
-            if (!activeTreble && !activeBass) activeBass = true;
-        }
-        document.getElementById('btnViolin').classList.toggle('active', activeTreble);
-        document.getElementById('btnBass').classList.toggle('active', activeBass);
-        if (isRunning) { stopPractice(); }
+        // 0: treble+bass, 1: treble only, 2: bass only
+        if (activeTreble && activeBass)      { activeTreble=true;  activeBass=false; }
+        else if (activeTreble && !activeBass){ activeTreble=false; activeBass=true;  }
+        else                                 { activeTreble=true;  activeBass=true;  }
+        document.getElementById('clefRH').style.color = activeTreble ? '#fff' : '#444';
+        document.getElementById('clefLH').style.color = activeBass   ? '#fff' : '#444';
     }
+    // toggleClef kept for backwards compatibility
+    function toggleClef(clef) { cycleClef(); }
     function toggleAccidentals() {
         if (helpActive) return;
         useAccidentals = !useAccidentals;
@@ -632,13 +676,17 @@
     }
 
     // ── PRACTICE KONTROL ──
-    function handleMainButton() {
+    function updateStartStop(running) {
+        document.getElementById('startLabel').classList.toggle('active', !running);
+        document.getElementById('stopLabel').classList.toggle('active', running);
+    }
+
+        function handleMainButton() {
         if (!isRunning) {
             initAudio();
             buildSequence();
             isRunning = true;
-            document.getElementById('btnStart').innerText = 'STOP';
-            document.getElementById('btnStart').classList.add('running');
+            updateStartStop(true);
             draw();
             // Rövid késleltetés után lejátssza az első hangot
             setTimeout(() => playCurrentAndStartTimer(), 600);
@@ -650,8 +698,7 @@
     function stopPractice() {
         isRunning = false; waitingNext = false;
         clearInterval(timerTicker); timerTicker = null;
-        document.getElementById('btnStart').innerText = 'START';
-        document.getElementById('btnStart').classList.remove('running');
+        updateStartStop(false);
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('ear-hint'));
         setInfo(TRANSLATIONS[currentLang]['ready'], '');
         updateOLED();
@@ -705,8 +752,7 @@
     function finalize() {
         isRunning = false;
         clearInterval(timerTicker); timerTicker = null;
-        document.getElementById('btnStart').innerText = 'START';
-        document.getElementById('btnStart').classList.remove('running');
+        updateStartStop(false);
 
         let pct = Math.round((scoreOk / seq.length) * 100);
         document.getElementById('resPercent').innerText = pct + '%';
@@ -949,6 +995,7 @@
     }
 
     window.onload = () => {
+        const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
         create88();
         updateOLED();
         document.fonts.ready.then(draw);

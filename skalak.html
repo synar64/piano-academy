@@ -68,12 +68,6 @@
             color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
             position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s;
         }
-        #helpTriangle {
-            font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold;
-            color: var(--oled-text); position: absolute; transition: left 0.15s;
-            pointer-events: none;
-        }
-
         /* ── MIXER OVERLAY ── */
         .settings-bar { 
             position: absolute; bottom: 100%; left: 0; width: 100%; height: 85px; background: var(--lcd-bg-dark); 
@@ -193,6 +187,10 @@
         .lang-split button:active { background: rgba(255,255,255,0.05); }
         .lang-divider { width:1px; background:#222; margin:6px 0; }
         body.help-mode-active, body.help-mode-active * { cursor: help !important; }
+
+        /* AKKORDTÁRCSA */
+        #wheelCanvas { position:fixed; right:40px; top:60px; width:400px; height:400px; z-index:10000; pointer-events:auto; background:rgba(5,5,8,0.85); border-radius:50%; box-shadow:0 10px 40px rgba(0,0,0,0.9),inset 0 0 0 2px rgba(255,255,255,0.05); backdrop-filter:blur(8px); display:none; cursor:grab; }
+        #wheelCanvas:active { cursor:grabbing; }
     </style>
 </head>
 <body onclick="initAudio()">
@@ -250,7 +248,28 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Shows note names and activates the LED light guide on the keyboard.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays the official scale fingering (1–5) on the sheet.</span></div>
             </div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Wheel</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Opens the Circle of Fifths. Click any major key sector to immediately load that scale.</span></div>
             <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p></div>
+            <div style="margin-bottom:22px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-wheelTitle">Circle of Fifths</div>
+                <div style="display:flex;gap:20px;align-items:center;">
+                    <svg width="130" height="130" viewBox="0 0 130 130" style="flex-shrink:0;">
+                        <circle cx="65" cy="65" r="60" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                        <circle cx="65" cy="65" r="38" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                        <circle cx="65" cy="65" r="18" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                        <path d="M65,65 L65,5 A60,60 0 0,1 125,65 L83,65 A18,18 0 0,0 65,47 Z" fill="rgba(179,230,255,0.12)" stroke="rgba(179,230,255,0.6)" stroke-width="1.5"/>
+                        <text x="65" y="24" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="12" font-weight="bold">C</text>
+                        <text x="98" y="48" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="10">G</text>
+                        <text x="34" y="48" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="10">F</text>
+                        <text x="116" y="68" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">D</text>
+                        <text x="14" y="68" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">Bb</text>
+                        <text x="65" y="112" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">F#</text>
+                        <text x="65" y="61" text-anchor="middle" fill="#555" font-family="Share Tech Mono" font-size="8">KEY</text>
+                        <text x="65" y="73" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="12" font-weight="bold">C</text>
+                    </svg>
+                    <p style="font-size:13px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-wheelBody">Press <strong style="color:var(--oled-text);">Wheel</strong> to open the draggable Circle of Fifths. Click any sector to instantly load that major scale — the OLED Scale display updates automatically. Keys arranged by harmonic distance: adjacent keys share 6 out of 7 notes, making scale transitions smooth. Drag the wheel anywhere on screen.</p>
+                </div>
+            </div>
             <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
         </div>
     </div>
@@ -262,6 +281,7 @@
         </div>
     </div>
 
+    <canvas id="wheelCanvas" width="400" height="400"></canvas>
     <div class="lower-section">
         <div class="workstation-chassis">
             <div class="wood-cheek"></div>
@@ -278,7 +298,6 @@
 
                 <div id="infoBar" class="info-bar-integrated">
                     <div id="infoBarText" class="info-bar-text" style="left:50%; transform:translateX(-50%);">SELECT SCALE OR PRESS START</div>
-                    <div id="helpTriangle" style="display:none;">▼</div>
                 </div>
 
                 <div class="master-dashboard">
@@ -301,6 +320,7 @@
                         <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: NOTE NAMES APPEAR NEXT TO EACH NOTEHEAD ON THE STAFF">Hints</button>
                         <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: OFFICIAL SCALE FINGERING (1–5) SHOWN ON THE STAFF">Fingers</button>
                         <button id="btnKeys" class="hardware-btn" onclick="if(!helpActive) toggleKeys()" data-help="KEYS: BLUE LED LIGHTS UP THE CURRENT NOTE ON THE PIANO KEYBOARD">Keys</button>
+                        <button id="btnWheel" class="hardware-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS — CLICK A SECTOR TO SELECT THAT KEY">Wheel</button>
                     </div>
 
                     <div class="center-console">
@@ -405,12 +425,12 @@
             ctrl2:'Sprint (1×), Marathon (3×), Training (endless loop).',
             ctrl3:'Switch between 1 and 2 octave scale runs.',
             ctrl4:'Shows note names and activates the LED light guide on the keyboard.',
-            ctrl5:'Displays the official scale fingering (1–5) on the sheet.',
+            ctrl5:'Displays the official scale fingering (1–5) on the sheet.', ctrl6:'Opens the Circle of Fifths. Click any major key sector to immediately load that scale.', wheelTitle:'Circle of Fifths', wheelBody:'Press Wheel to open the draggable Circle of Fifths. Click any sector to instantly load that major scale — the OLED Scale display updates automatically. Drag the wheel anywhere on screen.',
             tipTitle:'Learning Tip',
             tipBody:'Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',
             ready:'SELECT SCALE OR PRESS START',
             helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
-            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnFingers:'Fingers', btnKeys:'Keys',
+            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnFingers:'Fingers', btnKeys:'Keys', btnWheel:'Wheel',
             btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
             hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLES RIGHT HAND NOTES',
             hBottom:'BOTTOM CLEF: TOGGLES LEFT HAND NOTES', hHints:'HINTS: SHOWS NOTE NAMES AND LED GUIDE',
@@ -433,16 +453,16 @@
             ctrl2:'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',
             ctrl3:'Váltás 1 és 2 oktáv terjedelemű skálafutam között.',
             ctrl4:'Megjeleníti a hangneveket és aktiválja a LED fényvezetőt a billentyűzeten.',
-            ctrl5:'Megjeleníti a hivatalos skálaujjrendet (1–5) a kottán.',
+            ctrl5:'Megjeleníti a hivatalos skálaujjrendet (1–5) a kottán.', ctrl6:'Megnyitja a kvintkor tárcsát. Kattints bármely dúr szektorra a skála azonnali betöltéséhez.', wheelTitle:'Kvintkor', wheelBody:'Nyomd meg a Wheel gombot a mozgatható kvintkor tárcsához. Kattints bármely szektorra az adott dúr skála azonnali betöltéséhez — az OLED Scale kijelző automatikusan frissül. Húzd a tárcsát bárhova.',
             tipTitle:'Tanulási tipp',
             tipBody:'Kezdj <strong style="color:var(--oled-text);">Sprint</strong> móddal és 1 oktávval. Ha már tisztán tudod a skálát, válts 2 oktávra és Maratonra az izommemória építéséhez.',
             ready:'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT',
             helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
-            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnem', btnFingers:'Ujjrend', btnKeys:'Billentyű',
+            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnFingers:'Ujjrend', btnKeys:'Billentyű', btnWheel:'Tárcsa',
             btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
             hHome:'FŐOLDAL: VISSZA A FŐMENÜBE', hTop:'FELSŐ KULCS: JOBB KÉZ HANGOK BE/KI',
             hBottom:'ALSÓ KULCS: BAL KÉZ HANGOK BE/KI', hHints:'HANGNEM: HANGNEVEK ÉS LED VEZETŐ',
-            hFingers:'UJJREND: HIVATALOS SKÁLAUJJREND', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKTUÁLIS HANGOT A ZONGORÁN', hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
+            hFingers:'UJJREND: HIVATALOS SKÁLAUJJREND', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKTUÁLIS HANGOT A ZONGORÁN', hWheel:'TÁRCSA: MOZGATHATÓ KVINTKOR — KATTINTS EGY HANGNEMRE A SKÁLA KIVÁLASZTÁSÁHOZ', hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
             hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI', hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA',
             hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ', hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',
             hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
@@ -456,21 +476,22 @@
     };
 
     function setLang(lang) {
+        localStorage.setItem('akira_lang', lang);
         currentLang = lang;
         document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
         document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
         const T = SKALAK_T[lang];
         // Info modal
-        const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-gotIt'];
-        const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.gotIt];
+        const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-ctrl6','txt-tipTitle','txt-tipBody','txt-wheelTitle','txt-wheelBody','txt-gotIt'];
+        const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.ctrl6,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
         // Gombok
-        const btnMap={'handRH':T.btnTop,'handLH':T.btnBottom,'btnHintName':T.btnHints,'btnHintFinger':T.btnFingers,'btnKeys':T.btnKeys};
+        const btnMap={'handRH':T.btnTop,'handLH':T.btnBottom,'btnHintName':T.btnHints,'btnHintFinger':T.btnFingers,'btnKeys':T.btnKeys,'btnWheel':T.btnWheel};
         Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
         // Help szövegek
         const helpMap={
             'btnHome':T.hHome,'handRH':T.hTop,'handLH':T.hBottom,
-            'btnHintName':T.hHints,'btnHintFinger':T.hFingers,'btnKeys':T.hKeys,
+            'btnHintName':T.hHints,'btnHintFinger':T.hFingers,'btnKeys':T.hKeys,'btnWheel':T.hWheel,
             'btnStart':T.hStart,'audioToggle':T.hPiano,
             'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
             'oledModule':T.hModule,'oledMode':T.hMode,'oledScale':T.hScale,
@@ -532,35 +553,19 @@
 
     function setInfoBar(text, targetEl) {
         const bar = document.getElementById('infoBarText');
-        const tri = document.getElementById('helpTriangle');
         if (!targetEl) {
-            // normál állapot: középre, háromszög nélkül
-            tri.style.display = 'none';
-            bar.style.left = '50%';
-            bar.style.right = 'auto';
-            bar.style.transform = 'translateX(-50%)';
-            bar.innerHTML = text;
-            return;
+            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
+            bar.innerHTML = text; return;
         }
-        const barRect = document.getElementById('infoBar').getBoundingClientRect();
-        const elRect = targetEl.getBoundingClientRect();
-        const cx = elRect.left + elRect.width / 2 - barRect.left;
+        const barRect = bar.parentElement.getBoundingClientRect();
+        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
         const cxPct = cx / barRect.width;
-        // Háromszög az elem felett
-        tri.style.display = 'block';
-        tri.style.left = cx + 'px';
-        tri.style.transform = 'translateX(-50%)';
-        bar.innerHTML = text;
         if (cxPct < 0.5) {
-            // elem bal oldalon — szöveg a háromszögtől jobbra
-            bar.style.left = (cx + 18) + 'px';
-            bar.style.right = 'auto';
-            bar.style.transform = 'none';
+            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;">▼</span>' + text;
+            bar.style.left = Math.max(cx - 10, 20) + 'px'; bar.style.right='auto'; bar.style.transform='none';
         } else {
-            // elem jobb oldalon — szöveg a háromszögtől balra
-            bar.style.right = (barRect.width - cx + 18) + 'px';
-            bar.style.left = 'auto';
-            bar.style.transform = 'none';
+            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;">▼</span>';
+            bar.style.right = Math.max(barRect.width - cx - 10, 20) + 'px'; bar.style.left='auto'; bar.style.transform='none';
         }
     }
 
@@ -620,8 +625,8 @@
     const scaleOrder = Object.keys(scaleDefs).map(k => ({ v: k, n: k.replace('_', ' ') }));
     let currentScaleIdx = 0;
 
-    function cycleScale(dir) { if (helpActive) return; currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length; let s = scaleOrder[currentScaleIdx]; document.getElementById('lcdScaleText').innerText = s.n; document.getElementById('scaleSelectValue').value = s.v; if(isRunning) stopPractice(); buildSequence(); draw(); }
-    function selectPatch(val, name) { currentScaleIdx = scaleOrder.findIndex(s => s.v === val); document.getElementById('lcdScaleText').innerText = name; document.getElementById('scaleSelectValue').value = val; closePatchBrowser(); if(isRunning) stopPractice(); buildSequence(); draw(); }
+    function cycleScale(dir) { if (helpActive) return; currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length; let s = scaleOrder[currentScaleIdx]; document.getElementById('lcdScaleText').innerText = s.n; document.getElementById('scaleSelectValue').value = s.v; if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
+    function selectPatch(val, name) { currentScaleIdx = scaleOrder.findIndex(s => s.v === val); document.getElementById('lcdScaleText').innerText = name; document.getElementById('scaleSelectValue').value = val; closePatchBrowser(); if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
     
     function toggleVst() { 
         if (helpActive) return; 
@@ -909,6 +914,113 @@
         ctx.restore(); 
     }
 
+    // ── AKKORDTÁRCSA ──
+    // Wheel → scale mapping: kvintkor sorrendben C G D A E B F# Db Ab Eb Bb F
+    const WHEEL_TO_SCALE = ['C_DUR','G_DUR','D_DUR','A_DUR','E_DUR','H_DUR','FS_DUR','DB_DUR','AB_DUR','EB_DUR','B_FLAT_DUR','F_DUR'];
+    const WHEEL_MAJORS   = ['C','G','D','A','E','B','F#','Db','Ab','Eb','Bb','F'];
+    const WHEEL_MINORS   = ['Am','Em','Bm','F#m','C#m','G#m','Ebm','Bbm','Fm','Cm','Gm','Dm'];
+    let showWheel = false, activeWheelKeyIndex = 0;
+    let isDraggingWheel=false, dragOffX=0, dragOffY=0, dragStartX=0, dragStartY=0;
+
+    function toggleWheel() {
+        if (helpActive) return;
+        showWheel = !showWheel;
+        document.getElementById('btnWheel').classList.toggle('active', showWheel);
+        const wc = document.getElementById('wheelCanvas');
+        wc.style.display = showWheel ? 'block' : 'none';
+        wheelClose.style.display = showWheel ? 'flex' : 'none';
+        if (showWheel) drawWheel();
+    }
+
+    const wheelClose = document.createElement('div');
+    wheelClose.innerHTML = '×';
+    Object.assign(wheelClose.style, { position:'fixed', width:'28px', height:'28px', background:'#1a1a1d', border:'1px solid #333', borderRadius:'50%', cursor:'pointer', zIndex:'10001', display:'none', alignItems:'center', justifyContent:'center', fontSize:'16px', color:'#888', fontFamily:'Inter', right:'26px', top:'46px' });
+    wheelClose.addEventListener('click', () => toggleWheel());
+    document.body.appendChild(wheelClose);
+
+    const wheelCanvas = document.getElementById('wheelCanvas');
+    wheelCanvas.addEventListener('pointerdown', (e) => {
+        if (helpActive) return;
+        isDraggingWheel=true; dragStartX=e.clientX; dragStartY=e.clientY;
+        const r=wheelCanvas.getBoundingClientRect(); dragOffX=e.clientX-r.left; dragOffY=e.clientY-r.top;
+        wheelCanvas.setPointerCapture(e.pointerId);
+    });
+    wheelCanvas.addEventListener('pointermove', (e) => {
+        if (!isDraggingWheel) return;
+        if (Math.hypot(e.clientX-dragStartX, e.clientY-dragStartY) > 5) {
+            wheelCanvas.style.right='auto';
+            wheelCanvas.style.left=(e.clientX-dragOffX)+'px';
+            wheelCanvas.style.top=(e.clientY-dragOffY)+'px';
+            wheelClose.style.right='auto';
+            wheelClose.style.left=(e.clientX-dragOffX+372)+'px';
+            wheelClose.style.top=(e.clientY-dragOffY-14)+'px';
+        }
+    });
+    wheelCanvas.addEventListener('pointerup', (e) => {
+        isDraggingWheel=false; wheelCanvas.releasePointerCapture(e.pointerId);
+        if (Math.hypot(e.clientX-dragStartX, e.clientY-dragStartY) <= 5) {
+            const r=wheelCanvas.getBoundingClientRect();
+            const x=e.clientX-r.left-200, y=e.clientY-r.top-200, d=Math.hypot(x,y);
+            if (d > 67 && d < 195) {
+                const sector = Math.floor(((Math.atan2(y,x)*180/Math.PI)+90+360+15)%360/30);
+                activeWheelKeyIndex = sector;
+                // Scale szinkron
+                const scaleKey = WHEEL_TO_SCALE[sector];
+                selectPatch(scaleKey, scaleKey.replace('_',' '));
+                setInfoBar(`KEY: ${WHEEL_MAJORS[sector]} — I IV V: ${WHEEL_MAJORS[sector]}, ${WHEEL_MAJORS[(sector+5)%12]}, ${WHEEL_MAJORS[(sector+7)%12]}`, null);
+                drawWheel();
+            }
+        }
+    });
+
+    // Wheel szinkron a cycleScale-lel
+    const _origCycleScale = cycleScale;
+
+    function drawWheel() {
+        if (!showWheel) return;
+        const ctx = wheelCanvas.getContext('2d');
+        ctx.clearRect(0,0,400,400);
+        const cx=200, cy=200, r=195;
+        const iCenter = (activeWheelKeyIndex+0.5)*30-90;
+        const startRad=(iCenter-45)*Math.PI/180, endRad=(iCenter+45)*Math.PI/180;
+        ctx.beginPath(); ctx.arc(cx,cy,r,startRad,endRad); ctx.arc(cx,cy,67,endRad,startRad,true); ctx.closePath();
+        ctx.fillStyle='rgba(179,230,255,0.12)'; ctx.fill();
+        ctx.strokeStyle='rgba(179,230,255,0.7)'; ctx.lineWidth=2; ctx.stroke();
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        for (let i=0;i<12;i++) {
+            const angle=(i*30-90)*Math.PI/180;
+            ctx.beginPath(); ctx.moveTo(cx+Math.cos(angle)*67,cy+Math.sin(angle)*67); ctx.lineTo(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r);
+            ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1; ctx.stroke();
+            const mid=((i+0.5)*30-90)*Math.PI/180;
+            const mx=cx+Math.cos(mid)*160, my=cy+Math.sin(mid)*160;
+            const nx=cx+Math.cos(mid)*100, ny=cy+Math.sin(mid)*100;
+            const dist=(i-activeWheelKeyIndex+12)%12;
+            const inWedge=dist===0||dist===1||dist===11;
+            const rMaj={0:'I',1:'V',11:'IV'}, rMin={0:'vi',1:'iii',11:'ii'};
+            if (inWedge) {
+                ctx.font="bold 22px 'Share Tech Mono'"; ctx.fillStyle='#b3e6ff'; ctx.fillText(WHEEL_MAJORS[i],mx,my-9);
+                ctx.font="bold 13px 'Inter'"; ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText(rMaj[dist]||'',mx,my+10);
+                ctx.font="14px 'Share Tech Mono'"; ctx.fillStyle='rgba(179,230,255,0.6)'; ctx.fillText(WHEEL_MINORS[i],nx,ny-6);
+                ctx.font="11px 'Inter'"; ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fillText(rMin[dist]||'',nx,ny+8);
+            } else {
+                ctx.font="18px 'Share Tech Mono'"; ctx.fillStyle='#4a4a4a'; ctx.fillText(WHEEL_MAJORS[i],mx,my);
+                ctx.font="13px 'Share Tech Mono'"; ctx.fillStyle='#2a2a2a'; ctx.fillText(WHEEL_MINORS[i],nx,ny);
+            }
+        }
+        [[r,'rgba(255,255,255,0.12)'],[127,'rgba(255,255,255,0.04)'],[67,'rgba(255,255,255,0.12)']].forEach(([rad,col])=>{
+            ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.strokeStyle=col; ctx.lineWidth=1; ctx.stroke();
+        });
+        ctx.fillStyle='#444'; ctx.font="12px 'Share Tech Mono'"; ctx.fillText('KEY',cx,cy-16);
+        ctx.fillStyle='#b3e6ff'; ctx.font="bold 28px 'Share Tech Mono'"; ctx.fillText(WHEEL_MAJORS[activeWheelKeyIndex],cx,cy+8);
+    }
+
+    // cycleScale frissíti a wheel indexet is
+    function syncWheelToScale() {
+        const key = scaleOrder[currentScaleIdx]?.v || 'C_DUR';
+        const idx = WHEEL_TO_SCALE.indexOf(key);
+        if (idx !== -1) { activeWheelKeyIndex = idx; if(showWheel) drawWheel(); }
+    }
+
     function create88() {
         const wrap = document.getElementById('hb-wrap'); const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
         for(let m=21; m<=108; m++) {
@@ -929,7 +1041,7 @@
             wrap.appendChild(k);
         }
     }
-    window.onload = () => { create88(); buildSequence(); draw(); };
+    window.onload = () => { const sl=localStorage.getItem('akira_lang')||'EN'; setLang(sl); create88(); buildSequence(); draw(); };
 </script>
 </body>
 </html>

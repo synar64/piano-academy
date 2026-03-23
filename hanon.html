@@ -62,7 +62,7 @@
         .info-bar-text {
             font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
             color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
-            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s;
+            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s; line-height: 45px; vertical-align: middle;
         }
 
         /* ── MIXER OVERLAY ── */
@@ -438,7 +438,7 @@
             tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld leütés előtt, és tartsd lazán a csuklódat.',
             ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',
             helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
-            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnem', btnFingers:'Ujjrend',
+            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnFingers:'Ujjrend',
             btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
             hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE', hTop:'FELSŐ KULCS: JOBB KÉZ BE/KI',
             hBottom:'ALSÓ KULCS: BAL KÉZ BE/KI', hHints:'HANGNEM: HANGNEVEK MEGJELENÍTÉSE A KOTTÁN',
@@ -454,6 +454,7 @@
     };
 
     function setLang(lang) {
+        localStorage.setItem('akira_lang', lang);
         currentLang = lang;
         document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
         document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
@@ -482,18 +483,17 @@
     function setInfoBar(text, targetEl) {
         const bar = document.getElementById('infoBarText');
         if (!targetEl) {
-            bar.style.left = '50%'; bar.style.right = 'auto'; bar.style.transform = 'translateX(-50%)';
+            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
             bar.innerHTML = text; return;
         }
-        const barRect = document.getElementById('infoBarText').parentElement.getBoundingClientRect();
-        const elRect = targetEl.getBoundingClientRect();
-        const cx = elRect.left + elRect.width / 2 - barRect.left;
-        const cxPct = cx / barRect.width;
-        bar.innerHTML = text;
-        if (cxPct < 0.5) {
-            bar.style.left = (cx + 18) + 'px'; bar.style.right = 'auto'; bar.style.transform = 'none';
+        const barRect = bar.parentElement.getBoundingClientRect();
+        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
+        if (cx / barRect.width < 0.5) {
+            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>' + text;
+            bar.style.left = Math.max(cx - 10, 20) + 'px'; bar.style.right='auto'; bar.style.transform='none';
         } else {
-            bar.style.right = (barRect.width - cx + 18) + 'px'; bar.style.left = 'auto'; bar.style.transform = 'none';
+            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';
+            bar.style.right = Math.max(barRect.width - cx - 10, 20) + 'px'; bar.style.left='auto'; bar.style.transform='none';
         }
     }
 
@@ -577,14 +577,13 @@
                 const bar = document.getElementById('infoBarText');
                 const txt = target.dataset.help;
                 const barRect = bar.parentElement.getBoundingClientRect();
-                const elRect = target.getBoundingClientRect();
-                const cx = elRect.left + elRect.width / 2 - barRect.left;
-                const cxPct = cx / barRect.width;
-                bar.innerHTML = txt;
-                if (cxPct < 0.5) {
-                    bar.style.left = (cx + 18) + 'px'; bar.style.right = 'auto'; bar.style.transform = 'none';
+                const cx = target.getBoundingClientRect().left + target.getBoundingClientRect().width/2 - barRect.left;
+                if (cx / barRect.width < 0.5) {
+                    bar.innerHTML = '<span style="font-size:11px;opacity:0.6;">▼</span> ' + txt;
+                    bar.style.left = (cx - 12) + 'px'; bar.style.right = 'auto'; bar.style.transform = 'none';
                 } else {
-                    bar.style.right = (barRect.width - cx + 18) + 'px'; bar.style.left = 'auto'; bar.style.transform = 'none';
+                    bar.innerHTML = txt + ' <span style="font-size:11px;opacity:0.6;">▼</span>';
+                    bar.style.right = (barRect.width - cx - 12) + 'px'; bar.style.left = 'auto'; bar.style.transform = 'none';
                 }
             }
         }
@@ -921,10 +920,10 @@
     }
 
     window.onload = () => { 
+        const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
         create88(); 
         buildSequence(); 
         draw();
-        // Audio inicializálás első interakcióra (nem bodyon, hogy ne zavarja a gombokat)
         window.addEventListener('pointerdown', () => initAudio(), { once: true });
     };
 </script>

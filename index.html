@@ -130,11 +130,135 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        /* ── TOP CONTROLS ── */
+        .top-controls {
+            position: fixed; top: 20px; right: 30px; z-index: 100;
+            display: flex; gap: 10px; align-items: center;
+        }
+        .lang-split-idx {
+            display: flex; background: rgba(10,15,20,0.75);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 4px;
+            overflow: hidden; backdrop-filter: blur(8px);
+        }
+        .lang-split-idx button {
+            background: transparent; border: none;
+            color: rgba(255,255,255,0.35); cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 12px;
+            font-weight: 700; padding: 7px 16px; letter-spacing: 1px;
+            text-transform: uppercase; transition: 0.2s;
+        }
+        .lang-split-idx button.active { color: var(--theme-cyan); }
+        .lang-split-idx button:hover  { color: var(--theme-cyan); }
+        .lang-divider-idx { width: 1px; background: rgba(255,255,255,0.1); margin: 5px 0; }
+        .top-info-btn {
+            width: 34px; height: 34px; background: rgba(10,15,20,0.75);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px); color: rgba(255,255,255,0.4);
+            font-size: 16px; transition: 0.2s;
+        }
+        .top-info-btn:hover { color: var(--theme-cyan); border-color: var(--theme-cyan); }
+
+        /* ── INFO MODAL ── */
+        .idx-overlay {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.88);
+            z-index: 10000; justify-content: center; align-items: center;
+            padding: 20px; box-sizing: border-box;
+        }
+        .idx-modal {
+            background: linear-gradient(135deg, #080c10, #0a0f14);
+            border: 1px solid rgba(0,170,204,0.25); border-radius: 14px;
+            padding: 40px 44px; max-width: 780px; width: 100%;
+            max-height: 88vh; overflow-y: auto; position: relative;
+            box-shadow: 0 30px 80px rgba(0,0,0,1), 0 0 0 1px rgba(0,170,204,0.08);
+        }
+        .idx-modal::-webkit-scrollbar { width: 4px; }
+        .idx-modal::-webkit-scrollbar-track { background: transparent; }
+        .idx-modal::-webkit-scrollbar-thumb { background: rgba(0,170,204,0.3); border-radius: 2px; }
+        .idx-modal h2 { color: var(--theme-cyan); font-size: 20px; letter-spacing: 5px; text-transform: uppercase; margin: 0 0 8px; text-align: center; }
+        .idx-modal .subtitle { color: rgba(255,255,255,0.3); font-size: 12px; letter-spacing: 3px; text-align: center; margin-bottom: 32px; text-transform: uppercase; }
+        .idx-modal h3 { color: rgba(255,255,255,0.6); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin: 28px 0 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+        .idx-modal p, .idx-modal li { color: rgba(255,255,255,0.5); font-size: 13.5px; line-height: 1.85; margin: 0 0 10px; }
+        .idx-modal ul { padding-left: 18px; margin: 0 0 12px; }
+        .idx-modal .module-row { display: flex; gap: 14px; margin-bottom: 10px; align-items: baseline; }
+        .idx-modal .mod-tag { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--theme-cyan); background: rgba(0,170,204,0.08); border: 1px solid rgba(0,170,204,0.2); border-radius: 3px; padding: 3px 10px; white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; min-width: 110px; text-align: center; }
+        .idx-modal .mod-desc { color: rgba(255,255,255,0.45); font-size: 13px; line-height: 1.7; }
+        .idx-close-btn {
+            display: block; width: 100%; margin-top: 32px; padding: 14px;
+            background: transparent; border: 1px solid rgba(0,170,204,0.35);
+            border-radius: 6px; color: var(--theme-cyan);
+            font-family: 'Inter', sans-serif; font-size: 12px;
+            font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+            cursor: pointer; transition: 0.2s;
+        }
+        .idx-close-btn:hover { background: rgba(0,170,204,0.08); }
     </style>
 </head>
 <body>
 
     <div class="ambient-bg"></div>
+
+    <!-- TOP: Lang + Info -->
+    <div class="top-controls">
+        <div class="lang-split-idx">
+            <button id="idxEN" onclick="setLang('EN')">EN</button>
+            <div class="lang-divider-idx"></div>
+            <button id="idxHU" onclick="setLang('HU')" class="active">HU</button>
+        </div>
+        <button class="top-info-btn" onclick="document.getElementById('idxModal').style.display='flex'" title="Info">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+        </button>
+    </div>
+
+    <!-- INFO MODAL -->
+    <div id="idxModal" class="idx-overlay" onclick="if(event.target===this)this.style.display='none'">
+        <div class="idx-modal">
+            <h2 id="im-title">Akíra Piano Academy</h2>
+            <div class="subtitle" id="im-sub">Browser-Based Piano Training Workstation</div>
+
+            <h3 id="im-h1">About</h3>
+            <p id="im-about">A comprehensive, free, browser-based piano training environment. Six independent modules cover every essential area of piano education — from ear training and sight-reading to chords, scales, technique, and rhythm. Works with a real MIDI keyboard or with mouse clicks on the on-screen piano. No installation required.</p>
+
+            <h3 id="im-h2">Modules</h3>
+            <div id="im-modules">
+                <div class="module-row"><span class="mod-tag">Ear Training</span><span class="mod-desc">Identify individual notes and intervals by ear across multiple octave ranges. Includes chromatic option for black keys.</span></div>
+                <div class="module-row"><span class="mod-tag">Sight Reading</span><span class="mod-desc">Read notes from the staff and play them in real time. BPM and mistake tracking, hint system, LED keyboard guides.</span></div>
+                <div class="module-row"><span class="mod-tag">Chords</span><span class="mod-desc">Recognize and play diatonic chords, inversions, and seventh chords. Includes a draggable Circle of Fifths wheel showing key relationships.</span></div>
+                <div class="module-row"><span class="mod-tag">Scales</span><span class="mod-desc">All 24 major and minor scales with official fingering, LED keyboard guides, and Circle of Fifths navigation for key selection.</span></div>
+                <div class="module-row"><span class="mod-tag">Hanon</span><span class="mod-desc">Classic Hanon finger exercises with real-time BPM and stability tracking. Identifies which finger causes timing slowdowns.</span></div>
+                <div class="module-row"><span class="mod-tag">Rhythm</span><span class="mod-desc">Read and tap rhythmic patterns. Three modes: READ (follow the score), TAP (free tapping with accuracy bar), COPY (listen then repeat). 12 patterns across 4 levels.</span></div>
+            </div>
+
+            <h3 id="im-h3">How to Use</h3>
+            <p id="im-how">Connect a MIDI keyboard before opening a module for the best experience. All modules remember your language preference. Press the <strong style="color:#fff">?</strong> button in any module and click any element to learn what it does. Your language choice is saved automatically across all modules.</p>
+
+            <h3 id="im-h4">Technical</h3>
+            <p id="im-tech">Runs entirely in the browser — no server, no login, no data collection. Audio engine uses the Web Audio API with real Steinway Grand Piano samples (Salamander). MIDI input via Web MIDI API. Best experienced in Chrome or Edge.</p>
+
+            <h3 id="im-h5">Support</h3>
+            <p id="im-support">Akíra Piano Academy is a free, open educational project. If you find it useful and want to support its development, contributions are welcome.</p>
+            <div style="text-align:center;margin:16px 0;">
+                <a href="https://paypal.me" target="_blank" style="display:inline-block;padding:10px 28px;background:rgba(0,170,204,0.1);border:1px solid rgba(0,170,204,0.3);border-radius:6px;color:var(--theme-cyan);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-decoration:none;text-transform:uppercase;transition:0.2s;" onmouseover="this.style.background='rgba(0,170,204,0.18)'" onmouseout="this.style.background='rgba(0,170,204,0.1)'" id="im-donate">♥ Support via PayPal</a>
+            </div>
+
+            <h3 id="im-h6">Site Map</h3>
+            <ul id="im-sitemap">
+                <li><strong style="color:rgba(255,255,255,0.7)">index.html</strong> — Main menu</li>
+                <li><strong style="color:rgba(255,255,255,0.7)">hallasfejleszto.html</strong> — Ear Training</li>
+                <li><strong style="color:rgba(255,255,255,0.7)">kottaolvasas.html</strong> — Sight Reading</li>
+                <li><strong style="color:rgba(255,255,255,0.7)">akkordok.html</strong> — Chords</li>
+                <li><strong style="color:rgba(255,255,255,0.7)">skalak.html</strong> — Scales</li>
+                <li><strong style="color:rgba(255,255,255,0.7)">hanon.html</strong> — Hanon Exercises</li>
+                <li><strong style="color:rgba(255,255,255,0.7)">ritmus.html</strong> — Rhythm</li>
+            </ul>
+
+            <h3 id="im-h7">Contact & Impressum</h3>
+            <p id="im-contact">Akíra Piano Academy — Independent educational project. For feedback, bug reports, or collaboration inquiries, please reach out via the support link above.</p>
+
+            <button class="idx-close-btn" id="im-close" onclick="document.getElementById('idxModal').style.display='none'">Got It</button>
+        </div>
+    </div>
 
     <div class="main-container">
         
@@ -182,5 +306,103 @@
         </div>
     </div>
 
-</body>
+<script>
+const T = {
+    EN: {
+        cards: [
+            {t:'Ear Training',    d:'Identify notes and intervals purely by ear.'},
+            {t:'Sight Reading',   d:'Practice reading and playing notes from the staff in real time.'},
+            {t:'Chords',          d:'Learn chord shapes, inversions and functional notation.'},
+            {t:'Scales',          d:'Master all scales and fingering in every key.'},
+            {t:'Hanon',           d:'Virtuoso finger exercises for technique and independence.'},
+            {t:'Rhythm',          d:'Develop timing and understand complex rhythmic patterns.'}
+        ],
+        'im-title':'Akíra Piano Academy',
+        'im-sub':'Browser-Based Piano Training Workstation',
+        'im-h1':'About',
+        'im-about':'A comprehensive, free, browser-based piano training environment. Six independent modules cover every essential area of piano education — from ear training and sight-reading to chords, scales, technique, and rhythm. Works with a real MIDI keyboard or with mouse clicks on the on-screen piano. No installation required.',
+        'im-h2':'Modules',
+        'im-modules':`<div class="module-row"><span class="mod-tag">Ear Training</span><span class="mod-desc">Identify individual notes and intervals by ear across multiple octave ranges. Includes chromatic option.</span></div>
+            <div class="module-row"><span class="mod-tag">Sight Reading</span><span class="mod-desc">Read notes from the staff and play them in real time. BPM tracking, mistake counter, hint system.</span></div>
+            <div class="module-row"><span class="mod-tag">Chords</span><span class="mod-desc">Recognize and play diatonic chords, inversions, and seventh chords. Includes draggable Circle of Fifths wheel.</span></div>
+            <div class="module-row"><span class="mod-tag">Scales</span><span class="mod-desc">All 24 major and minor scales with official fingering, LED guides, and Circle of Fifths navigation.</span></div>
+            <div class="module-row"><span class="mod-tag">Hanon</span><span class="mod-desc">Classic Hanon exercises with real-time BPM and stability tracking. Identifies problem fingers.</span></div>
+            <div class="module-row"><span class="mod-tag">Rhythm</span><span class="mod-desc">READ / TAP / COPY modes. 12 patterns across 4 levels. Real-time accuracy bar.</span></div>`,
+        'im-h3':'How to Use',
+        'im-how':'Connect a MIDI keyboard before opening a module. All modules remember your language. Press <strong style="color:#fff">?</strong> in any module and click any element to learn what it does.',
+        'im-h4':'Technical',
+        'im-tech':'Runs entirely in the browser — no server, no login, no data collection. Audio: Web Audio API + Salamander Grand Piano samples. MIDI: Web MIDI API. Best in Chrome or Edge.',
+        'im-h5':'Support',
+        'im-support':'Akíra Piano Academy is a free educational project. If you find it useful, contributions are welcome.',
+        'im-donate':'♥ Support via PayPal',
+        'im-h6':'Site Map',
+        'im-sitemap':'<li><strong style="color:rgba(255,255,255,0.7)">index.html</strong> — Main menu</li><li><strong style="color:rgba(255,255,255,0.7)">hallasfejleszto.html</strong> — Ear Training</li><li><strong style="color:rgba(255,255,255,0.7)">kottaolvasas.html</strong> — Sight Reading</li><li><strong style="color:rgba(255,255,255,0.7)">akkordok.html</strong> — Chords</li><li><strong style="color:rgba(255,255,255,0.7)">skalak.html</strong> — Scales</li><li><strong style="color:rgba(255,255,255,0.7)">hanon.html</strong> — Hanon</li><li><strong style="color:rgba(255,255,255,0.7)">ritmus.html</strong> — Rhythm</li>',
+        'im-h7':'Contact & Impressum',
+        'im-contact':'Akíra Piano Academy — Independent educational project. For feedback, bug reports, or collaboration, please reach out via the support link above.',
+        'im-close':'Got It'
+    },
+    HU: {
+        cards: [
+            {t:'Hallásfejlesztő',  d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},
+            {t:'Kottaolvasás',     d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},
+            {t:'Akkordok',         d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},
+            {t:'Skálák',           d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},
+            {t:'Hanon',            d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},
+            {t:'Ritmus',           d:'Fejleszti az időzítést és a komplex ritmusképletek megértését.'}
+        ],
+        'im-title':'Akíra Zongora Akadémia',
+        'im-sub':'Böngészőalapú Zongora Tréning Workstation',
+        'im-h1':'A projektről',
+        'im-about':'Átfogó, ingyenes, böngészőalapú zongoraoktatási környezet. Hat független modul lefedi a zongora tanulás minden lényeges területét — hallásfejlesztéstől a kottaolvasásig, akkordoktól skálákig, technikáig és ritmusig. Működik valódi MIDI billentyűzettel és egérkattintással is. Telepítés nem szükséges.',
+        'im-h2':'Modulok',
+        'im-modules':`<div class="module-row"><span class="mod-tag">Hallásfejlesztő</span><span class="mod-desc">Azonosítsd a hangokat és hangközöket fülre, több oktávtartományban. Kromatikus opció is elérhető.</span></div>
+            <div class="module-row"><span class="mod-tag">Kottaolvasás</span><span class="mod-desc">Olvasd le a hangokat a kottáról valós időben. BPM követés, hibaszámláló, hangnév súgó.</span></div>
+            <div class="module-row"><span class="mod-tag">Akkordok</span><span class="mod-desc">Ismerd fel és játszd le a diatonikus akkordokat, fordításokat és szeptimakkordokat. Mozgatható kvintkor tárcsa.</span></div>
+            <div class="module-row"><span class="mod-tag">Skálák</span><span class="mod-desc">Mind a 24 dúr és moll skála hivatalos ujjrenddel, LED vezérléssel és kvintkor navigációval.</span></div>
+            <div class="module-row"><span class="mod-tag">Hanon</span><span class="mod-desc">Klasszikus ujjgyakorlatok valós idejű BPM és stabilitásmérővel. Megmutatja melyik ujj okoz lassulást.</span></div>
+            <div class="module-row"><span class="mod-tag">Ritmus</span><span class="mod-desc">READ / TAP / COPY módok. 12 ritmussémát 4 nehézségi szinten. Valós idejű pontossági sáv.</span></div>`,
+        'im-h3':'Használat',
+        'im-how':'Csatlakoztasd a MIDI billentyűzetet a modul megnyitása előtt. Minden modul megjegyzi a kiválasztott nyelvet. Nyomd meg a <strong style="color:#fff">?</strong> gombot bármely modulban és kattints bármely elemre a leírásért.',
+        'im-h4':'Technikai',
+        'im-tech':'Teljesen böngészőben fut — nincs szerver, nincs bejelentkezés, nincs adatgyűjtés. Hang: Web Audio API + Salamander Grand Piano minták. MIDI: Web MIDI API. Chrome vagy Edge ajánlott.',
+        'im-h5':'Támogatás',
+        'im-support':'Az Akíra Piano Academy egy ingyenes oktatási projekt. Ha hasznosnak találod és támogatnád a fejlesztését, köszönettel fogadjuk.',
+        'im-donate':'♥ Támogatás PayPalon',
+        'im-h6':'Oldaltérkép',
+        'im-sitemap':'<li><strong style="color:rgba(255,255,255,0.7)">index.html</strong> — Főoldal</li><li><strong style="color:rgba(255,255,255,0.7)">hallasfejleszto.html</strong> — Hallásfejlesztő</li><li><strong style="color:rgba(255,255,255,0.7)">kottaolvasas.html</strong> — Kottaolvasás</li><li><strong style="color:rgba(255,255,255,0.7)">akkordok.html</strong> — Akkordok</li><li><strong style="color:rgba(255,255,255,0.7)">skalak.html</strong> — Skálák</li><li><strong style="color:rgba(255,255,255,0.7)">hanon.html</strong> — Hanon</li><li><strong style="color:rgba(255,255,255,0.7)">ritmus.html</strong> — Ritmus</li>',
+        'im-h7':'Kapcsolat & Impresszum',
+        'im-contact':'Akíra Piano Academy — Független oktatási projekt. Visszajelzés, hibajelentés vagy együttműködési ajánlat esetén kérjük használd a fenti támogatási linket.',
+        'im-close':'Értettem'
+    }
+};
+
+const URLS = ['hallasfejleszto.html','kottaolvasas.html','akkordok.html','skalak.html','hanon.html','ritmus.html'];
+
+function setLang(lang) {
+    localStorage.setItem('akira_lang', lang);
+    document.getElementById('idxEN').classList.toggle('active', lang==='EN');
+    document.getElementById('idxHU').classList.toggle('active', lang==='HU');
+    const L = T[lang];
+    // Kártyák
+    document.querySelectorAll('.module-card').forEach((c, i) => {
+        c.querySelector('.module-title').textContent = L.cards[i].t;
+        c.querySelector('.module-desc').textContent  = L.cards[i].d;
+        c.onclick = () => window.location.href = URLS[i];
+    });
+    // Modal szövegek
+    ['im-title','im-sub','im-h1','im-h3','im-h4','im-h5','im-h6','im-h7','im-h8','im-close'].forEach(id => {
+        const el = document.getElementById(id); if (el && L[id]) el.textContent = L[id];
+    });
+    ['im-about','im-how','im-tech','im-support','im-modules','im-sitemap'].forEach(id => {
+        const el = document.getElementById(id); if (el && L[id]) el.innerHTML = L[id];
+    });
+    document.getElementById('im-h2').textContent = L['im-h2'];
+    const don = document.getElementById('im-donate'); if (don) don.textContent = L['im-donate'];
+}
+
+window.onload = () => {
+    const sl = localStorage.getItem('akira_lang') || 'HU';
+    setLang(sl);
+};
+</script></body>
 </html>

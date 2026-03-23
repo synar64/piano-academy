@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>Akíra Piano Academy | Rhythm Workstation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rack-bg: #1a1a1d; --rack-border: #2a2a2d; --btn-dark: #101012;
+            --btn-border: #050505; --text-dim: #555; --lcd-bg-dark: #111213;
+            --lcd-label-color: #557799; --oled-text: #b3e6ff;
+        }
+        body { font-family: 'Inter', sans-serif; background: #000; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; color: #fff; -webkit-user-select: none; user-select: none; }
+
+        /* ── KOTTA ── */
+        .sheet-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 10px 20px; width: 100%; box-sizing: border-box; }
+        .sheet-viewport { width: 100%; max-width: 2450px; aspect-ratio: 2450/480; position: relative; background: transparent; }
+        .sheet-image { width: 100%; height: 100%; object-fit: contain; position: absolute; opacity: 0.35; pointer-events: none; }
+        #staffCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+
+        /* ── CHASSIS ── */
+        .lower-section { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .workstation-chassis { display: flex; width: 100%; max-width: 2560px; position: relative; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0; background: var(--rack-bg); }
+        .wood-cheek { width: 24px; background: linear-gradient(to right, #3a1c0d, #1a0c05); box-shadow: inset 1px 0 2px rgba(255,255,255,0.1); border-radius: 6px 0 0 0; }
+        .wood-cheek.right { border-radius: 0 6px 0 0; background: linear-gradient(to left, #3a1c0d, #1a0c05); }
+        .synth-core { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+
+        /* ── INFO SÁV ── */
+        .info-bar-integrated { width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808; display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden; }
+        .info-bar-text { font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold; color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px; position: absolute; white-space: nowrap; }
+
+        /* ── ACCURACY BAR ── */
+        #accuracyBar { position: absolute; bottom: 0; left: 0; height: 3px; width: 0%; background: #66ff99; transition: width 0.1s, background 0.2s; z-index: 20; }
+
+        /* ── DASHBOARD ── */
+        .master-dashboard { display: flex; justify-content: space-between; align-items: center; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 100% 3px; padding: 25px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box; }
+        .dashboard-logo { position: absolute; top: -35px; left: 30px; z-index: 5; pointer-events: none; }
+        .control-group { display: flex; align-items: center; gap: 8px; z-index: 10; }
+
+        /* ── GOMBOK ── */
+        .hardware-btn { width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim); border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 0 #000; transition: transform 0.1s; }
+        .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .hardware-btn.active { color: #ffffff; background-color: #121214; }
+        .sq-btn { width: 38px; height: 38px; background-color: var(--btn-dark); color: #444; border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0; }
+        .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .sq-btn.active { color: #fff; background-color: #121214; }
+        .start-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000; overflow:hidden; cursor:pointer; transition:transform 0.1s; }
+        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .start-split span { display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif; color:#444; text-transform:uppercase; }
+        .start-split span#startLabel { padding: 0 12px 0 22px; }
+        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
+        .start-split span.active { color:#fff; }
+        .start-split .split-div { width:1px; background:#333; margin:6px 0; }
+        .lang-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
+        .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim); }
+        .lang-split button.active { color:#fff; }
+        .lang-divider { width:1px; background:#222; margin:6px 0; }
+
+        /* ── OLED ── */
+        .center-console { flex: 1; display: flex; justify-content: center; }
+        .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px; }
+        .arrow-row { display: flex; width: 100%; justify-content: space-around; margin: 4px 0; }
+        .nav-disk-btn { width: 22px; height: 22px; background: #222; border: 1px solid #111; border-radius: 50%; color: #888; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 2px rgba(0,0,0,0.6); transition: 0.1s; }
+        .nav-disk-btn:active { transform: translateY(2px); }
+        .oled-wrapper { background: #111; padding: 2px; border-radius: 4px; width: 100%; box-shadow: 0 2px 4px rgba(255,255,255,0.1); }
+        .oled-screen { background: var(--lcd-bg-dark); border: 2px solid #222; border-radius: 2px; display: flex; box-shadow: inset 0 3px 8px rgba(0,0,0,0.9); overflow: hidden; }
+        .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 8px 0; cursor: pointer; }
+        .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
+        .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
+        .oled-main { font-size: 20px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; }
+
+        /* ── ZONGORA ── */
+        .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: visible; border-top: 2px solid #000; }
+        .piano-inner { width: 100%; aspect-ratio: 2500/284; position: absolute; top: 0; left: 0; }
+        .piano-img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(100%); pointer-events: none; }
+        .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
+        .key-glow { position: absolute; top: 0; cursor: pointer; }
+        .tap-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(179,230,255,0.15); border-radius: 0 0 4px 4px; opacity: 0; transition: opacity 0.05s; pointer-events: none; z-index: 200; }
+
+        /* ── MODÁLIS ── */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; max-width: 640px; width: 90%; text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,1); }
+        .modal-title { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 16px; margin-top: 0; margin-bottom: 25px; border-bottom: 2px solid #111; padding-bottom: 15px; text-align: center; }
+        .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; letter-spacing: 1px; }
+        .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
+
+        body.help-mode-active, body.help-mode-active * { cursor: help !important; }
+    </style>
+</head>
+<body>
+
+    <!-- INFO MODAL -->
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title" id="txt-infoTitle">Rhythm — Module Guide</h2>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Rhythmic patterns are displayed on the staff as note symbols. In READ mode, play along with the metronome. In TAP mode, tap any key to the beat — the system measures your timing accuracy in real time. In COPY mode, listen first, then repeat.</p>
+            </div>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">READ (follow the score), TAP (free tapping), COPY (listen then repeat).</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Pattern ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Select from 12 rhythmic patterns across 4 difficulty levels.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Tempo ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Adjust BPM from 40 to 200. Click the Tempo cell to reset to 80.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Metro</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Toggle the metronome click. Beat 1 is accented.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Loop</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Loop the pattern continuously instead of stopping after one pass.</span></div>
+            </div>
+            <div style="margin-bottom:22px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Start slow — set the tempo well below your comfort zone. Accuracy at 60 BPM is worth more than sloppy playing at 120. The green accuracy bar shows how well your taps align with the beat grid.</p>
+            </div>
+            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
+        </div>
+    </div>
+
+    <!-- RESULT MODAL -->
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center; max-width:480px;">
+            <h2 class="modal-title" id="txt-resultTitle">Session Complete</h2>
+            <div style="display:flex;gap:16px;justify-content:center;margin-bottom:20px;">
+                <div style="background:#111;border:1px solid #222;border-radius:4px;padding:16px 24px;">
+                    <div style="font-size:11px;color:var(--lcd-label-color);font-family:'Share Tech Mono';text-transform:uppercase;margin-bottom:6px;" id="txt-accuracy">Accuracy</div>
+                    <div id="modalAccuracy" style="font-size:28px;color:var(--oled-text);font-family:'Share Tech Mono';font-weight:bold;">100%</div>
+                </div>
+                <div style="background:#111;border:1px solid #222;border-radius:4px;padding:16px 24px;">
+                    <div style="font-size:11px;color:var(--lcd-label-color);font-family:'Share Tech Mono';text-transform:uppercase;margin-bottom:6px;" id="txt-taps">Taps</div>
+                    <div id="modalTaps" style="font-size:28px;color:var(--oled-text);font-family:'Share Tech Mono';font-weight:bold;">0 / 0</div>
+                </div>
+            </div>
+            <div id="modalTip" style="font-size:13px;color:#666;font-family:'Inter';margin-bottom:20px;line-height:1.6;"></div>
+            <button class="modal-btn" onclick="closeResultModal()" style="width:100%;" id="txt-acknowledge">Acknowledge</button>
+        </div>
+    </div>
+
+    <div class="sheet-container">
+        <div class="sheet-viewport">
+            <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
+            <canvas id="staffCanvas" width="2450" height="480"></canvas>
+        </div>
+    </div>
+
+    <div class="lower-section">
+        <div class="workstation-chassis">
+            <div class="wood-cheek"></div>
+            <div class="synth-core">
+
+                <!-- INFO SÁV -->
+                <div class="info-bar-integrated">
+                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">SELECT PATTERN OR PRESS START</div>
+                    <div id="accuracyBar"></div>
+                </div>
+
+                <!-- MASTER DASHBOARD -->
+                <div class="master-dashboard">
+                    <div class="dashboard-logo">
+                        <svg viewBox="0 0 300 40" style="height:25px;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.8));">
+                            <text x="60" y="30" fill="#666" font-family="'Inter',sans-serif" font-weight="800" font-size="32" text-anchor="end">AK</text>
+                            <path d="M 64 30 L 72 30 L 72 12 L 68 12 L 68 0 L 64 0 Z" fill="#555"/>
+                            <text x="76" y="30" fill="#666" font-family="'Inter',sans-serif" font-weight="800" font-size="32" text-anchor="start">RA</text>
+                            <text x="135" y="28" fill="#444" font-family="'Inter',sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
+                        </svg>
+                    </div>
+
+                    <!-- BAL CSOPORT -->
+                    <div class="control-group">
+                        <button id="btnMetro" class="hardware-btn active" onclick="if(!helpActive) toggleMetro()" data-help="METRO: TOGGLE THE METRONOME CLICK — BEAT 1 IS ACCENTED">Metro</button>
+                        <button id="btnLoop"  class="hardware-btn"        onclick="if(!helpActive) toggleLoop()"  data-help="LOOP: REPEAT THE PATTERN CONTINUOUSLY">Loop</button>
+                        <button id="btnCount" class="hardware-btn"        onclick="if(!helpActive) toggleCount()" data-help="COUNT: 1-BAR COUNT-IN BEFORE THE PATTERN STARTS">Count</button>
+                    </div>
+
+                    <!-- KÖZÉP: START + OLED -->
+                    <div class="center-console">
+                        <div style="display:flex;align-items:center;gap:32px;">
+                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE RHYTHM SESSION">
+                                <span id="startLabel" class="active">START</span>
+                                <div class="split-div"></div>
+                                <span id="stopLabel">STOP</span>
+                            </div>
+                            <div class="lcd-arrow-wrapper">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)"    data-help="MODE: READ / TAP / COPY">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cyclePattern(1)" data-help="PATTERN: SELECT RHYTHM PATTERN">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(5)"   data-help="TEMPO: ADJUST BPM">▲</button>
+                                </div>
+                                <div class="oled-wrapper">
+                                    <div class="oled-screen">
+                                        <div id="oledModule" class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
+                                            <div class="oled-header">Module</div>
+                                            <div class="oled-main" id="lcdModuleText">RHYTHM</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: READ (FOLLOW SCORE) / TAP (FREE TAP) / COPY (LISTEN THEN REPEAT)">
+                                            <div class="oled-header">Mode</div>
+                                            <div class="oled-main" id="lcdMode">READ</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledPattern" class="oled-section" onclick="if(!helpActive) cyclePattern(1)" data-help="PATTERN: RHYTHMIC PATTERN — 12 PATTERNS ACROSS 4 DIFFICULTY LEVELS">
+                                            <div class="oled-header">Pattern</div>
+                                            <div class="oled-main" id="lcdPattern">P01</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledTempo" class="oled-section" onclick="if(!helpActive) resetTempo()" data-help="TEMPO: CLICK TO RESET TO 80 BPM — USE ARROWS TO ADJUST">
+                                            <div class="oled-header">Tempo</div>
+                                            <div class="oled-main" id="lcdTempo">80</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cyclePattern(-1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(-5)">▼</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JOBB CSOPORT -->
+                    <div class="control-group">
+                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        </button>
+                        <div class="lang-split">
+                            <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
+                            <div class="lang-divider"></div>
+                            <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
+                        </div>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;">?</button>
+                        <div style="width:16px;"></div>
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ZONGORA -->
+                <div class="piano-crop-wrapper">
+                    <div class="piano-inner">
+                        <img src="grandpiano-keys.png" class="piano-img">
+                        <div id="tapFlash" class="tap-flash"></div>
+                        <div id="hb-wrap" class="hitbox-layer"></div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="wood-cheek right"></div>
+        </div>
+    </div>
+
+<script>
+    // ── FORDÍTÁSOK ──
+    let currentLang = 'EN';
+    const MODULE_NAMES = { EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'], HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS'] };
+    const RHYTHM_T = {
+        EN: {
+            infoTitle:'Rhythm — Module Guide', howTitle:'How It Works',
+            howBody:'Rhythmic patterns are displayed on the staff. In READ mode, play along with the metronome. In TAP mode, tap any key to the beat — accuracy is measured in real time. In COPY mode, listen first then repeat.',
+            ctrlTitle:'Controls', gotIt:'Got It',
+            ctrl1:'READ (follow score), TAP (free tapping), COPY (listen then repeat).',
+            ctrl2:'Select from 12 rhythmic patterns across 4 difficulty levels.',
+            ctrl3:'Adjust BPM from 40 to 200. Click the Tempo cell to reset to 80.',
+            ctrl4:'Toggle the metronome click. Beat 1 is accented.',
+            ctrl5:'Loop the pattern continuously instead of stopping after one pass.',
+            tipTitle:'Learning Tip',
+            tipBody:'Start slow — accuracy at 60 BPM is worth more than sloppy playing at 120. The green accuracy bar shows how well your taps align with the beat grid.',
+            ready:'SELECT PATTERN OR PRESS START',
+            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            resultTitle:'Session Complete', accuracy:'Accuracy', taps:'Taps', acknowledge:'Acknowledge',
+            hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
+            hMode:'MODE: READ (FOLLOW SCORE) / TAP (FREE TAPPING) / COPY (LISTEN THEN REPEAT)',
+            hPattern:'PATTERN: SELECT RHYTHM PATTERN — 12 PATTERNS ACROSS 4 LEVELS',
+            hTempo:'TEMPO: CLICK TO RESET TO 80 BPM — USE ARROWS TO ADJUST',
+            hStart:'START/STOP: BEGIN OR END THE RHYTHM SESSION',
+            hMetro:'METRO: TOGGLE METRONOME CLICK — BEAT 1 IS ACCENTED',
+            hLoop:'LOOP: REPEAT THE PATTERN CONTINUOUSLY',
+            hCount:'COUNT: 1-BAR COUNT-IN BEFORE THE PATTERN STARTS',
+            hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',
+            hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            hHome:'HOME: RETURN TO MAIN MODULE MENU',
+            hInfo:'INFO: OPEN MODULE GUIDE',
+            modeTip: { READ:'PLAY ALONG WITH THE SCORE AND METRONOME', TAP:'TAP ANY KEY ON EVERY BEAT YOU SEE', COPY:'LISTEN TO THE PATTERN — THEN REPEAT IT' }
+        },
+        HU: {
+            infoTitle:'Ritmus — Modul útmutató', howTitle:'Hogyan működik',
+            howBody:'A ritmusminták a kottán jelennek meg. READ módban játssz a metronómmal együtt. TAP módban koppints bármely billentyűre az ütemre — a pontosságot valós időben méri. COPY módban hallgasd meg, majd ismételd.',
+            ctrlTitle:'Vezérlők', gotIt:'Értettem',
+            ctrl1:'READ (kövésd a kottát), TAP (szabad tapsolás), COPY (hallgasd, majd ismételd).',
+            ctrl2:'12 ritmussémából választhatsz 4 nehézségi szinten.',
+            ctrl3:'BPM 40-től 200-ig. Kattints a Tempo cellára a 80-ra visszaállításhoz.',
+            ctrl4:'A metronóm kattintás be/ki kapcsolása. Az 1-es ütem hangsúlyos.',
+            ctrl5:'A mintát végtelen ciklusban ismételi.',
+            tipTitle:'Tanulási tipp',
+            tipBody:'Kezdj lassan — a pontosság 60 BPM-nél többet ér mint a pontatlan játék 120-on. A zöld pontossági sáv mutatja mennyire illeszkednek a koppantásaid az ütemrácshoz.',
+            ready:'VÁLASSZ MINTÁT VAGY NYOMJ STARTOT',
+            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            resultTitle:'Session kész', accuracy:'Pontosság', taps:'Koppintás', acknowledge:'Értettem',
+            hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ',
+            hMode:'MÓD: READ (KOTTAKÖVETÉS) / TAP (SZABAD TAPSOLÁS) / COPY (HALLGASD MAJD ISMÉTELD)',
+            hPattern:'MINTA: RITMUSSÉMÁK — 12 MINTA 4 NEHÉZSÉGI SZINTEN',
+            hTempo:'TEMPÓ: KATTINTS A 80-RA VISSZAÁLLÍTÁSHOZ — NYILAKKAL MÓDOSÍTHATÓ',
+            hStart:'START/STOP: RITMUS SESSION INDÍTÁSA/LEÁLLÍTÁSA',
+            hMetro:'METRO: METRONÓM KATTINTÁS BE/KI — AZ 1-ES ÜTEM HANGSÚLYOS',
+            hLoop:'LOOP: MINTA VÉGTELEN ISMÉTLÉSE',
+            hCount:'COUNT: 1 ÜTEM BEOLVASÁS INDÍTÁS ELŐTT',
+            hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',
+            hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE',
+            hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',
+            modeTip: { READ:'JÁTSSZ A KOTTÁVAL ÉS METRONÓMMAL EGYÜTT', TAP:'KOPPINTS MINDEN LÁTHATÓ ÜTEMRE', COPY:'HALLGASD MEG A MINTÁT — MAJD ISMÉTELD' }
+        }
+    };
+
+    function setLang(lang) {
+        localStorage.setItem('akira_lang', lang);
+        currentLang = lang;
+        document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
+        document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
+        document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
+        const T = RHYTHM_T[lang];
+        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-gotIt','txt-resultTitle','txt-accuracy','txt-taps','txt-acknowledge'];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.gotIt,T.resultTitle,T.accuracy,T.taps,T.acknowledge];
+        ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
+        const helpMap={oledModule:T.hModule,oledMode:T.hMode,oledPattern:T.hPattern,oledTempo:T.hTempo,btnStart:T.hStart,btnMetro:T.hMetro,btnLoop:T.hLoop,btnCount:T.hCount,btnFullscreen:T.hFullscr,btnHelp:T.hHelp,btnHome:T.hHome,btnInfo:T.hInfo};
+        Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][5];
+        if (!isRunning) setInfoBar(T.ready, null);
+    }
+
+    function setInfoBar(text, targetEl) {
+        const bar = document.getElementById('infoBarText');
+        if (!targetEl) {
+            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
+            bar.innerHTML = text; return;
+        }
+        const barRect = bar.parentElement.getBoundingClientRect();
+        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
+        if (cx / barRect.width < 0.5) {
+            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>' + text;
+            bar.style.left = Math.max(cx-10,20)+'px'; bar.style.right='auto'; bar.style.transform='none';
+        } else {
+            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';
+            bar.style.right = Math.max(barRect.width-cx-10,20)+'px'; bar.style.left='auto'; bar.style.transform='none';
+        }
+    }
+
+    // ── RITMUSMINTÁK ──
+    // Minden minta: beats per measure = 4, értékek = negyedek (1.0), nyolcadok (0.5), negyedszünet (1.0r = rest)
+    // Struktúra: { dur: negyedekben, rest: bool, dots: dotted? }
+    const PATTERNS = [
+        // Szint 1 — csak negyedek
+        { name:'P01', level:1, beats:[ {d:1},{d:1},{d:1},{d:1} ] },
+        { name:'P02', level:1, beats:[ {d:1},{d:1},{d:2} ] },
+        { name:'P03', level:1, beats:[ {d:2},{d:1},{d:1} ] },
+        // Szint 2 — nyolcadok
+        { name:'P04', level:2, beats:[ {d:0.5},{d:0.5},{d:1},{d:1},{d:1} ] },
+        { name:'P05', level:2, beats:[ {d:1},{d:0.5},{d:0.5},{d:0.5},{d:0.5},{d:1} ] },
+        { name:'P06', level:2, beats:[ {d:0.5},{d:0.5},{d:0.5},{d:0.5},{d:0.5},{d:0.5},{d:0.5},{d:0.5} ] },
+        // Szint 3 — szünetek
+        { name:'P07', level:3, beats:[ {d:1},{d:1,rest:true},{d:1},{d:1} ] },
+        { name:'P08', level:3, beats:[ {d:0.5},{d:0.5,rest:true},{d:0.5},{d:0.5,rest:true},{d:1},{d:1} ] },
+        { name:'P09', level:3, beats:[ {d:1,rest:true},{d:0.5},{d:0.5},{d:1},{d:1} ] },
+        // Szint 4 — pontozott értékek
+        { name:'P10', level:4, beats:[ {d:1.5},{d:0.5},{d:1},{d:1} ] },
+        { name:'P11', level:4, beats:[ {d:0.5},{d:1.5},{d:0.5},{d:1.5} ] },
+        { name:'P12', level:4, beats:[ {d:1.5},{d:0.5},{d:0.5},{d:0.5},{d:1,rest:true} ] },
+    ];
+
+    // ── ÁLLAPOT ──
+    let isRunning = false, currentPatternIdx = 0, currentMode = 'READ';
+    let bpm = 80, metroOn = true, loopOn = false, countOn = false;
+    let helpActive = false, audioCtx, audioInited = false;
+    let beatScheduler = null, nextBeatTime = 0, currentBeat = 0, totalBeats = 0;
+    let tapTimes = [], expectedTimes = [], tapCount = 0, hitCount = 0;
+    let copyPhase = 'listen'; // 'listen' | 'tap'
+    const LOOK_AHEAD = 0.1, SCHEDULE_INTERVAL = 25;
+
+    // ── MODULE VÁLTÓ ──
+    const modules=[{url:'hallasfejleszto.html'},{url:'kottaolvasas.html'},{url:'akkordok.html'},{url:'skalak.html'},{url:'hanon.html'},{url:'ritmus.html'}];
+    let currentModuleIdx = 5;
+    function cycleModule(dir){ if(helpActive)return; currentModuleIdx=(currentModuleIdx+dir+6)%6; document.getElementById('lcdModuleText').innerText=MODULE_NAMES[currentLang][currentModuleIdx]; const T=RHYTHM_T[currentLang]; const click=currentLang==='EN'?' — CLICK TO SWITCH':' — KATTINTS A VÁLTÁSHOZ'; if(currentModuleIdx!==5)setInfoBar(MODULE_NAMES[currentLang][currentModuleIdx]+click,null); else setInfoBar(T.ready,null); }
+    function loadModule(){ if(helpActive)return; if(currentModuleIdx!==5)window.location.href=modules[currentModuleIdx].url; }
+
+    // ── OLED ──
+    function cycleMode(dir) {
+        if (helpActive) return;
+        const modes = ['READ','TAP','COPY'];
+        const idx = modes.indexOf(currentMode);
+        currentMode = modes[(idx + dir + 3) % 3];
+        document.getElementById('lcdMode').innerText = currentMode;
+        if (isRunning) stopSession();
+        setInfoBar(RHYTHM_T[currentLang].modeTip[currentMode], null);
+        draw();
+    }
+    function cyclePattern(dir) {
+        if (helpActive) return;
+        currentPatternIdx = (currentPatternIdx + dir + PATTERNS.length) % PATTERNS.length;
+        document.getElementById('lcdPattern').innerText = PATTERNS[currentPatternIdx].name;
+        if (isRunning) stopSession();
+        draw();
+    }
+    function cycleTempo(delta) {
+        if (helpActive) return;
+        bpm = Math.max(40, Math.min(200, bpm + delta));
+        document.getElementById('lcdTempo').innerText = bpm;
+        if (isRunning) { clearInterval(beatScheduler); scheduleBeat(); }
+    }
+    function resetTempo() { if (helpActive) return; bpm = 80; document.getElementById('lcdTempo').innerText = 80; }
+
+    function toggleMetro() { metroOn = !metroOn; document.getElementById('btnMetro').classList.toggle('active', metroOn); }
+    function toggleLoop()  { loopOn  = !loopOn;  document.getElementById('btnLoop').classList.toggle('active', loopOn); }
+    function toggleCount() { countOn = !countOn; document.getElementById('btnCount').classList.toggle('active', countOn); }
+
+    function updateStartStop(r) {
+        document.getElementById('startLabel').classList.toggle('active', !r);
+        document.getElementById('stopLabel').classList.toggle('active', r);
+    }
+
+    // ── AUDIO ──
+    async function initAudio() {
+        if (audioInited) return; audioInited = true;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+    }
+    function playClick(accent) {
+        if (!metroOn || !audioCtx) return;
+        const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.frequency.value = accent ? 1200 : 600;
+        g.gain.setValueAtTime(accent ? 0.25 : 0.1, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+    }
+    function playTap() {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.frequency.value = 400; osc.type = 'sine';
+        g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    // ── SESSION ──
+    function handleMainButton() {
+        if (!isRunning) startSession(); else stopSession();
+    }
+
+    function getBeatTimes() {
+        // Az aktuális mintából visszaadja a ütés időpontjait negyedekben
+        const pat = PATTERNS[currentPatternIdx];
+        let times = [], pos = 0;
+        pat.beats.forEach(b => { if (!b.rest) times.push(pos); pos += b.d; });
+        return { times, total: pos }; // total = minta hossza negyedekben
+    }
+
+    function startSession() {
+        initAudio().then(() => {
+            isRunning = true; updateStartStop(true);
+            tapTimes = []; expectedTimes = []; tapCount = 0; hitCount = 0;
+            currentBeat = 0; copyPhase = 'listen';
+            const { times, total } = getBeatTimes();
+            totalBeats = total;
+            // Felépítjük az összes várható ütemidőt
+            const beatsPerSec = bpm / 60;
+            expectedTimes = times.map(t => t / beatsPerSec);
+            const T = RHYTHM_T[currentLang];
+            if (currentMode === 'COPY') setInfoBar(T.modeTip.COPY, null);
+            else setInfoBar(T.modeTip[currentMode], null);
+            nextBeatTime = audioCtx.currentTime + (countOn ? 4 / (bpm/60) : 0.1);
+            document.getElementById('accuracyBar').style.width = '0%';
+            beatScheduler = setInterval(scheduleBeat, SCHEDULE_INTERVAL);
+            animatePlayhead();
+        });
+    }
+
+    let patternStartTime = 0, animId = null;
+    function scheduleBeat() {
+        if (!audioCtx) return;
+        const beatDur = 60 / bpm;
+        while (nextBeatTime < audioCtx.currentTime + LOOK_AHEAD) {
+            // Quarter beat index in the 4/4 bar
+            const barBeat = Math.floor(currentBeat) % 4;
+            playClick(barBeat === 0);
+            if (currentBeat === 0) patternStartTime = nextBeatTime;
+            currentBeat++;
+            nextBeatTime += beatDur;
+            // Minta vége?
+            if (currentBeat >= totalBeats) {
+                currentBeat = 0;
+                if (!loopOn) {
+                    setTimeout(() => finishSession(), (nextBeatTime - audioCtx.currentTime) * 1000 + 300);
+                    clearInterval(beatScheduler); beatScheduler = null;
+                    return;
+                }
+            }
+        }
+    }
+
+    function stopSession() {
+        isRunning = false; updateStartStop(false);
+        if (beatScheduler) { clearInterval(beatScheduler); beatScheduler = null; }
+        if (animId) { cancelAnimationFrame(animId); animId = null; }
+        document.getElementById('accuracyBar').style.width = '0%';
+        setInfoBar(RHYTHM_T[currentLang].ready, null);
+        draw();
+    }
+
+    function finishSession() {
+        isRunning = false; updateStartStop(false);
+        if (animId) { cancelAnimationFrame(animId); animId = null; }
+        // Pontossági számítás
+        const acc = tapCount > 0 ? Math.round((hitCount / Math.max(tapCount, expectedTimes.length)) * 100) : 0;
+        document.getElementById('modalAccuracy').innerText = acc + '%';
+        document.getElementById('modalTaps').innerText = `${hitCount} / ${expectedTimes.length}`;
+        const T = RHYTHM_T[currentLang];
+        document.getElementById('modalTip').innerText = acc >= 90 ? '✓ Excellent timing!' : acc >= 70 ? '→ Good — try a bit faster tempo.' : '→ Slow down and focus on accuracy first.';
+        document.getElementById('resultModal').style.display = 'flex';
+        draw();
+    }
+
+    function closeResultModal() {
+        document.getElementById('resultModal').style.display = 'none';
+        setInfoBar(RHYTHM_T[currentLang].ready, null);
+        document.getElementById('accuracyBar').style.width = '0%';
+    }
+
+    // ── TAP KEZELÉS ──
+    function handleTap() {
+        if (!isRunning || currentMode === 'READ') return;
+        if (currentMode === 'COPY' && copyPhase === 'listen') return;
+        initAudio(); playTap();
+        const now = audioCtx.currentTime;
+        tapCount++;
+        // Villanás
+        const flash = document.getElementById('tapFlash');
+        flash.style.opacity = '1';
+        setTimeout(() => flash.style.opacity = '0', 80);
+        // Pontosság mérés — keressük a legközelebbi várható ütemet
+        const elapsed = now - patternStartTime;
+        const beatDur = 60 / bpm;
+        const tolerance = beatDur * 0.25; // ±25% tolerancia
+        let closest = Infinity, hit = false;
+        expectedTimes.forEach(t => {
+            const diff = Math.abs(elapsed % (totalBeats / (bpm/60)) - t);
+            if (diff < closest) closest = diff;
+        });
+        if (closest < tolerance) { hitCount++; hit = true; }
+        // Accuracy bar frissítés
+        const acc = Math.round((hitCount / tapCount) * 100);
+        const bar = document.getElementById('accuracyBar');
+        bar.style.width = acc + '%';
+        bar.style.background = acc >= 80 ? '#66ff99' : acc >= 60 ? '#ffcc44' : '#ff5544';
+    }
+
+    // ── ANIMÁCIÓ ──
+    function animatePlayhead() {
+        if (!isRunning) return;
+        draw();
+        animId = requestAnimationFrame(animatePlayhead);
+    }
+
+    // ── KOTTA RAJZOLÁS ──
+    const canvas = document.getElementById('staffCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Kottavonal pozíciók (2450×480 canvas, kottavonal_feher.png-hez igazítva)
+    const TR_MID = 141.5, TR_SP = 11.14;
+    const TR_LINE = [TR_MID + 2*TR_SP, TR_MID + TR_SP, TR_MID, TR_MID - TR_SP, TR_MID - 2*TR_SP];
+    const NOTE_Y = TR_MID - TR_SP * 0.5; // ~136px — C5 tér, vonalak között
+
+    // Ütemvonal X pozíciók — igazítva a kottavonal_feher.png-hez (startX=180, endX=2380)
+    // 4/4-es ütem: 4 egyenlő ütem, mindegyik 550px
+    const BAR_X = [180, 730, 1280, 1830, 2380];
+    const BAR_COUNT = 4; // 4/4 ütem
+
+    function draw() {
+        ctx.clearRect(0, 0, 2450, 480);
+        const pat = PATTERNS[currentPatternIdx];
+        const totalDur = pat.beats.reduce((s, b) => s + b.d, 0);
+        // totalDur negyedekben = pl. 4.0 egy 4/4-es ütemhez
+        // Az összes ütem szélessége
+        const totalW = BAR_X[BAR_COUNT] - BAR_X[0];
+        // 1 negyed pixel szélessége
+        const qPx = totalW / totalDur;
+
+        // Hangjegyek
+        let pos = 0;
+        pat.beats.forEach((b) => {
+            // A hang közepe: pos + d/2 negyedekben → x pixelben
+            const x = BAR_X[0] + (pos + b.d / 2) * qPx;
+            const isCurrent = isCurrentBeat(pos, totalDur);
+            const color = b.rest
+                ? 'rgba(179,230,255,0.45)'
+                : isCurrent ? 'rgba(179,230,255,1.0)' : 'rgba(179,230,255,0.35)';
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+
+            if (b.rest) drawRest(ctx, x, b.d, color);
+            else drawNote(ctx, x, b.d);
+
+            if (b.d === 1.5 || b.d === 0.75) {
+                ctx.fillStyle = color;
+                ctx.beginPath(); ctx.arc(x + 22, NOTE_Y - 5, 4, 0, Math.PI*2); ctx.fill();
+            }
+            pos += b.d;
+        });
+
+        // Playhead kurzor
+        if (isRunning && audioCtx && patternStartTime > 0) {
+            const elapsed = audioCtx.currentTime - patternStartTime;
+            const patDurSec = totalDur / (bpm / 60);
+            const progress = Math.max(0, (elapsed % patDurSec) / patDurSec);
+            const cursorX = BAR_X[0] + progress * totalW;
+            ctx.strokeStyle = 'rgba(179,230,255,0.5)'; ctx.lineWidth = 3;
+            ctx.setLineDash([8, 6]);
+            ctx.beginPath(); ctx.moveTo(cursorX, TR_LINE[4] - 15); ctx.lineTo(cursorX, TR_LINE[0] + 15); ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    }
+
+    function isCurrentBeat(pos, totalDur) {
+        if (!audioCtx || patternStartTime === 0) return false;
+        const elapsed = audioCtx.currentTime - patternStartTime;
+        const patDurSec = totalDur / (bpm / 60);
+        const currentPos = (elapsed % patDurSec) / patDurSec * totalDur;
+        return currentPos >= pos && currentPos < pos + 0.15;
+    }
+
+    function drawNote(ctx, x, dur) {
+        const y = NOTE_Y;
+        const filled = dur < 2;
+        ctx.lineWidth = 2.5;
+        // Kottafej
+        ctx.beginPath(); ctx.ellipse(x, y, 15, 10, -0.22, 0, Math.PI*2);
+        if (filled) { ctx.fill(); } else { ctx.stroke(); }
+        // Szár
+        if (dur < 4) {
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(x + 13, y); ctx.lineTo(x + 13, y - 75); ctx.stroke();
+        }
+        // Zászló nyolcadhoz
+        if (dur <= 0.5) {
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(x + 13, y - 75);
+            ctx.bezierCurveTo(x + 13, y - 75, x + 44, y - 52, x + 40, y - 36);
+            ctx.stroke();
+        }
+    }
+
+    function drawRest(ctx, x, dur, color) {
+        ctx.lineWidth = 2.5;
+        if (dur >= 2) {
+            // Félszünet — kitöltött téglalap a 3. vonalon
+            ctx.fillStyle = color;
+            ctx.fillRect(x - 16, TR_LINE[2] - 14, 32, 12);
+        } else if (dur >= 1) {
+            // Negyedszünet — stilizált Z forma
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x - 7, NOTE_Y - 30); ctx.lineTo(x + 9, NOTE_Y - 18);
+            ctx.lineTo(x - 7, NOTE_Y - 8); ctx.lineTo(x + 9, NOTE_Y + 4);
+            ctx.moveTo(x - 7, NOTE_Y - 8); ctx.bezierCurveTo(x - 12, NOTE_Y + 2, x - 8, NOTE_Y + 14, x + 2, NOTE_Y + 12);
+            ctx.stroke();
+        } else {
+            // Nyolcadszünet
+            ctx.strokeStyle = color;
+            ctx.beginPath(); ctx.moveTo(x - 5, NOTE_Y - 22); ctx.lineTo(x + 7, NOTE_Y - 10); ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(x + 5, NOTE_Y - 8, 5, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    // ── HELP ──
+    function toggleHelp() {
+        helpActive = !helpActive;
+        document.getElementById('btnHelp').classList.toggle('active', helpActive);
+        if (helpActive) {
+            document.body.classList.add('help-mode-active');
+            setInfoBar(RHYTHM_T[currentLang].helpMode, null);
+        } else {
+            document.body.classList.remove('help-mode-active');
+            setInfoBar(RHYTHM_T[currentLang].ready, null);
+        }
+    }
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('#btnHelp')) return;
+        if (helpActive) {
+            e.preventDefault(); e.stopPropagation();
+            const t = e.target.closest('[data-help]');
+            if (t) setInfoBar(t.dataset.help, t);
+        }
+    }, true);
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+        else document.exitFullscreen();
+    }
+    document.addEventListener('fullscreenchange', () => {
+        document.getElementById('btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
+    });
+
+    // ── BILLENTYŰZET — tap kezelés ──
+    function buildPiano() {
+        const wrap = document.getElementById('hb-wrap');
+        const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
+        for (let m = 21; m <= 108; m++) {
+            const k = document.createElement('div');
+            const isW = whites.includes(m % 12);
+            k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
+            if (isW) { k.style.left=(wIdx*1.92307)+'%'; k.style.width='1.92307%'; k.style.height='100%'; wIdx++; }
+            else { k.style.left=((wIdx*1.92307)-0.6)+'%'; k.style.width='1.2%'; k.style.height='65%'; k.style.zIndex='200'; }
+            k.onmousedown = (e) => { e.preventDefault(); handleTap(); };
+            wrap.appendChild(k);
+        }
+    }
+
+    // Space bar = tap
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && !e.repeat) { e.preventDefault(); handleTap(); }
+    });
+
+    window.onload = () => {
+        const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
+        buildPiano();
+        draw();
+        window.addEventListener('pointerdown', () => initAudio(), { once: true });
+    };
+</script>
+</body>
+</html>
