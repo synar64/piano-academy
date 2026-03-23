@@ -228,17 +228,23 @@
             <div class="wood-cheek"></div>
             <div class="synth-core">
 
-                <!-- MIXER OVERLAY -->
-                <div id="mixerBar" class="settings-bar">
-                    <div class="settings-control"><label>Attack</label><input type="range" id="vst_a" min="0" max="0.5" step="0.01" value="0.01"></div>
-                    <div class="settings-control"><label>Decay</label><input type="range" id="vst_e" min="0.5" max="6" step="0.1" value="3.0"></div>
-                    <div class="settings-control"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.8"></div>
-                    <div class="settings-control"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
-                </div>
-
                 <!-- INFO SÁV -->
                 <div class="info-bar-integrated">
                     <div id="infoBarText" class="info-bar-text">SYSTEM READY — PRESS START TO BEGIN</div>
+                </div>
+
+                <!-- INFO GOMB — bal oldalt, Home fölött -->
+                <div style="position:absolute; top:55px; left:30px; z-index:20;">
+                    <button id="btnInfo" class="hardware-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN THE MODULE GUIDE">Info</button>
+                </div>
+
+                <!-- NYELV GOMB — jobb oldalt, Help fölött -->
+                <div style="position:absolute; top:55px; right:30px; z-index:20;">
+                    <div style="display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;">
+                        <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" data-help="LANGUAGE: SWITCH INTERFACE TO ENGLISH" style="flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; color:#fff; font-family:'Inter',sans-serif;">EN</button>
+                        <div style="width:1px; background:#222; margin:6px 0;"></div>
+                        <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')" data-help="LANGUAGE: FELÜLETET MAGYARRA VÁLT" style="flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; color:var(--text-dim); font-family:'Inter',sans-serif;">HU</button>
+                    </div>
                 </div>
 
                 <!-- MASTER DASHBOARD -->
@@ -254,13 +260,7 @@
 
                     <!-- BAL CSOPORT -->
                     <div class="control-group">
-                        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-                            <div style="display:flex; gap:5px; width:95px;">
-                                <button id="btnInfo" class="sq-btn" style="flex:1;" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN THE MODULE GUIDE">ⓘ</button>
-                                <button id="btnLang" class="sq-btn" style="flex:1;" onclick="if(!helpActive) toggleLang()" data-help="LANGUAGE: SWITCH BETWEEN ENGLISH AND HUNGARIAN">EN</button>
-                            </div>
-                            <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
-                        </div>
+                        <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
                         <button id="btnViolin" class="hardware-btn active" onclick="if(!helpActive) toggleClef('treble')" data-help="TOP: INCLUDE TREBLE CLEF NOTES (C4–G5) IN THE EXERCISE">Top</button>
                         <button id="btnBass" class="hardware-btn" onclick="if(!helpActive) toggleClef('bass')" data-help="BOTTOM: INCLUDE BASS CLEF NOTES (F2–C4) IN THE EXERCISE">Bottom</button>
                         <button id="btnAcc" class="hardware-btn" onclick="if(!helpActive) toggleAccidentals()" data-help="CHROMATIC: ADD BLACK KEY NOTES (SHARPS/FLATS) TO THE POOL">Chromatic</button>
@@ -314,7 +314,6 @@
                     <div class="control-group">
                         <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EAR TRAINING SESSION">START</button>
                         <button id="btnRepeat" class="hardware-btn" onclick="if(!helpActive) repeatNote()" data-help="REPLAY: PLAY THE CURRENT NOTE AGAIN">Replay</button>
-                        <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER: ADJUST THE PIANO SOUND ENVELOPE">Mixer</button>
                         <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN: IMMERSIVE STUDIO MODE">Fullscr</button>
                         <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO SEE ITS DESCRIPTION">Help</button>
                     </div>
@@ -500,9 +499,10 @@
         }
     };
 
-    function toggleLang() {
-        currentLang = currentLang === 'EN' ? 'HU' : 'EN';
-        document.getElementById('btnLang').innerText = currentLang;
+    function setLang(lang) {
+        currentLang = lang;
+        document.getElementById('btnLangEN').style.color = lang === 'EN' ? '#ffffff' : 'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color = lang === 'HU' ? '#ffffff' : 'var(--text-dim)';
         applyTranslations();
     }
 
@@ -747,7 +747,7 @@
 
     // ── NOTE DETECTION ──
     function handleNoteOn(midi, vel = 100) {
-        playMidi(midi, vel);
+        playKey(midi, vel);
         const k = document.getElementById(`k-${midi}`);
         if (k) k.classList.add('pressed');
         if (!isRunning || waitingNext || currentStep >= seq.length) return;
@@ -780,6 +780,14 @@
     function handleNoteOff(midi) {
         const k = document.getElementById(`k-${midi}`);
         if (k) k.classList.remove('pressed');
+        if (!activeNodes[midi] || !audioCtx) return;
+        const release = 0.8;
+        const gainNode = activeNodes[midi].gain;
+        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + release);
+        activeNodes[midi].source.stop(audioCtx.currentTime + release + 0.1);
+        delete activeNodes[midi];
     }
 
     // ── AUDIO ──
@@ -787,7 +795,7 @@
         if (audioInited) return; audioInited = true;
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') await audioCtx.resume();
-        const samples = { 36:'C2', 48:'C3', 60:'C4', 72:'C5', 84:'C6' };
+        const samples = { 36:'C2', 48:'C3', 60:'C4', 72:'C5' };
         for (let k in samples) {
             try {
                 const r = await fetch(`https://tonejs.github.io/audio/salamander/${samples[k]}.mp3`);
@@ -805,22 +813,47 @@
         }
     }
 
+    // Feladványhang — természetes lecsengés, nincs loop
     function playMidi(note, vel) {
         if (!audioCtx || Object.keys(sampleBuffers).length === 0) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        // Előző feladványhang leállítása
+        if (activeNodes['quiz']) { 
+            try { activeNodes['quiz'].gain.gain.cancelScheduledValues(audioCtx.currentTime); activeNodes['quiz'].gain.gain.setValueAtTime(0, audioCtx.currentTime); activeNodes['quiz'].source.stop(audioCtx.currentTime + 0.05); } catch(e) {} 
+            delete activeNodes['quiz']; 
+        }
+        const source = audioCtx.createBufferSource();
+        let closest = 36, minDiff = 999;
+        for (let b in sampleBuffers) { let diff = Math.abs(note - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
+        source.buffer = sampleBuffers[closest];
+        source.playbackRate.value = Math.pow(2, (note - closest) / 12);
+        // Nincs loop — természetes lecsengés
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime((vel / 127), audioCtx.currentTime);
+        // 1.5mp teljes hangerő, majd 4mp alatt lassú fade
+        gain.gain.setValueAtTime((vel / 127), audioCtx.currentTime + 1.5);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 5.5);
+        source.connect(gain).connect(audioCtx.destination);
+        source.start();
+        source.stop(audioCtx.currentTime + 5.6);
+        activeNodes['quiz'] = { source, gain };
+    }
+
+    // Billentyűhang — loop hogy lenyomva tartható legyen
+    function playKey(note, vel) {
+        if (!audioCtx || Object.keys(sampleBuffers).length === 0) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
         if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e) {} delete activeNodes[note]; }
         const source = audioCtx.createBufferSource();
         let closest = 36, minDiff = 999;
         for (let b in sampleBuffers) { let diff = Math.abs(note - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
         source.buffer = sampleBuffers[closest];
         source.playbackRate.value = Math.pow(2, (note - closest) / 12);
+        source.loop = true;
+        source.loopStart = sampleBuffers[closest].duration * 0.5;
+        source.loopEnd   = sampleBuffers[closest].duration * 0.9;
         const gain = audioCtx.createGain();
-        let atk  = parseFloat(document.getElementById('vst_a').value) || 0.01;
-        let dec  = parseFloat(document.getElementById('vst_e').value) || 3.0;
-        let velo = parseFloat(document.getElementById('vst_d').value) || 1.0;
-        gain.gain.setValueAtTime(0, audioCtx.currentTime);
-        if (atk > 0.05) gain.gain.linearRampToValueAtTime((vel/127)*velo, audioCtx.currentTime + atk);
-        else            gain.gain.setValueAtTime((vel/127)*velo, audioCtx.currentTime);
-        if (dec < 5.5)  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dec);
+        gain.gain.setValueAtTime((vel / 127), audioCtx.currentTime);
         source.connect(gain).connect(audioCtx.destination);
         source.start();
         activeNodes[note] = { source, gain };
@@ -887,7 +920,7 @@
             } else {
                 // Rejtett hang — ? jel a kottarendszeren belül
                 let hiddenY = baseY; // középvonal
-                ctx.font = 'bold 28px Share Tech Mono';
+                ctx.font = 'bold 42px Share Tech Mono';
                 ctx.fillStyle = isCurrent ? 'rgba(179,230,255,0.7)' : 'rgba(179,230,255,0.2)';
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.fillText('?', x, hiddenY);
