@@ -13,7 +13,7 @@
             --btn-dark: #101012;
             --btn-border: #050505;
             --text-dim: #555;
-            --lcd-bg-dark: #111211;
+            --lcd-bg-dark: #111213;
             --lcd-label-color: #557799;
             --oled-text: #b3e6ff;
         }
@@ -57,12 +57,12 @@
         /* ── INFO SÁV ── */
         .info-bar-integrated {
             width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808;
-            display: flex; align-items: center; justify-content: center; z-index: 10;
-            box-shadow: inset 0 3px 10px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden;
         }
         .info-bar-text {
             font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
             color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
+            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s;
         }
 
         /* ── MIXER OVERLAY ── */
@@ -96,9 +96,61 @@
         .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .hardware-btn.active { color: #ffffff; background-color: #121214; }
 
-        #btnStart { width: 110px; font-weight: 800; font-size: 14px; letter-spacing: 1px; box-shadow: 0 4px 0 #000; margin-left: 20px; }
-        #btnStart:active { transform: translateY(4px); box-shadow: 0 0 0 #000; }
-        #btnStart.running { color: #ffffff; background-color: #1a1a1c; border-color: #333; }
+        /* START|STOP SPLIT */
+        .start-split {
+            display:flex; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000;
+            overflow:hidden; transition:transform 0.1s; cursor:pointer;
+        }
+        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .start-split span {
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif;
+            color:#444; transition:color 0.15s; text-transform:uppercase;
+        }
+        .start-split span#startLabel { padding: 0 12px 0 22px; }
+        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
+        .start-split span.active { color:#fff; }
+        .start-split .split-div { width:1px; background:#333; margin:6px 0; flex-shrink:0; }
+
+        /* KIS NÉGYZETES GOMBOK */
+        .sq-btn {
+            width: 38px; height: 38px; background-color: var(--btn-dark); color: #444;
+            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
+            font-size: 16px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0;
+        }
+        .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .sq-btn.active { color: #fff; background-color: #121214; }
+
+        /* KULCS SPLIT GOMB */
+        .clef-split {
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
+            overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s;
+        }
+        .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
+        .clef-split span {
+            flex:1; display:flex; align-items:center; justify-content:center;
+            color:#444; transition:color 0.15s; padding:0;
+        }
+        .clef-split span.active { color:#fff; }
+        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+
+        /* LANG SPLIT GOMB */
+        .lang-split {
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
+        }
+        .lang-split button {
+            flex:1; background:transparent; border:none; cursor:pointer;
+            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
+        }
+        .lang-split button.active { color:#fff; }
+        .lang-split button:active { background: rgba(255,255,255,0.05); }
+        .lang-divider { width:1px; background:#222; margin:6px 0; }
+
+        body.help-mode-active, body.help-mode-active * { cursor: help !important; }
 
         /* ── CENTER CONSOLE (4-részes OLED + nyilak) ── */
         .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
@@ -112,7 +164,7 @@
         .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; cursor: pointer; }
         .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
         .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
-        .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important; }
+        .oled-main { font-size: 20px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important; }
 
         /* HANON PATCH BROWSER */
         .patch-browser-content { max-width: 500px; }
@@ -183,6 +235,23 @@
     </div>
 
     <!-- KOTTA -->
+    <!-- INFO MODAL -->
+    <div id="infoModal" class="modal-overlay">
+        <div class="modal-content" style="max-width:640px;text-align:left;">
+            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Hanon — Module Guide</h2>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Classic Hanon finger exercises displayed on the staff. Play each note in sequence — the exercise scrolls through positions automatically. BPM and stability are tracked in real time.</p></div>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Sprint (1×), Marathon (3×), Training (endless).</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Exercise ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Select the Hanon exercise number.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Top / Bottom</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Toggle treble and bass clef note generation independently.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Displays note names above each notehead.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays official fingering numbers (1–5) below noteheads.</span></div>
+            </div>
+            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.</p></div>
+            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
+        </div>
+    </div>
+
     <div class="sheet-container">
         <div class="sheet-viewport">
             <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
@@ -206,7 +275,7 @@
 
                 <!-- INFO SÁV -->
                 <div class="info-bar-integrated">
-                    <div id="infoBarText" class="info-bar-text">SYSTEM READY — SELECT EXERCISE OR PRESS START</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%; transform:translateX(-50%);">SELECT EXERCISE OR PRESS START</div>
                 </div>
 
                 <!-- MASTER DASHBOARD -->
@@ -220,66 +289,93 @@
                         </svg>
                     </div>
 
-                    <!-- BAL CSOPORT -->
+                    <!-- BAL — modul-specifikus -->
                     <div class="control-group">
-                        <a href="index.html" class="hardware-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MENU">Home</a>
-                        <button id="handRH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('RH')" data-help="TOP CLEF: TOGGLES RIGHT HAND NOTES">Top</button>
-                        <button id="handLH" class="hardware-btn active" onclick="if(!helpActive) toggleHand('LH')" data-help="BOTTOM CLEF: TOGGLES LEFT HAND NOTES">Bottom</button>
+                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                            <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
+                            <div class="clef-divider"></div>
+                            <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
+                        </button>
                         <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: SHOWS NOTE NAMES ABOVE NOTEHEADS">Hints</button>
                         <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: SHOWS OFFICIAL FINGERING (1–5) ON SHEET">Fingers</button>
                     </div>
 
-                    <!-- KÖZÉP: OLED + NYILAK -->
+                    <!-- KÖZÉP: OLED + START -->
                     <div class="center-console">
-                        <div class="lcd-arrow-wrapper">
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(1)">▲</button>
-                                <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▲</button>
+                        <div style="display:flex; align-items:center; gap:32px;">
+                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE">
+                                <span id="startLabel" class="active">START</span>
+                                <div class="split-div"></div>
+                                <span id="stopLabel">STOP</span>
                             </div>
-
-                            <div class="oled-wrapper">
-                                <div class="oled-screen">
-                                    <div class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
-                                        <div class="oled-header">Module</div>
-                                        <div class="oled-main" id="lcdModuleText">HANON</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1×), MARATHON (3×), TRAINING (∞)">
-                                        <div class="oled-header">Mode</div>
-                                        <div class="oled-main" id="lcdModeText">SPRINT</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="EXERCISE: CLICK TO BROWSE HANON EXERCISES">
-                                        <div class="oled-header">Exercise</div>
-                                        <div class="oled-main" id="lcdHanonText">No. 1</div>
-                                    </div>
-                                    <div class="oled-divider"></div>
-                                    <div class="oled-section" data-help="STATS: REAL-TIME BPM AND TIMING STABILITY">
-                                        <div class="oled-header">BPM / Stab</div>
-                                        <div class="oled-main" id="lcdStats" style="font-size:14px; letter-spacing:1px;">0 / 100%</div>
+                            <div class="lcd-arrow-wrapper">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1×), MARATHON (3×), TRAINING (∞)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(1)">▲</button>
+                                    <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▲</button>
+                                </div>
+                                <div class="oled-wrapper">
+                                    <div class="oled-screen">
+                                        <div id="oledModule" class="oled-section" onclick="if(!helpActive) loadModule()" data-help="MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE">
+                                            <div class="oled-header">Module</div>
+                                            <div class="oled-main" id="lcdModuleText">HANON</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP">
+                                            <div class="oled-header">Mode</div>
+                                            <div class="oled-main" id="lcdModeText">SPRINT</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledExercise" class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="EXERCISE: CLICK TO BROWSE HANON EXERCISES">
+                                            <div class="oled-header">Exercise</div>
+                                            <div class="oled-main" id="lcdHanonText">No. 1</div>
+                                        </div>
+                                        <div class="oled-divider"></div>
+                                        <div id="oledStats" class="oled-section" data-help="STATS: REAL-TIME BPM AND TIMING STABILITY">
+                                            <div class="oled-header">BPM / Stab</div>
+                                            <div class="oled-main" id="lcdStats">0 / 100%</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <input type="hidden" id="hanonSelectValue" value="1">
-
-                            <div class="arrow-row">
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
-                                <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(-1)">▼</button>
-                                <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▼</button>
+                                <input type="hidden" id="hanonSelectValue" value="1">
+                                <div class="arrow-row">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(-1)">▼</button>
+                                    <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▼</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- JOBB CSOPORT -->
+                    <!-- JOBB — globális + home + info -->
                     <div class="control-group">
-                        <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE">START</button>
-                        <button id="audioToggle" class="hardware-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTHESIZER">Piano</button>
-                        <button id="btnVst" class="hardware-btn" onclick="if(!helpActive) toggleVst()" data-help="MIXER: OPEN ADSR ENVELOPE PANEL">Mixer</button>
-                        <button id="btnFullscreen" class="hardware-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN: IMMERSIVE STUDIO MODE">Fullscr</button>
-                        <button id="btnHelp" class="hardware-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO SEE INFO">Help</button>
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
+                            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/>
+                                <rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
+                                <rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
+                                <line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
+                                <line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
+                            </svg>
+                        </button>
+                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        </button>
+                        <div class="lang-split">
+                            <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
+                            <div class="lang-divider"></div>
+                            <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
+                        </div>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
+                        <div style="width:16px;"></div>
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                        </button>
                     </div>
                 </div>
 
@@ -297,6 +393,114 @@
     </div>
 
 <script>
+    let currentLang = 'EN';
+    const MODULE_NAMES = {
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
+    };
+    const HANON_T = {
+        EN: {
+            infoTitle:'Hanon — Module Guide', howTitle:'How It Works',
+            howBody:'Classic Hanon finger exercises displayed on the staff. Play each note in sequence — the exercise scrolls through positions automatically. BPM and stability are tracked in real time.',
+            ctrlTitle:'Controls', gotIt:'Got It',
+            ctrl1:'Sprint (1×), Marathon (3×), Training (endless).',
+            ctrl2:'Select the Hanon exercise number.',
+            ctrl3:'Toggle treble and bass clef note generation independently.',
+            ctrl4:'Displays note names above each notehead.',
+            ctrl5:'Displays official fingering numbers (1–5) below noteheads.',
+            tipTitle:'Learning Tip',
+            tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.',
+            ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',
+            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnFingers:'Fingers',
+            btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
+            hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLES RIGHT HAND NOTES',
+            hBottom:'BOTTOM CLEF: TOGGLES LEFT HAND NOTES', hHints:'HINTS: SHOWS NOTE NAMES ABOVE NOTEHEADS',
+            hFingers:'FINGERS: SHOWS OFFICIAL FINGERING (1–5) ON SHEET', hStart:'START/STOP: BEGIN OR END THE EXERCISE',
+            hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD', hMixer:'MIXER: OPEN ADSR PANEL',
+            hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT', hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
+            hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
+            hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
+            hMode:'MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',
+            hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',
+            hStats:'STATS: REAL-TIME BPM AND TIMING STABILITY',
+        },
+        HU: {
+            infoTitle:'Hanon — Modul útmutató', howTitle:'Hogyan működik',
+            howBody:'Klasszikus Hanon ujjgyakorlatok a kottán. Játszd le a hangokat sorban — a gyakorlat automatikusan lépdel a pozíciókon. A BPM és stabilitás valós időben követhető.',
+            ctrlTitle:'Vezérlők', gotIt:'Értettem',
+            ctrl1:'Sprint (1×), Maraton (3×), Tréning (végtelen).',
+            ctrl2:'Válaszd ki a Hanon gyakorlatszámot.',
+            ctrl3:'Violin és basszus kulcsos hangok külön-külön be/ki.',
+            ctrl4:'Megjeleníti a hangneveket a kottafej felett.',
+            ctrl5:'Megjeleníti a hivatalos ujjrendszámokat (1–5) a kottafej alatt.',
+            tipTitle:'Tanulási tipp',
+            tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld leütés előtt, és tartsd lazán a csuklódat.',
+            ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',
+            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnem', btnFingers:'Ujjrend',
+            btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
+            hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE', hTop:'FELSŐ KULCS: JOBB KÉZ BE/KI',
+            hBottom:'ALSÓ KULCS: BAL KÉZ BE/KI', hHints:'HANGNEM: HANGNEVEK MEGJELENÍTÉSE A KOTTÁN',
+            hFingers:'UJJREND: HIVATALOS SKÁLAUJJREND (1–5)', hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
+            hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI — MIDI BILLENTYŰZETTEL IS MŰKÖDIK', hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA',
+            hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ', hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ — HOGYAN MŰKÖDIK ÉS MIRE JÓK A GOMBOK',
+            hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
+            hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
+            hMode:'MÓD: SPRINT (1×) = EGY FUTAM | MARATON (3×) = HÁROMSZOROS | TRAINING = VÉGTELEN HUROK',
+            hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',
+            hStats:'STATISZTIKA: VALÓS IDEJŰ BPM ÉS IDŐZÍTÉSI STABILITÁS',
+        }
+    };
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
+        document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
+        document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
+        const T = HANON_T[lang];
+        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.gotIt];
+        ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
+        // Csak szöveges gombok fordítása (ikonos sq-btn-ek nem)
+        const btnMap={'btnHintName':T.btnHints,'btnHintFinger':T.btnFingers};
+        Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
+        const helpMap={
+            'btnHome':T.hHome,'btnClef':T.hClef,
+            'btnHintName':T.hHints,'btnHintFinger':T.hFingers,
+            'btnStart':T.hStart,'audioToggle':T.hPiano,
+            'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
+            'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledStats':T.hStats
+        };
+        Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][4];
+        if(helpActive) setInfoBar(T.helpMode, null);
+        else if(!isRunning) setInfoBar(T.ready, null);
+    }
+
+    function setInfoBar(text, targetEl) {
+        const bar = document.getElementById('infoBarText');
+        if (!targetEl) {
+            bar.style.left = '50%'; bar.style.right = 'auto'; bar.style.transform = 'translateX(-50%)';
+            bar.innerHTML = text; return;
+        }
+        const barRect = document.getElementById('infoBarText').parentElement.getBoundingClientRect();
+        const elRect = targetEl.getBoundingClientRect();
+        const cx = elRect.left + elRect.width / 2 - barRect.left;
+        const cxPct = cx / barRect.width;
+        bar.innerHTML = text;
+        if (cxPct < 0.5) {
+            bar.style.left = (cx + 18) + 'px'; bar.style.right = 'auto'; bar.style.transform = 'none';
+        } else {
+            bar.style.right = (barRect.width - cx + 18) + 'px'; bar.style.left = 'auto'; bar.style.transform = 'none';
+        }
+    }
+
+    function updateStartStop(running) {
+        document.getElementById('startLabel').classList.toggle('active', !running);
+        document.getElementById('stopLabel').classList.toggle('active', running);
+    }
     // ── AUDIO ──
     let audioInited = false;
     let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
@@ -305,7 +509,7 @@
         if (audioInited) return; audioInited = true;
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') await audioCtx.resume();
-        const s = { 21: 'A0', 36: 'C2', 48: 'C3', 60: 'C4', 72: 'C5', 84: 'C6' };
+        const s = { 36: 'C2', 48: 'C3', 60: 'C4', 72: 'C5' };
         for (let k in s) {
             try {
                 const r = await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);
@@ -325,6 +529,7 @@
 
     function playTone(note, vel) {
         if (!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
         if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch (e) {} delete activeNodes[note]; }
         const source = audioCtx.createBufferSource();
         let closest = 36, minDiff = 999;
@@ -332,12 +537,8 @@
         source.buffer = sampleBuffers[closest];
         source.playbackRate.value = Math.pow(2, (note - closest) / 12);
         const gain = audioCtx.createGain();
-        const v_a = parseFloat(document.getElementById('vst_a').value);
-        const v_e = parseFloat(document.getElementById('vst_e').value);
-        const v_d = parseFloat(document.getElementById('vst_d').value);
-        gain.gain.setValueAtTime(0, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime((vel / 127) * v_d, audioCtx.currentTime + v_a + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + v_e);
+        const v_d = parseFloat(document.getElementById('vst_d').value) || 1.0;
+        gain.gain.setValueAtTime((vel / 127) * v_d, audioCtx.currentTime);
         source.connect(gain).connect(audioCtx.destination); source.start();
         activeNodes[note] = { source, gain };
     }
@@ -360,10 +561,10 @@
         document.getElementById('btnHelp').classList.toggle('active', helpActive);
         if (helpActive) {
             document.body.classList.add('help-mode-active');
-            document.getElementById('infoBarText').innerHTML = "HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION";
+            setInfoBar(HANON_T[currentLang].helpMode, null);
         } else {
             document.body.classList.remove('help-mode-active');
-            document.getElementById('infoBarText').innerHTML = "SYSTEM READY — SELECT EXERCISE OR PRESS START";
+            setInfoBar(HANON_T[currentLang].ready, null);
         }
     }
 
@@ -372,7 +573,20 @@
         if (helpActive) {
             e.preventDefault(); e.stopPropagation();
             const target = e.target.closest('[data-help]');
-            if (target) document.getElementById('infoBarText').innerHTML = target.dataset.help;
+            if (target) {
+                const bar = document.getElementById('infoBarText');
+                const txt = target.dataset.help;
+                const barRect = bar.parentElement.getBoundingClientRect();
+                const elRect = target.getBoundingClientRect();
+                const cx = elRect.left + elRect.width / 2 - barRect.left;
+                const cxPct = cx / barRect.width;
+                bar.innerHTML = txt;
+                if (cxPct < 0.5) {
+                    bar.style.left = (cx + 18) + 'px'; bar.style.right = 'auto'; bar.style.transform = 'none';
+                } else {
+                    bar.style.right = (barRect.width - cx + 18) + 'px'; bar.style.left = 'auto'; bar.style.transform = 'none';
+                }
+            }
         }
     }, true);
 
@@ -417,6 +631,19 @@
     let seqBlocks = [];
     let lastHitTime = 0, hitIntervals = [], fingerTimes = { 1: [], 2: [], 3: [], 4: [], 5: [] };
 
+    // Kulcs váltó
+    let clefState = 0;
+    function cycleClef() {
+        if (helpActive) return;
+        clefState = (clefState + 1) % 3;
+        activeRH = clefState !== 2;
+        activeLH = clefState !== 1;
+        document.getElementById('clefRH').style.color = activeRH ? '#fff' : '#444';
+        document.getElementById('clefLH').style.color = activeLH ? '#fff' : '#444';
+        if (isRunning) stopPractice();
+        buildSequence(); draw();
+    }
+
     // ── MODE ──
     const MODES = ['SPRINT', 'MARATHON', 'TRAINING'];
     let currentModeIdx = 0;
@@ -449,13 +676,7 @@
     }
 
     // ── EGYÉB GOMBOK ──
-    function toggleHand(hand) {
-        if (hand === 'RH') { activeRH = !activeRH; if (!activeRH && !activeLH) activeLH = true; }
-        else { activeLH = !activeLH; if (!activeLH && !activeRH) activeRH = true; }
-        document.getElementById('handRH').classList.toggle('active', activeRH);
-        document.getElementById('handLH').classList.toggle('active', activeLH);
-        if (isRunning) stopPractice(); buildSequence(); draw();
-    }
+    // toggleHand replaced by cycleClef above
     function toggleHint(type) {
         if (type === 'name') { showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); }
         else { showFinger = !showFinger; document.getElementById('btnHintFinger').classList.toggle('active', showFinger); }
@@ -470,7 +691,6 @@
         if (helpActive) return;
         let mb = document.getElementById('mixerBar');
         mb.style.display = (mb.style.display === 'flex') ? 'none' : 'flex';
-        document.getElementById('btnVst').classList.toggle('active');
     }
 
     // ── HANON 1 LOGIKA (eredeti, érintetlen) ──
@@ -560,16 +780,17 @@
         let spacingX = totalNotes > 1 ? (endX - startX) / (totalNotes - 1) : 0;
 
         block.forEach((n, i) => {
-            let alpha = (isRunning && i < currentNoteInBlock) ? 0.2 : (isRunning && i === currentNoteInBlock ? 1.0 : 0.6);
+            let alpha = 1.0;
             if (!isRunning && i === 0 && currentBlockIndex === 0) alpha = 1.0;
             let x = startX + (i * spacingX);
             let isActive = (isRunning && i === currentNoteInBlock);
-            let color = isActive ? '#b3e6ff' : '#ffffff';
+            let isPast = (isRunning && i < currentNoteInBlock);
+            let color = isActive ? 'rgba(179,230,255,1.0)' : isPast ? 'rgba(179,230,255,0.15)' : 'rgba(179,230,255,0.3)';
 
             if (activeRH) {
-                ctx.globalAlpha = alpha;
+                ctx.globalAlpha = 1.0;
                 let y = KOTTA_E4_Y - ((n.step_rh - 30) * KOTTA_VONALKOZ_FEL_RH);
-                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2;
+                ctx.save(); ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : isPast ? 'rgba(210,210,210,0.15)' : 'rgba(210,210,210,0.3)'; ctx.lineWidth = 2;
                 if (n.step_rh <= 28) { for (let s = 28; s >= n.step_rh; s -= 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
                 if (n.step_rh >= 40) { for (let s = 40; s <= n.step_rh; s += 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
                 ctx.restore();
@@ -579,11 +800,11 @@
             }
 
             if (activeLH) {
-                ctx.globalAlpha = alpha;
+                ctx.globalAlpha = 1.0;
                 // Hanon LH: step=21 = C3, step=19 = G2 (KOTTA_G2_Y)
                 // Offset = 19 hogy G2 (step=19) → y = KOTTA_G2_Y - 0 = G2 pixel pozíció
                 let y = KOTTA_G2_Y - ((n.step_lh - 19) * KOTTA_VONALKOZ_FEL_LH);
-                ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2;
+                ctx.save(); ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : isPast ? 'rgba(210,210,210,0.15)' : 'rgba(210,210,210,0.3)'; ctx.lineWidth = 2;
                 // Léniavonalak: bass clef alatt step<=17 (C3 alatti), fölötte step>=29
                 if (n.step_lh <= 17) { for (let s = 17; s >= n.step_lh; s -= 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
                 if (n.step_lh >= 29) { for (let s = 29; s <= n.step_lh; s += 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
@@ -600,20 +821,18 @@
     function handleMainButton() {
         if (!isRunning) {
             initAudio(); buildSequence(); isRunning = true;
-            document.getElementById('btnStart').innerText = 'STOP';
-            document.getElementById('btnStart').classList.add('running');
+            updateStartStop(true);
             lastHitTime = 0; hitIntervals = []; fingerTimes = { 1: [], 2: [], 3: [], 4: [], 5: [] };
             document.getElementById('lcdStats').innerText = '0 / 100%';
-            document.getElementById('infoBarText').innerText = `PLAYING — ${MODES[currentModeIdx]} — HANON ${hanonList[currentHanonIdx].name.toUpperCase()}`;
+            setInfoBar(`PLAYING — ${MODES[currentModeIdx]} — HANON ${hanonList[currentHanonIdx].name.toUpperCase()}`, null);
             draw();
         } else stopPractice();
     }
 
     function stopPractice() {
         isRunning = false; currentNoteInBlock = 0; currentBlockIndex = 0;
-        document.getElementById('btnStart').innerText = 'START';
-        document.getElementById('btnStart').classList.remove('running');
-        document.getElementById('infoBarText').innerText = 'SYSTEM READY — SELECT EXERCISE OR PRESS START';
+        updateStartStop(false);
+        setInfoBar(HANON_T[currentLang].ready, null);
         draw();
     }
 
