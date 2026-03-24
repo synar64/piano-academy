@@ -392,7 +392,7 @@ function submitRev(){
  revs.push({name:user.name,stars:pStars,text:txt});
  localStorage.setItem('akira_reviews',JSON.stringify(revs));
  // EmailJS küldés
- emailjs.send('service_ayrxjak','mghh0qs',{
+ emailjs.send('service_ayrxjak','template_z3c7d1y',{
   name: user.name,
   subject: 'Akíra vélemény (' + '★'.repeat(pStars) + ')',
   stars: '★'.repeat(pStars) + '☆'.repeat(5-pStars),
@@ -410,7 +410,7 @@ function sendContact(){
  const name=document.getElementById('cn').value.trim();
  const msg=document.getElementById('cm').value.trim();
  if(!name||!msg)return toast('❌ '+(lang==='HU'?'Töltsd ki a mezőket!':'Fill in the fields!'));
- emailjs.send('service_ayrxjak','mghh0qs',{
+ emailjs.send('service_ayrxjak','template_z3c7d1y',{
   name: name,
   subject: 'Akíra kapcsolatfelvétel',
   stars: '—',
