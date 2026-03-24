@@ -394,11 +394,9 @@ function submitRev(){
  // EmailJS küldés
  emailjs.send('service_ayrxjak','mghh0qs',{
   name: user.name,
-  from_name: user.name,
   subject: 'Akíra vélemény (' + '★'.repeat(pStars) + ')',
   stars: '★'.repeat(pStars) + '☆'.repeat(5-pStars),
-  message: txt,
-  email: user.email || 'névtelen'
+  message: txt
  }).then(()=>console.log('Email elküldve')).catch(e=>console.warn('Email hiba:',e));
  document.getElementById('rv-txt').value='';pStars=0;
  document.getElementById('srow').querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
@@ -414,16 +412,14 @@ function sendContact(){
  if(!name||!msg)return toast('❌ '+(lang==='HU'?'Töltsd ki a mezőket!':'Fill in the fields!'));
  emailjs.send('service_ayrxjak','mghh0qs',{
   name: name,
-  from_name: name,
   subject: 'Akíra kapcsolatfelvétel',
   stars: '—',
-  message: msg,
-  email: 'kapcsolat'
+  message: msg
  }).then(()=>{
   toast('✓ '+(lang==='HU'?'Üzenet elküldve!':'Message sent!'));
   document.getElementById('cn').value='';document.getElementById('cm').value='';
   closeM('contactM');
- }).catch(()=>toast('❌ '+(lang==='HU'?'Hiba, próbáld újra!':'Error, try again!')));
+ }).catch((err)=>{console.error('EmailJS hiba:',err);toast('❌ '+(lang==='HU'?'Hiba, próbáld újra!':'Error, try again!'));});
 }
 let tT;
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2200);}
