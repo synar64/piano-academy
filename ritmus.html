@@ -101,7 +101,7 @@
             </div>
             <div style="margin-bottom:18px;">
                 <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">READ (follow the score), TAP (free tapping), COPY (listen then repeat).</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Tap the rhythm on every beat shown on the score. Use spacebar, MIDI keyboard, or click the piano keys.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Pattern ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Select from 12 rhythmic patterns across 4 difficulty levels.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Tempo ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Adjust BPM from 40 to 200. Click the Tempo cell to reset to 80.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Metro</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Toggle the metronome click. Beat 1 is accented.</span></div>
@@ -181,7 +181,7 @@
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)"    data-help="MODE: READ / TAP / COPY">▲</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cyclePattern(1)" data-help="PATTERN: SELECT RHYTHM PATTERN">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(5)"   data-help="TEMPO: ADJUST BPM">▲</button>
                                 </div>
@@ -192,9 +192,9 @@
                                             <div class="oled-main" id="lcdModuleText">RHYTHM</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: READ (FOLLOW SCORE) / TAP (FREE TAP) / COPY (LISTEN THEN REPEAT)">
+                                        <div id="oledMode" class="oled-section" data-help="PRACTICE: TAP THE RHYTHM ON EVERY BEAT YOU SEE">
                                             <div class="oled-header">Mode</div>
-                                            <div class="oled-main" id="lcdMode">READ</div>
+                                            <div class="oled-main" id="lcdMode">PRACTICE</div>
                                         </div>
                                         <div class="oled-divider"></div>
                                         <div id="oledPattern" class="oled-section" onclick="if(!helpActive) cyclePattern(1)" data-help="PATTERN: RHYTHMIC PATTERN — 12 PATTERNS ACROSS 4 DIFFICULTY LEVELS">
@@ -210,7 +210,7 @@
                                 </div>
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
+                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cyclePattern(-1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(-5)">▼</button>
                                 </div>
@@ -373,12 +373,11 @@
     ];
 
     // ── ÁLLAPOT ──
-    let isRunning = false, currentPatternIdx = 0, currentMode = 'READ';
+    let isRunning = false, currentPatternIdx = 0;
     let bpm = 80, metroOn = true, loopOn = false, countOn = false;
     let helpActive = false, audioCtx, audioInited = false;
     let beatScheduler = null, nextBeatTime = 0, currentBeat = 0, totalBeats = 0;
     let tapTimes = [], expectedTimes = [], tapCount = 0, hitCount = 0;
-    let copyPhase = 'listen'; // 'listen' | 'tap'
     const LOOK_AHEAD = 0.1, SCHEDULE_INTERVAL = 25;
 
     // ── MODULE VÁLTÓ ──
@@ -388,16 +387,7 @@
     function loadModule(){ if(helpActive)return; if(currentModuleIdx!==5)window.location.href=modules[currentModuleIdx].url; }
 
     // ── OLED ──
-    function cycleMode(dir) {
-        if (helpActive) return;
-        const modes = ['READ','TAP','COPY'];
-        const idx = modes.indexOf(currentMode);
-        currentMode = modes[(idx + dir + 3) % 3];
-        document.getElementById('lcdMode').innerText = currentMode;
-        if (isRunning) stopSession();
-        setInfoBar(RHYTHM_T[currentLang].modeTip[currentMode], null);
-        draw();
-    }
+    function cycleMode(dir) { /* removed */ }
     function cyclePattern(dir) {
         if (helpActive) return;
         currentPatternIdx = (currentPatternIdx + dir + PATTERNS.length) % PATTERNS.length;
@@ -428,14 +418,15 @@
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') await audioCtx.resume();
     }
-    function playClick(accent) {
+    function playClick(accent, when) {
         if (!metroOn || !audioCtx) return;
+        when = when || audioCtx.currentTime;
         const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
         osc.connect(g); g.connect(audioCtx.destination);
         osc.frequency.value = accent ? 1200 : 600;
-        g.gain.setValueAtTime(accent ? 0.25 : 0.1, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+        g.gain.setValueAtTime(accent ? 0.25 : 0.1, when);
+        g.gain.exponentialRampToValueAtTime(0.001, when + 0.04);
+        osc.start(when); osc.stop(when + 0.05);
     }
     function playTap() {
         if (!audioCtx) return;
@@ -464,16 +455,17 @@
         initAudio().then(() => {
             isRunning = true; updateStartStop(true);
             tapTimes = []; expectedTimes = []; tapCount = 0; hitCount = 0;
-            currentBeat = 0; copyPhase = 'listen';
+            currentBeat = 0;
             const { times, total } = getBeatTimes();
             totalBeats = total;
             // Felépítjük az összes várható ütemidőt
             const beatsPerSec = bpm / 60;
             expectedTimes = times.map(t => t / beatsPerSec);
             const T = RHYTHM_T[currentLang];
-            if (currentMode === 'COPY') setInfoBar(T.modeTip.COPY, null);
-            else setInfoBar(T.modeTip[currentMode], null);
-            nextBeatTime = audioCtx.currentTime + (countOn ? 4 / (bpm/60) : 0.1);
+            setInfoBar(currentLang === 'EN' ? 'TAP THE RHYTHM — SPACE / MIDI / PIANO KEY' : 'KOPPINTS A RITMUSRA — SZÓKÖZ / MIDI / ZONGORA', null);
+            const startOffset = countOn ? 4 / (bpm/60) : 0.1;
+            nextBeatTime = audioCtx.currentTime + startOffset;
+            patternStartTime = nextBeatTime; // első ütem pontos ideje
             document.getElementById('accuracyBar').style.width = '0%';
             beatScheduler = setInterval(scheduleBeat, SCHEDULE_INTERVAL);
             animatePlayhead();
@@ -487,8 +479,7 @@
         while (nextBeatTime < audioCtx.currentTime + LOOK_AHEAD) {
             // Quarter beat index in the 4/4 bar
             const barBeat = Math.floor(currentBeat) % 4;
-            playClick(barBeat === 0);
-            if (currentBeat === 0) patternStartTime = nextBeatTime;
+            playClick(barBeat === 0, nextBeatTime);
             currentBeat++;
             nextBeatTime += beatDur;
             // Minta vége?
@@ -533,8 +524,7 @@
 
     // ── TAP KEZELÉS ──
     function handleTap() {
-        if (!isRunning || currentMode === 'READ') return;
-        if (currentMode === 'COPY' && copyPhase === 'listen') return;
+        if (!isRunning) return;
         initAudio(); playTap();
         const now = audioCtx.currentTime;
         tapCount++;
@@ -595,7 +585,7 @@
         pat.beats.forEach((b) => {
             // A hang közepe: pos + d/2 negyedekben → x pixelben
             const x = BAR_X[0] + (pos + b.d / 2) * qPx;
-            const isCurrent = isCurrentBeat(pos, totalDur);
+            const isCurrent = isCurrentBeat(pos, b.d, totalDur);
             const color = b.rest
                 ? 'rgba(179,230,255,0.45)'
                 : isCurrent ? 'rgba(179,230,255,1.0)' : 'rgba(179,230,255,0.35)';
@@ -625,12 +615,15 @@
         }
     }
 
-    function isCurrentBeat(pos, totalDur) {
+    function isCurrentBeat(pos, dur, totalDur) {
         if (!audioCtx || patternStartTime === 0) return false;
         const elapsed = audioCtx.currentTime - patternStartTime;
         const patDurSec = totalDur / (bpm / 60);
         const currentPos = (elapsed % patDurSec) / patDurSec * totalDur;
-        return currentPos >= pos && currentPos < pos + 0.15;
+        // A hang közepétől ±0.2 negyeden belül aktív
+        const noteCenter = pos + dur / 2;
+        const beatDur = 1.0; // negyed = 1.0 egység
+        return Math.abs(currentPos - noteCenter) < beatDur * 0.3;
     }
 
     function drawNote(ctx, x, dur) {
@@ -727,10 +720,28 @@
         if (e.code === 'Space' && !e.repeat) { e.preventDefault(); handleTap(); }
     });
 
+    // MIDI tap támogatás
+    function initMidi() {
+        if (!navigator.requestMIDIAccess) return;
+        navigator.requestMIDIAccess().then(access => {
+            function connect(ac) {
+                ac.inputs.forEach(input => {
+                    input.onmidimessage = (msg) => {
+                        const [status,,velocity] = msg.data;
+                        if ((status & 0xf0) === 0x90 && velocity > 0) handleTap();
+                    };
+                });
+            }
+            connect(access);
+            access.onstatechange = () => connect(access);
+        }).catch(() => {});
+    }
+
     window.onload = () => {
         const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
         buildPiano();
         draw();
+        initMidi();
         window.addEventListener('pointerdown', () => initAudio(), { once: true });
     };
 </script>
