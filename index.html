@@ -1,408 +1,483 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akíra Piano Academy | Start</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --theme-cyan: #00AACC;
-            --theme-cyan-glow: rgba(0, 170, 204, 0.4);
-            --bg-dark: #050508;
-            --glass-bg: rgba(10, 15, 20, 0.6); 
-            --glass-border: rgba(255, 255, 255, 0.06);
-        }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--bg-dark);
-            color: #fff; font-family: 'Inter', sans-serif;
-            overflow: hidden; display: flex; flex-direction: column;
-        }
-
-        .ambient-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('zongora-hatter-dark.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: 1;
-        }
-
-        .ambient-bg::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(5,5,8,0.7) 0%, rgba(5,5,8,0.9) 100%);
-        }
-
-        @keyframes fadeInContent {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .main-container {
-            position: relative; z-index: 10;
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: flex-start; 
-            height: 100vh; width: 100%; max-width: 1200px; margin: 0 auto;
-            padding-top: 12vh; 
-            box-sizing: border-box;
-        }
-
-        .main-logo {
-            margin-bottom: 50px;
-            filter: drop-shadow(0 0 15px var(--theme-cyan-glow));
-            transform: scale(1.2);
-            opacity: 0; 
-            animation: fadeInContent 1s cubic-bezier(0.2, 1, 0.3, 1) forwards;
-        }
-
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            width: 100%;
-            padding: 0 40px;
-            box-sizing: border-box;
-            opacity: 0;
-            animation: fadeInContent 1s cubic-bezier(0.2, 1, 0.3, 1) 0.3s forwards;
-        }
-
-        /* JAVÍTVA: A kártyák most <div> elemek lesznek, hogy ne ugorjon fel az URL sáv, 
-           ezért hozzáadtuk a kurzor formázást. */
-        .module-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 30px 20px;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer; /* Fontos a klikkelhetőség érzetéhez! */
-        }
-
-        .module-card:hover {
-            border-color: var(--theme-cyan);
-            background: rgba(0, 170, 204, 0.08);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 170, 204, 0.15);
-            transform: translateY(-5px) scale(1.02);
-        }
-
-        .module-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--theme-cyan), transparent);
-            opacity: 0; transition: 0.4s;
-        }
-        .module-card:hover::before { opacity: 1; }
-
-        .module-title {
-            color: #fff;
-            font-size: 19px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            transition: 0.4s;
-        }
-        
-        .module-card:hover .module-title {
-            color: var(--theme-cyan);
-            letter-spacing: 5px;
-            text-shadow: 0 0 10px var(--theme-cyan-glow);
-        }
-
-        .module-desc {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-            font-weight: 400;
-            line-height: 1.6;
-            transition: 0.4s;
-        }
-
-        .module-card:hover .module-desc {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* ── TOP CONTROLS ── */
-        .top-controls {
-            position: fixed; top: 20px; right: 30px; z-index: 100;
-            display: flex; gap: 10px; align-items: center;
-        }
-        .lang-split-idx {
-            display: flex; background: rgba(10,15,20,0.75);
-            border: 1px solid rgba(255,255,255,0.12); border-radius: 4px;
-            overflow: hidden; backdrop-filter: blur(8px);
-        }
-        .lang-split-idx button {
-            background: transparent; border: none;
-            color: rgba(255,255,255,0.35); cursor: pointer;
-            font-family: 'Inter', sans-serif; font-size: 12px;
-            font-weight: 700; padding: 7px 16px; letter-spacing: 1px;
-            text-transform: uppercase; transition: 0.2s;
-        }
-        .lang-split-idx button.active { color: var(--theme-cyan); }
-        .lang-split-idx button:hover  { color: var(--theme-cyan); }
-        .lang-divider-idx { width: 1px; background: rgba(255,255,255,0.1); margin: 5px 0; }
-        .top-info-btn {
-            width: 34px; height: 34px; background: rgba(10,15,20,0.75);
-            border: 1px solid rgba(255,255,255,0.12); border-radius: 50%;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(8px); color: rgba(255,255,255,0.4);
-            font-size: 16px; transition: 0.2s;
-        }
-        .top-info-btn:hover { color: var(--theme-cyan); border-color: var(--theme-cyan); }
-
-        /* ── INFO MODAL ── */
-        .idx-overlay {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.88);
-            z-index: 10000; justify-content: center; align-items: center;
-            padding: 20px; box-sizing: border-box;
-        }
-        .idx-modal {
-            background: linear-gradient(135deg, #080c10, #0a0f14);
-            border: 1px solid rgba(0,170,204,0.25); border-radius: 14px;
-            padding: 40px 44px; max-width: 780px; width: 100%;
-            max-height: 88vh; overflow-y: auto; position: relative;
-            box-shadow: 0 30px 80px rgba(0,0,0,1), 0 0 0 1px rgba(0,170,204,0.08);
-        }
-        .idx-modal::-webkit-scrollbar { width: 4px; }
-        .idx-modal::-webkit-scrollbar-track { background: transparent; }
-        .idx-modal::-webkit-scrollbar-thumb { background: rgba(0,170,204,0.3); border-radius: 2px; }
-        .idx-modal h2 { color: var(--theme-cyan); font-size: 20px; letter-spacing: 5px; text-transform: uppercase; margin: 0 0 8px; text-align: center; }
-        .idx-modal .subtitle { color: rgba(255,255,255,0.3); font-size: 12px; letter-spacing: 3px; text-align: center; margin-bottom: 32px; text-transform: uppercase; }
-        .idx-modal h3 { color: rgba(255,255,255,0.6); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin: 28px 0 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.07); }
-        .idx-modal p, .idx-modal li { color: rgba(255,255,255,0.5); font-size: 13.5px; line-height: 1.85; margin: 0 0 10px; }
-        .idx-modal ul { padding-left: 18px; margin: 0 0 12px; }
-        .idx-modal .module-row { display: flex; gap: 14px; margin-bottom: 10px; align-items: baseline; }
-        .idx-modal .mod-tag { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; color: var(--theme-cyan); background: rgba(0,170,204,0.08); border: 1px solid rgba(0,170,204,0.2); border-radius: 3px; padding: 3px 10px; white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; min-width: 110px; text-align: center; }
-        .idx-modal .mod-desc { color: rgba(255,255,255,0.45); font-size: 13px; line-height: 1.7; }
-        .idx-close-btn {
-            display: block; width: 100%; margin-top: 32px; padding: 14px;
-            background: transparent; border: 1px solid rgba(0,170,204,0.35);
-            border-radius: 6px; color: var(--theme-cyan);
-            font-family: 'Inter', sans-serif; font-size: 12px;
-            font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-            cursor: pointer; transition: 0.2s;
-        }
-        .idx-close-btn:hover { background: rgba(0,170,204,0.08); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akíra Piano Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+:root{--cyan:#00AACC;--cyan-glow:rgba(0,170,204,.35);--bg:#050508;--glass:rgba(8,12,18,.65);--glass-b:rgba(255,255,255,.06);--gold:#f0c040;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body,html{width:100%;height:100%;background:var(--bg);color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden;overflow-y:auto;}
+.ambient-bg{position:fixed;inset:0;z-index:0;background:url('zongora-hatter-dark.jpg') center/cover no-repeat;}
+.ambient-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,8,.72) 0%,rgba(5,5,8,.95) 100%);}
+#pc{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;}
+/* TOP BAR */
+.tbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:13px 28px;background:linear-gradient(180deg,rgba(5,5,8,.9) 0%,transparent 100%);}
+.tl,.tr{display:flex;align-items:center;gap:10px;}
+.xpw{display:flex;align-items:center;gap:8px;background:rgba(10,15,20,.75);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 14px 5px 10px;backdrop-filter:blur(8px);}
+.xpi{font-size:13px;}.xpl{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1px;}
+.xpt{width:80px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+.xpf{height:100%;background:linear-gradient(90deg,var(--gold),#ffd96a);border-radius:2px;transition:width .6s cubic-bezier(.2,1,.3,1);}
+.lvb{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:10px;background:rgba(240,192,64,.15);border:1px solid rgba(240,192,64,.3);color:var(--gold);}
+.tbtn{background:rgba(10,15,20,.75);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:rgba(255,255,255,.4);cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:6px 14px;backdrop-filter:blur(8px);transition:.2s;text-transform:uppercase;letter-spacing:1px;}
+.tbtn:hover{color:var(--cyan);border-color:rgba(0,170,204,.4);}
+.tbtn.danger:hover{color:#ff6655;border-color:rgba(255,100,85,.4);}
+.lsp{display:flex;background:rgba(10,15,20,.75);border:1px solid rgba(255,255,255,.1);border-radius:4px;overflow:hidden;backdrop-filter:blur(8px);}
+.lsp button{background:transparent;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:6px 14px;letter-spacing:1px;transition:.2s;text-transform:uppercase;}
+.lsp button.active,.lsp button:hover{color:var(--cyan);}
+.lsep{width:1px;background:rgba(255,255,255,.1);margin:4px 0;}
+.ibt{width:32px;height:32px;background:rgba(10,15,20,.75);border:1px solid rgba(255,255,255,.1);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);color:rgba(255,255,255,.3);transition:.2s;}
+.ibt:hover{color:var(--cyan);border-color:rgba(0,170,204,.4);}
+/* MAIN */
+.main{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;min-height:100vh;width:100%;max-width:1280px;margin:0 auto;padding:88px 28px 56px;}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.logw{margin-bottom:40px;filter:drop-shadow(0 0 20px var(--cyan-glow));opacity:0;animation:fu .9s cubic-bezier(.2,1,.3,1) .1s forwards;}
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;opacity:0;animation:fu .9s cubic-bezier(.2,1,.3,1) .25s forwards;}
+.card{background:var(--glass);border:1px solid var(--glass-b);border-radius:14px;padding:26px 20px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;backdrop-filter:blur(12px);transition:all .35s cubic-bezier(.2,1,.3,1);position:relative;overflow:hidden;cursor:pointer;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:.35s;}
+.card:hover{border-color:var(--cyan);background:rgba(0,170,204,.07);box-shadow:0 16px 40px rgba(0,0,0,.6),inset 0 0 24px rgba(0,170,204,.1);transform:translateY(-5px) scale(1.02);}
+.card:hover::before{opacity:1;}
+.card.last-visited{border-color:rgba(0,170,204,.3);background:rgba(0,170,204,.05);}
+.card.last-visited::after{content:attr(data-lbl);position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan);background:rgba(0,170,204,.15);border:1px solid rgba(0,170,204,.3);border-radius:3px;padding:2px 7px;}
+.cvbar{position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),rgba(0,170,204,.4));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.2,1,.3,1);}
+.card.visited .cvbar{transform:scaleX(1);}
+.cbadge{position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-radius:3px;padding:2px 8px;border:1px solid;}
+.bb{color:#66cc88;border-color:rgba(102,204,136,.4);background:rgba(102,204,136,.1);}
+.bi{color:#ffaa44;border-color:rgba(255,170,68,.4);background:rgba(255,170,68,.1);}
+.ba{color:#cc88ff;border-color:rgba(204,136,255,.4);background:rgba(204,136,255,.1);}
+.cion{font-size:28px;margin-bottom:12px;margin-top:4px;}
+.ctit{color:#fff;font-size:17px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;transition:.35s;}
+.card:hover .ctit{color:var(--cyan);letter-spacing:4px;text-shadow:0 0 12px var(--cyan-glow);}
+.cdesc{color:rgba(255,255,255,.42);font-size:12px;line-height:1.65;transition:.35s;}
+.card:hover .cdesc{color:rgba(255,255,255,.75);}
+/* BOTTOM ROW */
+.brow{display:flex;gap:12px;margin-top:20px;width:100%;opacity:0;animation:fu .9s cubic-bezier(.2,1,.3,1) .4s forwards;}
+.bcard{flex:1;background:var(--glass);border:1px solid var(--glass-b);border-radius:12px;padding:16px 18px;backdrop-filter:blur(12px);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .3s;text-decoration:none;}
+.bcard:hover{border-color:var(--cyan);background:rgba(0,170,204,.06);transform:translateY(-2px);}
+.bcard.sup:hover{border-color:var(--gold);background:rgba(240,192,64,.06);}
+.bci{font-size:22px;flex-shrink:0;}.bct{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:3px;}.bcd{font-size:11px;color:rgba(255,255,255,.3);line-height:1.5;}
+/* OVERLAYS */
+.overlay{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.88);justify-content:center;align-items:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:linear-gradient(135deg,#080c10,#0a0f14);border:1px solid rgba(0,170,204,.22);border-radius:16px;padding:36px 40px;max-width:800px;width:100%;max-height:88vh;overflow-y:auto;}
+.modal::-webkit-scrollbar{width:4px;}.modal::-webkit-scrollbar-thumb{background:rgba(0,170,204,.3);border-radius:2px;}
+.modal h2{color:var(--cyan);font-size:18px;letter-spacing:5px;text-transform:uppercase;margin-bottom:5px;text-align:center;}
+.msub{color:rgba(255,255,255,.25);font-size:10px;letter-spacing:3px;text-align:center;margin-bottom:26px;text-transform:uppercase;}
+.modal h3{color:rgba(255,255,255,.5);font-size:10px;letter-spacing:3px;text-transform:uppercase;margin:22px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);}
+.modal p,.modal li{color:rgba(255,255,255,.45);font-size:13px;line-height:1.8;margin-bottom:8px;}
+.modal ul{padding-left:18px;margin-bottom:10px;}
+.mrow{display:flex;gap:12px;margin-bottom:9px;align-items:baseline;}
+.mtag{font-size:10px;font-weight:700;color:var(--cyan);background:rgba(0,170,204,.08);border:1px solid rgba(0,170,204,.2);border-radius:3px;padding:3px 10px;white-space:nowrap;letter-spacing:1px;text-transform:uppercase;min-width:110px;text-align:center;}
+.mdesc{color:rgba(255,255,255,.4);font-size:13px;line-height:1.7;}
+.mclose{display:block;width:100%;margin-top:24px;padding:12px;background:transparent;border:1px solid rgba(0,170,204,.35);border-radius:7px;color:var(--cyan);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:.2s;}
+.mclose:hover{background:rgba(0,170,204,.09);}
+/* AUTH */
+.atabs{display:flex;margin-bottom:24px;border-bottom:1px solid rgba(255,255,255,.08);}
+.atab{flex:1;padding:11px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);border-bottom:2px solid transparent;transition:.2s;}
+.atab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.aform{display:flex;flex-direction:column;gap:12px;}
+.ainp{width:100%;padding:11px 15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#fff;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:.2s;}
+.ainp:focus{border-color:rgba(0,170,204,.5);background:rgba(0,170,204,.04);}
+.ainp::placeholder{color:rgba(255,255,255,.2);}
+.asub{padding:12px;background:var(--cyan);border:none;border-radius:7px;color:#000;font-family:'Inter',sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.2s;}
+.asub:hover{background:#00c4ec;}
+.anote{text-align:center;color:rgba(255,255,255,.22);font-size:11px;line-height:1.7;}
+.anote a{color:var(--cyan);text-decoration:none;}
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.sbox{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:14px 10px;text-align:center;}
+.sval{font-size:24px;font-weight:800;color:var(--cyan);font-family:'Inter',sans-serif;}
+.slbl{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.msrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.msn{font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.55);flex:1;text-transform:uppercase;}
+.msxp{font-size:11px;color:var(--gold);font-weight:700;}
+.vdot{width:8px;height:8px;border-radius:50%;background:var(--cyan);flex-shrink:0;}
+.udot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.1);flex-shrink:0;}
+/* REVIEWS */
+.rform{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+.srow{display:flex;gap:6px;}
+.star{font-size:22px;cursor:pointer;color:rgba(255,255,255,.15);transition:.15s;}
+.star.on{color:var(--gold);}
+.rtxt{width:100%;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#fff;font-family:'Inter',sans-serif;font-size:13px;resize:vertical;min-height:80px;outline:none;}
+.ri{padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.rih{display:flex;align-items:center;gap:10px;margin-bottom:5px;}
+.rav{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),#005577);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.rn{font-size:12px;font-weight:700;color:rgba(255,255,255,.65);}
+.rs{color:var(--gold);font-size:12px;}
+.rb{font-size:13px;color:rgba(255,255,255,.42);line-height:1.65;}
+/* SUPPORT */
+.sopt{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;margin-bottom:10px;cursor:pointer;transition:.2s;text-decoration:none;}
+.sopt:hover{border-color:rgba(240,192,64,.4);background:rgba(240,192,64,.06);}
+.soi{font-size:22px;flex-shrink:0;}
+.sot{font-size:13px;font-weight:700;color:rgba(255,255,255,.65);margin-bottom:3px;}
+.sod{font-size:11px;color:rgba(255,255,255,.28);}
+/* TOAST */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(0,170,204,.15);border:1px solid rgba(0,170,204,.4);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;color:var(--cyan);letter-spacing:1px;z-index:20000;pointer-events:none;opacity:0;transition:opacity .3s,transform .3s;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
+<div class="ambient-bg"></div>
+<canvas id="pc"></canvas>
 
-    <div class="ambient-bg"></div>
-
-    <!-- TOP: Lang + Info -->
-    <div class="top-controls">
-        <div class="lang-split-idx">
-            <button id="idxEN" onclick="setLang('EN')">EN</button>
-            <div class="lang-divider-idx"></div>
-            <button id="idxHU" onclick="setLang('HU')" class="active">HU</button>
-        </div>
-        <button class="top-info-btn" onclick="document.getElementById('idxModal').style.display='flex'" title="Info">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
-        </button>
+<div class="tbar">
+  <div class="tl">
+    <div class="xpw">
+      <span class="xpi">⭐</span>
+      <span class="xpl" id="xpL">0 XP</span>
+      <div class="xpt"><div class="xpf" id="xpF" style="width:0%"></div></div>
+      <span class="lvb" id="lvB">Lv.1</span>
     </div>
-
-    <!-- INFO MODAL -->
-    <div id="idxModal" class="idx-overlay" onclick="if(event.target===this)this.style.display='none'">
-        <div class="idx-modal">
-            <h2 id="im-title">Akíra Piano Academy</h2>
-            <div class="subtitle" id="im-sub">Browser-Based Piano Training Workstation</div>
-
-            <h3 id="im-h1">About</h3>
-            <p id="im-about">A comprehensive, free, browser-based piano training environment. Six independent modules cover every essential area of piano education — from ear training and sight-reading to chords, scales, technique, and rhythm. Works with a real MIDI keyboard or with mouse clicks on the on-screen piano. No installation required.</p>
-
-            <h3 id="im-h2">Modules</h3>
-            <div id="im-modules">
-                <div class="module-row"><span class="mod-tag">Ear Training</span><span class="mod-desc">Identify individual notes and intervals by ear across multiple octave ranges. Includes chromatic option for black keys.</span></div>
-                <div class="module-row"><span class="mod-tag">Sight Reading</span><span class="mod-desc">Read notes from the staff and play them in real time. BPM and mistake tracking, hint system, LED keyboard guides.</span></div>
-                <div class="module-row"><span class="mod-tag">Chords</span><span class="mod-desc">Recognize and play diatonic chords, inversions, and seventh chords. Includes a draggable Circle of Fifths wheel showing key relationships.</span></div>
-                <div class="module-row"><span class="mod-tag">Scales</span><span class="mod-desc">All 24 major and minor scales with official fingering, LED keyboard guides, and Circle of Fifths navigation for key selection.</span></div>
-                <div class="module-row"><span class="mod-tag">Hanon</span><span class="mod-desc">Classic Hanon finger exercises with real-time BPM and stability tracking. Identifies which finger causes timing slowdowns.</span></div>
-                <div class="module-row"><span class="mod-tag">Rhythm</span><span class="mod-desc">Read and tap rhythmic patterns. Three modes: READ (follow the score), TAP (free tapping with accuracy bar), COPY (listen then repeat). 12 patterns across 4 levels.</span></div>
-            </div>
-
-            <h3 id="im-h3">How to Use</h3>
-            <p id="im-how">Connect a MIDI keyboard before opening a module for the best experience. All modules remember your language preference. Press the <strong style="color:#fff">?</strong> button in any module and click any element to learn what it does. Your language choice is saved automatically across all modules.</p>
-
-            <h3 id="im-h4">Technical</h3>
-            <p id="im-tech">Runs entirely in the browser — no server, no login, no data collection. Audio engine uses the Web Audio API with real Steinway Grand Piano samples (Salamander). MIDI input via Web MIDI API. Best experienced in Chrome or Edge.</p>
-
-            <h3 id="im-h5">Support</h3>
-            <p id="im-support">Akíra Piano Academy is a free, open educational project. If you find it useful and want to support its development, contributions are welcome.</p>
-            <div style="text-align:center;margin:16px 0;">
-                <a href="https://paypal.me" target="_blank" style="display:inline-block;padding:10px 28px;background:rgba(0,170,204,0.1);border:1px solid rgba(0,170,204,0.3);border-radius:6px;color:var(--theme-cyan);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-decoration:none;text-transform:uppercase;transition:0.2s;" onmouseover="this.style.background='rgba(0,170,204,0.18)'" onmouseout="this.style.background='rgba(0,170,204,0.1)'" id="im-donate">♥ Support via PayPal</a>
-            </div>
-
-            <h3 id="im-h6">Site Map</h3>
-            <ul id="im-sitemap">
-                <li><strong style="color:rgba(255,255,255,0.7)">index.html</strong> — Main menu</li>
-                <li><strong style="color:rgba(255,255,255,0.7)">hallasfejleszto.html</strong> — Ear Training</li>
-                <li><strong style="color:rgba(255,255,255,0.7)">kottaolvasas.html</strong> — Sight Reading</li>
-                <li><strong style="color:rgba(255,255,255,0.7)">akkordok.html</strong> — Chords</li>
-                <li><strong style="color:rgba(255,255,255,0.7)">skalak.html</strong> — Scales</li>
-                <li><strong style="color:rgba(255,255,255,0.7)">hanon.html</strong> — Hanon Exercises</li>
-                <li><strong style="color:rgba(255,255,255,0.7)">ritmus.html</strong> — Rhythm</li>
-            </ul>
-
-            <h3 id="im-h7">Contact & Impressum</h3>
-            <p id="im-contact">Akíra Piano Academy — Independent educational project. For feedback, bug reports, or collaboration inquiries, please reach out via the support link above.</p>
-
-            <button class="idx-close-btn" id="im-close" onclick="document.getElementById('idxModal').style.display='none'">Got It</button>
-        </div>
+    <button class="tbtn" id="b-stats" onclick="openM('statsM')">Eredmények</button>
+    <button class="tbtn danger" id="b-reset" onclick="doReset()">Reset</button>
+  </div>
+  <div class="tr">
+    <div class="lsp">
+      <button id="bEN" onclick="setLang('EN')">EN</button>
+      <div class="lsep"></div>
+      <button id="bHU" onclick="setLang('HU')" class="active">HU</button>
     </div>
+    <button class="ibt" onclick="openM('revM')" title="Vélemény">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <button class="ibt" onclick="openM('infoM')" title="Info">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+    </button>
+    <button class="ibt" onclick="openM('authM')" title="Profil">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+  </div>
+</div>
 
-    <div class="main-container">
-        
-        <div class="main-logo">
-            <svg width="450" height="110" viewBox="0 0 400 95">
-                <text x="190" y="55" fill="#00AACC" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="end" letter-spacing="2">AK</text>
-                <g filter="drop-shadow(0 0 8px rgba(255,255,255,0.3))">
-                    <path d="M 194 55 L 206 55 L 206 33 L 200 33 L 200 0 L 194 0 Z" fill="#FFFFFF" stroke="#aaa" stroke-width="0.5" stroke-linejoin="round"/>
-                </g>
-                <text x="210" y="55" fill="#00AACC" font-family="'Inter', sans-serif" font-weight="800" font-size="44" text-anchor="start" letter-spacing="2">RA</text>
-                <text x="200" y="85" fill="#00AACC" font-family="'Inter', sans-serif" font-weight="600" font-size="16" text-anchor="middle" letter-spacing="8">PIANO ACADEMY</text>
-            </svg>
-        </div>
+<!-- INFO MODAL -->
+<div id="infoM" class="overlay" onclick="if(event.target===this)closeM('infoM')">
+ <div class="modal">
+  <h2 id="im-t">Akíra Piano Academy</h2><div class="msub" id="im-s"></div>
+  <h3 id="im-h1"></h3><p id="im-ab"></p>
+  <h3 id="im-h2"></h3><div id="im-mod"></div>
+  <h3 id="im-h3"></h3><p id="im-hw"></p>
+  <h3 id="im-h4"></h3><p id="im-tc"></p>
+  <h3 id="im-h5"></h3><ul id="im-sm"></ul>
+  <h3 id="im-h6"></h3><p id="im-ct"></p>
+  <button class="mclose" id="im-cl" onclick="closeM('infoM')">Got It</button>
+ </div>
+</div>
 
-        <div class="modules-grid">
-            <div class="module-card" onclick="window.location.href='hallasfejleszto.html'">
-                <div class="module-title">Hallásfejlesztő</div>
-                <div class="module-desc">Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.</div>
-            </div>
-            
-            <div class="module-card" onclick="window.location.href='kottaolvasas.html'">
-                <div class="module-title">Kottaolvasás</div>
-                <div class="module-desc">Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.</div>
-            </div>
-            
-            <div class="module-card" onclick="window.location.href='akkordok.html'">
-                <div class="module-title">Akkordok</div>
-                <div class="module-desc">Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.</div>
-            </div>
-            
-            <div class="module-card" onclick="window.location.href='skalak.html'">
-                <div class="module-title">Skálák</div>
-                <div class="module-desc">Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.</div>
-            </div>
-            
-            <div class="module-card" onclick="window.location.href='hanon.html'">
-                <div class="module-title">Hanon</div>
-                <div class="module-desc">Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.</div>
-            </div>
-            
-            <div class="module-card" onclick="window.location.href='ritmus.html'">
-                <div class="module-title">Ritmus</div>
-                <div class="module-desc">Fejleszti az időzítést és a komplex ritmusképletek megértését.</div>
-            </div>
-        </div>
-    </div>
+<!-- AUTH MODAL -->
+<div id="authM" class="overlay" onclick="if(event.target===this)closeM('authM')">
+ <div class="modal" style="max-width:440px">
+  <h2 id="au-t">Profil</h2><div class="msub" id="au-s">Akíra Piano Academy</div>
+  <div class="atabs">
+    <div class="atab active" onclick="aTab('l')" id="at-l">Bejelentkezés</div>
+    <div class="atab" onclick="aTab('r')" id="at-r">Regisztráció</div>
+  </div>
+  <div id="af-l" class="aform">
+    <input class="ainp" type="email" id="le" placeholder="Email">
+    <input class="ainp" type="password" id="lp" placeholder="Jelszó">
+    <button class="asub" id="al-s" onclick="doLogin()">Bejelentkezés</button>
+    <div class="anote" id="an-l">Még nincs fiókod? <a href="#" onclick="aTab('r')">Regisztrálj</a></div>
+  </div>
+  <div id="af-r" class="aform" style="display:none">
+    <input class="ainp" type="text" id="rn" placeholder="Becenév">
+    <input class="ainp" type="email" id="re" placeholder="Email">
+    <input class="ainp" type="password" id="rp" placeholder="Jelszó (min. 6 kar.)">
+    <button class="asub" id="ar-s" onclick="doReg()">Fiók létrehozása</button>
+    <div class="anote" id="an-r">Az adataid csak helyileg kerülnek mentésre a böngésződben.</div>
+  </div>
+  <button class="mclose" id="au-cl" onclick="closeM('authM')">Mégse</button>
+ </div>
+</div>
+
+<!-- STATS MODAL -->
+<div id="statsM" class="overlay" onclick="if(event.target===this)closeM('statsM')">
+ <div class="modal" style="max-width:520px">
+  <h2 id="st-t">Eredményeim</h2><div class="msub" id="st-s">XP és előrehaladás</div>
+  <div class="sgrid" id="st-g"></div>
+  <h3 id="st-mh">Modulok</h3>
+  <div id="st-ml"></div>
+  <button class="mclose" id="st-cl" onclick="closeM('statsM')">Bezárás</button>
+ </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div id="revM" class="overlay" onclick="if(event.target===this)closeM('revM')">
+ <div class="modal" style="max-width:520px">
+  <h2 id="rv-t">Vélemények</h2><div class="msub" id="rv-s">Oszd meg tapasztalatod</div>
+  <div id="rv-list"></div>
+  <h3 id="rv-wh">Írj véleményt</h3>
+  <div class="rform">
+    <div class="srow" id="srow"></div>
+    <textarea class="rtxt" id="rv-txt" placeholder="Írd le tapasztalatod..."></textarea>
+    <button class="asub" id="rv-sb" onclick="submitRev()">Küldés</button>
+  </div>
+  <button class="mclose" id="rv-cl" onclick="closeM('revM')">Bezárás</button>
+ </div>
+</div>
+
+<!-- SUPPORT MODAL -->
+<div id="supM" class="overlay" onclick="if(event.target===this)closeM('supM')">
+ <div class="modal" style="max-width:460px">
+  <h2 id="sp-t">Támogatás</h2><div class="msub" id="sp-s">Akíra Piano Academy</div>
+  <p id="sp-i" style="margin-bottom:18px;"></p>
+  <a href="https://paypal.me" target="_blank" class="sopt">
+    <span class="soi">💳</span>
+    <div><div class="sot" id="sp-pt">PayPal adományozás</div><div class="sod" id="sp-pd">Egyszeri támogatás</div></div>
+  </a>
+  <div class="sopt" onclick="copyMail()">
+    <span class="soi">✉️</span>
+    <div><div class="sot" id="sp-ct">Kapcsolatfelvétel</div><div class="sod" id="sp-cd">Visszajelzés, hibajelentés</div></div>
+  </div>
+  <div class="sopt" onclick="openM('revM');closeM('supM')">
+    <span class="soi">⭐</span>
+    <div><div class="sot" id="sp-rt">Értékelés</div><div class="sod" id="sp-rd">Oszd meg tapasztalatod</div></div>
+  </div>
+  <button class="mclose" id="sp-cl" onclick="closeM('supM')">Bezárás</button>
+ </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div id="contactM" class="overlay" onclick="if(event.target===this)closeM('contactM')">
+ <div class="modal" style="max-width:440px">
+  <h2>Kapcsolat</h2><div class="msub">Akíra Piano Academy</div>
+  <div class="aform">
+   <input class="ainp" type="text" id="cn" placeholder="Neved">
+   <textarea class="rtxt" id="cm" placeholder="Írd le az üzeneted..." style="min-height:100px"></textarea>
+   <button class="asub" onclick="sendContact()">Küldés</button>
+  </div>
+  <button class="mclose" onclick="closeM('contactM')">Mégse</button>
+ </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div class="main">
+ <div class="logw">
+  <svg width="400" height="90" viewBox="0 0 400 90">
+   <text x="190" y="52" fill="#00AACC" font-family="'Inter',sans-serif" font-weight="800" font-size="42" text-anchor="end" letter-spacing="2">AK</text>
+   <g filter="drop-shadow(0 0 8px rgba(255,255,255,0.3))">
+    <path d="M194 52L206 52L206 31L200 31L200 0L194 0Z" fill="#FFF" stroke="#aaa" stroke-width="0.5"/>
+   </g>
+   <text x="210" y="52" fill="#00AACC" font-family="'Inter',sans-serif" font-weight="800" font-size="42" text-anchor="start" letter-spacing="2">RA</text>
+   <text x="200" y="80" fill="#00AACC" font-family="'Inter',sans-serif" font-weight="600" font-size="15" text-anchor="middle" letter-spacing="8">PIANO ACADEMY</text>
+  </svg>
+ </div>
+ <div class="grid" id="grid"></div>
+ <div class="brow">
+  <div class="bcard" onclick="openM('statsM')"><span class="bci">📊</span><div><div class="bct" id="bc-st">Eredményeim</div><div class="bcd" id="bc-sd">XP, modulok, előrehaladás</div></div></div>
+  <div class="bcard" onclick="openM('revM')"><span class="bci">💬</span><div><div class="bct" id="bc-rv">Vélemények</div><div class="bcd" id="bc-rd">Tapasztalatok megosztása</div></div></div>
+  <div class="bcard sup" onclick="openM('supM')"><span class="bci">♥</span><div><div class="bct" id="bc-sp">Támogatás</div><div class="bcd" id="bc-pd">PayPal, kapcsolat, értékelés</div></div></div>
+ </div>
+</div>
 
 <script>
-const T = {
-    EN: {
-        cards: [
-            {t:'Ear Training',    d:'Identify notes and intervals purely by ear.'},
-            {t:'Sight Reading',   d:'Practice reading and playing notes from the staff in real time.'},
-            {t:'Chords',          d:'Learn chord shapes, inversions and functional notation.'},
-            {t:'Scales',          d:'Master all scales and fingering in every key.'},
-            {t:'Hanon',           d:'Virtuoso finger exercises for technique and independence.'},
-            {t:'Rhythm',          d:'Develop timing and understand complex rhythmic patterns.'}
-        ],
-        'im-title':'Akíra Piano Academy',
-        'im-sub':'Browser-Based Piano Training Workstation',
-        'im-h1':'About',
-        'im-about':'A comprehensive, free, browser-based piano training environment. Six independent modules cover every essential area of piano education — from ear training and sight-reading to chords, scales, technique, and rhythm. Works with a real MIDI keyboard or with mouse clicks on the on-screen piano. No installation required.',
-        'im-h2':'Modules',
-        'im-modules':`<div class="module-row"><span class="mod-tag">Ear Training</span><span class="mod-desc">Identify individual notes and intervals by ear across multiple octave ranges. Includes chromatic option.</span></div>
-            <div class="module-row"><span class="mod-tag">Sight Reading</span><span class="mod-desc">Read notes from the staff and play them in real time. BPM tracking, mistake counter, hint system.</span></div>
-            <div class="module-row"><span class="mod-tag">Chords</span><span class="mod-desc">Recognize and play diatonic chords, inversions, and seventh chords. Includes draggable Circle of Fifths wheel.</span></div>
-            <div class="module-row"><span class="mod-tag">Scales</span><span class="mod-desc">All 24 major and minor scales with official fingering, LED guides, and Circle of Fifths navigation.</span></div>
-            <div class="module-row"><span class="mod-tag">Hanon</span><span class="mod-desc">Classic Hanon exercises with real-time BPM and stability tracking. Identifies problem fingers.</span></div>
-            <div class="module-row"><span class="mod-tag">Rhythm</span><span class="mod-desc">READ / TAP / COPY modes. 12 patterns across 4 levels. Real-time accuracy bar.</span></div>`,
-        'im-h3':'How to Use',
-        'im-how':'Connect a MIDI keyboard before opening a module. All modules remember your language. Press <strong style="color:#fff">?</strong> in any module and click any element to learn what it does.',
-        'im-h4':'Technical',
-        'im-tech':'Runs entirely in the browser — no server, no login, no data collection. Audio: Web Audio API + Salamander Grand Piano samples. MIDI: Web MIDI API. Best in Chrome or Edge.',
-        'im-h5':'Support',
-        'im-support':'Akíra Piano Academy is a free educational project. If you find it useful, contributions are welcome.',
-        'im-donate':'♥ Support via PayPal',
-        'im-h6':'Site Map',
-        'im-sitemap':'<li><strong style="color:rgba(255,255,255,0.7)">index.html</strong> — Main menu</li><li><strong style="color:rgba(255,255,255,0.7)">hallasfejleszto.html</strong> — Ear Training</li><li><strong style="color:rgba(255,255,255,0.7)">kottaolvasas.html</strong> — Sight Reading</li><li><strong style="color:rgba(255,255,255,0.7)">akkordok.html</strong> — Chords</li><li><strong style="color:rgba(255,255,255,0.7)">skalak.html</strong> — Scales</li><li><strong style="color:rgba(255,255,255,0.7)">hanon.html</strong> — Hanon</li><li><strong style="color:rgba(255,255,255,0.7)">ritmus.html</strong> — Rhythm</li>',
-        'im-h7':'Contact & Impressum',
-        'im-contact':'Akíra Piano Academy — Independent educational project. For feedback, bug reports, or collaboration, please reach out via the support link above.',
-        'im-close':'Got It'
-    },
-    HU: {
-        cards: [
-            {t:'Hallásfejlesztő',  d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},
-            {t:'Kottaolvasás',     d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},
-            {t:'Akkordok',         d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},
-            {t:'Skálák',           d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},
-            {t:'Hanon',            d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},
-            {t:'Ritmus',           d:'Fejleszti az időzítést és a komplex ritmusképletek megértését.'}
-        ],
-        'im-title':'Akíra Zongora Akadémia',
-        'im-sub':'Böngészőalapú Zongora Tréning Workstation',
-        'im-h1':'A projektről',
-        'im-about':'Átfogó, ingyenes, böngészőalapú zongoraoktatási környezet. Hat független modul lefedi a zongora tanulás minden lényeges területét — hallásfejlesztéstől a kottaolvasásig, akkordoktól skálákig, technikáig és ritmusig. Működik valódi MIDI billentyűzettel és egérkattintással is. Telepítés nem szükséges.',
-        'im-h2':'Modulok',
-        'im-modules':`<div class="module-row"><span class="mod-tag">Hallásfejlesztő</span><span class="mod-desc">Azonosítsd a hangokat és hangközöket fülre, több oktávtartományban. Kromatikus opció is elérhető.</span></div>
-            <div class="module-row"><span class="mod-tag">Kottaolvasás</span><span class="mod-desc">Olvasd le a hangokat a kottáról valós időben. BPM követés, hibaszámláló, hangnév súgó.</span></div>
-            <div class="module-row"><span class="mod-tag">Akkordok</span><span class="mod-desc">Ismerd fel és játszd le a diatonikus akkordokat, fordításokat és szeptimakkordokat. Mozgatható kvintkor tárcsa.</span></div>
-            <div class="module-row"><span class="mod-tag">Skálák</span><span class="mod-desc">Mind a 24 dúr és moll skála hivatalos ujjrenddel, LED vezérléssel és kvintkor navigációval.</span></div>
-            <div class="module-row"><span class="mod-tag">Hanon</span><span class="mod-desc">Klasszikus ujjgyakorlatok valós idejű BPM és stabilitásmérővel. Megmutatja melyik ujj okoz lassulást.</span></div>
-            <div class="module-row"><span class="mod-tag">Ritmus</span><span class="mod-desc">READ / TAP / COPY módok. 12 ritmussémát 4 nehézségi szinten. Valós idejű pontossági sáv.</span></div>`,
-        'im-h3':'Használat',
-        'im-how':'Csatlakoztasd a MIDI billentyűzetet a modul megnyitása előtt. Minden modul megjegyzi a kiválasztott nyelvet. Nyomd meg a <strong style="color:#fff">?</strong> gombot bármely modulban és kattints bármely elemre a leírásért.',
-        'im-h4':'Technikai',
-        'im-tech':'Teljesen böngészőben fut — nincs szerver, nincs bejelentkezés, nincs adatgyűjtés. Hang: Web Audio API + Salamander Grand Piano minták. MIDI: Web MIDI API. Chrome vagy Edge ajánlott.',
-        'im-h5':'Támogatás',
-        'im-support':'Az Akíra Piano Academy egy ingyenes oktatási projekt. Ha hasznosnak találod és támogatnád a fejlesztését, köszönettel fogadjuk.',
-        'im-donate':'♥ Támogatás PayPalon',
-        'im-h6':'Oldaltérkép',
-        'im-sitemap':'<li><strong style="color:rgba(255,255,255,0.7)">index.html</strong> — Főoldal</li><li><strong style="color:rgba(255,255,255,0.7)">hallasfejleszto.html</strong> — Hallásfejlesztő</li><li><strong style="color:rgba(255,255,255,0.7)">kottaolvasas.html</strong> — Kottaolvasás</li><li><strong style="color:rgba(255,255,255,0.7)">akkordok.html</strong> — Akkordok</li><li><strong style="color:rgba(255,255,255,0.7)">skalak.html</strong> — Skálák</li><li><strong style="color:rgba(255,255,255,0.7)">hanon.html</strong> — Hanon</li><li><strong style="color:rgba(255,255,255,0.7)">ritmus.html</strong> — Ritmus</li>',
-        'im-h7':'Kapcsolat & Impresszum',
-        'im-contact':'Akíra Piano Academy — Független oktatási projekt. Visszajelzés, hibajelentés vagy együttműködési ajánlat esetén kérjük használd a fenti támogatási linket.',
-        'im-close':'Értettem'
-    }
+const MODS=[
+ {id:'hallasfejleszto',url:'hallasfejleszto.html',icon:'👂',diff:'b',xp:15},
+ {id:'kottaolvasas',url:'kottaolvasas.html',icon:'🎼',diff:'i',xp:20},
+ {id:'akkordok',url:'akkordok.html',icon:'🎹',diff:'i',xp:25},
+ {id:'skalak',url:'skalak.html',icon:'🎵',diff:'i',xp:20},
+ {id:'hanon',url:'hanon.html',icon:'💪',diff:'a',xp:30},
+ {id:'ritmus',url:'ritmus.html',icon:'🥁',diff:'b',xp:15},
+];
+const T={
+ EN:{
+  badge:{b:'Beginner',i:'Intermediate',a:'Advanced'},lbl:'Last visited',
+  cards:[{t:'Ear Training',d:'Identify notes and intervals purely by ear.'},{t:'Sight Reading',d:'Practice reading notes from the staff in real time.'},{t:'Chords',d:'Learn chord shapes, inversions and functional notation.'},{t:'Scales',d:'Master all scales and fingering in every key.'},{t:'Hanon',d:'Virtuoso finger exercises for technique and independence.'},{t:'Rhythm',d:'Develop timing and understand complex rhythmic patterns.'}],
+  bs:'Results',br:'Reset',
+  it:'Akíra Piano Academy',is:'Browser-Based Piano Training Workstation',
+  h1:'About',h2:'Modules',h3:'How to Use',h4:'Technical',h5:'Site Map',h6:'Contact',
+  ab:'A comprehensive, free, browser-based piano training workstation. Six independent modules cover every essential area of piano education. Works with a real MIDI keyboard or mouse clicks.',
+  mods:[['Ear Training','Notes and intervals by ear. Multiple ranges, chromatic option.'],['Sight Reading','Staff reading in real time. BPM, mistakes, hints.'],['Chords','Diatonic chords, inversions, sevenths. Circle of Fifths wheel.'],['Scales','All 24 major/minor scales with fingering, LED guides.'],['Hanon','Classic exercises with BPM and stability tracking.'],['Rhythm','READ / TAP / COPY. 12 patterns, 4 levels.']],
+  hw:'Connect a MIDI keyboard before opening a module. Press ? and click any element to learn what it does.',
+  tc:'Runs entirely in the browser — no server required. Audio: Web Audio API + Salamander piano. MIDI: Web MIDI API. Best in Chrome or Edge.',
+  sm:'<li><b style="color:rgba(255,255,255,.7)">hallasfejleszto.html</b> — Ear Training</li><li><b style="color:rgba(255,255,255,.7)">kottaolvasas.html</b> — Sight Reading</li><li><b style="color:rgba(255,255,255,.7)">akkordok.html</b> — Chords</li><li><b style="color:rgba(255,255,255,.7)">skalak.html</b> — Scales</li><li><b style="color:rgba(255,255,255,.7)">hanon.html</b> — Hanon</li><li><b style="color:rgba(255,255,255,.7)">ritmus.html</b> — Rhythm</li>',
+  ct:'Akíra Piano Academy — Independent educational project. Use the support options on the main page for feedback.',
+  cl:'Got It',atl:'Login',atr:'Register',als:'Log In',ars:'Create Account',acl:'Cancel',
+  stl:'My Results',sts:'XP & Progress',stm:'Modules',stc:'Close',
+  rvl:'Reviews',rvs:'Share your experience',rvw:'Write a review',rvc:'Close',rvb:'Submit',
+  spl:'Support',sps:'Akíra Piano Academy',spi:'Akíra Piano Academy is a free educational project. Your support helps keep it maintained.',
+  sppt:'PayPal Donation',sppd:'One-time contribution, any amount',
+  spct:'Get in Touch',spcd:'Feedback, collaboration, bug reports',
+  sprt:'Leave a Review',sprd:'Share your experience',spcl:'Close',
+  bst:'My Results',bsd:'XP, modules, progress',brv:'Reviews',brd:'Share experience',bsp:'Support',bpd:'PayPal, contact, review',
+  lvs:['Beginner','Student','Practitioner','Musician','Virtuoso','Master'],
+  rstm:'Reset all progress and XP?',nore:'No reviews yet. Be the first!',tyrev:'Thank you for your review!',errev:'Add stars and text!',eml:'Email copied!',
+ },
+ HU:{
+  badge:{b:'Kezdő',i:'Haladó',a:'Mester'},lbl:'Legutóbb nyitott',
+  cards:[{t:'Hallásfejlesztő',d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},{t:'Kottaolvasás',d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},{t:'Akkordok',d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},{t:'Skálák',d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},{t:'Hanon',d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},{t:'Ritmus',d:'Fejleszti az időzítést és a komplex ritmusképletek megértését.'}],
+  bs:'Eredményeim',br:'Reset',
+  it:'Akíra Zongora Akadémia',is:'Böngészőalapú Zongora Tréning Workstation',
+  h1:'A projektről',h2:'Modulok',h3:'Használat',h4:'Technikai',h5:'Oldaltérkép',h6:'Kapcsolat',
+  ab:'Átfogó, ingyenes, böngészőalapú zongoraoktatási workstation. Hat független modul lefedi a zongora tanulás minden területét. Működik MIDI billentyűzettel és egérkattintással is.',
+  mods:[['Hallásfejlesztő','Hangok és hangközök felismerése fülre. Több oktávtartomány, kromatikus opció.'],['Kottaolvasás','Valós idejű kottaolvasás. BPM, hibaszámláló, hangnév súgó.'],['Akkordok','Diatonikus akkordok, fordítások, szeptimek. Kvintkor tárcsa.'],['Skálák','24 dúr/moll skála ujjrenddel, LED vezérléssel, kvintkor navigációval.'],['Hanon','Klasszikus ujjgyakorlatok valós idejű BPM és stabilitásmérővel.'],['Ritmus','READ / TAP / COPY módok. 12 minta, 4 szint.']],
+  hw:'Csatlakoztasd a MIDI billentyűzetet a modul megnyitása előtt. Nyomd meg a ? gombot és kattints bármely elemre.',
+  tc:'Teljesen böngészőben fut — nincs szerver. Hang: Web Audio API + Salamander Grand Piano. MIDI: Web MIDI API. Chrome vagy Edge ajánlott.',
+  sm:'<li><b style="color:rgba(255,255,255,.7)">hallasfejleszto.html</b> — Hallásfejlesztő</li><li><b style="color:rgba(255,255,255,.7)">kottaolvasas.html</b> — Kottaolvasás</li><li><b style="color:rgba(255,255,255,.7)">akkordok.html</b> — Akkordok</li><li><b style="color:rgba(255,255,255,.7)">skalak.html</b> — Skálák</li><li><b style="color:rgba(255,255,255,.7)">hanon.html</b> — Hanon</li><li><b style="color:rgba(255,255,255,.7)">ritmus.html</b> — Ritmus</li>',
+  ct:'Akíra Piano Academy — Független oktatási projekt. Visszajelzéshez használd a főoldalon elérhető támogatási lehetőségeket.',
+  cl:'Értettem',atl:'Bejelentkezés',atr:'Regisztráció',als:'Bejelentkezés',ars:'Fiók létrehozása',acl:'Mégse',
+  stl:'Eredményeim',sts:'XP és előrehaladás',stm:'Modulok',stc:'Bezárás',
+  rvl:'Vélemények',rvs:'Oszd meg tapasztalatod',rvw:'Írj véleményt',rvc:'Bezárás',rvb:'Küldés',
+  spl:'Támogatás',sps:'Akíra Piano Academy',spi:'Az Akíra Piano Academy egy ingyenes oktatási projekt. Támogatásod segíti a fejlesztés folytatását.',
+  sppt:'PayPal adományozás',sppd:'Egyszeri támogatás, bármilyen összeggel',
+  spct:'Kapcsolatfelvétel',spcd:'Visszajelzés, együttműködés, hibajelentés',
+  sprt:'Értékelés írása',sprd:'Oszd meg a projektről alkotott véleményed',spcl:'Bezárás',
+  bst:'Eredményeim',bsd:'XP, modulok, előrehaladás',brv:'Vélemények',brd:'Tapasztalatok megosztása',bsp:'Támogatás',bpd:'PayPal, kapcsolat, értékelés',
+  lvs:['Kezdő','Tanuló','Gyakorló','Zenész','Virtuóz','Mester'],
+  rstm:'Biztosan törlöd az összes előrehaladást?',nore:'Még nincsenek vélemények.',tyrev:'Köszönjük a véleményt!',errev:'Adj csillagot és írj szöveget!',eml:'Email másolva!',
+ }
 };
-
-const URLS = ['hallasfejleszto.html','kottaolvasas.html','akkordok.html','skalak.html','hanon.html','ritmus.html'];
-
-function setLang(lang) {
-    localStorage.setItem('akira_lang', lang);
-    document.getElementById('idxEN').classList.toggle('active', lang==='EN');
-    document.getElementById('idxHU').classList.toggle('active', lang==='HU');
-    const L = T[lang];
-    // Kártyák
-    document.querySelectorAll('.module-card').forEach((c, i) => {
-        c.querySelector('.module-title').textContent = L.cards[i].t;
-        c.querySelector('.module-desc').textContent  = L.cards[i].d;
-        c.onclick = () => window.location.href = URLS[i];
-    });
-    // Modal szövegek
-    ['im-title','im-sub','im-h1','im-h3','im-h4','im-h5','im-h6','im-h7','im-h8','im-close'].forEach(id => {
-        const el = document.getElementById(id); if (el && L[id]) el.textContent = L[id];
-    });
-    ['im-about','im-how','im-tech','im-support','im-modules','im-sitemap'].forEach(id => {
-        const el = document.getElementById(id); if (el && L[id]) el.innerHTML = L[id];
-    });
-    document.getElementById('im-h2').textContent = L['im-h2'];
-    const don = document.getElementById('im-donate'); if (don) don.textContent = L['im-donate'];
+let lang=localStorage.getItem('akira_lang')||'HU';
+let visited=JSON.parse(localStorage.getItem('akira_visited')||'{}');
+let xp=parseInt(localStorage.getItem('akira_xp')||'0');
+let lastV=localStorage.getItem('akira_last')||null;
+let revs=JSON.parse(localStorage.getItem('akira_reviews')||'[]');
+let pStars=0;
+function save(){localStorage.setItem('akira_visited',JSON.stringify(visited));localStorage.setItem('akira_xp',xp);if(lastV)localStorage.setItem('akira_last',lastV);}
+function getLv(x){return Math.min(5,Math.floor(x/100));}
+function updXp(){const lv=getLv(xp);document.getElementById('xpL').textContent=xp+' XP';document.getElementById('xpF').style.width=(xp%100)+'%';document.getElementById('lvB').textContent='Lv.'+(lv+1)+' '+T[lang].lvs[lv];}
+function addXp(n){xp+=n;save();updXp();toast('+'+n+' XP ✓');}
+function buildGrid(){
+ const g=document.getElementById('grid');g.innerHTML='';
+ const L=T[lang];
+ MODS.forEach((m,i)=>{
+  const v=!!visited[m.id],isL=m.id===lastV;
+  const c=document.createElement('div');
+  c.className='card'+(v?' visited':'')+(isL?' last-visited':'');
+  if(isL)c.setAttribute('data-lbl',L.lbl);
+  const bcls={'b':'bb','i':'bi','a':'ba'}[m.diff];
+  c.innerHTML=`<span class="cbadge ${bcls}">${L.badge[m.diff]}</span><div class="cion">${m.icon}</div><div class="ctit">${L.cards[i].t}</div><div class="cdesc">${L.cards[i].d}</div><div class="cvbar"></div>`;
+  c.onclick=()=>go(m,i);
+  g.appendChild(c);
+ });
 }
-
-window.onload = () => {
-    const sl = localStorage.getItem('akira_lang') || 'HU';
-    setLang(sl);
+function go(m,i){const isN=!visited[m.id];visited[m.id]=(visited[m.id]||0)+1;lastV=m.id;if(isN)addXp(m.xp);save();window.location.href=m.url;}
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function aTab(t){
+ document.getElementById('af-l').style.display=t==='l'?'flex':'none';
+ document.getElementById('af-r').style.display=t==='r'?'flex':'none';
+ document.getElementById('at-l').classList.toggle('active',t==='l');
+ document.getElementById('at-r').classList.toggle('active',t==='r');
+}
+function doLogin(){const e=document.getElementById('le').value.trim();if(!e)return toast('❌ Add meg az email címed!');toast('✓ Üdv újra!');closeM('authM');}
+function doReg(){const n=document.getElementById('rn').value.trim(),e=document.getElementById('re').value.trim(),p=document.getElementById('rp').value;if(!n||!e||p.length<6)return toast('❌ Töltsd ki az összes mezőt!');localStorage.setItem('akira_user',JSON.stringify({name:n,email:e}));toast('✓ Üdv, '+n+'!');closeM('authM');}
+function doReset(){const L=T[lang];if(confirm(L.rstm)){visited={};xp=0;lastV=null;localStorage.removeItem('akira_visited');localStorage.removeItem('akira_xp');localStorage.removeItem('akira_last');buildGrid();updXp();buildStats();toast('↺ Reset');}}
+function buildStats(){
+ const L=T[lang];
+ const tot=Object.keys(visited).length,sess=Object.values(visited).reduce((a,b)=>a+b,0);
+ document.getElementById('st-g').innerHTML=`<div class="sbox"><div class="sval">${xp}</div><div class="slbl">XP</div></div><div class="sbox"><div class="sval">${tot}/6</div><div class="slbl">${lang==='HU'?'Modul':'Modules'}</div></div><div class="sbox"><div class="sval">${sess}</div><div class="slbl">${lang==='HU'?'Session':'Sessions'}</div></div>`;
+ document.getElementById('st-ml').innerHTML=MODS.map((m,i)=>`<div class="msrow"><div class="${visited[m.id]?'vdot':'udot'}"></div><span style="font-size:16px">${m.icon}</span><span class="msn">${L.cards[i].t}</span><span class="msxp">${visited[m.id]?'+'+m.xp+' XP':'—'}</span></div>`).join('');
+}
+function buildRevs(){
+ const L=T[lang];
+ const list=document.getElementById('rv-list');
+ if(!revs.length){list.innerHTML=`<p style="color:rgba(255,255,255,.25);font-size:13px;">${L.nore}</p>`;return;}
+ list.innerHTML=revs.slice().reverse().map(r=>`<div class="ri"><div class="rih"><div class="rav">${r.name[0].toUpperCase()}</div><div><div class="rn">${r.name}</div><div class="rs">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div></div></div><div class="rb">${r.text}</div></div>`).join('');
+}
+function initStars(){
+ const row=document.getElementById('srow');
+ row.innerHTML=['★','★','★','★','★'].map((_,i)=>`<span class="star" data-i="${i+1}">★</span>`).join('');
+ row.querySelectorAll('.star').forEach(s=>{s.onclick=()=>{pStars=+s.dataset.i;row.querySelectorAll('.star').forEach((ss,j)=>ss.classList.toggle('on',j<pStars));};});
+}
+function submitRev(){
+ const L=T[lang],txt=document.getElementById('rv-txt').value.trim();
+ const user=JSON.parse(localStorage.getItem('akira_user')||'{"name":"Névtelen"}');
+ if(!txt||!pStars)return toast('❌ '+L.errev);
+ // Lokálisan tárol
+ revs.push({name:user.name,stars:pStars,text:txt});
+ localStorage.setItem('akira_reviews',JSON.stringify(revs));
+ // EmailJS küldés
+ emailjs.send('service_ayrxjak','mghh0qs',{
+  from_name: user.name,
+  subject: 'Vélemény / Review',
+  stars: '★'.repeat(pStars) + '☆'.repeat(5-pStars),
+  message: txt
+ }).then(()=>console.log('Email elküldve')).catch(e=>console.warn('Email hiba:',e));
+ document.getElementById('rv-txt').value='';pStars=0;
+ document.getElementById('srow').querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
+ buildRevs();toast('✓ '+L.tyrev);
+}
+function copyMail(){
+ // Kapcsolat modal megnyitás helyett EmailJS küldés
+ openM('contactM');
+}
+function sendContact(){
+ const name=document.getElementById('cn').value.trim();
+ const msg=document.getElementById('cm').value.trim();
+ if(!name||!msg)return toast('❌ '+(lang==='HU'?'Töltsd ki a mezőket!':'Fill in the fields!'));
+ emailjs.send('service_ayrxjak','mghh0qs',{
+  from_name: name,
+  subject: 'Kapcsolatfelvétel / Contact',
+  stars: '—',
+  message: msg
+ }).then(()=>{
+  toast('✓ '+(lang==='HU'?'Üzenet elküldve!':'Message sent!'));
+  document.getElementById('cn').value='';document.getElementById('cm').value='';
+  closeM('contactM');
+ }).catch(()=>toast('❌ '+(lang==='HU'?'Hiba, próbáld újra!':'Error, try again!')));
+}
+let tT;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2200);}
+function setLang(l){
+ localStorage.setItem('akira_lang',l);lang=l;
+ document.getElementById('bEN').classList.toggle('active',l==='EN');
+ document.getElementById('bHU').classList.toggle('active',l==='HU');
+ const L=T[l];
+ document.getElementById('b-stats').textContent=L.bs;
+ document.getElementById('b-reset').textContent=L.br;
+ // info
+ document.getElementById('im-t').textContent=L.it;
+ document.getElementById('im-s').textContent=L.is;
+ document.getElementById('im-h1').textContent=L.h1;document.getElementById('im-ab').textContent=L.ab;
+ document.getElementById('im-h2').textContent=L.h2;
+ document.getElementById('im-mod').innerHTML=L.mods.map(([t,d])=>`<div class="mrow"><span class="mtag">${t}</span><span class="mdesc">${d}</span></div>`).join('');
+ document.getElementById('im-h3').textContent=L.h3;document.getElementById('im-hw').textContent=L.hw;
+ document.getElementById('im-h4').textContent=L.h4;document.getElementById('im-tc').textContent=L.tc;
+ document.getElementById('im-h5').textContent=L.h5;document.getElementById('im-sm').innerHTML=L.sm;
+ document.getElementById('im-h6').textContent=L.h6;document.getElementById('im-ct').textContent=L.ct;
+ document.getElementById('im-cl').textContent=L.cl;
+ // auth
+ document.getElementById('au-t').textContent=L.atl;document.getElementById('at-l').textContent=L.atl;document.getElementById('at-r').textContent=L.atr;
+ document.getElementById('al-s').textContent=L.als;document.getElementById('ar-s').textContent=L.ars;document.getElementById('au-cl').textContent=L.acl;
+ // stats
+ document.getElementById('st-t').textContent=L.stl;document.getElementById('st-s').textContent=L.sts;
+ document.getElementById('st-mh').textContent=L.stm;document.getElementById('st-cl').textContent=L.stc;
+ // reviews
+ document.getElementById('rv-t').textContent=L.rvl;document.getElementById('rv-s').textContent=L.rvs;
+ document.getElementById('rv-wh').textContent=L.rvw;document.getElementById('rv-cl').textContent=L.rvc;
+ document.getElementById('rv-sb').textContent=L.rvb;
+ // support
+ document.getElementById('sp-t').textContent=L.spl;document.getElementById('sp-s').textContent=L.sps;
+ document.getElementById('sp-i').textContent=L.spi;
+ document.getElementById('sp-pt').textContent=L.sppt;document.getElementById('sp-pd').textContent=L.sppd;
+ document.getElementById('sp-ct').textContent=L.spct;document.getElementById('sp-cd').textContent=L.spcd;
+ document.getElementById('sp-rt').textContent=L.sprt;document.getElementById('sp-rd').textContent=L.sprd;
+ document.getElementById('sp-cl').textContent=L.spcl;
+ // bottom
+ document.getElementById('bc-st').textContent=L.bst;document.getElementById('bc-sd').textContent=L.bsd;
+ document.getElementById('bc-rv').textContent=L.brv;document.getElementById('bc-rd').textContent=L.brd;
+ document.getElementById('bc-sp').textContent=L.bsp;document.getElementById('bc-pd').textContent=L.bpd;
+ buildGrid();updXp();buildStats();buildRevs();
+}
+// PARTICLES
+function initParticles(){
+ const cv=document.getElementById('pc'),ctx=cv.getContext('2d');
+ let W,H,pts=[];
+ const SYM=['♩','♪','♫','♬','𝄞','𝄢','♭','♯'];
+ function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+ function mkP(){return{x:Math.random()*W,y:H+20,sym:SYM[Math.floor(Math.random()*SYM.length)],sz:12+Math.random()*16,sp:.3+Math.random()*.5,dr:(Math.random()-.5)*.4,al:.06+Math.random()*.15,ang:0,rot:(Math.random()-.5)*.02};}
+ function init(){rsz();pts=Array.from({length:20},()=>{const p=mkP();p.y=Math.random()*H;return p;});}
+ function anim(){ctx.clearRect(0,0,W,H);pts.forEach((p,i)=>{p.y-=p.sp;p.x+=p.dr;p.ang+=p.rot;if(p.y<-30)pts[i]=mkP();ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.ang);ctx.font=p.sz+'px serif';ctx.fillStyle='rgba(0,170,204,'+p.al+')';ctx.textAlign='center';ctx.fillText(p.sym,0,0);ctx.restore();});requestAnimationFrame(anim);}
+ window.addEventListener('resize',rsz);init();anim();
+}
+window.onload=()=>{
+  emailjs.init('Blr6S_QwbDA8wJfd3');
+  initStars();initParticles();setLang(localStorage.getItem('akira_lang')||'HU');
 };
-</script></body>
+</script>
+</body>
 </html>
