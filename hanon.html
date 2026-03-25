@@ -975,7 +975,17 @@
 
     // ── RITMUS DEMO — meghallgatható mintajáték ──
     function playRhythmDemo() {
-        if (!audioCtx) initAudio().then(_playDemo); else _playDemo();
+        initAudio().then(() => {
+            // Várjuk meg amíg a minták betöltődnek
+            const tryPlay = () => {
+                if (Object.keys(sampleBuffers).length >= 4) {
+                    _playDemo();
+                } else {
+                    setTimeout(tryPlay, 100);
+                }
+            };
+            tryPlay();
+        });
     }
     function _playDemo() {
         // Az aktuális Hanon szekvencia első 16 hangját játsszuk le (1 kottasor)
@@ -1000,10 +1010,10 @@
             src.playbackRate.value = Math.pow(2, (midiNote - closest) / 12);
             const g = audioCtx.createGain();
             g.gain.setValueAtTime(0.6, time);
-            g.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.9);
+            g.gain.exponentialRampToValueAtTime(0.001, time + dur * 2.5);
             src.connect(g).connect(audioCtx.destination);
             src.start(time);
-            src.stop(time + dur);
+            src.stop(time + dur * 2.8);
             time += dur;
         });
         const isHU = currentLang === 'HU';
