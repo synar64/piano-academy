@@ -246,6 +246,7 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Top / Bottom</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Toggle treble and bass clef note generation independently.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Displays note names above each notehead.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays official fingering numbers (1–5) below noteheads.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Rhythm ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Select a rhythmic pattern for the exercise.</span></div>
             </div>
             <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.</p></div>
             <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
@@ -313,7 +314,7 @@
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1×), MARATHON (3×), TRAINING (∞)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(1)">▲</button>
-                                    <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleRhythm(1)">▲</button>
                                 </div>
                                 <div class="oled-wrapper">
                                     <div class="oled-screen">
@@ -332,9 +333,9 @@
                                             <div class="oled-main" id="lcdHanonText">No. 1</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledStats" class="oled-section" data-help="STATS: REAL-TIME BPM AND TIMING STABILITY">
-                                            <div class="oled-header">BPM / Stab</div>
-                                            <div class="oled-main" id="lcdStats">0 / 100%</div>
+                                        <div id="oledRhythm" class="oled-section" onclick="if(!helpActive) playRhythmDemo()" data-help="RHYTHM: CLICK TO PREVIEW — USE ARROWS TO CHANGE PATTERN">
+                                            <div class="oled-header">Rhythm</div>
+                                            <div class="oled-main" id="lcdRhythm">EVEN</div>
                                         </div>
                                     </div>
                                 </div>
@@ -343,7 +344,7 @@
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(-1)">▼</button>
-                                    <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleRhythm(-1)">▼</button>
                                 </div>
                             </div>
                         </div>
@@ -408,6 +409,7 @@
             ctrl3:'Toggle treble and bass clef note generation independently.',
             ctrl4:'Displays note names above each notehead.',
             ctrl5:'Displays official fingering numbers (1–5) below noteheads.',
+            ctrl6:'Select a rhythmic pattern for the exercise. The notation updates to show the correct note values. Click the Rhythm cell to hear a demo. Patterns: Even (standard eighths), Dotted (long-short), Reverse (short-long), Swing (jazz groove), Syncopa (syncopated).',
             tipTitle:'Learning Tip',
             tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.',
             ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',
@@ -423,6 +425,7 @@
             hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
             hMode:'MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',
             hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',
+            hRhythm:'RHYTHM: ARROWS TO CHANGE PATTERN — CLICK TO HEAR DEMO',
             hStats:'STATS: REAL-TIME BPM AND TIMING STABILITY',
         },
         HU: {
@@ -434,6 +437,7 @@
             ctrl3:'Violin és basszus kulcsos hangok külön-külön be/ki.',
             ctrl4:'Megjeleníti a hangneveket a kottafej felett.',
             ctrl5:'Megjeleníti a hivatalos ujjrendszámokat (1–5) a kottafej alatt.',
+            ctrl6:'Ritmusképlet kiválasztása a gyakorlathoz. A kotta azonnal frissül a megfelelő hanghosszakra. Kattints a Rhythm ablakra a bemutató lejátszásához. Képletek: Egyenletes (standard nyolcadok), Punktírozott (hosszú-rövid), Fordított (rövid-hosszú), Swing (jazz groove), Szinkópa.',
             tipTitle:'Tanulási tipp',
             tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld leütés előtt, és tartsd lazán a csuklódat.',
             ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',
@@ -449,6 +453,7 @@
             hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
             hMode:'MÓD: SPRINT (1×) = EGY FUTAM | MARATON (3×) = HÁROMSZOROS | TRAINING = VÉGTELEN HUROK',
             hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',
+            hRhythm:'RITMUS: NYILAKKAL VÁLTASZ — KATTINTS A DEMÓ LEJÁTSZÁSÁHOZ',
             hStats:'STATISZTIKA: VALÓS IDEJŰ BPM ÉS IDŐZÍTÉSI STABILITÁS',
         }
     };
@@ -461,8 +466,8 @@
         document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
         document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
         const T = HANON_T[lang];
-        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-gotIt'];
-        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.gotIt];
+        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-ctrl6','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.ctrl6,T.tipTitle,T.tipBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
         // Csak szöveges gombok fordítása (ikonos sq-btn-ek nem)
         const btnMap={'btnHintName':T.btnHints,'btnHintFinger':T.btnFingers};
@@ -472,7 +477,7 @@
             'btnHintName':T.hHints,'btnHintFinger':T.hFingers,
             'btnStart':T.hStart,'audioToggle':T.hPiano,
             'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
-            'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledStats':T.hStats
+            'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledRhythm':T.hRhythm
         };
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
         document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][4];
@@ -616,7 +621,7 @@
     function cycleModule(dir) {
         if (helpActive) return;
         currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length;
-        document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name;
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[currentLang][currentModuleIdx];
     }
     function loadModule() {
         if (helpActive) return;
@@ -646,10 +651,45 @@
     // ── MODE ──
     const MODES = ['SPRINT', 'MARATHON', 'TRAINING'];
     let currentModeIdx = 0;
+
+    // ── RITMUSKÉPLETEK ──
+    const RHYTHMS = [
+        { id:'EVEN',       label:'EVEN',        labelHU:'EGYENLETES', desc:'Even eighth notes — standard Hanon tempo',         descHU:'Egyenletes nyolcadok — standard Hanon tempó',      ratios:[1,1] },
+        { id:'DOTTED',     label:'DOTTED',      labelHU:'PUNKTÍROZOTT', desc:'Long-short pairs ♩♪ — develops accentuation',   descHU:'Hosszú-rövid párok ♩♪ — hangsúlyfejlesztés',      ratios:[3,1] },
+        { id:'REVERSE',    label:'REVERSE',     labelHU:'FORDÍTOTT',  desc:'Short-long pairs ♪♩ — reverse dotted',            descHU:'Rövid-hosszú párok ♪♩ — fordított punktírozott',   ratios:[1,3] },
+        { id:'SWING',      label:'SWING',       labelHU:'SWING',      desc:'Jazz swing feel — triplet-based groove',           descHU:'Jazz swing érzés — triola alapú groove',           ratios:[2,1] },
+        { id:'SYNCOPATED', label:'SYNCOPA',     labelHU:'SZINKÓPA',   desc:'Syncopated rhythm',               descHU:'Szinkópa ritmus',       ratios:[1,2,1] },
+    ];
+    let currentRhythmIdx = 0;
+    let rhythmNoteIdx = 0; // hangjegy pozíció a ritmusképleten belül
+
+    function cycleRhythm(dir) {
+        if (helpActive) return;
+        currentRhythmIdx = (currentRhythmIdx + dir + RHYTHMS.length) % RHYTHMS.length;
+        rhythmNoteIdx = 0;
+        const R = RHYTHMS[currentRhythmIdx];
+        const isHU = (localStorage.getItem('akira_lang')||'EN') === 'HU';
+        document.getElementById('lcdRhythm').innerText = isHU ? R.labelHU : R.label;
+        const demoHint = isHU ? ' — KATTINTS A RITMUS ABLAKRA A LEJÁTSZÁSHOZ' : ' — CLICK RHYTHM CELL TO PREVIEW';
+        setInfoBar((isHU ? R.descHU : R.desc).toUpperCase() + demoHint, null);
+        if (isRunning) stopPractice();
+        buildSequence();
+        draw();
+    }
+
+    function getRhythmRatio() {
+        const R = RHYTHMS[currentRhythmIdx];
+        const ratio = R.ratios[rhythmNoteIdx % R.ratios.length];
+        rhythmNoteIdx++;
+        return ratio; // relative weight — 1=normal, 2=double, 3=triple length
+    }
     function cycleMode(dir) {
         if (helpActive) return;
         currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length;
         document.getElementById('lcdModeText').innerText = MODES[currentModeIdx];
+        const R = RHYTHMS[currentRhythmIdx];
+        const isHU2 = lang === 'HU';
+        document.getElementById('lcdRhythm').innerText = isHU2 ? R.labelHU : R.label;
         if (isRunning) stopPractice(); buildSequence(); draw();
     }
 
@@ -758,7 +798,7 @@
         for (let l = 0; l < loops; l++) flatSeq = flatSeq.concat(rawSeq);
         seqBlocks = [];
         for (let i = 0; i < flatSeq.length; i += 16) seqBlocks.push(flatSeq.slice(i, i + 16));
-        currentBlockIndex = 0; currentNoteInBlock = 0;
+        currentBlockIndex = 0; currentNoteInBlock = 0; rhythmNoteIdx = 0;
     }
 
     // ── KOTTA KALIBRÁCIÓ ──
@@ -768,6 +808,38 @@
     const KOTTA_VONALKOZ_FEL_LH = 10.71;
 
     const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+
+
+    // ── RITMUSOS KOTTARAJZOLÁS ──
+    function drawRhythmNote(ctx, x, y, color, noteIdx, hand) {
+        const R = RHYTHMS[currentRhythmIdx];
+        const ratio = R.ratios[noteIdx % R.ratios.length];
+        // ratio: 1=nyolcad, 2=negyed, 3=pontozott negyed, 4=fél
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+
+        if (ratio === 1) {
+            // Nyolcad: tömör fej + szár + zászló
+            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
+            // Zászló
+            ctx.beginPath(); ctx.moveTo(x+11, y-50); ctx.bezierCurveTo(x+30, y-40, x+30, y-25, x+11, y-30); ctx.stroke();
+        } else if (ratio === 2) {
+            // Negyed: tömör fej + szár
+            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
+        } else if (ratio === 3) {
+            // Pontozott negyed: tömör fej + szár + pont
+            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x+20, y-4, 4, 0, Math.PI*2); ctx.fill();
+        } else if (ratio >= 4) {
+            // Fél: üres fej + szár
+            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
+        }
+    }
 
     function draw() {
         ctx.clearRect(0, 0, 2450, 480);
@@ -793,22 +865,19 @@
                 if (n.step_rh <= 28) { for (let s = 28; s >= n.step_rh; s -= 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
                 if (n.step_rh >= 40) { for (let s = 40; s <= n.step_rh; s += 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
                 ctx.restore();
-                ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI / 10, 0, 2 * Math.PI); ctx.fillStyle = color; ctx.fill();
+                drawRhythmNote(ctx, x, y, color, i, 'rh');
                 if (showNames) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.n, x, y - 22); }
                 if (showFinger) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.f_rh, x, y + 34); }
             }
 
             if (activeLH) {
                 ctx.globalAlpha = 1.0;
-                // Hanon LH: step=21 = C3, step=19 = G2 (KOTTA_G2_Y)
-                // Offset = 19 hogy G2 (step=19) → y = KOTTA_G2_Y - 0 = G2 pixel pozíció
                 let y = KOTTA_G2_Y - ((n.step_lh - 19) * KOTTA_VONALKOZ_FEL_LH);
                 ctx.save(); ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : isPast ? 'rgba(210,210,210,0.15)' : 'rgba(210,210,210,0.3)'; ctx.lineWidth = 2;
-                // Léniavonalak: bass clef alatt step<=17 (C3 alatti), fölötte step>=29
                 if (n.step_lh <= 17) { for (let s = 17; s >= n.step_lh; s -= 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
                 if (n.step_lh >= 29) { for (let s = 29; s <= n.step_lh; s += 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
                 ctx.restore();
-                ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI / 10, 0, 2 * Math.PI); ctx.fillStyle = color; ctx.fill();
+                drawRhythmNote(ctx, x, y, color, i, 'lh');
                 if (showNames) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.n, x, y - 22); }
                 if (showFinger) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.f_lh, x, y + 34); }
             }
@@ -822,7 +891,7 @@
             initAudio(); buildSequence(); isRunning = true;
             updateStartStop(true);
             lastHitTime = 0; hitIntervals = []; fingerTimes = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-            document.getElementById('lcdStats').innerText = '0 / 100%';
+            // BPM/Stab now shown in infoBar
             setInfoBar(`PLAYING — ${MODES[currentModeIdx]} — HANON ${hanonList[currentHanonIdx].name.toUpperCase()}`, null);
             draw();
         } else stopPractice();
@@ -891,7 +960,7 @@
                 let avg = hitIntervals.reduce((a, b) => a + b) / hitIntervals.length;
                 let dev = Math.sqrt(hitIntervals.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / hitIntervals.length);
                 let uniformity = Math.round(Math.max(0, 100 - (dev / 3)));
-                document.getElementById('lcdStats').innerText = `${currentBpm} / ${uniformity}%`;
+                setInfoBar(`BPM: ${currentBpm}  |  STABILITY: ${uniformity}%  |  ${RHYTHMS[currentRhythmIdx].label}`, null);
             }
             lastHitTime = now;
             currentNoteInBlock++;
@@ -903,6 +972,43 @@
         }
     }
 
+
+    // ── RITMUS DEMO — meghallgatható mintajáték ──
+    function playRhythmDemo() {
+        if (!audioCtx) initAudio().then(_playDemo); else _playDemo();
+    }
+    function _playDemo() {
+        // Az aktuális Hanon szekvencia első 16 hangját játsszuk le (1 kottasor)
+        const rawSeq = buildHanon1();
+        const demoSeq = rawSeq.slice(0, 16); // első blokk = első sor
+        const R = RHYTHMS[currentRhythmIdx];
+        const baseDur = 0.28;
+        let time = audioCtx.currentTime + 0.15;
+
+        demoSeq.forEach((note, i) => {
+            const ratio = R.ratios[i % R.ratios.length];
+            const dur = baseDur * ratio;
+            const midiNote = activeRH ? note.m_rh : note.m_lh;
+            const src = audioCtx.createBufferSource();
+            let closest = 36, minDiff = 999;
+            for (let b in sampleBuffers) {
+                let diff = Math.abs(midiNote - b);
+                if (diff < minDiff) { minDiff = diff; closest = b; }
+            }
+            if (!sampleBuffers[closest]) { time += dur; return; }
+            src.buffer = sampleBuffers[closest];
+            src.playbackRate.value = Math.pow(2, (midiNote - closest) / 12);
+            const g = audioCtx.createGain();
+            g.gain.setValueAtTime(0.6, time);
+            g.gain.exponentialRampToValueAtTime(0.001, time + dur * 0.9);
+            src.connect(g).connect(audioCtx.destination);
+            src.start(time);
+            src.stop(time + dur);
+            time += dur;
+        });
+        const isHU = currentLang === 'HU';
+        setInfoBar((isHU ? '▶ MINTA: ' : '▶ DEMO: ') + (isHU ? R.descHU : R.desc).toUpperCase(), null);
+    }
     // ── BILLENTYŰZET ──
     function create88() {
         const wrap = document.getElementById('hb-wrap');
