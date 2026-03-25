@@ -36,7 +36,7 @@ body,html{width:100%;height:100%;background:var(--bg);color:#fff;font-family:'In
 @keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .logw{margin-bottom:40px;filter:drop-shadow(0 0 20px var(--cyan-glow));opacity:0;animation:fu .9s cubic-bezier(.2,1,.3,1) .1s forwards;}
 /* GRID */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;opacity:0;animation:fu .9s cubic-bezier(.2,1,.3,1) .25s forwards;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;opacity:0;animation:fu .9s cubic-bezier(.2,1,.3,1) .25s forwards;margin-bottom:20px;}
 .card{background:var(--glass);border:1px solid var(--glass-b);border-radius:14px;padding:26px 20px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;backdrop-filter:blur(12px);transition:all .35s cubic-bezier(.2,1,.3,1);position:relative;overflow:hidden;cursor:pointer;}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:0;transition:.35s;}
 .card:hover{border-color:var(--cyan);background:rgba(0,170,204,.07);box-shadow:0 16px 40px rgba(0,0,0,.6),inset 0 0 24px rgba(0,170,204,.1);transform:translateY(-5px) scale(1.02);}
@@ -118,6 +118,21 @@ body,html{width:100%;height:100%;background:var(--bg);color:#fff;font-family:'In
 /* TOAST */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(0,170,204,.15);border:1px solid rgba(0,170,204,.4);border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;color:var(--cyan);letter-spacing:1px;z-index:20000;pointer-events:none;opacity:0;transition:opacity .3s,transform .3s;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.lmbtn{display:block;margin:80px auto 0;padding:9px 28px;background:transparent;border:1px solid rgba(0,170,204,.35);border-radius:7px;color:var(--cyan);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:.2s;opacity:0;animation:fu .9s cubic-bezier(.2,1,.3,1) .5s forwards;}
+.lmbtn:hover{background:rgba(0,170,204,.09);}
+.lm-intro{font-size:14px;color:rgba(255,255,255,.55);line-height:1.85;margin-bottom:24px;text-align:center;}
+.lm-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:24px;}
+.lm-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px 18px;}
+.lm-card-icon{font-size:22px;margin-bottom:8px;}
+.lm-card-title{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:6px;}
+.lm-card-desc{font-size:12px;color:rgba(255,255,255,.45);line-height:1.7;}
+.lm-card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.lm-tag{font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(0,170,204,.08);border:1px solid rgba(0,170,204,.2);color:rgba(0,170,204,.8);font-family:'Share Tech Mono',monospace;}
+.lm-tag.gold{background:rgba(240,192,64,.08);border-color:rgba(240,192,64,.2);color:rgba(240,192,64,.8);}
+.lm-tech{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.lm-tech-row{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:rgba(255,255,255,.45);line-height:1.6;}
+.lm-tech-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
@@ -142,6 +157,9 @@ body,html{width:100%;height:100%;background:var(--bg);color:#fff;font-family:'In
       <div class="lsep"></div>
       <button id="bHU" onclick="setLang('HU')" class="active">HU</button>
     </div>
+    <button class="ibt" onclick="openM('supM')" title="Támogatás">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </button>
     <button class="ibt" onclick="openM('revM')" title="Vélemény">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </button>
@@ -253,6 +271,37 @@ body,html{width:100%;height:100%;background:var(--bg);color:#fff;font-family:'In
  </div>
 </div>
 
+<!-- LEARN MORE MODAL -->
+<div id="learnM" class="overlay" onclick="if(event.target===this)closeM('learnM')">
+ <div class="modal" style="max-width:800px">
+  <h2 id="lm-t">Tudj meg többet</h2>
+  <div class="msub" id="lm-s">Akíra Piano Academy</div>
+
+  <!-- MI EZ -->
+  <h3 id="lm-h1">Mi ez az oldal?</h3>
+  <p id="lm-about" style="color:rgba(255,255,255,.55);font-size:13.5px;line-height:1.85;margin-bottom:12px;"></p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;" id="lm-pills"></div>
+
+  <!-- HOGYAN JOTT LETRE -->
+  <h3 id="lm-h2">Hogyan jött létre?</h3>
+  <p id="lm-story" style="color:rgba(255,255,255,.55);font-size:13.5px;line-height:1.85;margin-bottom:20px;"></p>
+
+  <!-- ELSO LEPESEK -->
+  <h3 id="lm-h3">Hogyan kezdj hozzá?</h3>
+  <div id="lm-steps" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
+
+  <!-- TECHNIKAI -->
+  <h3 id="lm-h4">Technikai tudnivalók</h3>
+  <div class="lm-tech" id="lm-tech"></div>
+
+  <!-- MODULOK -->
+  <h3 id="lm-h5">A modulok részletesen</h3>
+  <div id="lm-mods" style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px;"></div>
+
+  <button class="mclose" id="lm-cl" onclick="closeM('learnM')">Bezárás</button>
+ </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <div class="main">
@@ -267,11 +316,7 @@ body,html{width:100%;height:100%;background:var(--bg);color:#fff;font-family:'In
   </svg>
  </div>
  <div class="grid" id="grid"></div>
- <div class="brow">
-  <div class="bcard" onclick="openM('statsM')"><span class="bci">📊</span><div><div class="bct" id="bc-st">Eredményeim</div><div class="bcd" id="bc-sd">XP, modulok, előrehaladás</div></div></div>
-  <div class="bcard" onclick="openM('revM')"><span class="bci">💬</span><div><div class="bct" id="bc-rv">Vélemények</div><div class="bcd" id="bc-rd">Tapasztalatok megosztása</div></div></div>
-  <div class="bcard sup" onclick="openM('supM')"><span class="bci">♥</span><div><div class="bct" id="bc-sp">Támogatás</div><div class="bcd" id="bc-pd">PayPal, kapcsolat, értékelés</div></div></div>
- </div>
+ <button class="lmbtn" onclick="openM('learnM')" id="btn-lm" style="margin-top:64px;">✦ Tudj meg többet</button>
 </div>
 
 <script>
@@ -459,10 +504,22 @@ function setLang(l){
  document.getElementById('sp-rt').textContent=L.sprt;document.getElementById('sp-rd').textContent=L.sprd;
  document.getElementById('sp-cl').textContent=L.spcl;
  // bottom
- document.getElementById('bc-st').textContent=L.bst;document.getElementById('bc-sd').textContent=L.bsd;
- document.getElementById('bc-rv').textContent=L.brv;document.getElementById('bc-rd').textContent=L.brd;
- document.getElementById('bc-sp').textContent=L.bsp;document.getElementById('bc-pd').textContent=L.bpd;
- buildGrid();updXp();buildStats();buildRevs();
+
+
+ // Learn more modal
+ const LT = LM_DATA[l];
+ if (LT) {
+  ['lm-t','lm-s','lm-h1','lm-h2','lm-h3','lm-h4','lm-h5','lm-cl'].forEach((id,i)=>{
+   const el=document.getElementById(id);
+   if(el) el.textContent=[LT.t,LT.s,LT.h1,LT.h2,LT.h3,LT.h4,LT.h5,LT.cl][i];
+  });
+  const ab=document.getElementById('lm-about');if(ab)ab.textContent=LT.about;
+  const st=document.getElementById('lm-story');if(st)st.textContent=LT.story;
+  const btnLm=document.getElementById('btn-lm');if(btnLm)btnLm.textContent=LT.btn;
+ }
+ buildGrid();updXp();buildStats();buildRevs();buildLmGrid();
+  // Learn More modal — dinamikusan épül fel JS-ből
+ buildLearnModal(l);
 }
 // PARTICLES
 function initParticles(){
@@ -474,6 +531,294 @@ function initParticles(){
  function init(){rsz();pts=Array.from({length:20},()=>{const p=mkP();p.y=Math.random()*H;return p;});}
  function anim(){ctx.clearRect(0,0,W,H);pts.forEach((p,i)=>{p.y-=p.sp;p.x+=p.dr;p.ang+=p.rot;if(p.y<-30)pts[i]=mkP();ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.ang);ctx.font=p.sz+'px serif';ctx.fillStyle='rgba(0,170,204,'+p.al+')';ctx.textAlign='center';ctx.fillText(p.sym,0,0);ctx.restore();});requestAnimationFrame(anim);}
  window.addEventListener('resize',rsz);init();anim();
+}
+
+const LM_DATA = {
+ HU: {
+  t:'Tudj meg többet', s:'Akíra Piano Academy', cl:'Bezárás', btn:'✦ Tudj meg többet',
+  h1:'Mi ez az oldal?', h2:'Hogyan jött létre?', h3:'Hogyan kezdj hozzá?',
+  h4:'Technikai tudnivalók', h5:'A modulok részletesen',
+  about:'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak készült. Hat interaktív modul segít a zongora különböző területein: zenei hallás fejlesztése, kottaolvasás, akkordok, skálák, ujjtechnika és ritmusérzék. Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel, előrehaladási jelzőkkel és vizuális segítségekkel.',
+  pills:['🎹 Kezdőknek', '🎵 Ingyenes', '🌐 Böngészőben fut', '🎹 MIDI támogatás', '🇭🇺 Magyar nyelvű'],
+  story:'Autodidakta zongoratanuló vagyok — és hamar szembesültem azzal, hogy a megfizethető, igazán használható magyar zongora gyakorlóeszközök száma meglepően kevés. Ami elérhető, az vagy drága, vagy csak YouTube videókból lehet összerakni a tudást. Egy egyszerű kottafelismerő oldallal kezdtem, ami fokozatosan bővült — Claude és Gemini AI asszisztensek segítségével — egészen addig amíg ez a hat modulból álló akadémia lett belőle. Remélem másoknak is segít az otthoni zongoratanulásban.',
+  steps:[
+   {icon:'1️⃣', text:'Válassz egy modult a főoldalon — ha nem tudod melyikkel kezdj, a Hallásfejlesztő vagy a Ritmus modul ideális kiindulópontok.'},
+   {icon:'2️⃣', text:'Csatlakoztasd MIDI billentyűzetedet a modul megnyitása előtt — ha van. Ha nincs, az egérrel is kattinthatsz a virtuális zongorán.'},
+   {icon:'3️⃣', text:'Nyomd meg a ⓘ Info gombot a jobb sarokban — ez részletesen leírja a modul működését és a vezérlőket.'},
+   {icon:'4️⃣', text:'Nyomd meg a ? Súgó gombot, majd kattints bármely gombra vagy elemre — megjelenik annak pontos leírása.'},
+   {icon:'5️⃣', text:'Nyomd meg a START gombot és kezdj el játszani! Az OLED kijelzőn látod a módot, szintet és a statisztikákat.'},
+  ],
+  tech:[
+   {icon:'🎹', text:'MIDI billentyűzet automatikusan felismerhető minden modulban — csatlakoztasd a modul megnyitása előtt.'},
+   {icon:'🔊', text:'Minden modulban találsz egy zongora ikont (🎹) a jobb oldalon — ezzel ki/be kapcsolhatod a beépített hangot. Ha saját szintetizátort vagy DAW-t (pl. Pianoteq, Arturia) használsz, kapcsold ki a belső hangot és a MIDI-n keresztül a saját hangszered szól.'},
+   {icon:'🖥️', text:'Az alkalmazás teljesen a böngészőben fut — nincs szerver, nincs bejelentkezés, nincs adatgyűjtés. Az előrehaladásod és az XP-d a böngésző helyi memóriájában tárolódik.'},
+   {icon:'🌐', text:'Chrome vagy Edge böngésző ajánlott a legjobb MIDI és audio támogatáshoz. Mobilon is működik, de MIDI ott nem elérhető.'},
+  ],
+  mods:[
+   {icon:'👂', diff:'Kezdő', title:'Hallásfejlesztő',
+    desc:'A zenei hallás fejlesztésére szolgáló modul. Egy hangot játszik le a rendszer — a feladatod megtalálni és leütni azt a zongorán. Első ránézésre egyszerűnek tűnik, de komoly koncentrációt igényel, és idővel észre fogod venni hogy egyre gyorsabban ismered fel a hangokat.',
+    details:['A hang automatikusan lejátszódik — ha nem hallottad, kattints a Replay gombra újrajátszáshoz.','A Hints gomb bekapcsolásával megjelenik a hangnév a kottán — hasznos kezdőknek.','A Chromatic opcióval fekete billentyűk (keresztek és bék) is bekerülnek a feladványokba.','A szint növelésével több oktáv kerül be — magasabb és mélyebb hangok is szerepelhetnek.','Session módban 10 hangból áll egy kör, a végén értékelést kapsz.'],
+    diff_color:'#66cc88'},
+   {icon:'🎼', diff:'Haladó', title:'Kottaolvasás',
+    desc:'A lapról olvasás — az egyik legfontosabb zongoristai készség. Hangok jelennek meg a kottán és le kell ütni őket. A modul méri a tempódat (BPM) és számolja a hibákat, így pontosan látod hogyan fejlődsz.',
+    details:['A Hints gomb bekapcsolásával a hangnév megjelenik a kottán a hangjegy mellett.','A Keys gomb bekapcsolásával a célfunkció billentyű kivilágosodik a zongorán.','Diatonikus szinten csak fehér billentyűk szerepelnek — Kromatikus szinten fekete billentyűk is.','Violin (𝄞) és Basszus (𝄢) kulcs külön-külön vagy együtt is bekapcsolható.','Flow módban végtelen a gyakorlás, Session módban egy kör után értékelést kapsz.'],
+    diff_color:'#ffaa44'},
+   {icon:'🎹', diff:'Haladó', title:'Akkordok',
+    desc:'Az akkordok felismerése és lejátszása az egyik alapköve a harmónia megértésének. A modul diatonikus akkordokat, fordításokat és szeptimakkordokat tartalmaz, kvintkor tárcsával a hangnem választáshoz.',
+    details:['A Keys gomb bekapcsolásával az akkord összes hangja kivilágosodik a zongorán.','A Wheel gomb megnyitja a kvintkor tárcsát — kattints bármely hangnemre az azonnali váltáshoz.','Az akkord neve és funkciója (I, IV, V stb.) megjelenik a kottán.','Alapakkordoktól haladunk a fordításokon át a szeptimakkordokig.','Az OLED kijelzőn látható az aktuális hangnem és az akkord típusa.'],
+    diff_color:'#ffaa44'},
+   {icon:'🎵', diff:'Haladó', title:'Skálák',
+    desc:'Mind a 24 dúr és moll skála — a hivatalos klasszikus ujjrenddel. A skálák ismerete elengedhetetlen a technika fejlesztéséhez és a harmónia megértéséhez.',
+    details:['A Hints gomb bekapcsolásával hangnév és ujjszám jelenik meg minden hangnál.','A Keys gomb bekapcsolásával a skála összes hangja kivilágosodik a zongorán.','A Fingers gomb az ujjszámokat jeleníti meg a kottán.','1 vagy 2 oktávos futamok közül lehet választani.','Sprint, Marathon és Training módok — különböző ismétlési stratégiák.','A kvintkor tárcsával bármely hangnem azonnal betölthető.'],
+    diff_color:'#ffaa44'},
+   {icon:'💪', diff:'Mester', title:'Hanon',
+    desc:'A Hanon ujjgyakorlatok a zongorázás klasszikus technikai alapjai. Valós idejű BPM méréssel és stabilitásmérővel — pontosan látod melyik ujj okoz lassulást vagy egyenetlenséget.',
+    details:['A BPM kijelző mutatja az aktuális tempódat — próbálj egyenletes tempót tartani.','A stabilitás sáv jelzi ha az ütések közötti időköz ingadozik.','Különböző ujjgyakorlatok közül választhatsz.','Treble és Basszus kulcs külön-külön bekapcsolható.','Érdemes lassú tempón kezdeni és csak akkor gyorsítani ha teljesen egyenletes a játék.'],
+    diff_color:'#cc88ff'},
+   {icon:'🥁', diff:'Kezdő', title:'Ritmus',
+    desc:'A ritmusérzék fejlesztése a zene egyik alapköve. A kottán megjelenik egy ritmusminta — koppints rá a metronómmal együtt szóközzel, MIDI billentyűzettel vagy a virtuális zongorán kattintva. A zöld sáv mutatja a pontosságodat.',
+    details:['Koppintás: szóköz billentyű, MIDI billentyűzet bármely billentyűje, vagy kattintás a virtuális zongorán.','A metronóm ki/bekapcsolható — először hallgasd meg, majd kapcsold ki és próbáld belső érzékkel.','A Count gomb visszaszámlálást indít a lejátszás előtt — segít ráhangolódni.','A Loop gomb folyamatosan ismétli a mintát.','12 minta, 4 nehézségi szinten — P01-P03 kezdőknek, P10-P12 haladóknak.','A pontossági sáv zöld ha 80% felett vagy, sárga 60-80% között, piros alatt.'],
+    diff_color:'#66cc88'},
+  ]
+ },
+ EN: {
+  t:'Learn More', s:'Akíra Piano Academy', cl:'Close', btn:'✦ Learn More',
+  h1:'What is this?', h2:'How it was made', h3:'Getting started',
+  h4:'Technical notes', h5:'The modules in detail',
+  about:'Akíra Piano Academy is a free, browser-based piano practice app — designed primarily for beginners and self-learners. Six interactive modules cover different areas of piano education: ear training, sight reading, chords, scales, finger technique and rhythm. Each module offers tasks at different difficulty levels with instant feedback, progress indicators and visual aids.',
+  pills:['🎹 For beginners', '🎵 Free', '🌐 Browser-based', '🎹 MIDI support', '🇬🇧 English UI'],
+  story:'I am a self-taught piano student — and I quickly realized that affordable, genuinely useful practice tools are surprisingly rare. What is available is either expensive or requires piecing together knowledge from YouTube videos. I started with a simple note recognition page which gradually grew — with Claude and Gemini AI assistants — into this six-module academy. I hope it helps others learning piano at home.',
+  steps:[
+   {icon:'1️⃣', text:'Choose a module on the main page — if unsure where to start, Ear Training or Rhythm are great entry points.'},
+   {icon:'2️⃣', text:'Connect your MIDI keyboard before opening a module — if you have one. If not, you can click the on-screen piano with your mouse.'},
+   {icon:'3️⃣', text:'Press the ⓘ Info button in the top right — it explains the module in detail including all controls.'},
+   {icon:'4️⃣', text:'Press the ? Help button, then click any button or element — its description will appear in the info bar.'},
+   {icon:'5️⃣', text:'Press START and begin playing! The OLED display shows the current mode, level and statistics.'},
+  ],
+  tech:[
+   {icon:'🎹', text:'MIDI keyboard is automatically detected in every module — connect it before opening the module.'},
+   {icon:'🔊', text:'Every module has a piano icon (🎹) on the right side — use it to toggle the built-in sound on/off. If you use your own synthesizer or DAW (e.g. Pianoteq, Arturia), turn off the internal sound and your instrument will play via MIDI.'},
+   {icon:'🖥️', text:'The app runs entirely in the browser — no server, no login, no data collection. Your progress and XP are stored in your browser\'s local memory.'},
+   {icon:'🌐', text:'Chrome or Edge recommended for best MIDI and audio support. Works on mobile too, but MIDI is not available there.'},
+  ],
+  mods:[
+   {icon:'👂', diff:'Beginner', title:'Ear Training',
+    desc:'A module for developing musical hearing. The system plays a note — your task is to find and play it on the keyboard. It seems simple at first, but requires real concentration, and over time you will notice you recognize notes faster and faster.',
+    details:['The note plays automatically — if you missed it, click the Replay button to hear it again.','Enable Hints to show the note name on the staff — useful for beginners.','Enable Chromatic to include black keys (sharps and flats) in the exercises.','Higher levels add more octaves — both higher and lower notes may appear.','In Session mode, each round consists of 10 notes with a result at the end.'],
+    diff_color:'#66cc88'},
+   {icon:'🎼', diff:'Intermediate', title:'Sight Reading',
+    desc:'Reading at sight is one of the most important pianist skills. Notes appear on the staff and you play them. The module measures your tempo (BPM) and counts mistakes so you can see exactly how you improve.',
+    details:['Enable Hints to show note names next to noteheads on the staff.','Enable Keys to light up the target key on the keyboard.','Diatonic level uses only white keys — Chromatic level adds black keys too.','Treble (𝄞) and Bass (𝄢) clef can be toggled individually or together.','Flow mode runs endlessly, Session mode gives you a result after each round.'],
+    diff_color:'#ffaa44'},
+   {icon:'🎹', diff:'Intermediate', title:'Chords',
+    desc:'Recognizing and playing chords is one of the foundations of understanding harmony. The module covers diatonic chords, inversions and seventh chords, with a Circle of Fifths wheel for key selection.',
+    details:['Enable Keys to light up all chord tones on the keyboard.','The Wheel button opens the Circle of Fifths — click any key to switch instantly.','The chord name and function (I, IV, V etc.) appears on the staff.','Progress from basic chords through inversions to seventh chords.','The OLED display shows the current key and chord type.'],
+    diff_color:'#ffaa44'},
+   {icon:'🎵', diff:'Intermediate', title:'Scales',
+    desc:'All 24 major and minor scales — with official classical fingering. Knowing your scales is essential for technique development and harmonic understanding.',
+    details:['Enable Hints to show note name and finger number at each note.','Enable Keys to light up all scale notes on the keyboard.','Enable Fingers to show fingering numbers on the staff.','Choose between 1 or 2 octave runs.','Sprint, Marathon and Training modes for different practice strategies.','Use the Circle of Fifths wheel to instantly load any key.'],
+    diff_color:'#ffaa44'},
+   {icon:'💪', diff:'Advanced', title:'Hanon',
+    desc:'The Hanon exercises are the classical technical foundation of piano playing. With real-time BPM measurement and stability tracking — see exactly which finger causes slowdowns or unevenness.',
+    details:['The BPM display shows your current tempo — try to keep it steady.','The stability bar shows when the timing between notes fluctuates.','Multiple different finger exercises to choose from.','Treble and Bass clef can be toggled individually.','Start slow and only increase speed when your playing is completely even.'],
+    diff_color:'#cc88ff'},
+   {icon:'🥁', diff:'Beginner', title:'Rhythm',
+    desc:'Rhythm is one of the foundations of music. A rhythmic pattern appears on the staff — tap along with the metronome using spacebar, MIDI keyboard or by clicking the on-screen piano. The green bar shows your accuracy.',
+    details:['Tap using: spacebar, any MIDI keyboard key, or clicking the on-screen piano.','The metronome can be toggled — listen first, then try without it using your inner sense of beat.','Count-in button starts a countdown before playback — helps you lock in the tempo.','Loop button repeats the pattern continuously.','12 patterns across 4 difficulty levels — P01-P03 for beginners, P10-P12 for advanced.','Accuracy bar is green above 80%, yellow between 60-80%, red below.'],
+    diff_color:'#66cc88'},
+  ]
+ }
+};
+
+function buildLmGrid() {
+ const D = LM_DATA[lang];
+ if (!D) return;
+ // Pills
+ const pills = document.getElementById('lm-pills');
+ if (pills) pills.innerHTML = D.pills.map(p=>`<span style="font-size:11px;padding:3px 10px;border-radius:12px;background:rgba(0,170,204,.1);border:1px solid rgba(0,170,204,.25);color:rgba(0,170,204,.9);">${p}</span>`).join('');
+ // Steps
+ const steps = document.getElementById('lm-steps');
+ if (steps) steps.innerHTML = D.steps.map(s=>`<div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.03);border-radius:8px;padding:12px 14px;"><span style="font-size:18px;flex-shrink:0;">${s.icon}</span><span style="font-size:13px;color:rgba(255,255,255,.55);line-height:1.7;">${s.text}</span></div>`).join('');
+ // Tech
+ const tech = document.getElementById('lm-tech');
+ if (tech) tech.innerHTML = D.tech.map(t=>`<div class="lm-tech-row"><span class="lm-tech-icon">${t.icon}</span><span>${t.text}</span></div>`).join('');
+ // Mods
+ const mods = document.getElementById('lm-mods');
+ if (mods) mods.innerHTML = D.mods.map(m=>`
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:18px 20px;">
+   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+    <span style="font-size:24px;">${m.icon}</span>
+    <span style="font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;">${m.title}</span>
+    <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;border:1px solid ${m.diff_color}44;background:${m.diff_color}18;color:${m.diff_color};letter-spacing:1px;">${m.diff}</span>
+   </div>
+   <p style="font-size:13px;color:rgba(255,255,255,.5);line-height:1.75;margin-bottom:12px;">${m.desc}</p>
+   <ul style="padding-left:16px;margin:0;display:flex;flex-direction:column;gap:5px;">
+    ${m.details.map(d=>`<li style="font-size:12px;color:rgba(255,255,255,.38);line-height:1.65;">${d}</li>`).join('')}
+   </ul>
+  </div>`).join('');
+}
+
+
+function toggleLmCard(i) {
+ const d = document.getElementById('lm-detail-'+i);
+ const t = document.getElementById('lm-toggle-'+i);
+ const open = d.style.display === 'none';
+ d.style.display = open ? 'block' : 'none';
+ t.textContent = open ? (lang==='HU'?'▲ Bezár':'▲ Close') : ('▼ '+(lang==='HU'?'Részletek':'Details'));
+}
+
+function buildLearnModal(l) {
+ const isEN = l === 'EN';
+
+ // Gombok szövege
+ const btnLm = document.getElementById('btn-lm');
+ if (btnLm) btnLm.textContent = isEN ? '✦ Learn More' : '✦ Tudj meg többet';
+
+ // Modal fejléc
+ const ids = {
+  'lm-t': isEN ? 'Learn More' : 'Tudj meg többet',
+  'lm-s': 'Akíra Piano Academy',
+  'lm-h1': isEN ? 'What is this?' : 'Mi ez az oldal?',
+  'lm-h2': isEN ? 'How it was made' : 'Hogyan jött létre?',
+  'lm-h3': isEN ? 'How to get started' : 'Hogyan kezdj hozzá?',
+  'lm-h4': isEN ? 'Technical notes' : 'Technikai tudnivalók',
+  'lm-h5': isEN ? 'The modules' : 'A modulok részletesen',
+  'lm-cl': isEN ? 'Close' : 'Bezárás',
+ };
+ Object.entries(ids).forEach(([id, txt]) => {
+  const el = document.getElementById(id); if (el) el.textContent = txt;
+ });
+
+ // Bevezető szöveg
+ const about = document.getElementById('lm-about');
+ if (about) about.textContent = isEN
+  ? 'Akíra Piano Academy is a free, browser-based piano practice application — designed primarily for beginners and self-learners. Six interactive modules cover every essential area of piano education: ear training, sight reading, chords, scales, technique and rhythm. Each module offers tasks at multiple difficulty levels with instant scoring and a visual progress tracker.'
+  : 'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak. Hat interaktív modul fedi le a zongora tanulás legfontosabb területeit: hallásfejlesztés, kottaolvasás, akkordok, skálák, technika és ritmusérzék. Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel és vizuális előrehaladási jelzéssel.';
+
+ // Hogyan jött létre
+ const story = document.getElementById('lm-story');
+ if (story) story.textContent = isEN
+  ? 'I am a self-taught piano learner — and quickly realized that affordable, genuinely useful practice tools are surprisingly rare. I built this application to provide exactly what I was looking for myself. It was created with the help of Claude and Gemini AI assistants.'
+  : 'Autodidakta zongoratanuló vagyok — és hamar szembesültem azzal, hogy a megfizethető, igazán használható gyakorlóeszközök száma meglepően kevés. Ezt az alkalmazást azért hoztam létre, hogy azt nyújtsa amit én is kerestem. Claude és Gemini AI asszisztensek segítségével készült.';
+
+ // Első lépések
+ const steps = document.getElementById('lm-steps');
+ if (steps) {
+  const stepData = isEN ? [
+   {n:'1', t:'Open a module', d:'Click any card on the main page. Start with Ear Training or Rhythm if you are a complete beginner.'},
+   {n:'2', t:'Press Start', d:'The large START button in the center launches the exercise. STOP ends the session and shows your results.'},
+   {n:'3', t:'Use the helpers', d:'Turn on Hints to see note names, Keys to light up the piano, or Fingers for fingering numbers. All optional.'},
+   {n:'4', t:'Read the ? Help', d:'Press the ? button then click any control to see what it does. The ⓘ Info button opens the full module guide.'},
+  ] : [
+   {n:'1', t:'Nyiss meg egy modult', d:'Kattints bármelyik kártyára a főoldalon. Ha teljesen kezdő vagy, kezdd a Hallásfejlesztővel vagy a Ritmussal.'},
+   {n:'2', t:'Nyomd meg a Start gombot', d:'A középső START gomb indítja a feladatot. A STOP befejezi a session-t és megmutatja az eredményeket.'},
+   {n:'3', t:'Használd a segítségeket', d:'Kapcsold be a Hints-et a hangnevekhez, a Keys-t a billentyű kiemeléshez, vagy a Fingers-t az ujjszámokhoz.'},
+   {n:'4', t:'Olvasd el a ? Súgót', d:'Nyomd meg a ? gombot, majd kattints bármely vezérlőre a leírásért. Az ⓘ gomb a modul részletes ismertetőjét nyitja meg.'},
+  ];
+  steps.innerHTML = stepData.map(s => `
+   <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;">
+    <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,170,204,.2);border:1px solid rgba(0,170,204,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--cyan);flex-shrink:0;">${s.n}</div>
+    <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:1px;margin-bottom:3px;">${s.t}</div><div style="font-size:12px;color:rgba(255,255,255,.42);line-height:1.65;">${s.d}</div></div>
+   </div>`).join('');
+ }
+
+ // Technikai tudnivalók
+ const tech = document.getElementById('lm-tech');
+ if (tech) {
+  const techData = isEN ? [
+   {i:'🎹', t:'MIDI keyboard', d:'Connect before opening a module. Automatically detected in Chrome/Edge. Works in all six modules.'},
+   {i:'🔊', t:'Audio engine', d:'Each module has a piano icon button to toggle the internal sound on/off. If you use an external synthesizer or DAW, turn off the internal sound — the module will still track your keystrokes for scoring.'},
+   {i:'❓', t:'Help system', d:'Press the ? button in any module, then click any element to see its description highlighted in the info bar. Press again to exit help mode.'},
+   {i:'ⓘ', t:'Info modal', d:'The ⓘ button opens a detailed guide for each module: how it works, controls explained, learning tips.'},
+   {i:'🌐', t:'No installation needed', d:'Runs entirely in the browser. No account required, no data sent to any server. Works offline after first load. Chrome or Edge recommended for MIDI support.'},
+  ] : [
+   {i:'🎹', t:'MIDI billentyűzet', d:'Csatlakoztasd a modul megnyitása előtt. Chrome/Edge-ben automatikusan felismeri. Mind a hat modulban működik.'},
+   {i:'🔊', t:'Hangmotor', d:'Minden modulban van egy zongora ikon gomb a belső hang ki/bekapcsolásához. Ha külső szintetizátort vagy DAW-t használsz, kapcsold ki a belső hangot — a modul akkor is rögzíti a billentyűleütéseket a pontozáshoz.'},
+   {i:'❓', t:'Súgó rendszer', d:'Nyomd meg a ? gombot bármelyik modulban, majd kattints bármely elemre — a leírása megjelenik az info sávban. Újra megnyomva kilép a súgó módból.'},
+   {i:'ⓘ', t:'Info modal', d:'Az ⓘ gomb részletes ismertetőt nyit meg minden modulhoz: hogyan működik, vezérlők magyarázata, tanulási tippek.'},
+   {i:'🌐', t:'Telepítés nélkül', d:'Teljesen böngészőben fut. Nincs szükség fiókra, semmilyen adat nem kerül szerverre. MIDI támogatáshoz Chrome vagy Edge ajánlott.'},
+  ];
+  tech.innerHTML = techData.map(t => `
+   <div style="display:flex;gap:12px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;margin-bottom:8px;">
+    <span style="font-size:20px;flex-shrink:0;">${t.i}</span>
+    <div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.65);margin-bottom:3px;">${t.t}</div><div style="font-size:12px;color:rgba(255,255,255,.42);line-height:1.65;">${t.d}</div></div>
+   </div>`).join('');
+ }
+
+ // Modulok részletesen
+ const mods = document.getElementById('lm-mods');
+ if (mods) {
+  const modData = isEN ? [
+   {icon:'👂', name:'Ear Training', diff:'Beginner', color:'#66cc88',
+    desc:'A note is played — your task is to find it on the piano keyboard or MIDI keyboard. The system moves to the next note only after a correct hit. Training your ear is one of the most fundamental skills in music.',
+    details:['<b>Top/Bass clef</b>: toggle treble and bass clef notes independently','<b>Chromatic</b>: adds black key notes (sharps/flats) to the pool','<b>Hints</b>: shows the note name on the staff before you play','<b>Timer</b>: set a countdown per note — reach 100% speed to level up automatically','<b>Modes</b>: Session (fixed rounds with results) or Flow (endless)'],
+   },
+   {icon:'🎼', name:'Sight Reading', diff:'Intermediate', color:'#ffaa44',
+    desc:'Notes appear on the grand staff — treble and bass clef. Your task is to identify each note and play it on the keyboard in real time. BPM and mistake counter help you track your reading speed and accuracy.',
+    details:['<b>Top/Bass clef</b>: toggle which clef generates notes','<b>Hints</b>: shows the note name next to the notehead','<b>Keys</b>: lights up the target key on the piano keyboard','<b>Level Diatonic</b>: white keys only — ideal for beginners','<b>Level Rhythmic</b>: notes with rhythm values — you must play in time','<b>Level Chromatic</b>: adds accidentals (sharps and flats)'],
+   },
+   {icon:'🎹', name:'Chords', diff:'Intermediate', color:'#ffaa44',
+    desc:'A chord symbol appears on the OLED display — play all the notes simultaneously on the keyboard. The system checks which notes you play and evaluates the chord. Includes a draggable Circle of Fifths for key navigation.',
+    details:['<b>Keys</b>: highlights all chord tones on the keyboard','<b>Wheel</b>: opens the Circle of Fifths — click any key to navigate','<b>Level Basic</b>: major and minor triads','<b>Level Inversions</b>: first and second inversions','<b>Level Sevenths</b>: dominant, major and minor seventh chords'],
+   },
+   {icon:'🎵', name:'Scales', diff:'Intermediate', color:'#ffaa44',
+    desc:'A scale is shown on the staff — play it from bottom to top and back down. Official fingering is included for both hands. The Circle of Fifths lets you jump directly to any key.',
+    details:['<b>Hints</b>: shows note names on the staff','<b>Keys</b>: LED guide highlights the next key to press','<b>Fingers</b>: displays official fingering numbers (1-5) on the staff','<b>Octaves</b>: switch between 1 and 2 octave range','<b>Modes</b>: Sprint (one pass), Marathon (3x), Training (endless loop)','<b>Wheel</b>: Circle of Fifths for instant key selection'],
+   },
+   {icon:'💪', name:'Hanon', diff:'Advanced', color:'#cc88ff',
+    desc:'Classic Hanon finger exercises rendered on the staff with real-time BPM tracking. A stability bar shows how evenly you play — the system identifies which finger causes timing irregularities.',
+    details:['<b>BPM display</b>: shows your current playing speed in real time','<b>Stability bar</b>: measures timing evenness across all fingers','<b>Finger tracker</b>: highlights the finger that causes the most slowdowns','<b>Multiple exercises</b>: cycle through different Hanon patterns','<b>Modes</b>: Sprint, Marathon, Training'],
+   },
+   {icon:'🥁', name:'Rhythm', diff:'Beginner', color:'#66cc88',
+    desc:'A rhythmic pattern is displayed on the staff. Tap along with the metronome using spacebar, MIDI keyboard, or the virtual piano keys. The green accuracy bar shows how well your taps align with the beat grid.',
+    details:['<b>Metro</b>: toggle the metronome click — beat 1 is accented','<b>Loop</b>: repeat the pattern continuously','<b>Count</b>: 4-beat count-in before the pattern starts','<b>12 patterns</b> across 4 difficulty levels (P01–P12)','<b>Accuracy bar</b>: real-time timing precision indicator','<b>Tempo</b>: adjustable from 40–200 BPM'],
+   },
+  ] : [
+   {icon:'👂', name:'Hallásfejlesztő', diff:'Kezdő', color:'#66cc88',
+    desc:'Egy hangot lejátszik a program — a feladatod megtalálni a zongora billentyűzetén vagy MIDI billentyűzeteden. A rendszer csak helyes leütés után lép a következő hangra. A zenei hallás fejlesztése az egyik legalapvetőbb zenei készség.',
+    details:['<b>Violin/Basszus kulcs</b>: kapcsold be/ki a violinkulcsos és basszuskulcsos hangokat','<b>Kromatikus</b>: fekete billentyűk (kereszt/bé hangok) hozzáadása a feladványokhoz','<b>Hints</b>: mutatja a hang nevét a kottán mielőtt játszol','<b>Timer</b>: időkorlát hangnként — 100%-os sebességnél automatikusan gyorsít','<b>Módok</b>: Session (kötött kör eredménnyel) vagy Flow (végtelen)'],
+   },
+   {icon:'🎼', name:'Kottaolvasás', diff:'Haladó', color:'#ffaa44',
+    desc:'Hangok jelennek meg a nagykottán — violin és basszus kulcson. A feladatod azonosítani és valós időben lejátszani minden hangot a billentyűzeten. BPM mérő és hibaszámláló segít nyomon követni az olvasási sebességet és pontosságot.',
+    details:['<b>Violin/Basszus kulcs</b>: válaszd ki melyik kulcsból generáljon hangokat','<b>Hints</b>: hangnév megjelenítése a kottafejen','<b>Keys</b>: kiemeli a célbillentyűt a zongorán','<b>Diatonikus szint</b>: csak fehér billentyűk — kezdőknek ideális','<b>Ritmusos szint</b>: ritmusértékes hangjegyek — időre kell játszani','<b>Kromatikus szint</b>: előjegyzéseket (kereszt, bé) is tartalmaz'],
+   },
+   {icon:'🎹', name:'Akkordok', diff:'Haladó', color:'#ffaa44',
+    desc:'Egy akkord neve megjelenik az OLED kijelzőn — játszd le az összes hangját egyszerre a billentyűzeten. A rendszer ellenőrzi melyik hangokat nyomtad le és értékeli az akkordot. Tartalmaz egy mozgatható kvintkor tárcsát is a hangnemek közötti navigációhoz.',
+    details:['<b>Keys</b>: kiemeli az akkord összes hangját a billentyűzeten','<b>Wheel</b>: megnyitja a kvintkor tárcsát — kattints bármely szektorra a navigációhoz','<b>Alap szint</b>: dúr és moll hármashangzatok','<b>Fordítások szint</b>: első és második fordítás','<b>Szeptimek szint</b>: domináns, dúr és moll szeptimakkordok'],
+   },
+   {icon:'🎵', name:'Skálák', diff:'Haladó', color:'#ffaa44',
+    desc:'Egy skála jelenik meg a kottán — játszd le alulról felfelé és visszafelé. Hivatalos ujjrend is megjelenik mindkét kézhez. A kvintkor tárcsa segítségével bármely hangnembe ugorhatsz.',
+    details:['<b>Hints</b>: hangneveket mutat a kottán','<b>Keys</b>: LED vezérlés — kiemeli a következő lenyomandó billentyűt','<b>Fingers</b>: hivatalos ujjszámokat (1-5) jelenít meg a kottán','<b>Oktávok</b>: váltás 1 és 2 oktáv között','<b>Módok</b>: Sprint (egy menet), Marathon (3x), Training (végtelen loop)','<b>Wheel</b>: kvintkor tárcsa az azonnali hangnem váltáshoz'],
+   },
+   {icon:'💪', name:'Hanon', diff:'Mester', color:'#cc88ff',
+    desc:'Klasszikus Hanon ujjgyakorlatok kottán ábrázolva valós idejű BPM méréssel. A stabilitási sáv megmutatja mennyire egyenletesen játszol — a rendszer azonosítja melyik ujj okozza az időzítési egyenetlenségeket.',
+    details:['<b>BPM kijelző</b>: valós idejű tempómérés','<b>Stabilitás sáv</b>: az összes ujj egyenletességét méri','<b>Ujj tracker</b>: megmutatja melyik ujj okozza a legtöbb lassulást','<b>Több gyakorlat</b>: különböző Hanon minták között váltasz','<b>Módok</b>: Sprint, Marathon, Training'],
+   },
+   {icon:'🥁', name:'Ritmus', diff:'Kezdő', color:'#66cc88',
+    desc:'Egy ritmikus minta jelenik meg a kottán. Koppints a metronómmal együtt szóközzel, MIDI billentyűzettel vagy a virtuális zongora billentyűivel. A zöld pontossági sáv megmutatja mennyire pontosan ütsz az ütemrácshoz.',
+    details:['<b>Metro</b>: metronóm be/ki — az 1. ütem hangsúlyos','<b>Loop</b>: folyamatos ismétlés','<b>Count</b>: 4 ütem visszaszámlálás indítás előtt','<b>12 minta</b> 4 nehézségi szinten (P01–P12)','<b>Pontossági sáv</b>: valós idejű időzítési visszajelzés','<b>Tempo</b>: 40–200 BPM között állítható'],
+   },
+  ];
+
+  mods.innerHTML = modData.map(m => `
+   <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;">
+    <div style="padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:14px;">
+     <span style="font-size:26px;">${m.icon}</span>
+     <div>
+      <div style="display:flex;align-items:center;gap:8px;">
+       <span style="font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;">${m.name}</span>
+       <span style="font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:3px;color:${m.color};background:${m.color}18;border:1px solid ${m.color}44;">${m.diff}</span>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.65;margin-top:4px;">${m.desc}</div>
+     </div>
+    </div>
+    <div style="padding:14px 20px;">
+     <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;">
+      ${m.details.map(d=>`<li style="font-size:12px;color:rgba(255,255,255,.42);line-height:1.6;">${d}</li>`).join('')}
+     </ul>
+    </div>
+   </div>`).join('');
+ }
 }
 window.onload=()=>{
   emailjs.init('Blr6S_QwbDA8wJfd3');
