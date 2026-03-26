@@ -200,18 +200,14 @@
                     </div>
                     <!-- KÖZÉP -->
                     <div class="center-console">
-                        <div style="display:flex; align-items:center; gap:32px;">
-                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE">
-                                <span id="startLabel" class="active">START</span>
-                                <div class="split-div"></div>
-                                <span id="stopLabel">STOP</span>
-                            </div>
+                        <div style="display:flex; align-items:center; gap:16px;">
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleEtude(1)">▲</button>
-                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
+
                                 </div>
                                 <div class="oled-wrapper">
                                     <div class="oled-screen">
@@ -229,20 +225,17 @@
                                             <div class="oled-header">Etude</div>
                                             <div class="oled-main" id="lcdEtudeText">No. 1</div>
                                         </div>
-                                        <div class="oled-divider"></div>
-                                        <div id="oledDemo" class="oled-section" onclick="if(!helpActive) playEtudeDemo()" data-help="DEMO: CLICK TO HEAR THE ETUDE — KEYS LIGHT UP IN SYNC">
-                                            <div class="oled-header">Demo</div>
-                                            <div class="oled-main" id="lcdDemoText">▶ PLAY</div>
-                                        </div>
+
                                     </div>
                                 </div>
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleEtude(-1)">▼</button>
-                                    <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
+
                                 </div>
                             </div>
+                            <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playEtudeDemo()" data-help="DEMO: CLICK TO HEAR THE ETUDE — KEYS LIGHT UP IN SYNC" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
                     <!-- JOBB -->
@@ -357,7 +350,7 @@
         const helpMap = {
             'btnHome':'HOME: RETURN TO MAIN MODULE MENU',
             'btnClef':T.hClef, 'btnHints':T.hHints, 'btnStart':T.hStart,
-            'oledModule':T.hModule, 'oledMode':T.hMode, 'oledEtude':T.hEtude, 'oledDemo':'DEMO: CLICK TO HEAR THE ETUDE — KEYS LIGHT UP IN SYNC',
+            'oledModule':T.hModule, 'oledMode':T.hMode, 'oledEtude':T.hEtude, 'btnDemo':T.hDemo,
         };
         Object.entries(helpMap).forEach(([id,txt])=>{ const el=document.getElementById(id); if(el) el.dataset.help=txt; });
         if (helpActive) setInfoBar(T.helpMode, null);
@@ -382,8 +375,11 @@
     }
 
     function updateStartStop(running) {
-        document.getElementById('startLabel').classList.toggle('active', !running);
-        document.getElementById('stopLabel').classList.toggle('active', running);
+        const btn = document.getElementById('btnStart');
+        if (btn) {
+            btn.textContent = running ? 'STOP' : 'START';
+            btn.style.color = '';
+        }
     }
 
     // ── AUDIO ──
@@ -610,7 +606,7 @@
         const e = etudeList[currentEtudeIdx];
         document.getElementById('lcdEtudeText').innerText = e.name;
         const isHU = currentLang === 'HU';
-        document.getElementById('lcdDemoText').innerText = '▶ PLAY';
+
         if (!isRunning) setInfoBar((isHU ? e.infoHU : e.infoEN), null);
     }
 
