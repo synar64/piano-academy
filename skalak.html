@@ -138,11 +138,12 @@
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
         .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
-        .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255, 255, 255, 0.15); box-shadow: inset 0 -10px 15px rgba(255, 255, 255, 0.3); z-index: 40; }
+        .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
 
         /* LED POZÍCIÓ: Még 10 pixellel feljebb (-22px) */
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
 .key-glow.scale-hint .key-led { opacity: 1; }
+        .key-glow.demo-flash .key-led { opacity: 1; background: rgba(179,230,255,0.95) !important; box-shadow: 0 0 12px rgba(179,230,255,0.8) !important; }
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
@@ -504,6 +505,9 @@
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
         // OLED modul név
         document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][3];
+        // Skálanév frissítése az aktuális nyelvnek megfelelően
+        const curVal = document.getElementById('scaleSelectValue').value;
+        document.getElementById('lcdScaleText').innerText = getScaleName(curVal);
         // Info sáv
         if(helpActive) setInfoBar(T.helpMode, null);
         else if(!isRunning) setInfoBar(T.ready, null);
@@ -626,11 +630,33 @@
         }
     };
 
-    const scaleOrder = Object.keys(scaleDefs).map(k => ({ v: k, n: k.replace('_', ' ') }));
+    const SCALE_NAMES = {
+        EN: {
+            'C_DUR':'C MAJOR','DB_DUR':'Db MAJOR','D_DUR':'D MAJOR','EB_DUR':'Eb MAJOR',
+            'E_DUR':'E MAJOR','F_DUR':'F MAJOR','FS_DUR':'F# MAJOR','G_DUR':'G MAJOR',
+            'AB_DUR':'Ab MAJOR','A_DUR':'A MAJOR','B_FLAT_DUR':'Bb MAJOR','H_DUR':'B MAJOR',
+            'C_MOLL':'C MINOR','CS_MOLL':'C# MINOR','D_MOLL':'D MINOR','EB_MOLL':'Eb MINOR',
+            'E_MOLL':'E MINOR','F_MOLL':'F MINOR','FS_MOLL':'F# MINOR','G_MOLL':'G MINOR',
+            'GS_MOLL':'G# MINOR','A_MOLL':'A MINOR','B_FLAT_MOLL':'Bb MINOR','H_MOLL':'B MINOR'
+        },
+        HU: {
+            'C_DUR':'C-dúr','DB_DUR':'Desz-dúr','D_DUR':'D-dúr','EB_DUR':'Esz-dúr',
+            'E_DUR':'E-dúr','F_DUR':'F-dúr','FS_DUR':'Fisz-dúr','G_DUR':'G-dúr',
+            'AB_DUR':'Asz-dúr','A_DUR':'A-dúr','B_FLAT_DUR':'B-dúr','H_DUR':'H-dúr',
+            'C_MOLL':'C-moll','CS_MOLL':'Cisz-moll','D_MOLL':'D-moll','EB_MOLL':'Esz-moll',
+            'E_MOLL':'E-moll','F_MOLL':'F-moll','FS_MOLL':'Fisz-moll','G_MOLL':'G-moll',
+            'GS_MOLL':'Gisz-moll','A_MOLL':'A-moll','B_FLAT_MOLL':'B-moll','H_MOLL':'H-moll'
+        }
+    };
+    const scaleOrder = Object.keys(scaleDefs).map(k => ({ v: k, n: SCALE_NAMES['EN'][k] || k }));
+
+    function getScaleName(val) {
+        return SCALE_NAMES[currentLang][val] || SCALE_NAMES['EN'][val] || val;
+    }
     let currentScaleIdx = 0;
 
-    function cycleScale(dir) { if (helpActive) return; currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length; let s = scaleOrder[currentScaleIdx]; document.getElementById('lcdScaleText').innerText = s.n; document.getElementById('scaleSelectValue').value = s.v; if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
-    function selectPatch(val, name) { currentScaleIdx = scaleOrder.findIndex(s => s.v === val); document.getElementById('lcdScaleText').innerText = name; document.getElementById('scaleSelectValue').value = val; closePatchBrowser(); if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
+    function cycleScale(dir) { if (helpActive) return; currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length; let s = scaleOrder[currentScaleIdx]; document.getElementById('lcdScaleText').innerText = getScaleName(s.v); document.getElementById('scaleSelectValue').value = s.v; if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
+    function selectPatch(val, name) { currentScaleIdx = scaleOrder.findIndex(s => s.v === val); document.getElementById('lcdScaleText').innerText = getScaleName(val); document.getElementById('scaleSelectValue').value = val; closePatchBrowser(); if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
     
     function toggleVst() { 
         if (helpActive) return; 
@@ -679,30 +705,65 @@
         const R = RHYTHMS[currentRhythmIdx];
         const baseDur = 0.28;
         let time = audioCtx.currentTime + 0.15;
-        // Az aktuális skála hangjait vesszük
         const scaleObj = generateScaleNotes(document.getElementById('scaleSelectValue').value);
-        const midiNotes = scaleObj.rh.slice(0, 8).map(n => n.midi);
-        // Fel + le: 8 hang fel, majd visszafelé
-        const fullDemo = [...midiNotes, ...midiNotes.slice(0, 7).reverse()];
-        fullDemo.forEach((midi, i) => {
-            const ratio = R.ratios[i % R.ratios.length];
+
+        // Hangok összeállítása kulcs állás szerint
+        function buildNotes(noteArr) {
+            let asc = [...noteArr];
+            if (selectedOctaves === 2) {
+                const oct2 = noteArr.slice(0, 7).map(m => m + 12);
+                asc = [...noteArr, ...oct2, noteArr[7] + 12];
+            }
+            return [...asc, ...asc.slice(0, -1).reverse()];
+        }
+
+        const rhNotes = activeRH ? buildNotes(scaleObj.rh.slice(0, 8).map(n => n.midi)) : [];
+        const lhNotes = activeLH ? buildNotes(scaleObj.lh.slice(0, 8).map(n => n.midi)) : [];
+
+        // Ha mindkettő aktív: RH és LH egyszerre szól (párhuzamosan)
+        // Ha csak egyik: csak azt játssza
+        const maxLen = Math.max(rhNotes.length, lhNotes.length);
+
+        document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('demo-flash'));
+
+        for (let i = 0; i < maxLen; i++) {
+            const R2 = RHYTHMS[currentRhythmIdx];
+            const ratio = R2.ratios[i % R2.ratios.length];
             const dur = baseDur * ratio;
-            const src = audioCtx.createBufferSource();
-            let closest = 36, minDiff = 999;
-            for (let b in sampleBuffers) { let diff = Math.abs(midi-b); if(diff<minDiff){minDiff=diff;closest=b;} }
-            if (!sampleBuffers[closest]) { time += dur; return; }
-            src.buffer = sampleBuffers[closest];
-            src.playbackRate.value = Math.pow(2, (midi-closest)/12);
-            const g = audioCtx.createGain();
-            g.gain.setValueAtTime(0.6, time);
-            g.gain.exponentialRampToValueAtTime(0.001, time + dur * 2.5);
-            src.connect(g).connect(audioCtx.destination);
-            src.start(time); src.stop(time + dur * 2.8);
+            const notesToPlay = [];
+            if (activeRH && rhNotes[i]) notesToPlay.push(rhNotes[i]);
+            if (activeLH && lhNotes[i]) notesToPlay.push(lhNotes[i]);
+
+            notesToPlay.forEach(midi => {
+                const src = audioCtx.createBufferSource();
+                let closest = 36, minDiff = 999;
+                for (let b in sampleBuffers) { let diff = Math.abs(midi-b); if(diff<minDiff){minDiff=diff;closest=b;} }
+                if (!sampleBuffers[closest]) return;
+                src.buffer = sampleBuffers[closest];
+                src.playbackRate.value = Math.pow(2, (midi-closest)/12);
+                const g = audioCtx.createGain();
+                g.gain.setValueAtTime(0.6, time);
+                g.gain.exponentialRampToValueAtTime(0.001, time + dur * 2.5);
+                src.connect(g).connect(audioCtx.destination);
+                src.start(time); src.stop(time + dur * 2.8);
+
+                // LED villanás
+                const delayMs = (time - audioCtx.currentTime) * 1000;
+                const flashDur = Math.min(dur * 0.85 * 1000, 400);
+                setTimeout(() => {
+                    const key = document.getElementById(`k-${midi}`);
+                    if (key) {
+                        key.classList.add('demo-flash');
+                        setTimeout(() => key.classList.remove('demo-flash'), flashDur);
+                    }
+                }, delayMs);
+            });
+
             time += dur;
-        });
+        }
+
         const isHU = currentLang === 'HU';
-        const R2 = RHYTHMS[currentRhythmIdx];
-        setInfoBar((isHU ? '▶ MINTA: ' : '▶ DEMO: ') + (isHU ? R2.descHU : R2.desc).toUpperCase(), null);
+        setInfoBar((isHU ? '▶ MINTA: ' : '▶ DEMO: ') + (isHU ? R.descHU : R.desc).toUpperCase(), null);
     }
     let rhHit = false, lhHit = false, seqBlocks = [];
     let lastHitTime = 0, hitIntervals = [];
@@ -927,30 +988,39 @@
 
     const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
 
-    function drawRhythmNote(ctx, x, y, color, noteIdx) {
+    function drawRhythmNote(ctx, x, y, color, noteIdx, midLineY) {
         const R = RHYTHMS[currentRhythmIdx];
         const ratio = R.ratios[noteIdx % R.ratios.length];
         ctx.fillStyle = color;
         ctx.strokeStyle = color;
         ctx.lineWidth = 2.5;
+        // Szárirány: ha a hang a középső vonal felett → szár lefelé, alatta → szár felfelé
+        const stemUp = !midLineY || y >= midLineY;
+        const sx = stemUp ? x + 11 : x - 11;
+        const sy = stemUp ? y - 50 : y + 50;
+
         if (ratio === 1) {
             // Nyolcad: tömör fej + szár + zászló
             ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(x+11, y-50); ctx.bezierCurveTo(x+30, y-40, x+30, y-25, x+11, y-30); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
+            if (stemUp) {
+                ctx.beginPath(); ctx.moveTo(sx, sy); ctx.bezierCurveTo(sx+19, sy+10, sx+19, sy+25, sx, sy+20); ctx.stroke();
+            } else {
+                ctx.beginPath(); ctx.moveTo(sx, sy); ctx.bezierCurveTo(sx+19, sy-10, sx+19, sy-25, sx, sy-20); ctx.stroke();
+            }
         } else if (ratio === 2) {
             // Negyed: tömör fej + szár
             ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
         } else if (ratio === 3) {
-            // Pontozott negyed: tömör fej + szár + pont
+            // Pontozott negyed
             ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x+20, y-4, 4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x + 20, y - 4, 4, 0, Math.PI*2); ctx.fill();
         } else {
             // Fél: üres fej + szár
             ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
         }
     }
 
@@ -990,7 +1060,7 @@
                     if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
                     else if (n.s === '♯') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-28, y+12); }
                 }
-                drawRhythmNote(ctx, x, y, color, i);
+                drawRhythmNote(ctx, x, y, color, i, 142);
                 
                 if (showNames || showFinger) { 
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = "white";
@@ -1014,7 +1084,7 @@
                     if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
                     else if (n.s === '♯') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-28, y+12); }
                 }
-                drawRhythmNote(ctx, x, y, color, i);
+                drawRhythmNote(ctx, x, y, color, i, 363);
                 
                 if (showNames || showFinger) { 
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = "white";
@@ -1140,7 +1210,17 @@
             const k = document.createElement('div'); const isW = whites.includes(m%12);
             k.id = `k-${m}`; k.className = `key-glow ${isW?'white-glow':'black-glow'}`;
             if(isW) { k.style.left = (wIdx * 1.92307) + "%"; k.style.width = "1.92307%"; k.style.height="100%"; wIdx++; }
-            else { k.style.left = ((wIdx * 1.92307) - 0.6) + "%"; k.style.width = "1.2%"; k.style.height="65%"; k.style.zIndex="200"; }
+            else {
+                // C#=1, D#=3, F#=6, G#=8, A#=10
+                // 1px ≈ 0.041% (2450px canvas)
+                const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
+                const noteInOctave = m % 12;
+                const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
+                k.style.left = ((wIdx * 1.92307) + offset) + "%";
+                k.style.width = "1.241%";
+                k.style.height = "65%";
+                k.style.zIndex = "200";
+            }
             const led = document.createElement('div'); led.className = 'key-led'; k.appendChild(led);
             k.onmousedown = async (e) => { 
                 e.preventDefault(); 
