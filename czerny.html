@@ -120,7 +120,7 @@
     <div id="patchBrowserModal" class="modal-overlay">
         <div class="modal-content patch-browser-content">
             <h2 class="modal-title" id="txt-browserTitle">Czerny Op. 599 — Etude Browser</h2>
-            <div style="text-align:left; margin-bottom:10px; color:var(--text-dim); font-size:11px; font-weight:bold; letter-spacing:1px;" id="txt-browserSub">THE PRACTICAL PIANIST — EXERCISES 1–3</div>
+            <div style="text-align:left; margin-bottom:10px; color:var(--text-dim); font-size:11px; font-weight:bold; letter-spacing:1px;" id="txt-browserSub">THE PRACTICAL PIANIST — EXERCISES 1–4, 7</div>
             <div class="patch-grid-czerny">
                 <button class="patch-btn" onclick="selectPatch(1, 'No. 1')">
                     No. 1<span style="font-size:10px; display:block; color:#777; margin-top:4px;">RH melody<br>LH whole note</span>
@@ -130,6 +130,12 @@
                 </button>
                 <button class="patch-btn" onclick="selectPatch(3, 'No. 3')">
                     No. 3<span style="font-size:10px; display:block; color:#777; margin-top:4px;">RH 8ths<br>LH quarters</span>
+                </button>
+                <button class="patch-btn" onclick="selectPatch(4, 'No. 4')">
+                    No. 4<span style="font-size:10px; display:block; color:#777; margin-top:4px;">Scale runs<br>finger cross</span>
+                </button>
+                <button class="patch-btn" onclick="selectPatch(7, 'No. 7')">
+                    No. 7<span style="font-size:10px; display:block; color:#777; margin-top:4px;">Hand<br>alternation</span>
                 </button>
             </div>
             <button class="modal-btn" onclick="closePatchBrowser()" id="txt-cancel">Cancel</button>
@@ -148,6 +154,8 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 1</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">RH plays quarter notes (C–D–E–F–G–F–E–D), LH holds a whole note C. Trains right hand independence.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 2</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Both hands play quarter notes in parallel motion up and down. Trains hand coordination.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 3</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">RH plays eighth notes while LH plays quarter notes. The hardest coordination challenge of the three.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 4</span><span style="font-size:14px;color:#999;font-family:'Inter';">Full C major scale in both hands with thumb crossing. Key skill for smooth scale playing.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 7</span><span style="font-size:14px;color:#999;font-family:'Inter';">Hands alternate on every note. Trains evenness and independence of touch.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Hints cycles through: 1× note names → 2× + fingering → 3× + keyboard LED guide → 4× all off.</span></div>
             </div>
             <div style="margin-bottom:22px;">
@@ -584,6 +592,20 @@
             tipEN: 'The hardest etude: RH plays twice as fast as LH. Practice hands separately first until each feels natural.',
             tipHU: 'A legnehezebb etűd: JK kétszer olyan gyors mint BK. Először külön tanuld meg mindkét kezet.'
         },
+        {
+            val: 4, name: 'No. 4',
+            infoEN: 'SCALE RUNS / FINGER CROSSING',
+            infoHU: 'SKÁLAFUTAM / UJJÁTTEVÉS',
+            tipEN: 'This etude introduces thumb crossing — the key to smooth scale playing. Keep the wrist relaxed as the thumb passes under.',
+            tipHU: 'Ez az etűd bevezeti az ujjáttevést — a sima skálajáték kulcsát. Tartsd lazán a csuklót miközben a hüvelyk átmegy.'
+        },
+        {
+            val: 7, name: 'No. 7',
+            infoEN: 'HAND ALTERNATION',
+            infoHU: 'KÉZVÁLTÁS',
+            tipEN: 'Hands take turns — listen for an even sound between them. Both hands should have the same touch and volume.',
+            tipHU: 'A két kéz felváltva játszik — figyelj az egyenletes hangzásra. Mindkét kéznek azonos érintéssel és hangerővel kell szólnia.'
+        },
     ];
     let currentEtudeIdx = 0;
 
@@ -622,7 +644,7 @@
     let demoActiveIdx = -1; // aktuálisan kiemelkedő hangjegy indexe demo közben
 
     function _playEtudeDemo() {
-        const builders = [buildEtude1, buildEtude2, buildEtude3];
+        const builders = [buildEtude1, buildEtude2, buildEtude3, buildEtude4, buildEtude7];
         const demoSeq = builders[currentEtudeIdx]();
         const baseDur = currentEtudeIdx === 2 ? 0.18 : 0.28;
         let time = audioCtx.currentTime + 0.15;
@@ -764,8 +786,45 @@
         return seq;
     }
 
+    function buildEtude4() {
+        // No. 4: C-dúr skálafutam ujjáttevéssel, mindkét kéz
+        const seq = [];
+        const rhPattern = [28,29,30,31,32,33,34,35, 34,33,32,31,30,29,28,28];
+        const lhPattern = [21,22,23,24,25,26,27,28, 27,26,25,24,23,22,21,21];
+        const f_rh = [1,2,3,1,2,3,4,5, 4,3,2,1,3,2,1,1];
+        const f_lh = [5,4,3,2,1,3,2,1, 2,3,1,2,3,4,5,5];
+        rhPattern.forEach((stepRH, i) => {
+            seq.push({
+                n: stepToName(stepRH), s: '',
+                m_rh: stepToMidi(stepRH), step_rh: stepRH,
+                m_lh: stepToMidi(lhPattern[i]), step_lh: lhPattern[i],
+                f_rh: f_rh[i] || 1, f_lh: f_lh[i] || 5,
+                lh_hold: false
+            });
+        });
+        return seq;
+    }
+    function buildEtude7() {
+        // No. 7: Kézváltás — RH és LH felváltva, C-pozícióban
+        const seq = [];
+        const fullPattern = [28,29,30,31,32,31,30,29, 28,29,30,31,32,31,30,28];
+        const f_pattern   = [1,2,3,4,5,4,3,2, 1,2,3,4,5,4,3,1];
+        fullPattern.forEach((stepRH, i) => {
+            const isRHTurn = (i % 2 === 0);
+            const stepLH = stepRH - 7; // 1 oktávval lejjebb
+            seq.push({
+                n: stepToName(stepRH), s: '',
+                m_rh: stepToMidi(stepRH), step_rh: stepRH,
+                m_lh: stepToMidi(stepLH), step_lh: stepLH,
+                f_rh: f_pattern[i] || 1, f_lh: f_pattern[i] || 1,
+                lh_hold: isRHTurn,
+                rh_rest: !isRHTurn
+            });
+        });
+        return seq;
+    }
     function buildSequence() {
-        const builders = [buildEtude1, buildEtude2, buildEtude3];
+        const builders = [buildEtude1, buildEtude2, buildEtude3, buildEtude4, buildEtude7];
         const rawSeq = builders[currentEtudeIdx]();
         flatSeq = [];
         const loops = MODES[currentModeIdx] === 'SPRINT' ? 1 : MODES[currentModeIdx] === 'MARATHON' ? 3 : 100;
