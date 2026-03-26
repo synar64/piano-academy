@@ -120,7 +120,7 @@
     <div id="patchBrowserModal" class="modal-overlay">
         <div class="modal-content patch-browser-content">
             <h2 class="modal-title" id="txt-browserTitle">Czerny Op. 599 — Etude Browser</h2>
-            <div style="text-align:left; margin-bottom:10px; color:var(--text-dim); font-size:11px; font-weight:bold; letter-spacing:1px;" id="txt-browserSub">THE PRACTICAL PIANIST — EXERCISES 1–4, 7</div>
+            <div style="text-align:left; margin-bottom:10px; color:var(--text-dim); font-size:11px; font-weight:bold; letter-spacing:1px;" id="txt-browserSub">THE PRACTICAL PIANIST — EXERCISES 1–8, 24, 33</div>
             <div class="patch-grid-czerny">
                 <button class="patch-btn" onclick="selectPatch(1, 'No. 1')">
                     No. 1<span style="font-size:10px; display:block; color:#777; margin-top:4px;">RH melody<br>LH whole note</span>
@@ -136,6 +136,21 @@
                 </button>
                 <button class="patch-btn" onclick="selectPatch(7, 'No. 7')">
                     No. 7<span style="font-size:10px; display:block; color:#777; margin-top:4px;">Hand<br>alternation</span>
+                </button>
+                <button class="patch-btn" onclick="selectPatch(5, 'No. 5')">
+                    No. 5<span style="font-size:10px; display:block; color:#777; margin-top:4px;">RH staccato<br>articulation</span>
+                </button>
+                <button class="patch-btn" onclick="selectPatch(6, 'No. 6')">
+                    No. 6<span style="font-size:10px; display:block; color:#777; margin-top:4px;">LH melody<br>RH accomp.</span>
+                </button>
+                <button class="patch-btn" onclick="selectPatch(8, 'No. 8')">
+                    No. 8<span style="font-size:10px; display:block; color:#777; margin-top:4px;">Legato<br>phrasing</span>
+                </button>
+                <button class="patch-btn" onclick="selectPatch(24, 'No. 24')">
+                    No. 24<span style="font-size:10px; display:block; color:#777; margin-top:4px;">Alberti<br>bass</span>
+                </button>
+                <button class="patch-btn" onclick="selectPatch(33, 'No. 33')">
+                    No. 33<span style="font-size:10px; display:block; color:#777; margin-top:4px;">Position<br>shift</span>
                 </button>
             </div>
             <button class="modal-btn" onclick="closePatchBrowser()" id="txt-cancel">Cancel</button>
@@ -154,8 +169,13 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 1</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">RH plays quarter notes (C–D–E–F–G–F–E–D), LH holds a whole note C. Trains right hand independence.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 2</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Both hands play quarter notes in parallel motion up and down. Trains hand coordination.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 3</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">RH plays eighth notes while LH plays quarter notes. The hardest coordination challenge of the three.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 4</span><span style="font-size:14px;color:#999;font-family:'Inter';">Full C major scale in both hands with thumb crossing. Key skill for smooth scale playing.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 7</span><span style="font-size:14px;color:#999;font-family:'Inter';">Hands alternate on every note. Trains evenness and independence of touch.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 4</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Full C major scale in both hands with thumb crossing. Key skill for smooth scale playing.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 7</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Hands alternate on every note. Trains evenness and independence of touch.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 5</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl7">RH staccato in C position, LH holds whole note. Trains short articulation and quick finger release.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 6</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl8">LH carries the melody, RH holds a sustained note. Trains left hand independence and tone projection.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 8</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl9">Both hands in parallel legato motion. Trains smooth connection between notes and singing tone.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 24</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl10">LH plays Alberti bass pattern (low–high–mid–high), RH carries the melody. Essential accompaniment technique.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">No. 33</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl11">First position shift — from C position to G position mid-exercise. Trains smooth hand movement and security.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Hints cycles through: 1× note names → 2× + fingering → 3× + keyboard LED guide → 4× all off.</span></div>
             </div>
             <div style="margin-bottom:22px;">
@@ -295,14 +315,14 @@
             playing: 'PLAYING',
             infoTitle: 'Czerny Op. 599 — Module Guide',
             howTitle: 'How It Works',
-            howBody: 'Three etudes from Czerny\'s Op. 599. All exercises stay in C position (C–D–E–F–G) — no position shifts needed. Each etude trains a different coordination skill between the hands. Play each note as it lights up on the staff.',
+            howBody: 'Ten etudes from Czerny\'s Op. 599. Most exercises stay in C position — No. 33 introduces the first position shift. Each etude trains a different technique: articulation, coordination, legato, Alberti bass and more. Play each note as it lights up on the staff.',
             ctrlTitle: 'Etudes',
             ctrl1: 'RH plays quarter notes (C–D–E–F–G–F–E–D), LH holds a whole note C. Trains right hand independence.',
             ctrl2: 'Both hands play quarter notes in parallel motion up and down. Trains hand coordination.',
             ctrl3: 'RH plays eighth notes while LH plays quarter notes. The hardest coordination challenge of the three.',
             ctrl4: 'Hints cycles through: 1× note names above noteheads → 2× + fingering numbers → 3× + keyboard LED guide → 4× all off.',
             tipTitle: 'Learning Tip',
-            tipBody: 'Start with No. 1 to get comfortable with the C position. Then move to No. 2 for both hands together. Only attempt No. 3 once No. 2 feels natural — the rhythm difference between hands is tricky at first.',
+            tipBody: 'Work through the etudes in order — each one builds on the previous. Start slow and only increase speed when it feels completely natural. Use the Hints button to see note names and fingering.',
             gotIt: 'Got It',
             hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
             hMode:'MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',
@@ -311,6 +331,13 @@
             hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
             hHints:'HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEYS LED | 4× OFF',
             hStart:'START/STOP: BEGIN OR END THE EXERCISE',
+            ctrl5: 'Full C major scale in both hands — introduces thumb crossing. Keep the wrist relaxed as the thumb passes under.',
+            ctrl6: 'Hands alternate on every note — the same melody, one octave apart. Trains evenness and independence of touch.',
+            ctrl7: 'RH staccato in C position, LH holds whole note. Trains short articulation and quick finger release.',
+            ctrl8: 'LH carries the melody, RH holds a sustained note. Trains left hand independence and tone projection.',
+            ctrl9: 'Both hands in parallel legato motion. Trains smooth connection between notes and singing tone.',
+            ctrl10: 'LH plays Alberti bass pattern (low–high–mid–high), RH carries the melody. Essential accompaniment technique.',
+            ctrl11: 'First position shift — from C position to G position mid-exercise. Trains smooth hand movement and security.',
             hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
         },
         HU: {
@@ -319,14 +346,14 @@
             playing: 'LEJÁTSZÁS',
             infoTitle: 'Czerny Op. 599 — Modul útmutató',
             howTitle: 'Hogyan működik',
-            howBody: 'Három etűd Czerny Op. 599-ből. Minden gyakorlat C-pozícióban marad (C–D–E–F–G) — nincs ujjáttevés. Mindegyik etűd más koordinációs készséget fejleszt a két kéz között. Játszd le a hangokat sorban ahogy a kottán kiemelkednek.',
+            howBody: 'Tíz etűd Czerny Op. 599-ből. A legtöbb C-pozícióban marad — a 33. etűd vezeti be az első pozícióváltást. Mindegyik más technikát fejleszt: artikuláció, koordináció, legato, Alberti basszus és még több. Játszd le a hangokat sorban ahogy a kottán kiemelkednek.',
             ctrlTitle: 'Etűdök',
             ctrl1: 'JK negyedeket játszik (C–D–E–F–G–F–E–D), BK egy egész C hangot tart. A jobb kéz önállóságát fejleszti.',
             ctrl2: 'Mindkét kéz párhuzamos negyedeket játszik fel és le. A két kéz koordinációját fejleszti.',
             ctrl3: 'JK nyolcadokat játszik, BK negyedeket. A három közül a legnehezebb koordinációs kihívás.',
             ctrl4: 'A Hints gomb körkörösen vált: 1× hangnevek a kottafejek felett → 2× + ujjrendszámok → 3× + billentyűzet LED jelzés → 4× minden ki.',
             tipTitle: 'Tanulási tipp',
-            tipBody: 'Kezdd az 1. etűddel hogy megszokd a C-pozíciót. Aztán jöjjön a 2. mindkét kézzel együtt. A 3.-at csak akkor próbáld, ha a 2. már természetesnek érződik — a két kéz közötti ritmuskülönbség eleinte trükkös.',
+            tipBody: 'Haladj sorban az etűdökön — mindegyik épít az előzőre. Kezdj lassan és csak akkor gyorsíts ha teljesen természetesnek érződik. Használd a Hints gombot a hangnevekhez és ujjrendhez.',
             gotIt: 'Értettem',
             hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
             hMode:'MÓD: SPRINT (1×) = EGY FUTAM | MARATON (3×) = HÁROMSZOROS | TRAINING = VÉGTELEN HUROK',
@@ -335,6 +362,13 @@
             hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
             hHints:'SEGÉD: 1× HANGNÉV | 2× + UJJREND | 3× + BILLENTYŰ LED | 4× KI',
             hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
+            ctrl5: 'C-dúr skálafutam mindkét kézben — bevezeti az ujjáttevést. Tartsd lazán a csuklót miközben a hüvelyk átmegy.',
+            ctrl6: 'A két kéz felváltva játszik — ugyanaz a dallam, egy oktáv különbséggel. Fejleszti az egyenletességet és a két kéz önállóságát.',
+            ctrl7: 'JK staccato C-pozícióban, BK tartott egész hang. Rövid artikulációt és gyors ujjemelést fejleszt.',
+            ctrl8: 'BK viszi a dallamot, JK tartott hangot játszik. A bal kéz önállóságát és hangkiemelő képességét fejleszti.',
+            ctrl9: 'Mindkét kéz párhuzamos legato mozgásban. Hangok közötti sima összekötést és éneklő hangzást fejleszt.',
+            ctrl10: 'BK Alberti basszus mintát játszik (mély–magas–közép–magas), JK viszi a dallamot. Alapvető kísérőtechnika.',
+            ctrl11: 'Első pozícióváltás — C-pozícióból G-pozícióba menet közben. Sima kézmozgást és biztonságot fejleszt.',
             hInfo:'INFO: MODUL ÚTMUTATÓ — HOGYAN MŰKÖDIK ÉS MIRE JÓK A GOMBOK',
         }
     };
@@ -349,8 +383,8 @@
         document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][5];
         const T = CZERNY_T[lang];
         // Info modal szövegek frissítése
-        const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-tipTitle','txt-tipBody','txt-gotIt'];
-        const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.tipTitle,T.tipBody,T.gotIt];
+        const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-ctrl6','txt-ctrl7','txt-ctrl8','txt-ctrl9','txt-ctrl10','txt-ctrl11','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.ctrl6,T.ctrl7,T.ctrl8,T.ctrl9,T.ctrl10,T.ctrl11,T.tipTitle,T.tipBody,T.gotIt];
         ids.forEach((id,i)=>{ const el=document.getElementById(id); if(el) el.innerHTML=vals[i]; });
         // Hints gomb felirata magyarul: Segéd
         const btnHintsEl = document.getElementById('btnHints');
@@ -606,6 +640,41 @@
             tipEN: 'Hands take turns — listen for an even sound between them. Both hands should have the same touch and volume.',
             tipHU: 'A két kéz felváltva játszik — figyelj az egyenletes hangzásra. Mindkét kéznek azonos érintéssel és hangerővel kell szólnia.'
         },
+        {
+            val: 5, name: 'No. 5',
+            infoEN: 'RH STACCATO / ARTICULATION',
+            infoHU: 'JK STACCATO / ARTIKULÁCIÓ',
+            tipEN: 'Keep the staccato short and bouncy — lift the finger quickly after each note. The wrist should stay relaxed, not rigid.',
+            tipHU: 'Tartsd a staccatot rövidre és pattogósra — emeld fel gyorsan az ujjat minden hang után. A csukló maradjon laza, ne feszüljön.'
+        },
+        {
+            val: 6, name: 'No. 6',
+            infoEN: 'LH MELODY / RH ACCOMPANIMENT',
+            infoHU: 'BK DALLAM / JK KÍSÉRET',
+            tipEN: 'The left hand carries the melody — make sure it sings out clearly above the right hand accompaniment. Role reversal is a key skill.',
+            tipHU: 'A bal kéz viszi a dallamot — ügyelj hogy tisztán kiemelkedjen a jobb kéz kísérete fölé. A szerepcsere fontos készség.'
+        },
+        {
+            val: 8, name: 'No. 8',
+            infoEN: 'LEGATO / SMOOTH PHRASING',
+            infoHU: 'LEGATO / SIMA FRAZEÁLÁS',
+            tipEN: 'Connect every note smoothly — there should be no gaps between them. Listen for an even, singing tone throughout.',
+            tipHU: 'Kösd össze simán minden hangot — ne legyen köztük rés. Figyelj az egyenletes, éneklő hangzásra végig.'
+        },
+        {
+            val: 24, name: 'No. 24',
+            infoEN: 'ALBERTI BASS / LH BROKEN CHORDS',
+            infoHU: 'ALBERTI BASSZUS / BK TÖRTAKKORD',
+            tipEN: 'The Alberti bass pattern (low-high-middle-high) must be light and even — it is accompaniment, not melody. Keep it quiet under the RH.',
+            tipHU: 'Az Alberti basszus minta (mély-magas-közép-magas) legyen könnyű és egyenletes — kíséret, nem dallam. Tartsd halkan a JK alatt.'
+        },
+        {
+            val: 33, name: 'No. 33',
+            infoEN: 'POSITION SHIFT / EXTENDED RANGE',
+            infoHU: 'POZÍCIÓVÁLTÁS / KITERJESZTETT TERJEDELEM',
+            tipEN: 'For the first time the hand moves beyond C position. Prepare the shift early — move the whole hand, not just the finger reaching for the note.',
+            tipHU: 'Először mozdul a kéz a C-pozíción túlra. Készülj fel időben a váltásra — az egész kezet mozgasd, ne csak az adott hangért nyúló ujjat.'
+        },
     ];
     let currentEtudeIdx = 0;
 
@@ -644,7 +713,7 @@
     let demoActiveIdx = -1; // aktuálisan kiemelkedő hangjegy indexe demo közben
 
     function _playEtudeDemo() {
-        const builders = [buildEtude1, buildEtude2, buildEtude3, buildEtude4, buildEtude7];
+        const builders = [buildEtude1, buildEtude2, buildEtude3, buildEtude4, buildEtude7, buildEtude5, buildEtude6, buildEtude8, buildEtude24, buildEtude33];
         const demoSeq = builders[currentEtudeIdx]();
         const baseDur = currentEtudeIdx === 2 ? 0.18 : 0.28;
         let time = audioCtx.currentTime + 0.15;
@@ -823,8 +892,101 @@
         });
         return seq;
     }
+    function buildEtude5() {
+        // No. 5: RH staccato C-pozícióban, LH tartott C
+        const seq = [];
+        const rhPattern = [28,29,30,31,32,31,30,29, 28,29,30,31,32,31,30,28];
+        const f_rh = [1,2,3,4,5,4,3,2, 1,2,3,4,5,4,3,1];
+        const lhMidi = stepToMidi(21);
+        rhPattern.forEach((step, i) => {
+            seq.push({
+                n: stepToName(step), s: '',
+                m_rh: stepToMidi(step), step_rh: step,
+                m_lh: lhMidi, step_lh: 21,
+                f_rh: f_rh[i] || 1, f_lh: 5,
+                lh_hold: i > 0,
+                rh_staccato: true
+            });
+        });
+        return seq;
+    }
+    function buildEtude6() {
+        // No. 6: LH dallam (C-pozíció), RH kísér tartott hangokkal
+        const seq = [];
+        const lhPattern = [21,22,23,24,25,24,23,22, 21,22,23,24,25,24,23,21];
+        const rhMidi = stepToMidi(28); // C4 tartott
+        const f_lh = [5,4,3,2,1,2,3,4, 5,4,3,2,1,2,3,5];
+        lhPattern.forEach((stepLH, i) => {
+            seq.push({
+                n: stepToName(stepLH), s: '',
+                m_rh: rhMidi, step_rh: 28,
+                m_lh: stepToMidi(stepLH), step_lh: stepLH,
+                f_rh: 1, f_lh: f_lh[i] || 5,
+                lh_hold: false,
+                rh_hold: i > 0  // RH tartott, csak első hangnál szólal meg
+            });
+        });
+        return seq;
+    }
+    function buildEtude8() {
+        // No. 8: Legato — mindkét kéz sima összekötéssel, párhuzamos mozgás
+        const seq = [];
+        const rhPattern = [28,29,30,31,32,33,32,31, 30,29,28,29,30,31,30,28];
+        const lhPattern = [21,22,23,24,25,26,25,24, 23,22,21,22,23,24,23,21];
+        const f_rh = [1,2,3,4,5,4,3,2, 1,2,3,1,2,3,2,1];
+        const f_lh = [5,4,3,2,1,2,3,4, 5,4,5,4,3,2,3,5];
+        rhPattern.forEach((stepRH, i) => {
+            seq.push({
+                n: stepToName(stepRH), s: '',
+                m_rh: stepToMidi(stepRH), step_rh: stepRH,
+                m_lh: stepToMidi(lhPattern[i]), step_lh: lhPattern[i],
+                f_rh: f_rh[i] || 1, f_lh: f_lh[i] || 5,
+                lh_hold: false
+            });
+        });
+        return seq;
+    }
+    function buildEtude24() {
+        // No. 24: Alberti basszus — LH törtakkord (low-high-mid-high), RH dallam
+        const seq = [];
+        // RH dallam: C4-E4-G4-E4 ismétlés (stepek: 28,30,32,30)
+        const rhPattern = [28,28,30,30, 32,32,30,30, 28,28,30,30, 32,32,28,28];
+        // LH Alberti: C3-G3-E3-G3 (low=21, high=25, mid=23)
+        const lhAlberti = [21,25,23,25, 21,25,23,25, 21,25,23,25, 21,25,23,21];
+        const f_rh = [1,1,3,3, 5,5,3,3, 1,1,3,3, 5,5,1,1];
+        const f_lh = [5,1,2,1, 5,1,2,1, 5,1,2,1, 5,1,5,5];
+        rhPattern.forEach((stepRH, i) => {
+            seq.push({
+                n: stepToName(stepRH), s: '',
+                m_rh: stepToMidi(stepRH), step_rh: stepRH,
+                m_lh: stepToMidi(lhAlberti[i]), step_lh: lhAlberti[i],
+                f_rh: f_rh[i] || 1, f_lh: f_lh[i] || 5,
+                lh_hold: false
+            });
+        });
+        return seq;
+    }
+    function buildEtude33() {
+        // No. 33: Pozícióváltás — C-pozícióból G-pozícióba (28-35 → 32-39)
+        const seq = [];
+        // Első 8 hang: C-pozíció (28-32), második 8: G-pozíció (32-36)
+        const rhPattern = [28,29,30,31,32,31,30,29, 32,33,34,35,36,35,34,32];
+        const lhPattern = [21,22,23,24,25,24,23,22, 25,26,27,28,29,28,27,25];
+        const f_rh = [1,2,3,4,5,4,3,2, 1,2,3,4,5,4,3,1];
+        const f_lh = [5,4,3,2,1,2,3,4, 5,4,3,2,1,2,3,5];
+        rhPattern.forEach((stepRH, i) => {
+            seq.push({
+                n: stepToName(stepRH), s: '',
+                m_rh: stepToMidi(stepRH), step_rh: stepRH,
+                m_lh: stepToMidi(lhPattern[i]), step_lh: lhPattern[i],
+                f_rh: f_rh[i] || 1, f_lh: f_lh[i] || 5,
+                lh_hold: false
+            });
+        });
+        return seq;
+    }
     function buildSequence() {
-        const builders = [buildEtude1, buildEtude2, buildEtude3, buildEtude4, buildEtude7];
+        const builders = [buildEtude1, buildEtude2, buildEtude3, buildEtude4, buildEtude7, buildEtude5, buildEtude6, buildEtude8, buildEtude24, buildEtude33];
         const rawSeq = builders[currentEtudeIdx]();
         flatSeq = [];
         const loops = MODES[currentModeIdx] === 'SPRINT' ? 1 : MODES[currentModeIdx] === 'MARATHON' ? 3 : 100;
