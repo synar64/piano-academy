@@ -3,294 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google" content="notranslate">
     <title>Akíra Piano Academy | Workstation - Hanon</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --rack-bg: #1a1a1d;
-            --rack-border: #2a2a2d;
-            --btn-dark: #101012;
-            --btn-border: #050505;
-            --text-dim: #555;
-            --lcd-bg-dark: #111213;
-            --lcd-label-color: #557799;
-            --oled-text: #b3e6ff;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif; background: #000;
-            margin: 0; padding: 0; height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column; justify-content: space-between; color: #fff;
-            -webkit-user-select: none; user-select: none;
-        }
-
-        /* ── KOTTA KIJELZŐ ── */
-        .sheet-container {
-            flex-grow: 1; display: flex; align-items: center; justify-content: center;
-            padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible;
-        }
-        .sheet-viewport {
-            width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; position: relative; overflow: visible;
-            background: transparent;
-        }
-        .sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; opacity: 0.35; pointer-events: none; }
-        #staffCanvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10; pointer-events: none;
-        }
-
-        /* ── WORKSTATION CHASSIS ── */
-        .lower-section { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-        .workstation-chassis {
-            display: flex; width: 100%; max-width: 2560px; position: relative;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0; background: var(--rack-bg);
-        }
-        .wood-cheek {
-            width: 24px; background: linear-gradient(to right, #3a1c0d, #1a0c05);
-            box-shadow: inset 1px 0 2px rgba(255,255,255,0.1), inset -2px 0 5px rgba(0,0,0,0.8);
-            border-radius: 6px 0 0 0; z-index: 10;
-        }
-        .wood-cheek.right { border-radius: 0 6px 0 0; background: linear-gradient(to left, #3a1c0d, #1a0c05); }
-        .synth-core { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
-
-        /* ── INFO SÁV ── */
-        .info-bar-integrated {
-            width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808;
-            display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden;
-        }
-        .info-bar-text {
-            font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
-            color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
-            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s; line-height: 45px; vertical-align: middle;
-        }
-
-        /* ── MIXER OVERLAY ── */
-        .settings-bar {
-            position: absolute; bottom: 100%; left: 0; width: 100%; height: 85px; background: var(--lcd-bg-dark);
-            display: none; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #333;
-            box-shadow: 0 -10px 30px #000; padding: 0 20px; box-sizing: border-box;
-        }
-        .settings-control { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; z-index: 2; position: relative; }
-        .settings-control label { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-transform: uppercase; font-weight: bold; }
-        .settings-control input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: #111; border-radius: 3px; outline: none; cursor: pointer; box-shadow: inset 0 1px 3px #000; }
-        .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 20px; background: #888; border: 1px solid #111; border-radius: 2px; box-shadow: 0 2px 4px #000; cursor: grab; }
-
-        /* ── MASTER DASHBOARD ── */
-        .master-dashboard {
-            display: flex; justify-content: space-between; align-items: center;
-            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 100% 3px;
-            padding: 25px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box;
-        }
-        .dashboard-logo { position: absolute; top: -35px; left: 30px; z-index: 5; pointer-events: none; }
-        .control-group { display: flex; align-items: center; gap: 8px; z-index: 10; }
-
-        /* HARDVER GOMBOK */
-        .hardware-btn {
-            width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim);
-            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
-            font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s; text-shadow: none !important;
-        }
-        .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .hardware-btn.active { color: #ffffff; background-color: #121214; }
-
-        /* START|STOP SPLIT */
-        .start-split {
-            display:flex; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000;
-            overflow:hidden; transition:transform 0.1s; cursor:pointer;
-        }
-        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .start-split span {
-            display:flex; align-items:center; justify-content:center;
-            font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif;
-            color:#444; transition:color 0.15s; text-transform:uppercase;
-        }
-        .start-split span#startLabel { padding: 0 12px 0 22px; }
-        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
-        .start-split span.active { color:#fff; }
-        .start-split .split-div { width:1px; background:#333; margin:6px 0; flex-shrink:0; }
-
-        /* KIS NÉGYZETES GOMBOK */
-        .sq-btn {
-            width: 38px; height: 38px; background-color: var(--btn-dark); color: #444;
-            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
-            font-size: 16px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0;
-        }
-        .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .sq-btn.active { color: #fff; background-color: #121214; }
-
-        /* KULCS SPLIT GOMB */
-        .clef-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
-            overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s;
-        }
-        .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .clef-split span {
-            flex:1; display:flex; align-items:center; justify-content:center;
-            color:#444; transition:color 0.15s; padding:0;
-        }
+        :root { --rack-bg:#1a1a1d; --rack-border:#2a2a2d; --btn-dark:#101012; --btn-border:#050505; --text-dim:#555; --lcd-bg-dark:#111213; --lcd-label-color:#557799; --oled-text:#b3e6ff; }
+        body { font-family:'Inter',sans-serif; background:#000; margin:0; padding:0; height:100vh; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; color:#fff; -webkit-user-select:none; user-select:none; }
+        .sheet-container { flex-grow:1; display:flex; align-items:center; justify-content:center; padding:10px 20px; width:100%; box-sizing:border-box; overflow:visible; }
+        .sheet-viewport { width:100%; max-width:2450px; aspect-ratio:2450/480; position:relative; overflow:visible; background:transparent; }
+        .sheet-image { width:100%; height:100%; object-fit:contain; z-index:1; position:absolute; opacity:0.35; pointer-events:none; }
+        #staffCanvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; pointer-events:none; }
+        .lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
+        .workstation-chassis { display:flex; width:100%; max-width:2560px; position:relative; box-shadow:0 -10px 40px rgba(0,0,0,0.9); border-radius:6px 6px 0 0; background:var(--rack-bg); }
+        .wood-cheek { width:24px; background:linear-gradient(to right,#3a1c0d,#1a0c05); box-shadow:inset 1px 0 2px rgba(255,255,255,0.1),inset -2px 0 5px rgba(0,0,0,0.8); border-radius:6px 0 0 0; z-index:10; }
+        .wood-cheek.right { border-radius:0 6px 0 0; background:linear-gradient(to left,#3a1c0d,#1a0c05); }
+        .synth-core { flex-grow:1; display:flex; flex-direction:column; position:relative; }
+        .info-bar-integrated { width:100%; height:45px; background-color:var(--lcd-bg-dark); border-bottom:2px solid #080808; display:flex; align-items:center; z-index:10; position:relative; overflow:hidden; }
+        .info-bar-text { font-family:'Share Tech Mono',monospace; font-size:18px; font-weight:bold; color:var(--oled-text); text-transform:uppercase; letter-spacing:2px; position:absolute; white-space:nowrap; transition:left 0.15s,right 0.15s; line-height:45px; }
+        .settings-bar { position:absolute; bottom:100%; left:0; width:100%; height:85px; background:var(--lcd-bg-dark); display:none; align-items:center; justify-content:space-around; z-index:50; border-top:2px solid #333; box-shadow:0 -10px 30px #000; padding:0 20px; box-sizing:border-box; }
+        .settings-control { display:flex; flex-direction:column; align-items:center; gap:8px; width:150px; z-index:2; position:relative; }
+        .settings-control label { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono',monospace; cursor:pointer; text-transform:uppercase; font-weight:bold; }
+        .settings-control input[type="range"] { -webkit-appearance:none; width:100%; height:6px; background:#111; border-radius:3px; outline:none; cursor:pointer; box-shadow:inset 0 1px 3px #000; }
+        .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:20px; background:#888; border:1px solid #111; border-radius:2px; box-shadow:0 2px 4px #000; cursor:grab; }
+        .master-dashboard { display:flex; justify-content:space-between; align-items:center; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px); background-size:100% 3px; padding:25px 30px; border-top:1px solid #333; position:relative; width:100%; box-sizing:border-box; }
+        .dashboard-logo { position:absolute; top:-35px; left:30px; z-index:5; pointer-events:none; }
+        .control-group { display:flex; align-items:center; gap:8px; z-index:10; }
+        .hardware-btn { width:95px; height:38px; background-color:var(--btn-dark); color:var(--text-dim); border:1px solid var(--btn-border); border-radius:3px; cursor:pointer; font-weight:700; font-size:12px; text-transform:uppercase; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 3px 0 #000; transition:transform 0.1s; }
+        .hardware-btn:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .hardware-btn.active { color:#fff; background-color:#121214; }
+        .sq-btn { width:38px; height:38px; background-color:var(--btn-dark); color:#444; border:1px solid var(--btn-border); border-radius:3px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 #000; transition:transform 0.1s,color 0.15s; flex-shrink:0; }
+        .sq-btn:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .sq-btn.active { color:#fff; background-color:#121214; }
+        .clef-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s; }
+        .clef-split:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .clef-split span { flex:1; display:flex; align-items:center; justify-content:center; color:#444; transition:color 0.15s; padding:0; }
         .clef-split span.active { color:#fff; }
         .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
-
-        /* LANG SPLIT GOMB */
-        .lang-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
-        }
-        .lang-split button {
-            flex:1; background:transparent; border:none; cursor:pointer;
-            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
-        }
+        .lang-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
+        .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim); }
         .lang-split button.active { color:#fff; }
-        .lang-split button:active { background: rgba(255,255,255,0.05); }
         .lang-divider { width:1px; background:#222; margin:6px 0; }
-
-        body.help-mode-active, body.help-mode-active * { cursor: help !important; }
-
-        /* ── CENTER CONSOLE (4-részes OLED + nyilak) ── */
-        .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
-        .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px; }
-        .arrow-row { display: flex; width: 100%; justify-content: space-around; margin: 4px 0; }
-        .nav-disk-btn { width: 22px; height: 22px; background: #222; border: 1px solid #111; border-radius: 50%; color: #888; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 2px rgba(0,0,0,0.6); transition: 0.1s; flex-shrink: 0; }
-        .nav-disk-btn:active { transform: translateY(2px); box-shadow: 0 0 1px rgba(0,0,0,0.6); }
-
-        .oled-wrapper { background: #111; padding: 2px; border-radius: 4px; width: 100%; box-shadow: 0 2px 4px rgba(255,255,255,0.1); box-sizing: border-box; }
-        .oled-screen { background: var(--lcd-bg-dark); border: 2px solid #222; border-radius: 2px; display: flex; box-shadow: inset 0 3px 8px rgba(0,0,0,0.9); overflow: hidden; }
-        .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; cursor: pointer; }
-        .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
-        .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
-        .oled-main { font-size: 20px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important; }
-
-        /* HANON PATCH BROWSER */
-        .patch-browser-content { max-width: 500px; }
-        .patch-grid-hanon { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-        .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 5px; font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: center; }
-        .patch-btn:hover { background: #222; color: #fff; }
-        .patch-btn:active { transform: translateY(2px); }
-        .patch-btn.disabled { color: #333; cursor: not-allowed; }
-        .patch-btn.disabled:hover { background: #111; color: #333; }
-
-        /* ── ZONGORA ── */
-        .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: visible; border-top: 2px solid #000; }
-        .piano-inner { width: 100%; aspect-ratio: 2500/284; position: absolute; top: 0; left: 0; }
-        .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
-        .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
-        .key-glow { position: absolute; top: 0; cursor: pointer; }
-       .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
-        .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
-
-        /* ── MODÁLIS ABLAKOK ── */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; text-align: center; max-width: 550px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.05); }
-        .modal-title { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 16px; margin-top: 0; margin-bottom: 25px; border-bottom: 2px solid #111; padding-bottom: 15px; }
-        .modal-stats { display: flex; justify-content: space-around; margin-bottom: 20px; }
-        .modal-stat-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .modal-stat-label { font-size: 10px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .modal-stat-value { font-family: 'Share Tech Mono'; font-size: 28px; color: var(--oled-text); font-weight: bold; }
-        .modal-tip { background: #111; border-left: 4px solid #333; padding: 15px; margin: 20px 0; text-align: left; font-size: 13px; color: #aaa; line-height: 1.5; border-radius: 0 4px 4px 0; font-family: 'Inter', sans-serif; }
-        .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; transition: 0.1s; letter-spacing: 1px; }
-        .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
-
-        body.help-mode-active { cursor: help; } body.help-mode-active * { cursor: help !important; }
+        body.help-mode-active, body.help-mode-active * { cursor:help !important; }
+        .center-console { flex:1; display:flex; justify-content:center; position:relative; }
+        .lcd-arrow-wrapper { display:flex; flex-direction:column; align-items:center; width:620px; }
+        .arrow-row { display:flex; width:100%; justify-content:space-around; margin:4px 0; }
+        .nav-disk-btn { width:22px; height:22px; background:#222; border:1px solid #111; border-radius:50%; color:#888; font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 2px rgba(0,0,0,0.6); transition:0.1s; flex-shrink:0; }
+        .nav-disk-btn:active { transform:translateY(2px); box-shadow:0 0 1px rgba(0,0,0,0.6); }
+        .oled-wrapper { background:#111; padding:2px; border-radius:4px; width:100%; box-shadow:0 2px 4px rgba(255,255,255,0.1); box-sizing:border-box; }
+        .oled-screen { background:var(--lcd-bg-dark); border:2px solid #222; border-radius:2px; display:flex; box-shadow:inset 0 3px 8px rgba(0,0,0,0.9); overflow:hidden; }
+        .oled-section { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:10px 0; cursor:pointer; }
+        .oled-divider { width:1px; background:rgba(255,255,255,0.05); margin:5px 0; }
+        .oled-header { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono'; text-transform:uppercase; font-weight:bold; margin-bottom:2px; }
+        .oled-main { font-size:20px; color:var(--oled-text); font-family:'Share Tech Mono'; font-weight:bold; text-transform:uppercase; }
+        .patch-browser-content { max-width:500px; }
+        .patch-grid-hanon { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:25px; }
+        .patch-btn { background:#111; border:1px solid #333; color:#aaa; padding:12px 5px; font-family:'Share Tech Mono',monospace; font-size:14px; cursor:pointer; border-radius:4px; transition:0.1s; text-align:center; }
+        .patch-btn:hover { background:#222; color:#fff; }
+        .patch-btn.disabled { color:#333; cursor:not-allowed; }
+        .patch-btn.disabled:hover { background:#111; color:#333; }
+        .piano-crop-wrapper { width:100%; position:relative; aspect-ratio:2500/248; background:#000; overflow:visible; border-top:2px solid #000; }
+        .piano-inner { width:100%; aspect-ratio:2500/284; position:absolute; top:0; left:0; }
+        .piano-img { width:100%; height:100%; display:block; filter:grayscale(100%); pointer-events:none; }
+        .hitbox-layer { position:absolute; top:0; left:0; width:100%; height:100%; z-index:100; }
+        .key-glow { position:absolute; top:0; cursor:pointer; }
+        .key-glow.pressed::after { content:''; position:absolute; pointer-events:none; z-index:150; top:0; left:0; width:100%; height:100%; border-radius:0 0 4px 4px; background:rgba(0,0,0,0.11); box-shadow:inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .black-glow.pressed::after { top:6px; left:25%; width:50%; height:77%; border-radius:2px; background:rgba(255,255,255,0.36); z-index:40; }
+        .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:9999; }
+        .key-glow.demo-flash .key-led { opacity:1; background:rgba(179,230,255,0.95) !important; box-shadow:0 0 12px rgba(179,230,255,0.8) !important; }
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; }
+        .modal-content { background:var(--rack-bg); padding:30px; border:2px solid var(--rack-border); border-radius:6px; text-align:center; max-width:550px; width:90%; box-shadow:0 20px 50px rgba(0,0,0,1); }
+        .modal-title { color:#aaa; text-transform:uppercase; letter-spacing:2px; font-weight:800; font-size:16px; margin-top:0; margin-bottom:25px; border-bottom:2px solid #111; padding-bottom:15px; }
+        .modal-stats { display:flex; justify-content:space-around; margin-bottom:20px; }
+        .modal-stat-box { display:flex; flex-direction:column; align-items:center; gap:4px; }
+        .modal-stat-label { font-size:10px; color:var(--lcd-label-color); font-family:'Share Tech Mono'; text-transform:uppercase; letter-spacing:1px; font-weight:bold; }
+        .modal-stat-value { font-family:'Share Tech Mono'; font-size:28px; color:var(--oled-text); font-weight:bold; }
+        .modal-tip { background:#111; border-left:4px solid #333; padding:15px; margin:20px 0; text-align:left; font-size:13px; color:#aaa; line-height:1.5; border-radius:0 4px 4px 0; font-family:'Inter',sans-serif; }
+        .modal-btn { background-color:var(--btn-dark); color:#aaa; border:1px solid var(--btn-border); border-radius:4px; font-weight:800; cursor:pointer; text-transform:uppercase; font-size:14px; padding:12px 40px; box-shadow:0 3px 0 #000; transition:0.1s; letter-spacing:1px; }
+        .modal-btn:active { transform:translateY(3px); box-shadow:0 0 0 #000; }
     </style>
 </head>
 <body>
-
-    <!-- RESULT MODAL -->
     <div id="resultModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">Session Complete</h2>
             <div class="modal-stats">
-                <div class="modal-stat-box">
-                    <div class="modal-stat-label">Avg Tempo</div>
-                    <div id="modalBpm" class="modal-stat-value">0 BPM</div>
-                </div>
-                <div class="modal-stat-box">
-                    <div class="modal-stat-label">Stability</div>
-                    <div id="modalUni" class="modal-stat-value">100%</div>
-                </div>
+                <div class="modal-stat-box"><div class="modal-stat-label">Avg Tempo</div><div id="modalBpm" class="modal-stat-value">0 BPM</div></div>
+                <div class="modal-stat-box"><div class="modal-stat-label">Stability</div><div id="modalUni" class="modal-stat-value">100%</div></div>
             </div>
             <div id="modalTip" class="modal-tip">Excellent work!</div>
             <button class="modal-btn" onclick="closeModal()">Acknowledge</button>
         </div>
     </div>
-
-    <!-- PATCH BROWSER MODAL -->
     <div id="patchBrowserModal" class="modal-overlay">
         <div class="modal-content patch-browser-content">
             <h2 class="modal-title">Hanon Patch Browser</h2>
-            <div style="text-align:left; margin-bottom:10px; color:var(--text-dim); font-size:11px; font-weight:bold; letter-spacing:1px;">PART I — EXERCISES 1–20</div>
+            <div style="text-align:left;margin-bottom:10px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;">PART I — EXERCISES 1–20</div>
             <div class="patch-grid-hanon">
-                <button class="patch-btn" onclick="selectPatch(1, 'HANON No.1')">No. 1</button>
-                <button class="patch-btn disabled">No. 2 <span style="font-size:10px; display:block; color:#444;">Soon</span></button>
-                <button class="patch-btn disabled">No. 3 <span style="font-size:10px; display:block; color:#444;">Soon</span></button>
+                <button class="patch-btn" onclick="selectPatch(1,'HANON No.1')">No. 1</button>
+                <button class="patch-btn disabled">No. 2 <span style="font-size:10px;display:block;color:#444;">Soon</span></button>
+                <button class="patch-btn disabled">No. 3 <span style="font-size:10px;display:block;color:#444;">Soon</span></button>
             </div>
             <button class="modal-btn" onclick="closePatchBrowser()">Cancel</button>
         </div>
     </div>
-
-    <!-- KOTTA -->
-    <!-- INFO MODAL -->
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content" style="max-width:640px;text-align:left;">
             <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Hanon — Module Guide</h2>
-            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Classic Hanon finger exercises displayed on the staff. Play each note in sequence — the exercise scrolls through positions automatically. BPM and stability are tracked in real time.</p></div>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Classic Hanon finger exercises displayed on the staff.</p></div>
             <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Sprint (1×), Marathon (3×), Training (endless).</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Exercise ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Select the Hanon exercise number.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Top / Bottom</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Toggle treble and bass clef note generation independently.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Displays note names above each notehead.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays official fingering numbers (1–5) below noteheads.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Rhythm ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Select a rhythmic pattern for the exercise.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Rhythm ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Select a rhythmic pattern. Click Demo to preview.</span></div>
             </div>
-            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.</p></div>
+            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">After the session, the analysis shows which finger caused the most slowdowns.</p></div>
             <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
         </div>
     </div>
-
     <div class="sheet-container">
         <div class="sheet-viewport">
             <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
             <canvas id="staffCanvas" width="2450" height="480"></canvas>
         </div>
     </div>
-
-    <!-- WORKSTATION CHASSIS -->
     <div class="lower-section">
         <div class="workstation-chassis">
             <div class="wood-cheek"></div>
             <div class="synth-core">
-
-                <!-- MIXER OVERLAY -->
                 <div id="mixerBar" class="settings-bar">
                     <div class="settings-control"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.0"></div>
                     <div class="settings-control"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="5.0"></div>
                     <div class="settings-control"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.6"></div>
                     <div class="settings-control"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
                 </div>
-
-                <!-- INFO SÁV -->
                 <div class="info-bar-integrated">
-                    <div id="infoBarText" class="info-bar-text" style="left:50%; transform:translateX(-50%);">SELECT EXERCISE OR PRESS START</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">SELECT EXERCISE OR PRESS START</div>
                 </div>
-
-                <!-- MASTER DASHBOARD -->
                 <div class="master-dashboard">
                     <div class="dashboard-logo">
-                        <svg viewBox="0 0 300 40" style="height:25px; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.8));">
+                        <svg viewBox="0 0 300 40" style="height:25px;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.8));">
                             <text x="60" y="30" fill="#666" font-family="'Inter',sans-serif" font-weight="800" font-size="32" text-anchor="end">AK</text>
                             <path d="M 64 30 L 72 30 L 72 12 L 68 12 L 68 0 L 64 0 Z" fill="#555"/>
                             <text x="76" y="30" fill="#666" font-family="'Inter',sans-serif" font-weight="800" font-size="32" text-anchor="start">RA</text>
                             <text x="135" y="28" fill="#444" font-family="'Inter',sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
                         </svg>
                     </div>
-
-                    <!-- BAL — modul-specifikus -->
                     <div class="control-group">
                         <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
                             <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
@@ -300,20 +157,14 @@
                         <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: SHOWS NOTE NAMES ABOVE NOTEHEADS">Hints</button>
                         <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: SHOWS OFFICIAL FINGERING (1–5) ON SHEET">Fingers</button>
                     </div>
-
-                    <!-- KÖZÉP: OLED + START -->
                     <div class="center-console">
-                        <div style="display:flex; align-items:center; gap:32px;">
-                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE">
-                                <span id="startLabel" class="active">START</span>
-                                <div class="split-div"></div>
-                                <span id="stopLabel">STOP</span>
-                            </div>
+                        <div style="display:flex;align-items:center;gap:16px;">
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1×), MARATHON (3×), TRAINING (∞)">▲</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(5)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleRhythm(1)">▲</button>
                                 </div>
                                 <div class="oled-wrapper">
@@ -323,17 +174,17 @@
                                             <div class="oled-main" id="lcdModuleText">HANON</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP">
+                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1X) | MARATHON (3X) | TRAINING = ENDLESS">
                                             <div class="oled-header">Mode</div>
                                             <div class="oled-main" id="lcdModeText">SPRINT</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledExercise" class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="EXERCISE: CLICK TO BROWSE HANON EXERCISES">
-                                            <div class="oled-header">Exercise</div>
-                                            <div class="oled-main" id="lcdHanonText">No. 1</div>
+                                        <div id="oledTempo" class="oled-section" onclick="if(!helpActive) cycleTempo(5)" data-help="TEMPO: CLICK TO INCREASE — USE ARROWS TO ADJUST BPM">
+                                            <div class="oled-header">Tempo</div>
+                                            <div class="oled-main" id="lcdTempoText">80 BPM</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledRhythm" class="oled-section" onclick="if(!helpActive) playRhythmDemo()" data-help="RHYTHM: CLICK TO PREVIEW — USE ARROWS TO CHANGE PATTERN">
+                                        <div id="oledRhythm" class="oled-section" onclick="if(!helpActive) cycleRhythm(1)" data-help="RHYTHM: CLICK TO CYCLE — USE ARROWS TO CHANGE PATTERN">
                                             <div class="oled-header">Rhythm</div>
                                             <div class="oled-main" id="lcdRhythm">EVEN</div>
                                         </div>
@@ -343,23 +194,16 @@
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(-1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(-5)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleRhythm(-1)">▼</button>
                                 </div>
                             </div>
+                            <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playRhythmDemo()" data-help="DEMO: CLICK TO HEAR THE EXERCISE — KEYS LIGHT UP IN SYNC" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
-
-                    <!-- JOBB — globális + home + info -->
                     <div class="control-group">
-                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
-                            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/>
-                                <rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
-                                <rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
-                                <line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
-                                <line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
-                            </svg>
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH">
+                            <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
                         </button>
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
@@ -369,687 +213,331 @@
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
                         </div>
-                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;">?</button>
                         <div style="width:16px;"></div>
                         <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
                         </a>
-                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
                         </button>
                     </div>
                 </div>
-
-                <!-- ZONGORA -->
                 <div class="piano-crop-wrapper">
                     <div class="piano-inner">
                         <img src="grandpiano-keys.png" class="piano-img">
                         <div id="hb-wrap" class="hitbox-layer"></div>
                     </div>
                 </div>
-
             </div>
             <div class="wood-cheek right"></div>
         </div>
     </div>
-
 <script>
-    let currentLang = 'EN';
-    const MODULE_NAMES = {
-        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
-        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
+    let currentLang='EN';
+    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']};
+    const HANON_T={
+        EN:{infoTitle:'Hanon — Module Guide',howTitle:'How It Works',howBody:'Classic Hanon finger exercises on the staff. Play each note in sequence. BPM and stability tracked in real time.',ctrlTitle:'Controls',gotIt:'Got It',ctrl1:'Sprint (1×), Marathon (3×), Training (endless).',ctrl2:'Select the Hanon exercise number.',ctrl4:'Displays note names above each notehead.',ctrl5:'Displays official fingering numbers (1–5) below noteheads.',ctrl6:'Select a rhythmic pattern. Click Demo to preview.',tipTitle:'Learning Tip',tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher and keep your wrist relaxed.',ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',btnHints:'Hints',btnFingers:'Fingers',hHome:'HOME: RETURN TO MAIN MODULE MENU',hHints:'HINTS: SHOWS NOTE NAMES ABOVE NOTEHEADS',hFingers:'FINGERS: SHOWS OFFICIAL FINGERING (1–5) ON SHEET',hStart:'START/STOP: BEGIN OR END THE EXERCISE',hDemo:'DEMO: CLICK TO HEAR THE EXERCISE — KEYS LIGHT UP IN SYNC',hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH',hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hInfo:'INFO: OPEN MODULE GUIDE',hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',hMode:'MODE: SPRINT (1X) | MARATHON (3X) | TRAINING = ENDLESS',hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',hRhythm:'RHYTHM: ARROWS TO CHANGE — CLICK TO CYCLE'},
+        HU:{infoTitle:'Hanon — Modul útmutató',howTitle:'Hogyan működik',howBody:'Klasszikus Hanon ujjgyakorlatok a kottán. Játszd le a hangokat sorban. BPM és stabilitás valós időben követhető.',ctrlTitle:'Vezérlők',gotIt:'Értettem',ctrl1:'Sprint (1×), Maraton (3×), Tréning (végtelen).',ctrl2:'Válaszd ki a Hanon gyakorlatszámot.',ctrl4:'Megjeleníti a hangneveket a kottafej felett.',ctrl5:'Megjeleníti a hivatalos ujjrendszámokat (1–5) a kottafej alatt.',ctrl6:'Ritmusképlet kiválasztása. Kattints a Demo gombra a lejátszáshoz.',tipTitle:'Tanulási tipp',tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld és tartsd lazán a csuklódat.',ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',btnHints:'Hangnév',btnFingers:'Ujjrend',hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE',hHints:'HANGNEM: HANGNEVEK MEGJELENÍTÉSE A KOTTÁN',hFingers:'UJJREND: HIVATALOS UJJRENDSZÁMOK (1–5)',hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',hDemo:'DEMÓ: KATTINTS A GYAKORLAT MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK',hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI',hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hInfo:'INFO: MODUL ÚTMUTATÓ',hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',hMode:'MÓD: SPRINT (1×) | MARATON (3×) | TRAINING = VÉGTELEN',hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',hRhythm:'RITMUS: NYILAKKAL VÁLTASZ — KATTINTS A CIKLÁLÁSHOZ'}
     };
-    const HANON_T = {
-        EN: {
-            infoTitle:'Hanon — Module Guide', howTitle:'How It Works',
-            howBody:'Classic Hanon finger exercises displayed on the staff. Play each note in sequence — the exercise scrolls through positions automatically. BPM and stability are tracked in real time.',
-            ctrlTitle:'Controls', gotIt:'Got It',
-            ctrl1:'Sprint (1×), Marathon (3×), Training (endless).',
-            ctrl2:'Select the Hanon exercise number.',
-            ctrl3:'Toggle treble and bass clef note generation independently.',
-            ctrl4:'Displays note names above each notehead.',
-            ctrl5:'Displays official fingering numbers (1–5) below noteheads.',
-            ctrl6:'Select a rhythmic pattern for the exercise. The notation updates to show the correct note values. Click the Rhythm cell to hear a demo. Patterns: Even (standard eighths), Dotted (long-short), Reverse (short-long), Swing (jazz groove), Syncopa (syncopated).',
-            tipTitle:'Learning Tip',
-            tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.',
-            ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',
-            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
-            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnFingers:'Fingers',
-            btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
-            hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLES RIGHT HAND NOTES',
-            hBottom:'BOTTOM CLEF: TOGGLES LEFT HAND NOTES', hHints:'HINTS: SHOWS NOTE NAMES ABOVE NOTEHEADS',
-            hFingers:'FINGERS: SHOWS OFFICIAL FINGERING (1–5) ON SHEET', hStart:'START/STOP: BEGIN OR END THE EXERCISE',
-            hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD', hMixer:'MIXER: OPEN ADSR PANEL',
-            hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT', hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
-            hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
-            hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
-            hMode:'MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',
-            hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',
-            hRhythm:'RHYTHM: ARROWS TO CHANGE PATTERN — CLICK TO HEAR DEMO',
-            hStats:'STATS: REAL-TIME BPM AND TIMING STABILITY',
-        },
-        HU: {
-            infoTitle:'Hanon — Modul útmutató', howTitle:'Hogyan működik',
-            howBody:'Klasszikus Hanon ujjgyakorlatok a kottán. Játszd le a hangokat sorban — a gyakorlat automatikusan lépdel a pozíciókon. A BPM és stabilitás valós időben követhető.',
-            ctrlTitle:'Vezérlők', gotIt:'Értettem',
-            ctrl1:'Sprint (1×), Maraton (3×), Tréning (végtelen).',
-            ctrl2:'Válaszd ki a Hanon gyakorlatszámot.',
-            ctrl3:'Violin és basszus kulcsos hangok külön-külön be/ki.',
-            ctrl4:'Megjeleníti a hangneveket a kottafej felett.',
-            ctrl5:'Megjeleníti a hivatalos ujjrendszámokat (1–5) a kottafej alatt.',
-            ctrl6:'Ritmusképlet kiválasztása a gyakorlathoz. A kotta azonnal frissül a megfelelő hanghosszakra. Kattints a Rhythm ablakra a bemutató lejátszásához. Képletek: Egyenletes (standard nyolcadok), Punktírozott (hosszú-rövid), Fordított (rövid-hosszú), Swing (jazz groove), Szinkópa.',
-            tipTitle:'Tanulási tipp',
-            tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld leütés előtt, és tartsd lazán a csuklódat.',
-            ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',
-            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
-            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnFingers:'Ujjrend',
-            btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
-            hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE', hTop:'FELSŐ KULCS: JOBB KÉZ BE/KI',
-            hBottom:'ALSÓ KULCS: BAL KÉZ BE/KI', hHints:'HANGNEM: HANGNEVEK MEGJELENÍTÉSE A KOTTÁN',
-            hFingers:'UJJREND: HIVATALOS SKÁLAUJJREND (1–5)', hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
-            hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI — MIDI BILLENTYŰZETTEL IS MŰKÖDIK', hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA',
-            hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ', hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ — HOGYAN MŰKÖDIK ÉS MIRE JÓK A GOMBOK',
-            hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
-            hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
-            hMode:'MÓD: SPRINT (1×) = EGY FUTAM | MARATON (3×) = HÁROMSZOROS | TRAINING = VÉGTELEN HUROK',
-            hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',
-            hRhythm:'RITMUS: NYILAKKAL VÁLTASZ — KATTINTS A DEMÓ LEJÁTSZÁSÁHOZ',
-            hStats:'STATISZTIKA: VALÓS IDEJŰ BPM ÉS IDŐZÍTÉSI STABILITÁS',
-        }
-    };
-
-    function setLang(lang) {
-        localStorage.setItem('akira_lang', lang);
-        currentLang = lang;
-        document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
-        document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
-        document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
-        document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
-        const T = HANON_T[lang];
-        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-ctrl6','txt-tipTitle','txt-tipBody','txt-gotIt'];
-        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.ctrl6,T.tipTitle,T.tipBody,T.gotIt];
+    function setLang(lang){
+        localStorage.setItem('akira_lang',lang);currentLang=lang;
+        document.getElementById('btnLangEN').classList.toggle('active',lang==='EN');
+        document.getElementById('btnLangHU').classList.toggle('active',lang==='HU');
+        document.getElementById('btnLangEN').style.color=lang==='EN'?'#fff':'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color=lang==='HU'?'#fff':'var(--text-dim)';
+        const T=HANON_T[lang];
+        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl4','txt-ctrl5','txt-ctrl6','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl4,T.ctrl5,T.ctrl6,T.tipTitle,T.tipBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
-        // Csak szöveges gombok fordítása (ikonos sq-btn-ek nem)
         const btnMap={'btnHintName':T.btnHints,'btnHintFinger':T.btnFingers};
         Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
-        const helpMap={
-            'btnHome':T.hHome,'btnClef':T.hClef,
-            'btnHintName':T.hHints,'btnHintFinger':T.hFingers,
-            'btnStart':T.hStart,'audioToggle':T.hPiano,
-            'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
-            'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledRhythm':T.hRhythm
-        };
+        const helpMap={'btnHome':T.hHome,'btnClef':T.hClef,'btnHintName':T.hHints,'btnHintFinger':T.hFingers,'btnStart':T.hStart,'btnDemo':T.hDemo,'audioToggle':T.hPiano,'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,'oledModule':T.hModule,'oledMode':T.hMode,'oledTempo':'TEMPO: USE ARROWS TO SET BPM | CLICK TO INCREASE | RANGE: 40–200 BPM','oledRhythm':T.hRhythm};
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
-        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][4];
-        if(helpActive) setInfoBar(T.helpMode, null);
-        else if(!isRunning) setInfoBar(T.ready, null);
+        document.getElementById('lcdModuleText').innerText=MODULE_NAMES[lang][4];
+        const R=RHYTHMS[currentRhythmIdx];
+        document.getElementById('lcdRhythm').innerText=lang==='HU'?R.labelHU:R.label;
+        if(helpActive)setInfoBar(T.helpMode,null);
+        else if(!isRunning)setInfoBar(T.ready,null);
     }
-
-    function setInfoBar(text, targetEl) {
-        const bar = document.getElementById('infoBarText');
-        if (!targetEl) {
-            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
-            bar.innerHTML = text; return;
-        }
-        const barRect = bar.parentElement.getBoundingClientRect();
-        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
-        if (cx / barRect.width < 0.5) {
-            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>' + text;
-            bar.style.left = Math.max(cx - 10, 20) + 'px'; bar.style.right='auto'; bar.style.transform='none';
-        } else {
-            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';
-            bar.style.right = Math.max(barRect.width - cx - 10, 20) + 'px'; bar.style.left='auto'; bar.style.transform='none';
-        }
+    function setInfoBar(text,targetEl){
+        const bar=document.getElementById('infoBarText');
+        if(!targetEl){bar.style.left='50%';bar.style.right='auto';bar.style.transform='translateX(-50%)';bar.innerHTML=text;return;}
+        const barRect=bar.parentElement.getBoundingClientRect();
+        const cx=targetEl.getBoundingClientRect().left+targetEl.getBoundingClientRect().width/2-barRect.left;
+        if(cx/barRect.width<0.5){bar.innerHTML='<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>'+text;bar.style.left=Math.max(cx-10,20)+'px';bar.style.right='auto';bar.style.transform='none';}
+        else{bar.innerHTML=text+'<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';bar.style.right=Math.max(barRect.width-cx-10,20)+'px';bar.style.left='auto';bar.style.transform='none';}
     }
-
-    function updateStartStop(running) {
-        document.getElementById('startLabel').classList.toggle('active', !running);
-        document.getElementById('stopLabel').classList.toggle('active', running);
-    }
-    // ── AUDIO ──
-    let audioInited = false;
-    let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
-
-    async function initAudio() {
-        if (audioInited) return; audioInited = true;
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
-        const s = { 36: 'C2', 48: 'C3', 60: 'C4', 72: 'C5' };
-        for (let k in s) {
-            try {
-                const r = await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);
-                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
-            } catch (e) {}
-        }
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then(m => {
-                m.inputs.forEach(input => input.onmidimessage = (msg) => {
-                    const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
-                    if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
-                    else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
+    function updateStartStop(running){const btn=document.getElementById('btnStart');if(btn)btn.textContent=running?'STOP':'START';}
+    let audioInited=false,audioCtx,sampleBuffers={},activeNodes={},audioOn=true;
+    async function initAudio(){
+        if(audioInited)return;audioInited=true;
+        if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+        if(audioCtx.state==='suspended')await audioCtx.resume();
+        const s={36:'C2',48:'C3',60:'C4',72:'C5'};
+        for(let k in s){try{const r=await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);sampleBuffers[k]=await audioCtx.decodeAudioData(await r.arrayBuffer());}catch(e){}}
+        if(navigator.requestMIDIAccess){
+            navigator.requestMIDIAccess().then(m=>{
+                m.inputs.forEach(input=>input.onmidimessage=(msg)=>{
+                    const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];
+                    if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
+                    else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}
                 });
-            }).catch(e => {});
+            }).catch(e=>{});
         }
     }
-
-    function playTone(note, vel) {
-        if (!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch (e) {} delete activeNodes[note]; }
-        const source = audioCtx.createBufferSource();
-        let closest = 36, minDiff = 999;
-        for (let b in sampleBuffers) { let diff = Math.abs(note - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
-        source.buffer = sampleBuffers[closest];
-        source.playbackRate.value = Math.pow(2, (note - closest) / 12);
-        const gain = audioCtx.createGain();
-        const v_d = parseFloat(document.getElementById('vst_d').value) || 1.0;
-        gain.gain.setValueAtTime((vel / 127) * v_d, audioCtx.currentTime);
-        source.connect(gain).connect(audioCtx.destination); source.start();
-        activeNodes[note] = { source, gain };
+    function playTone(note,vel){
+        if(!audioCtx||!audioOn||Object.keys(sampleBuffers).length===0)return;
+        if(audioCtx.state==='suspended')audioCtx.resume();
+        if(activeNodes[note]){try{activeNodes[note].source.stop();}catch(e){}delete activeNodes[note];}
+        const source=audioCtx.createBufferSource();
+        let closest=36,minDiff=999;
+        for(let b in sampleBuffers){let diff=Math.abs(note-b);if(diff<minDiff){minDiff=diff;closest=b;}}
+        source.buffer=sampleBuffers[closest];source.playbackRate.value=Math.pow(2,(note-closest)/12);
+        const gain=audioCtx.createGain();const v_d=parseFloat(document.getElementById('vst_d').value)||1.0;
+        gain.gain.setValueAtTime((vel/127)*v_d,audioCtx.currentTime);
+        source.connect(gain).connect(audioCtx.destination);source.start();
+        activeNodes[note]={source,gain};
     }
-
-    function handleNoteOff(midi) {
-        if (!activeNodes[midi]) return;
-        const v_r = parseFloat(document.getElementById('vst_r').value);
-        const gainNode = activeNodes[midi].gain;
-        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + v_r);
-        activeNodes[midi].source.stop(audioCtx.currentTime + v_r + 0.1);
-        delete activeNodes[midi];
+    function handleNoteOff(midi){
+        if(!activeNodes[midi])return;
+        const v_r=parseFloat(document.getElementById('vst_r').value);
+        const gainNode=activeNodes[midi].gain;
+        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);gainNode.gain.setValueAtTime(gainNode.gain.value,audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+v_r);
+        activeNodes[midi].source.stop(audioCtx.currentTime+v_r+0.1);delete activeNodes[midi];
     }
-
-    // ── HELP ──
-    let helpActive = false;
-    function toggleHelp() {
-        helpActive = !helpActive;
-        document.getElementById('btnHelp').classList.toggle('active', helpActive);
-        if (helpActive) {
-            document.body.classList.add('help-mode-active');
-            setInfoBar(HANON_T[currentLang].helpMode, null);
-        } else {
-            document.body.classList.remove('help-mode-active');
-            setInfoBar(HANON_T[currentLang].ready, null);
-        }
+    let helpActive=false;
+    function toggleHelp(){
+        helpActive=!helpActive;document.getElementById('btnHelp').classList.toggle('active',helpActive);
+        if(helpActive){document.body.classList.add('help-mode-active');setInfoBar(HANON_T[currentLang].helpMode,null);}
+        else{document.body.classList.remove('help-mode-active');setInfoBar(HANON_T[currentLang].ready,null);}
     }
-
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('#btnHelp')) return;
-        if (helpActive) {
-            e.preventDefault(); e.stopPropagation();
-            const target = e.target.closest('[data-help]');
-            if (target) {
-                const bar = document.getElementById('infoBarText');
-                const txt = target.dataset.help;
-                const barRect = bar.parentElement.getBoundingClientRect();
-                const cx = target.getBoundingClientRect().left + target.getBoundingClientRect().width/2 - barRect.left;
-                if (cx / barRect.width < 0.5) {
-                    bar.innerHTML = '<span style="font-size:11px;opacity:0.6;">▼</span> ' + txt;
-                    bar.style.left = (cx - 12) + 'px'; bar.style.right = 'auto'; bar.style.transform = 'none';
-                } else {
-                    bar.innerHTML = txt + ' <span style="font-size:11px;opacity:0.6;">▼</span>';
-                    bar.style.right = (barRect.width - cx - 12) + 'px'; bar.style.left = 'auto'; bar.style.transform = 'none';
-                }
+    document.addEventListener('click',(e)=>{
+        if(e.target.closest('#btnHelp'))return;
+        if(helpActive){
+            e.preventDefault();e.stopPropagation();
+            const target=e.target.closest('[data-help]');
+            if(target){
+                const bar=document.getElementById('infoBarText');const txt=target.dataset.help;
+                const barRect=bar.parentElement.getBoundingClientRect();
+                const cx=target.getBoundingClientRect().left+target.getBoundingClientRect().width/2-barRect.left;
+                if(cx/barRect.width<0.5){bar.innerHTML='<span style="font-size:11px;opacity:0.6;">▼</span> '+txt;bar.style.left=(cx-12)+'px';bar.style.right='auto';bar.style.transform='none';}
+                else{bar.innerHTML=txt+' <span style="font-size:11px;opacity:0.6;">▼</span>';bar.style.right=(barRect.width-cx-12)+'px';bar.style.left='auto';bar.style.transform='none';}
             }
         }
-    }, true);
-
-    // ── FULLSCREEN ──
-    function toggleFullScreen() {
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
-        else if (document.exitFullscreen) document.exitFullscreen();
+    },true);
+    function toggleFullScreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen();}
+    document.addEventListener('fullscreenchange',()=>{document.getElementById('btnFullscreen').classList.toggle('active',!!document.fullscreenElement);});
+    function openPatchBrowser(){document.getElementById('patchBrowserModal').style.display='flex';}
+    function closePatchBrowser(){document.getElementById('patchBrowserModal').style.display='none';}
+    function closeModal(){document.getElementById('resultModal').style.display='none';stopPractice();}
+    const modules=[{name:'EAR TRAIN',url:'hallasfejleszto.html'},{name:'SIGHT READ',url:'kottaolvasas.html'},{name:'CHORDS',url:'akkordok.html'},{name:'SCALES',url:'skalak.html'},{name:'HANON',url:'hanon.html'},{name:'CZERNY',url:'czerny.html'}];
+    let currentModuleIdx=4;
+    function cycleModule(dir){if(helpActive)return;currentModuleIdx=(currentModuleIdx+dir+modules.length)%modules.length;document.getElementById('lcdModuleText').innerText=MODULE_NAMES[currentLang][currentModuleIdx];}
+    function loadModule(){if(helpActive)return;if(currentModuleIdx!==4)window.location.href=modules[currentModuleIdx].url;}
+    let isRunning=false,activeRH=true,activeLH=true;
+    let currentNoteInBlock=0,currentBlockIndex=0;
+    let showNames=false,showFinger=false;
+    let seqBlocks=[];
+    let lastHitTime=0,hitIntervals=[],fingerTimes={1:[],2:[],3:[],4:[],5:[]};
+    let demoActiveNoteIdx=-1;
+    let clefState=0;
+    function cycleClef(){
+        if(helpActive)return;clefState=(clefState+1)%3;activeRH=clefState!==2;activeLH=clefState!==1;
+        document.getElementById('clefRH').style.color=activeRH?'#fff':'#444';
+        document.getElementById('clefLH').style.color=activeLH?'#fff':'#444';
+        if(isRunning)stopPractice();buildSequence();draw();
     }
-    document.addEventListener('fullscreenchange', () => {
-        document.getElementById('btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
-    });
-
-    // ── MODALS ──
-    function openPatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'flex'; }
-    function closePatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'none'; }
-    function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
-
-    // ── MODULE VÁLTÓ ──
-    const modules = [
-        { name: 'EAR TRAIN', url: 'hallasfejleszto.html' },
-        { name: 'SIGHT READ', url: 'kottaolvasas.html' },
-        { name: 'CHORDS', url: 'akkordok.html' },
-        { name: 'SCALES', url: 'skalak.html' },
-        { name: 'HANON', url: 'hanon.html' },
-        { name: 'CZERNY', url: 'czerny.html' }
+    const MODES=['SPRINT','MARATHON','TRAINING'];let currentModeIdx=0;
+    const RHYTHMS=[
+        {id:'EVEN',label:'EVEN',labelHU:'EGYENLETES',desc:'Even eighth notes — standard Hanon tempo',descHU:'Egyenletes nyolcadok — standard Hanon tempó',ratios:[1,1]},
+        {id:'DOTTED',label:'DOTTED',labelHU:'PUNKTÍROZOTT',desc:'Long-short pairs — develops accentuation',descHU:'Hosszú-rövid párok — hangsúlyfejlesztés',ratios:[3,1]},
+        {id:'REVERSE',label:'REVERSE',labelHU:'FORDÍTOTT',desc:'Short-long pairs — reverse dotted',descHU:'Rövid-hosszú párok — fordított punktírozott',ratios:[1,3]},
+        {id:'SWING',label:'SWING',labelHU:'SWING',desc:'Jazz swing feel — triplet-based groove',descHU:'Jazz swing érzés — triola alapú groove',ratios:[2,1]},
+        {id:'SYNCOPATED',label:'SYNCOPA',labelHU:'SZINKÓPA',desc:'Syncopated rhythm',descHU:'Szinkópa ritmus',ratios:[1,2,1]},
     ];
-    let currentModuleIdx = 4; // HANON
-    function cycleModule(dir) {
-        if (helpActive) return;
-        currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length;
-        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[currentLang][currentModuleIdx];
+    let currentRhythmIdx=0,rhythmNoteIdx=0;
+    function cycleRhythm(dir){
+        if(helpActive)return;currentRhythmIdx=(currentRhythmIdx+dir+RHYTHMS.length)%RHYTHMS.length;rhythmNoteIdx=0;
+        const R=RHYTHMS[currentRhythmIdx];const isHU=currentLang==='HU';
+        document.getElementById('lcdRhythm').innerText=isHU?R.labelHU:R.label;
+        setInfoBar((isHU?R.descHU:R.desc).toUpperCase()+(isHU?' — KATTINTS A DEMO GOMBRA':' — CLICK DEMO TO PREVIEW'),null);
+        if(isRunning)stopPractice();buildSequence();draw();
     }
-    function loadModule() {
-        if (helpActive) return;
-        if (currentModuleIdx !== 4) window.location.href = modules[currentModuleIdx].url;
+    function cycleMode(dir){
+        if(helpActive)return;currentModeIdx=(currentModeIdx+dir+MODES.length)%MODES.length;
+        document.getElementById('lcdModeText').innerText=MODES[currentModeIdx];
+        const R=RHYTHMS[currentRhythmIdx];document.getElementById('lcdRhythm').innerText=currentLang==='HU'?R.labelHU:R.label;
+        if(isRunning)stopPractice();buildSequence();draw();
     }
-
-    // ── ÁLLAPOTOK ──
-    let isRunning = false, activeRH = true, activeLH = true;
-    let currentNoteInBlock = 0, currentBlockIndex = 0;
-    let showNames = false, showFinger = false;
-    let seqBlocks = [];
-    let lastHitTime = 0, hitIntervals = [], fingerTimes = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-
-    // Kulcs váltó
-    let clefState = 0;
-    function cycleClef() {
-        if (helpActive) return;
-        clefState = (clefState + 1) % 3;
-        activeRH = clefState !== 2;
-        activeLH = clefState !== 1;
-        document.getElementById('clefRH').style.color = activeRH ? '#fff' : '#444';
-        document.getElementById('clefLH').style.color = activeLH ? '#fff' : '#444';
-        if (isRunning) stopPractice();
-        buildSequence(); draw();
+    let bpm=80;const BPM_MIN=40,BPM_MAX=200;
+    function cycleTempo(delta){
+        if(helpActive)return;
+        bpm=Math.min(BPM_MAX,Math.max(BPM_MIN,bpm+delta));
+        document.getElementById('lcdTempoText').innerText=bpm+' BPM';
+        const isHU=currentLang==='HU';
+        setInfoBar((isHU?'TEMPÓ: ':'TEMPO: ')+bpm+' BPM',null);
     }
-
-    // ── MODE ──
-    const MODES = ['SPRINT', 'MARATHON', 'TRAINING'];
-    let currentModeIdx = 0;
-
-    // ── RITMUSKÉPLETEK ──
-    const RHYTHMS = [
-        { id:'EVEN',       label:'EVEN',        labelHU:'EGYENLETES', desc:'Even eighth notes — standard Hanon tempo',         descHU:'Egyenletes nyolcadok — standard Hanon tempó',      ratios:[1,1] },
-        { id:'DOTTED',     label:'DOTTED',      labelHU:'PUNKTÍROZOTT', desc:'Long-short pairs ♩♪ — develops accentuation',   descHU:'Hosszú-rövid párok ♩♪ — hangsúlyfejlesztés',      ratios:[3,1] },
-        { id:'REVERSE',    label:'REVERSE',     labelHU:'FORDÍTOTT',  desc:'Short-long pairs ♪♩ — reverse dotted',            descHU:'Rövid-hosszú párok ♪♩ — fordított punktírozott',   ratios:[1,3] },
-        { id:'SWING',      label:'SWING',       labelHU:'SWING',      desc:'Jazz swing feel — triplet-based groove',           descHU:'Jazz swing érzés — triola alapú groove',           ratios:[2,1] },
-        { id:'SYNCOPATED', label:'SYNCOPA',     labelHU:'SZINKÓPA',   desc:'Syncopated rhythm',               descHU:'Szinkópa ritmus',       ratios:[1,2,1] },
-    ];
-    let currentRhythmIdx = 0;
-    let rhythmNoteIdx = 0; // hangjegy pozíció a ritmusképleten belül
-
-    function cycleRhythm(dir) {
-        if (helpActive) return;
-        currentRhythmIdx = (currentRhythmIdx + dir + RHYTHMS.length) % RHYTHMS.length;
-        rhythmNoteIdx = 0;
-        const R = RHYTHMS[currentRhythmIdx];
-        const isHU = (localStorage.getItem('akira_lang')||'EN') === 'HU';
-        document.getElementById('lcdRhythm').innerText = isHU ? R.labelHU : R.label;
-        const demoHint = isHU ? ' — KATTINTS A RITMUS ABLAKRA A LEJÁTSZÁSHOZ' : ' — CLICK RHYTHM CELL TO PREVIEW';
-        setInfoBar((isHU ? R.descHU : R.desc).toUpperCase() + demoHint, null);
-        if (isRunning) stopPractice();
-        buildSequence();
-        draw();
+    const hanonList=[{val:1,name:'No. 1'}];let currentHanonIdx=0;
+    function cycleHanon(dir){
+        if(helpActive)return;let next=currentHanonIdx+dir;if(next<0||next>=hanonList.length)return;
+        currentHanonIdx=next;document.getElementById('lcdHanonText').innerText=hanonList[currentHanonIdx].name;document.getElementById('hanonSelectValue').value=hanonList[currentHanonIdx].val;
+        if(isRunning)stopPractice();buildSequence();draw();
     }
-
-    function getRhythmRatio() {
-        const R = RHYTHMS[currentRhythmIdx];
-        const ratio = R.ratios[rhythmNoteIdx % R.ratios.length];
-        rhythmNoteIdx++;
-        return ratio; // relative weight — 1=normal, 2=double, 3=triple length
+    function selectPatch(val,name){
+        currentHanonIdx=hanonList.findIndex(h=>h.val===val);if(currentHanonIdx<0)currentHanonIdx=0;
+        document.getElementById('lcdHanonText').innerText=hanonList[currentHanonIdx].name;document.getElementById('hanonSelectValue').value=val;
+        closePatchBrowser();if(isRunning)stopPractice();buildSequence();draw();
     }
-    function cycleMode(dir) {
-        if (helpActive) return;
-        currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length;
-        document.getElementById('lcdModeText').innerText = MODES[currentModeIdx];
-        const R = RHYTHMS[currentRhythmIdx];
-        const isHU2 = lang === 'HU';
-        document.getElementById('lcdRhythm').innerText = isHU2 ? R.labelHU : R.label;
-        if (isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    // ── HANON VÁLTÓ ──
-    const hanonList = [{ val: 1, name: 'No. 1' }]; // bővíthető
-    let currentHanonIdx = 0;
-    function cycleHanon(dir) {
-        if (helpActive) return;
-        let next = currentHanonIdx + dir;
-        if (next < 0 || next >= hanonList.length) return;
-        currentHanonIdx = next;
-        document.getElementById('lcdHanonText').innerText = hanonList[currentHanonIdx].name;
-        document.getElementById('hanonSelectValue').value = hanonList[currentHanonIdx].val;
-        if (isRunning) stopPractice(); buildSequence(); draw();
-    }
-    function selectPatch(val, name) {
-        currentHanonIdx = hanonList.findIndex(h => h.val === val);
-        if (currentHanonIdx < 0) currentHanonIdx = 0;
-        document.getElementById('lcdHanonText').innerText = hanonList[currentHanonIdx].name;
-        document.getElementById('hanonSelectValue').value = val;
-        closePatchBrowser();
-        if (isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    // ── EGYÉB GOMBOK ──
-    // toggleHand replaced by cycleClef above
-    function toggleHint(type) {
-        if (type === 'name') { showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); }
-        else { showFinger = !showFinger; document.getElementById('btnHintFinger').classList.toggle('active', showFinger); }
-        draw();
-    }
-    function toggleAudio() {
-        audioOn = !audioOn;
-        document.getElementById('audioToggle').classList.toggle('active', audioOn);
-        if (audioOn && !audioCtx) initAudio();
-    }
-    function toggleVst() {
-        if (helpActive) return;
-        let mb = document.getElementById('mixerBar');
-        mb.style.display = (mb.style.display === 'flex') ? 'none' : 'flex';
-    }
-
-    // ── HANON 1 LOGIKA (eredeti, érintetlen) ──
-    const C_MAJOR_MIDI = [0, 2, 4, 5, 7, 9, 11];
-    const NOTE_NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'H'];
-
-    function getNoteInfo(diatonicStep) {
-        let octave = Math.floor(diatonicStep / 7);
-        let noteIndex = diatonicStep % 7;
-        let midi = (octave * 12) + 12 + C_MAJOR_MIDI[noteIndex];
-        let name = NOTE_NAMES[noteIndex];
-        return { midi, name };
-    }
-
-    function buildHanon1() {
-        let fullSeq = [];
-        let ascPattern  = [0,  2,  3,  4,  5,  4,  3,  2];
-        let descPattern = [0, -2, -3, -4, -5, -4, -3, -2];
-        let f_rh_asc  = [1, 2, 3, 4, 5, 4, 3, 2];
-        let f_lh_asc  = [5, 4, 3, 2, 1, 2, 3, 4];
-        let f_rh_desc = [5, 4, 3, 2, 1, 2, 3, 4];
-        let f_lh_desc = [1, 2, 3, 4, 5, 4, 3, 2];
-
-        // Felfelé
-        for (let rootStep = 28; rootStep <= 34; rootStep++) {
-            for (let i = 0; i < 8; i++) {
-                let currentStepRH = rootStep + ascPattern[i];
-                let currentStepLH = (rootStep - 7) + ascPattern[i];
-                let infoRH = getNoteInfo(currentStepRH);
-                let infoLH = getNoteInfo(currentStepLH);
-                fullSeq.push({
-                    n: infoRH.name, s: '',
-                    m_rh: infoRH.midi, step_rh: currentStepRH,
-                    m_lh: infoLH.midi, step_lh: currentStepLH,
-                    f_rh: f_rh_asc[i], f_lh: f_lh_asc[i]
-                });
-            }
-        }
-
-        // Lefelé
-        for (let rootStep = 39; rootStep >= 31; rootStep--) {
-            for (let i = 0; i < 8; i++) {
-                let currentStepRH = rootStep + descPattern[i];
-                let currentStepLH = (rootStep - 7) + descPattern[i];
-                let infoRH = getNoteInfo(currentStepRH);
-                let infoLH = getNoteInfo(currentStepLH);
-                fullSeq.push({
-                    n: infoRH.name, s: '',
-                    m_rh: infoRH.midi, step_rh: currentStepRH,
-                    m_lh: infoLH.midi, step_lh: currentStepLH,
-                    f_rh: f_rh_desc[i], f_lh: f_lh_desc[i]
-                });
-            }
-        }
-
-        // Záróhang C4
-        let finRH = getNoteInfo(28), finLH = getNoteInfo(21);
-        fullSeq.push({ n: finRH.name, s: '', m_rh: finRH.midi, step_rh: 28, m_lh: finLH.midi, step_lh: 21, f_rh: 1, f_lh: 5 });
+    function toggleHint(type){if(type==='name'){showNames=!showNames;document.getElementById('btnHintName').classList.toggle('active',showNames);}else{showFinger=!showFinger;document.getElementById('btnHintFinger').classList.toggle('active',showFinger);}draw();}
+    function toggleAudio(){audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn&&!audioCtx)initAudio();}
+    const C_MAJOR_MIDI=[0,2,4,5,7,9,11];const NOTE_NAMES=['C','D','E','F','G','A','H'];
+    function getNoteInfo(diatonicStep){let octave=Math.floor(diatonicStep/7);let noteIndex=diatonicStep%7;let midi=(octave*12)+12+C_MAJOR_MIDI[noteIndex];return{midi,name:NOTE_NAMES[noteIndex]};}
+    function buildHanon1(){
+        let fullSeq=[];
+        let ascPattern=[0,2,3,4,5,4,3,2];let descPattern=[0,-2,-3,-4,-5,-4,-3,-2];
+        let f_rh_asc=[1,2,3,4,5,4,3,2];let f_lh_asc=[5,4,3,2,1,2,3,4];
+        let f_rh_desc=[5,4,3,2,1,2,3,4];let f_lh_desc=[1,2,3,4,5,4,3,2];
+        for(let rootStep=28;rootStep<=34;rootStep++){for(let i=0;i<8;i++){let csRH=rootStep+ascPattern[i];let csLH=(rootStep-7)+ascPattern[i];let iRH=getNoteInfo(csRH);let iLH=getNoteInfo(csLH);fullSeq.push({n:iRH.name,s:'',m_rh:iRH.midi,step_rh:csRH,m_lh:iLH.midi,step_lh:csLH,f_rh:f_rh_asc[i],f_lh:f_lh_asc[i]});}}
+        for(let rootStep=39;rootStep>=31;rootStep--){for(let i=0;i<8;i++){let csRH=rootStep+descPattern[i];let csLH=(rootStep-7)+descPattern[i];let iRH=getNoteInfo(csRH);let iLH=getNoteInfo(csLH);fullSeq.push({n:iRH.name,s:'',m_rh:iRH.midi,step_rh:csRH,m_lh:iLH.midi,step_lh:csLH,f_rh:f_rh_desc[i],f_lh:f_lh_desc[i]});}}
+        let fRH=getNoteInfo(28),fLH=getNoteInfo(21);fullSeq.push({n:fRH.name,s:'',m_rh:fRH.midi,step_rh:28,m_lh:fLH.midi,step_lh:21,f_rh:1,f_lh:5});
         return fullSeq;
     }
-
-    function buildSequence() {
-        let rawSeq = buildHanon1();
-        let loops = (MODES[currentModeIdx] === 'SPRINT') ? 1 : (MODES[currentModeIdx] === 'MARATHON' ? 3 : 100);
-        let flatSeq = [];
-        for (let l = 0; l < loops; l++) flatSeq = flatSeq.concat(rawSeq);
-        seqBlocks = [];
-        for (let i = 0; i < flatSeq.length; i += 16) seqBlocks.push(flatSeq.slice(i, i + 16));
-        currentBlockIndex = 0; currentNoteInBlock = 0; rhythmNoteIdx = 0;
+    function buildSequence(){
+        let rawSeq=buildHanon1();let loops=MODES[currentModeIdx]==='SPRINT'?1:MODES[currentModeIdx]==='MARATHON'?3:100;
+        let flatSeq=[];for(let l=0;l<loops;l++)flatSeq=flatSeq.concat(rawSeq);
+        seqBlocks=[];for(let i=0;i<flatSeq.length;i+=16)seqBlocks.push(flatSeq.slice(i,i+16));
+        currentBlockIndex=0;currentNoteInBlock=0;rhythmNoteIdx=0;
     }
-
-    // ── KOTTA KALIBRÁCIÓ ──
-    const KOTTA_E4_Y = 187.6;
-    const KOTTA_VONALKOZ_FEL_RH = 11.14;
-    const KOTTA_G2_Y = 417;
-    const KOTTA_VONALKOZ_FEL_LH = 10.71;
-
-    const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-
-
-    // ── RITMUSOS KOTTARAJZOLÁS ──
-    function drawRhythmNote(ctx, x, y, color, noteIdx, hand) {
-        const R = RHYTHMS[currentRhythmIdx];
-        const ratio = R.ratios[noteIdx % R.ratios.length];
-        // ratio: 1=nyolcad, 2=negyed, 3=pontozott negyed, 4=fél
-        ctx.fillStyle = color;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2.5;
-
-        if (ratio === 1) {
-            // Nyolcad: tömör fej + szár + zászló
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
-            // Zászló
-            ctx.beginPath(); ctx.moveTo(x+11, y-50); ctx.bezierCurveTo(x+30, y-40, x+30, y-25, x+11, y-30); ctx.stroke();
-        } else if (ratio === 2) {
-            // Negyed: tömör fej + szár
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
-        } else if (ratio === 3) {
-            // Pontozott negyed: tömör fej + szár + pont
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x+20, y-4, 4, 0, Math.PI*2); ctx.fill();
-        } else if (ratio >= 4) {
-            // Fél: üres fej + szár
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(x+11, y); ctx.lineTo(x+11, y-50); ctx.stroke();
-        }
+    const KOTTA_E4_Y=187.6,KOTTA_VONALKOZ_FEL_RH=11.14,KOTTA_G2_Y=417,KOTTA_VONALKOZ_FEL_LH=10.71;
+    const canvas=document.getElementById('staffCanvas'),ctx=canvas.getContext('2d');
+    function drawRhythmNote(ctx,x,y,color,noteIdx){
+        const R=RHYTHMS[currentRhythmIdx];const ratio=R.ratios[noteIdx%R.ratios.length];
+        ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=2.5;
+        if(ratio===1){ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();ctx.beginPath();ctx.moveTo(x+11,y);ctx.lineTo(x+11,y-50);ctx.stroke();ctx.beginPath();ctx.moveTo(x+11,y-50);ctx.bezierCurveTo(x+30,y-40,x+30,y-25,x+11,y-30);ctx.stroke();}
+        else if(ratio===2){ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();ctx.beginPath();ctx.moveTo(x+11,y);ctx.lineTo(x+11,y-50);ctx.stroke();}
+        else if(ratio===3){ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();ctx.beginPath();ctx.moveTo(x+11,y);ctx.lineTo(x+11,y-50);ctx.stroke();ctx.beginPath();ctx.arc(x+20,y-4,4,0,Math.PI*2);ctx.fill();}
+        else{ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.stroke();ctx.beginPath();ctx.moveTo(x+11,y);ctx.lineTo(x+11,y-50);ctx.stroke();}
     }
-
-    function draw() {
-        ctx.clearRect(0, 0, 2450, 480);
-        if (seqBlocks.length === 0) return;
-
-        let block = seqBlocks[currentBlockIndex];
-        let totalNotes = block.length;
-        let startX = 180, endX = 2380;
-        let spacingX = totalNotes > 1 ? (endX - startX) / (totalNotes - 1) : 0;
-
-        block.forEach((n, i) => {
-            let alpha = 1.0;
-            if (!isRunning && i === 0 && currentBlockIndex === 0) alpha = 1.0;
-            let x = startX + (i * spacingX);
-            let isActive = (isRunning && i === currentNoteInBlock);
-            let isPast = (isRunning && i < currentNoteInBlock);
-            let color = isActive ? 'rgba(179,230,255,1.0)' : isPast ? 'rgba(179,230,255,0.15)' : 'rgba(179,230,255,0.3)';
-
-            if (activeRH) {
-                ctx.globalAlpha = 1.0;
-                let y = KOTTA_E4_Y - ((n.step_rh - 30) * KOTTA_VONALKOZ_FEL_RH);
-                ctx.save(); ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : isPast ? 'rgba(210,210,210,0.15)' : 'rgba(210,210,210,0.3)'; ctx.lineWidth = 2;
-                if (n.step_rh <= 28) { for (let s = 28; s >= n.step_rh; s -= 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                if (n.step_rh >= 40) { for (let s = 40; s <= n.step_rh; s += 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                ctx.restore();
-                drawRhythmNote(ctx, x, y, color, i, 'rh');
-                if (showNames) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.n, x, y - 22); }
-                if (showFinger) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.f_rh, x, y + 34); }
+    function draw(){
+        ctx.clearRect(0,0,2450,480);if(seqBlocks.length===0)return;
+        let block=seqBlocks[currentBlockIndex];let startX=180,endX=2380;
+        let spacingX=block.length>1?(endX-startX)/(block.length-1):0;
+        block.forEach((n,i)=>{
+            let x=startX+(i*spacingX);
+            let isActive=(isRunning&&i===currentNoteInBlock)||(demoActiveNoteIdx>=0&&demoActiveNoteIdx===i);
+            let isPast=isRunning&&i<currentNoteInBlock;
+            let color=isActive?'rgba(179,230,255,1.0)':isPast?'rgba(179,230,255,0.15)':'rgba(179,230,255,0.3)';
+            if(activeRH){
+                ctx.globalAlpha=1.0;let y=KOTTA_E4_Y-((n.step_rh-30)*KOTTA_VONALKOZ_FEL_RH);
+                ctx.save();ctx.strokeStyle=isActive?'rgba(210,210,210,1.0)':isPast?'rgba(210,210,210,0.15)':'rgba(210,210,210,0.3)';ctx.lineWidth=2;
+                if(n.step_rh<=28){for(let s=28;s>=n.step_rh;s-=2){let ly=KOTTA_E4_Y-((s-30)*KOTTA_VONALKOZ_FEL_RH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
+                if(n.step_rh>=40){for(let s=40;s<=n.step_rh;s+=2){let ly=KOTTA_E4_Y-((s-30)*KOTTA_VONALKOZ_FEL_RH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
+                ctx.restore();drawRhythmNote(ctx,x,y,color,i);
+                if(showNames){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.n,x,y-22);}
+                if(showFinger){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.f_rh,x,y+34);}
             }
-
-            if (activeLH) {
-                ctx.globalAlpha = 1.0;
-                let y = KOTTA_G2_Y - ((n.step_lh - 19) * KOTTA_VONALKOZ_FEL_LH);
-                ctx.save(); ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : isPast ? 'rgba(210,210,210,0.15)' : 'rgba(210,210,210,0.3)'; ctx.lineWidth = 2;
-                if (n.step_lh <= 17) { for (let s = 17; s >= n.step_lh; s -= 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                if (n.step_lh >= 29) { for (let s = 29; s <= n.step_lh; s += 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                ctx.restore();
-                drawRhythmNote(ctx, x, y, color, i, 'lh');
-                if (showNames) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.n, x, y - 22); }
-                if (showFinger) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.f_lh, x, y + 34); }
+            if(activeLH){
+                ctx.globalAlpha=1.0;let y=KOTTA_G2_Y-((n.step_lh-19)*KOTTA_VONALKOZ_FEL_LH);
+                ctx.save();ctx.strokeStyle=isActive?'rgba(210,210,210,1.0)':isPast?'rgba(210,210,210,0.15)':'rgba(210,210,210,0.3)';ctx.lineWidth=2;
+                if(n.step_lh<=17){for(let s=17;s>=n.step_lh;s-=2){let ly=KOTTA_G2_Y-((s-19)*KOTTA_VONALKOZ_FEL_LH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
+                if(n.step_lh>=29){for(let s=29;s<=n.step_lh;s+=2){let ly=KOTTA_G2_Y-((s-19)*KOTTA_VONALKOZ_FEL_LH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
+                ctx.restore();drawRhythmNote(ctx,x,y,color,i);
+                if(showNames){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.n,x,y-22);}
+                if(showFinger){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.f_lh,x,y+34);}
             }
         });
-        ctx.globalAlpha = 1.0;
+        ctx.globalAlpha=1.0;
     }
-
-    // ── PRACTICE KONTROL ──
-    function handleMainButton() {
-        if (!isRunning) {
-            initAudio(); buildSequence(); isRunning = true;
-            updateStartStop(true);
-            lastHitTime = 0; hitIntervals = []; fingerTimes = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-            // BPM/Stab now shown in infoBar
-            setInfoBar(`PLAYING — ${MODES[currentModeIdx]} — HANON ${hanonList[currentHanonIdx].name.toUpperCase()}`, null);
-            draw();
-        } else stopPractice();
+    function handleMainButton(){
+        if(!isRunning){initAudio();buildSequence();isRunning=true;updateStartStop(true);lastHitTime=0;hitIntervals=[];fingerTimes={1:[],2:[],3:[],4:[],5:[]};setInfoBar(`PLAYING — ${MODES[currentModeIdx]} — HANON ${hanonList[currentHanonIdx].name.toUpperCase()}`,null);draw();}
+        else stopPractice();
     }
-
-    function stopPractice() {
-        isRunning = false; currentNoteInBlock = 0; currentBlockIndex = 0;
-        updateStartStop(false);
-        setInfoBar(HANON_T[currentLang].ready, null);
-        draw();
+    function stopPractice(){isRunning=false;currentNoteInBlock=0;currentBlockIndex=0;updateStartStop(false);setInfoBar(HANON_T[currentLang].ready,null);draw();}
+    function showResults(){
+        isRunning=false;updateStartStop(false);
+        if(hitIntervals.length===0){stopPractice();return;}
+        let avgDiff=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let avgBpm=Math.round(60000/avgDiff);
+        let avg2=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let dev=Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avg2,2),0)/hitIntervals.length);
+        let uniformity=Math.round(Math.max(0,100-(dev/3)))+'%';
+        let weakestFinger=0,maxAvgTime=0;
+        for(let f=1;f<=5;f++){if(fingerTimes[f].length>0){let avg=fingerTimes[f].reduce((a,b)=>a+b)/fingerTimes[f].length;if(avg>maxAvgTime){maxAvgTime=avg;weakestFinger=f;}}}
+        const fingerNames=['','Thumb (1)','Index (2)','Middle (3)','Ring (4)','Pinky (5)'];
+        let tipText='Excellent work! Your timing was consistent throughout the exercise.';
+        if(weakestFinger===4||weakestFinger===5)tipText=`The data shows your <b>${fingerNames[weakestFinger]}</b> was the slowest. Focus on lifting that finger higher before each keystroke.`;
+        else if(weakestFinger>0)tipText=`Your <b>${fingerNames[weakestFinger]}</b> caused the most slowdowns. Check your hand position and keep your wrist relaxed.`;
+        document.getElementById('modalBpm').innerText=avgBpm+' BPM';document.getElementById('modalUni').innerText=uniformity;document.getElementById('modalTip').innerHTML=tipText;
+        document.getElementById('resultModal').style.display='flex';draw();
     }
-
-    function showResults() {
-        isRunning = false;
-        document.getElementById('btnStart').innerText = 'START';
-        document.getElementById('btnStart').classList.remove('running');
-        if (hitIntervals.length === 0) { stopPractice(); return; }
-
-        let avgDiff = hitIntervals.reduce((a, b) => a + b) / hitIntervals.length;
-        let avgBpm = Math.round(60000 / avgDiff);
-        let finalUniformity = document.getElementById('lcdStats').innerText.split('/')[1]?.trim() || '100%';
-
-        let weakestFinger = 0, maxAvgTime = 0;
-        for (let f = 1; f <= 5; f++) {
-            if (fingerTimes[f].length > 0) {
-                let avg = fingerTimes[f].reduce((a, b) => a + b) / fingerTimes[f].length;
-                if (avg > maxAvgTime) { maxAvgTime = avg; weakestFinger = f; }
+    function handleNoteOn(midi,vel=100){
+        playTone(midi,vel);if(!isRunning||seqBlocks.length===0)return;
+        let note=seqBlocks[currentBlockIndex][currentNoteInBlock];let hit=false;
+        if(activeRH&&midi===note.m_rh)hit=true;if(activeLH&&midi===note.m_lh)hit=true;
+        if(hit){
+            let now=performance.now();
+            if(lastHitTime>0){
+                let diff=now-lastHitTime;hitIntervals.push(diff);
+                if(activeRH&&note.f_rh)fingerTimes[note.f_rh].push(diff);if(activeLH&&note.f_lh)fingerTimes[note.f_lh].push(diff);
+                let currentBpm=Math.round(60000/diff);let avg=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
+                let dev=Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avg,2),0)/hitIntervals.length);
+                let uniformity=Math.round(Math.max(0,100-(dev/3)));
+                setInfoBar(`BPM: ${currentBpm}  |  STABILITY: ${uniformity}%  |  ${RHYTHMS[currentRhythmIdx].label}`,null);
             }
-        }
-
-        const fingerNames = ['', 'Thumb (1)', 'Index (2)', 'Middle (3)', 'Ring (4)', 'Pinky (5)'];
-        let tipText = 'Excellent work! Your timing was consistent throughout the exercise.';
-        if (weakestFinger === 4 || weakestFinger === 5) {
-            tipText = `The data shows your <b>${fingerNames[weakestFinger]}</b> was the slowest. This is natural in Hanon exercises — focus on lifting that finger higher before each keystroke.`;
-        } else if (weakestFinger > 0) {
-            tipText = `Your <b>${fingerNames[weakestFinger]}</b> caused the most slowdowns. Check your hand position and keep your wrist relaxed.`;
-        }
-
-        document.getElementById('modalBpm').innerText = avgBpm + ' BPM';
-        document.getElementById('modalUni').innerText = finalUniformity;
-        document.getElementById('modalTip').innerHTML = tipText;
-        document.getElementById('resultModal').style.display = 'flex';
-        draw();
-    }
-
-    function handleNoteOn(midi, vel = 100) {
-        playTone(midi, vel);
-        if (!isRunning || seqBlocks.length === 0) return;
-        let note = seqBlocks[currentBlockIndex][currentNoteInBlock];
-
-        // Hit detekció: ha mindkét kéz aktív, elég bármelyik helyes hang
-        // (egéren/billentyűzeten nem lehet egyszerre két hangot leütni)
-        let hit = false;
-        if (activeRH && midi === note.m_rh) hit = true;
-        if (activeLH && midi === note.m_lh) hit = true;
-
-        if (hit) {
-            let now = performance.now();
-            if (lastHitTime > 0) {
-                let diff = now - lastHitTime;
-                hitIntervals.push(diff);
-                if (activeRH && note.f_rh) fingerTimes[note.f_rh].push(diff);
-                if (activeLH && note.f_lh) fingerTimes[note.f_lh].push(diff);
-
-                let currentBpm = Math.round(60000 / diff);
-                let avg = hitIntervals.reduce((a, b) => a + b) / hitIntervals.length;
-                let dev = Math.sqrt(hitIntervals.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / hitIntervals.length);
-                let uniformity = Math.round(Math.max(0, 100 - (dev / 3)));
-                setInfoBar(`BPM: ${currentBpm}  |  STABILITY: ${uniformity}%  |  ${RHYTHMS[currentRhythmIdx].label}`, null);
-            }
-            lastHitTime = now;
-            currentNoteInBlock++;
-            if (currentNoteInBlock >= seqBlocks[currentBlockIndex].length) {
-                currentNoteInBlock = 0; currentBlockIndex++;
-                if (currentBlockIndex >= seqBlocks.length) { showResults(); return; }
-            }
+            lastHitTime=now;currentNoteInBlock++;
+            if(currentNoteInBlock>=seqBlocks[currentBlockIndex].length){currentNoteInBlock=0;currentBlockIndex++;if(currentBlockIndex>=seqBlocks.length){showResults();return;}}
             draw();
         }
     }
-
-
-    // ── RITMUS DEMO — meghallgatható mintajáték ──
-    function playRhythmDemo() {
-        initAudio().then(() => {
-            // Várjuk meg amíg a minták betöltődnek
-            const tryPlay = () => {
-                if (Object.keys(sampleBuffers).length >= 4) {
-                    _playDemo();
-                } else {
-                    setTimeout(tryPlay, 100);
-                }
-            };
-            tryPlay();
-        });
+    function playRhythmDemo(){
+        if(!audioCtx){initAudio().then(()=>{setTimeout(()=>{const t=()=>{if(Object.keys(sampleBuffers).length>=4)_playDemo();else setTimeout(t,100);};t();},300);});return;}
+        const t=()=>{if(Object.keys(sampleBuffers).length>=4)_playDemo();else setTimeout(t,100);};t();
     }
-    function _playDemo() {
-        // Az aktuális Hanon szekvencia első 16 hangját játsszuk le (1 kottasor)
-        const rawSeq = buildHanon1();
-        const demoSeq = rawSeq.slice(0, 16); // első blokk = első sor
-        const R = RHYTHMS[currentRhythmIdx];
-        const baseDur = 0.28;
-        let time = audioCtx.currentTime + 0.15;
-
-        demoSeq.forEach((note, i) => {
-            const ratio = R.ratios[i % R.ratios.length];
-            const dur = baseDur * ratio;
-            const midiNote = activeRH ? note.m_rh : note.m_lh;
-            const src = audioCtx.createBufferSource();
-            let closest = 36, minDiff = 999;
-            for (let b in sampleBuffers) {
-                let diff = Math.abs(midiNote - b);
-                if (diff < minDiff) { minDiff = diff; closest = b; }
-            }
-            if (!sampleBuffers[closest]) { time += dur; return; }
-            src.buffer = sampleBuffers[closest];
-            src.playbackRate.value = Math.pow(2, (midiNote - closest) / 12);
-            const g = audioCtx.createGain();
-            g.gain.setValueAtTime(0.6, time);
-            g.gain.exponentialRampToValueAtTime(0.001, time + dur * 2.5);
-            src.connect(g).connect(audioCtx.destination);
-            src.start(time);
-            src.stop(time + dur * 2.8);
-            time += dur;
+    function _playDemo(){
+        const rawSeq=buildHanon1();const demoSeq=rawSeq.slice(0,16);
+        const R=RHYTHMS[currentRhythmIdx];const baseDur=60/bpm;
+        let time=audioCtx.currentTime+0.15;
+        demoActiveNoteIdx=-1;document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
+        if(seqBlocks.length===0)buildSequence();
+        demoSeq.forEach((note,i)=>{
+            const ratio=R.ratios[i%R.ratios.length];const dur=baseDur*ratio;
+            const delayMs=(time-audioCtx.currentTime)*1000;const flashDur=Math.min(dur*0.85*1000,400);
+            setTimeout(()=>{demoActiveNoteIdx=i;currentBlockIndex=0;currentNoteInBlock=i;draw();setTimeout(()=>{if(demoActiveNoteIdx===i){demoActiveNoteIdx=-1;draw();}},flashDur);},delayMs);
+            [activeRH?note.m_rh:null,activeLH?note.m_lh:null].forEach(midiNote=>{
+                if(!midiNote)return;
+                const src=audioCtx.createBufferSource();let closest=36,minDiff=999;
+                for(let b in sampleBuffers){let diff=Math.abs(midiNote-b);if(diff<minDiff){minDiff=diff;closest=b;}}
+                if(!sampleBuffers[closest])return;
+                src.buffer=sampleBuffers[closest];src.playbackRate.value=Math.pow(2,(midiNote-closest)/12);
+                const g=audioCtx.createGain();g.gain.setValueAtTime(0.6,time);g.gain.exponentialRampToValueAtTime(0.001,time+dur*2.5);
+                src.connect(g).connect(audioCtx.destination);src.start(time);src.stop(time+dur*2.8);
+                setTimeout(()=>{const key=document.getElementById(`k-${midiNote}`);if(key){key.classList.add('demo-flash');setTimeout(()=>key.classList.remove('demo-flash'),flashDur);}},delayMs);
+            });
+            time+=dur;
         });
-        const isHU = currentLang === 'HU';
-        setInfoBar((isHU ? '▶ MINTA: ' : '▶ DEMO: ') + (isHU ? R.descHU : R.desc).toUpperCase(), null);
+        const totalMs=(time-audioCtx.currentTime)*1000;
+        setTimeout(()=>{demoActiveNoteIdx=-1;currentNoteInBlock=0;draw();},totalMs);
+        const isHU=currentLang==='HU';setInfoBar((isHU?'▶ MINTA: ':'▶ DEMO: ')+(isHU?R.descHU:R.desc).toUpperCase()+'  |  '+bpm+' BPM',null);
     }
-    // ── BILLENTYŰZET ──
-    function create88() {
-        const wrap = document.getElementById('hb-wrap');
-        const whites = [0, 2, 4, 5, 7, 9, 11]; let wIdx = 0;
-        for (let m = 21; m <= 108; m++) {
-            const k = document.createElement('div'); const isW = whites.includes(m % 12);
-            k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
-            if (isW) { k.style.left = (wIdx * 1.92307) + '%'; k.style.width = '1.92307%'; k.style.height = '100%'; wIdx++; }
-            else {
-                const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
-                const noteInOctave = m % 12;
-                const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
-                k.style.left = ((wIdx * 1.92307) + offset) + '%';
-                k.style.width = '1.241%';
-                k.style.height = '65%';
-                k.style.zIndex = '200';
+    function create88(){
+        const wrap=document.getElementById('hb-wrap');const whites=[0,2,4,5,7,9,11];let wIdx=0;
+        for(let m=21;m<=108;m++){
+            const k=document.createElement('div');const isW=whites.includes(m%12);
+            k.id=`k-${m}`;k.className=`key-glow ${isW?'white-glow':'black-glow'}`;
+            if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}
+            else{
+                const blackOffsets={1:-0.621,3:-0.477,6:-0.723,8:-0.559,10:-0.415};
+                const noteInOctave=m%12;const offset=blackOffsets[noteInOctave]!==undefined?blackOffsets[noteInOctave]:-0.6;
+                k.style.left=((wIdx*1.92307)+offset)+'%';k.style.width='1.241%';k.style.height='65%';k.style.zIndex='200';
             }
-            k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); };
-            k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); };
-            k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
+            const led=document.createElement('div');led.className='key-led';k.appendChild(led);
+            k.onmousedown=(e)=>{e.preventDefault();k.classList.add('pressed');handleNoteOn(m,100);};
+            k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};
+            k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};
             wrap.appendChild(k);
         }
     }
-
-    window.onload = () => { 
-        const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
-        create88(); 
-        buildSequence(); 
-        draw();
-        window.addEventListener('pointerdown', () => initAudio(), { once: true });
-    };
+    window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);create88();buildSequence();draw();window.addEventListener('pointerdown',()=>initAudio(),{once:true});};
 </script>
 </body>
 </html>
