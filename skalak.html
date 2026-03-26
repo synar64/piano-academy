@@ -255,6 +255,7 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays the official scale fingering (1–5) on the sheet.</span></div>
             </div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Wheel</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Opens the Circle of Fifths. Click any major key sector to immediately load that scale.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Demo</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl7">Plays the selected scale with the current rhythm pattern. Keys light up in sync with the notes.</span></div>
             <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p></div>
             <div style="margin-bottom:22px;">
                 <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-wheelTitle">Circle of Fifths</div>
@@ -330,11 +331,7 @@
 
                     <div class="center-console">
                         <div style="display:flex; align-items:center; gap:32px;">
-                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE SCALE PRACTICE">
-                                <span id="startLabel" class="active">START</span>
-                                <div class="split-div"></div>
-                                <span id="stopLabel">STOP</span>
-                            </div>
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE SCALE PRACTICE" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
@@ -356,9 +353,10 @@
                                             <div class="oled-header">Scale</div><div class="oled-main" id="lcdScaleText">C MAJOR</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledRhythm" class="oled-section" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="RHYTHM: CLICK TO PREVIEW — USE ARROWS TO CHANGE PATTERN">
+                                        <div id="oledRhythm" class="oled-section" onclick="if(!helpActive) cycleRhythm(1)" data-help="RHYTHM: SELECT RHYTHMIC PATTERN — USE ARROWS TO CHANGE">
                                             <div class="oled-header">Rhythm</div><div class="oled-main" id="lcdRhythm">EVEN</div>
                                         </div>
+
                                     </div>
                                 </div>
                                 <input type="hidden" id="scaleSelectValue" value="C_DUR">
@@ -369,6 +367,7 @@
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleRhythm(-1)">▼</button>
                                 </div>
                             </div>
+                            <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
 
@@ -418,8 +417,8 @@
     // ── NYELVVÁLTÓ ──
     let currentLang = 'EN';
     const MODULE_NAMES = {
-        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
-        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
     };
     const SKALAK_T = {
         EN: {
@@ -500,7 +499,8 @@
             'btnStart':T.hStart,'audioToggle':T.hPiano,
             'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
             'oledModule':T.hModule,'oledMode':T.hMode,'oledScale':T.hScale,
-            'btnClef':T.hClef
+            'btnClef':T.hClef,
+            'btnDemo': currentLang==='HU' ? 'DEMÓ: KATTINTS A SKÁLA MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK' : 'DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC'
         };
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
         // OLED modul név
@@ -589,7 +589,7 @@
     function openPatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'flex'; }
     function closePatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'none'; }
 
-    const modules = [ {name: 'EAR TRAIN', url: 'hallasfejleszto.html'}, {name: 'SIGHT READ', url: 'kottaolvasas.html'}, {name: 'CHORDS', url: 'akkordok.html'}, {name: 'SCALES', url: 'skalak.html'}, {name: 'HANON', url: 'hanon.html'}, {name: 'RHYTHM', url: 'ritmus.html'} ];
+    const modules = [ {name: 'EAR TRAIN', url: 'hallasfejleszto.html'}, {name: 'SIGHT READ', url: 'kottaolvasas.html'}, {name: 'CHORDS', url: 'akkordok.html'}, {name: 'SCALES', url: 'skalak.html'}, {name: 'HANON', url: 'hanon.html'}, {name: 'CZERNY', url: 'czerny.html'} ];
     let currentModuleIdx = 3; 
     function cycleModule(dir) { if (helpActive) return; currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length; document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name; }
     function loadModule() { if (helpActive) return; if (currentModuleIdx !== 3) window.location.href = modules[currentModuleIdx].url; }
@@ -711,8 +711,10 @@
         function buildNotes(noteArr) {
             let asc = [...noteArr];
             if (selectedOctaves === 2) {
-                const oct2 = noteArr.slice(0, 7).map(m => m + 12);
-                asc = [...noteArr, ...oct2, noteArr[7] + 12];
+                // noteArr[7] = felső C (1. okt vége), oct2 = 2. okt C-H + záró C
+                // noteArr.slice(0,7) = C..H (7 hang), + záró C = noteArr[0]+24
+                const oct2 = noteArr.slice(1, 8).map(m => m + 12);
+                asc = [...noteArr, ...oct2];
             }
             return [...asc, ...asc.slice(0, -1).reverse()];
         }
@@ -725,11 +727,29 @@
         const maxLen = Math.max(rhNotes.length, lhNotes.length);
 
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('demo-flash'));
+        demoActiveNoteIdx = -1;
+        const blockSize = seqBlocks.length > 0 ? seqBlocks[0].length : 16;
 
         for (let i = 0; i < maxLen; i++) {
             const R2 = RHYTHMS[currentRhythmIdx];
             const ratio = R2.ratios[i % R2.ratios.length];
             const dur = baseDur * ratio;
+            const delayMs = (time - audioCtx.currentTime) * 1000;
+            const flashDur = Math.min(dur * 0.85 * 1000, 400);
+
+            // Kotta kiemelés — blokk és pozíció frissítése
+            const capturedBlock = Math.floor(i / blockSize);
+            const capturedNote = i % blockSize;
+            setTimeout(() => {
+                if (capturedBlock < seqBlocks.length) {
+                    currentBlockIndex = capturedBlock;
+                    currentNoteInBlock = capturedNote;
+                }
+                demoActiveNoteIdx = capturedNote;
+                draw();
+                setTimeout(() => { demoActiveNoteIdx = -1; }, flashDur);
+            }, delayMs);
+
             const notesToPlay = [];
             if (activeRH && rhNotes[i]) notesToPlay.push(rhNotes[i]);
             if (activeLH && lhNotes[i]) notesToPlay.push(lhNotes[i]);
@@ -748,8 +768,6 @@
                 src.start(time); src.stop(time + dur * 2.8);
 
                 // LED villanás
-                const delayMs = (time - audioCtx.currentTime) * 1000;
-                const flashDur = Math.min(dur * 0.85 * 1000, 400);
                 setTimeout(() => {
                     const key = document.getElementById(`k-${midi}`);
                     if (key) {
@@ -762,11 +780,16 @@
             time += dur;
         }
 
+        // Demo végén visszaállítás
+        const totalMs = (time - audioCtx.currentTime) * 1000;
+        setTimeout(() => { demoActiveNoteIdx = -1; draw(); }, totalMs);
+
         const isHU = currentLang === 'HU';
         setInfoBar((isHU ? '▶ MINTA: ' : '▶ DEMO: ') + (isHU ? R.descHU : R.desc).toUpperCase(), null);
     }
     let rhHit = false, lhHit = false, seqBlocks = [];
     let lastHitTime = 0, hitIntervals = [];
+    let demoActiveNoteIdx = -1;
 
     function updateKeyboardHints() {
     // Összes LED leoltása
@@ -883,7 +906,13 @@
         let currentMode = MODES[currentModeIdx];
         let loops = (currentMode === 'SPRINT') ? 1 : (currentMode === 'MARATHON' ? 3 : 100);
         seqBlocks = [];
-        for(let l=0; l<loops; l++) { seqBlocks.push(JSON.parse(JSON.stringify(fullCycle))); }
+        // Max 15 hang per blokk hogy a kottán szépen elférjenek
+        const blockSize = 15;
+        for(let l=0; l<loops; l++) {
+            for(let i=0; i<fullCycle.length; i+=blockSize) {
+                seqBlocks.push(JSON.parse(JSON.stringify(fullCycle.slice(i, i+blockSize))));
+            }
+        }
         currentBlockIndex = 0; currentNoteInBlock = 0;
         updateKeyboardHints();
     }
@@ -920,8 +949,8 @@
     }
 
     function updateStartStop(running) {
-        document.getElementById('startLabel').classList.toggle('active', !running);
-        document.getElementById('stopLabel').classList.toggle('active', running);
+        const btn = document.getElementById('btnStart');
+        if (btn) btn.textContent = running ? 'STOP' : 'START';
     }
 
     function handleMainButton() { 
@@ -1037,10 +1066,15 @@
         let totalNotes = block.length; 
         
         let startX = 180; let endX = 2250;
-        let spacingX = totalNotes > 1 ? (endX - startX) / (totalNotes - 1) : 0;
+        // Egységes spacing: mindig a maximális blokkméret alapján
+        const maxBlockSize = Math.max(...seqBlocks.map(b => b.length));
+        let spacingX = maxBlockSize > 1 ? (endX - startX) / (maxBlockSize - 1) : 0;
         
         block.forEach((n, i) => {
-            let isActive = (isRunning && i === currentNoteInBlock) || (!isRunning && i === 0 && currentBlockIndex === 0);
+            const blockSize = block.length;
+            let isActive = (isRunning && i === currentNoteInBlock) || 
+                           (!isRunning && demoActiveNoteIdx < 0 && i === 0 && currentBlockIndex === 0) || 
+                           (demoActiveNoteIdx >= 0 && (demoActiveNoteIdx % blockSize) === i);
             
             /* 1. JAVÍTÁS: A zöldes árnyalat visszaállítva a kék helyett! */
             let color = isActive ? "rgba(179, 230, 255, 1.0)" : "rgba(179, 230, 255, 0.3)";
