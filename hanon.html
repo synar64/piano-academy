@@ -181,8 +181,8 @@
         .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
-        .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255,255,255,0.15); box-shadow: inset 0 -10px 15px rgba(255,255,255,0.3); z-index: 40; }
+       .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
@@ -1027,7 +1027,15 @@
             const k = document.createElement('div'); const isW = whites.includes(m % 12);
             k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
             if (isW) { k.style.left = (wIdx * 1.92307) + '%'; k.style.width = '1.92307%'; k.style.height = '100%'; wIdx++; }
-            else { k.style.left = ((wIdx * 1.92307) - 0.6) + '%'; k.style.width = '1.2%'; k.style.height = '65%'; k.style.zIndex = '200'; }
+            else {
+                const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
+                const noteInOctave = m % 12;
+                const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
+                k.style.left = ((wIdx * 1.92307) + offset) + '%';
+                k.style.width = '1.241%';
+                k.style.height = '65%';
+                k.style.zIndex = '200';
+            }
             k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); };
             k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); };
             k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
