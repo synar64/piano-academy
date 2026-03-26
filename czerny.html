@@ -235,7 +235,7 @@
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleEtude(1)">▲</button>
-
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(5)">▲</button>
                                 </div>
                                 <div class="oled-wrapper">
                                     <div class="oled-screen">
@@ -253,14 +253,18 @@
                                             <div class="oled-header">Etude</div>
                                             <div class="oled-main" id="lcdEtudeText">No. 1</div>
                                         </div>
-
+                                        <div class="oled-divider"></div>
+                                        <div id="oledTempo" class="oled-section" onclick="if(!helpActive) cycleTempo(5)" data-help="TEMPO: USE ARROWS TO SET BPM | CLICK TO INCREASE | RANGE: 40–200 BPM">
+                                            <div class="oled-header">Tempo</div>
+                                            <div class="oled-main" id="lcdTempoText">80 BPM</div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleEtude(-1)">▼</button>
-
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleTempo(-5)">▼</button>
                                 </div>
                             </div>
                             <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playEtudeDemo()" data-help="DEMO: CLICK TO HEAR THE ETUDE — KEYS LIGHT UP IN SYNC" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">DEMO</button>
@@ -392,7 +396,7 @@
         const helpMap = {
             'btnHome':'HOME: RETURN TO MAIN MODULE MENU',
             'btnClef':T.hClef, 'btnHints':T.hHints, 'btnStart':T.hStart,
-            'oledModule':T.hModule, 'oledMode':T.hMode, 'oledEtude':T.hEtude, 'btnDemo':T.hDemo,
+            'oledModule':T.hModule, 'oledMode':T.hMode, 'oledEtude':T.hEtude, 'oledTempo':'TEMPO: USE ARROWS TO SET BPM | CLICK TO INCREASE | RANGE: 40–200 BPM', 'btnDemo':T.hDemo,
         };
         Object.entries(helpMap).forEach(([id,txt])=>{ const el=document.getElementById(id); if(el) el.dataset.help=txt; });
         if (helpActive) setInfoBar(T.helpMode, null);
@@ -590,6 +594,16 @@
         if (isRunning) stopPractice(); buildSequence(); draw();
     }
 
+    // ── TEMPO ──
+    let bpm = 80;
+    const BPM_MIN = 40, BPM_MAX = 200;
+    function cycleTempo(delta) {
+        if (helpActive) return;
+        bpm = Math.min(BPM_MAX, Math.max(BPM_MIN, bpm + delta));
+        document.getElementById('lcdTempoText').innerText = bpm + ' BPM';
+        const isHU = currentLang === 'HU';
+        setInfoBar((isHU ? 'TEMPÓ: ' : 'TEMPO: ') + bpm + ' BPM', null);
+    }
     // ── ETUDE DATA ──
     // Hangjegyek: diatonikus lépésből MIDI
     const C_MAJOR_MIDI = [0,2,4,5,7,9,11];
@@ -715,7 +729,9 @@
     function _playEtudeDemo() {
         const builders = [buildEtude1, buildEtude2, buildEtude3, buildEtude4, buildEtude7, buildEtude5, buildEtude6, buildEtude8, buildEtude24, buildEtude33];
         const demoSeq = builders[currentEtudeIdx]();
-        const baseDur = currentEtudeIdx === 2 ? 0.18 : 0.28;
+        // baseDur from BPM: quarter note duration. Etude 3 uses eighths (2x faster)
+        const beatDur = 60 / bpm;
+        const baseDur = currentEtudeIdx === 2 ? beatDur / 2 : beatDur;
         let time = audioCtx.currentTime + 0.15;
 
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('demo-flash'));
@@ -759,7 +775,7 @@
 
             // No.1: LH tartott hang
             if (activeLH && note.lh_hold === false && currentEtudeIdx === 0 && i === 0) {
-                _scheduleNote(note.m_lh, time, baseDur * demoSeq.length * 0.9);
+                _scheduleNote(note.m_lh, time, (60/bpm) * demoSeq.length * 0.9);
             }
 
             time += dur;
@@ -775,7 +791,7 @@
 
         const e = etudeList[currentEtudeIdx];
         const isHU = currentLang === 'HU';
-        setInfoBar('▶ DEMO: ' + (isHU ? e.infoHU : e.infoEN), null);
+        setInfoBar('▶ DEMO: ' + (isHU ? e.infoHU : e.infoEN) + '  |  ' + bpm + ' BPM', null);
     }
 
     function _scheduleNote(midi, time, dur) {
