@@ -326,20 +326,20 @@ const MODS=[
  {id:'akkordok',url:'akkordok.html',icon:'🎹',diff:'i',xp:25},
  {id:'skalak',url:'skalak.html',icon:'🎵',diff:'i',xp:20},
  {id:'hanon',url:'hanon.html',icon:'💪',diff:'a',xp:30},
- {id:'ritmus',url:'ritmus.html',icon:'🥁',diff:'b',xp:15},
+ {id:'czerny',url:'czerny.html',icon:'🎼',diff:'i',xp:25},
 ];
 const T={
  EN:{
   badge:{b:'Beginner',i:'Intermediate',a:'Advanced'},lbl:'Last visited',
-  cards:[{t:'Ear Training',d:'Identify notes and intervals purely by ear.'},{t:'Sight Reading',d:'Practice reading notes from the staff in real time.'},{t:'Chords',d:'Learn chord shapes, inversions and functional notation.'},{t:'Scales',d:'Master all scales and fingering in every key.'},{t:'Hanon',d:'Virtuoso finger exercises for technique and independence.'},{t:'Rhythm',d:'Develop timing and understand complex rhythmic patterns.'}],
+  cards:[{t:'Ear Training',d:'Identify notes and intervals purely by ear.'},{t:'Sight Reading',d:'Practice reading notes from the staff in real time.'},{t:'Chords',d:'Learn chord shapes, inversions and functional notation.'},{t:'Scales',d:'Master all scales and fingering in every key.'},{t:'Hanon',d:'Virtuoso finger exercises for technique and independence.'},{t:'Czerny',d:'Classic Op. 599 etudes — build coordination and independence between both hands.'}],
   bs:'Results',br:'Reset',
   it:'Akíra Piano Academy',is:'Browser-Based Piano Training Workstation',
   h1:'About',h2:'Modules',h3:'How to Use',h4:'Technical',h5:'Site Map',h6:'Contact',
   ab:'A comprehensive, free, browser-based piano training workstation. Six independent modules cover every essential area of piano education. Works with a real MIDI keyboard or mouse clicks.',
-  mods:[['Ear Training','Notes and intervals by ear. Multiple ranges, chromatic option.'],['Sight Reading','Staff reading in real time. BPM, mistakes, hints.'],['Chords','Diatonic chords, inversions, sevenths. Circle of Fifths wheel.'],['Scales','All 24 major/minor scales with fingering, LED guides.'],['Hanon','Classic exercises with BPM and stability tracking.'],['Rhythm','READ / TAP / COPY. 12 patterns, 4 levels.']],
+  mods:[['Ear Training','Notes and intervals by ear. Multiple ranges, chromatic option.'],['Sight Reading','Staff reading in real time. BPM, mistakes, hints.'],['Chords','Diatonic chords, inversions, sevenths. Circle of Fifths wheel.'],['Scales','All 24 major/minor scales with fingering, LED guides.'],['Hanon','Classic exercises with BPM and stability tracking.'],['Czerny','Op. 599 etudes No. 1-3. C position, two-hand coordination, rhythm independence.']],
   hw:'Connect a MIDI keyboard before opening a module. Press ? and click any element to learn what it does.',
   tc:'Runs entirely in the browser — no server required. Audio: Web Audio API + Salamander piano. MIDI: Web MIDI API. Best in Chrome or Edge.',
-  sm:'<li><b style="color:rgba(255,255,255,.7)">hallasfejleszto.html</b> — Ear Training</li><li><b style="color:rgba(255,255,255,.7)">kottaolvasas.html</b> — Sight Reading</li><li><b style="color:rgba(255,255,255,.7)">akkordok.html</b> — Chords</li><li><b style="color:rgba(255,255,255,.7)">skalak.html</b> — Scales</li><li><b style="color:rgba(255,255,255,.7)">hanon.html</b> — Hanon</li><li><b style="color:rgba(255,255,255,.7)">ritmus.html</b> — Rhythm</li>',
+  sm:'<li><b style="color:rgba(255,255,255,.7)">hallasfejleszto.html</b> — Ear Training</li><li><b style="color:rgba(255,255,255,.7)">kottaolvasas.html</b> — Sight Reading</li><li><b style="color:rgba(255,255,255,.7)">akkordok.html</b> — Chords</li><li><b style="color:rgba(255,255,255,.7)">skalak.html</b> — Scales</li><li><b style="color:rgba(255,255,255,.7)">hanon.html</b> — Hanon</li><li><b style="color:rgba(255,255,255,.7)">czerny.html</b> — Czerny Op. 599</li>',
   ct:'Akíra Piano Academy — Independent educational project. Use the support options on the main page for feedback.',
   cl:'Got It',atl:'Login',atr:'Register',als:'Log In',ars:'Create Account',acl:'Cancel',
   stl:'My Results',sts:'XP & Progress',stm:'Modules',stc:'Close',
@@ -354,15 +354,15 @@ const T={
  },
  HU:{
   badge:{b:'Kezdő',i:'Haladó',a:'Mester'},lbl:'Legutóbb nyitott',
-  cards:[{t:'Hallásfejlesztő',d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},{t:'Kottaolvasás',d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},{t:'Akkordok',d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},{t:'Skálák',d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},{t:'Hanon',d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},{t:'Ritmus',d:'Fejleszti az időzítést és a komplex ritmusképletek megértését.'}],
+  cards:[{t:'Hallásfejlesztő',d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},{t:'Kottaolvasás',d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},{t:'Akkordok',d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},{t:'Skálák',d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},{t:'Hanon',d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},{t:'Czerny',d:'Klasszikus Op. 599 etűdök — fejleszti a két kéz koordinációját és önállóságát.'}],
   bs:'Eredményeim',br:'Reset',
   it:'Akíra Zongora Akadémia',is:'Böngészőalapú Zongora Tréning Workstation',
   h1:'A projektről',h2:'Modulok',h3:'Használat',h4:'Technikai',h5:'Oldaltérkép',h6:'Kapcsolat',
   ab:'Átfogó, ingyenes, böngészőalapú zongoraoktatási workstation. Hat független modul lefedi a zongora tanulás minden területét. Működik MIDI billentyűzettel és egérkattintással is.',
-  mods:[['Hallásfejlesztő','Hangok és hangközök felismerése fülre. Több oktávtartomány, kromatikus opció.'],['Kottaolvasás','Valós idejű kottaolvasás. BPM, hibaszámláló, hangnév súgó.'],['Akkordok','Diatonikus akkordok, fordítások, szeptimek. Kvintkor tárcsa.'],['Skálák','24 dúr/moll skála ujjrenddel, LED vezérléssel, kvintkor navigációval.'],['Hanon','Klasszikus ujjgyakorlatok valós idejű BPM és stabilitásmérővel.'],['Ritmus','READ / TAP / COPY módok. 12 minta, 4 szint.']],
+  mods:[['Hallásfejlesztő','Hangok és hangközök felismerése fülre. Több oktávtartomány, kromatikus opció.'],['Kottaolvasás','Valós idejű kottaolvasás. BPM, hibaszámláló, hangnév súgó.'],['Akkordok','Diatonikus akkordok, fordítások, szeptimek. Kvintkor tárcsa.'],['Skálák','24 dúr/moll skála ujjrenddel, LED vezérléssel, kvintkor navigációval.'],['Hanon','Klasszikus ujjgyakorlatok valós idejű BPM és stabilitásmérővel.'],['Czerny','Op. 599 etűdök 1-3. C-pozíció, kétkezes koordináció, ritmusfüggetlenség.']],
   hw:'Csatlakoztasd a MIDI billentyűzetet a modul megnyitása előtt. Nyomd meg a ? gombot és kattints bármely elemre.',
   tc:'Teljesen böngészőben fut — nincs szerver. Hang: Web Audio API + Salamander Grand Piano. MIDI: Web MIDI API. Chrome vagy Edge ajánlott.',
-  sm:'<li><b style="color:rgba(255,255,255,.7)">hallasfejleszto.html</b> — Hallásfejlesztő</li><li><b style="color:rgba(255,255,255,.7)">kottaolvasas.html</b> — Kottaolvasás</li><li><b style="color:rgba(255,255,255,.7)">akkordok.html</b> — Akkordok</li><li><b style="color:rgba(255,255,255,.7)">skalak.html</b> — Skálák</li><li><b style="color:rgba(255,255,255,.7)">hanon.html</b> — Hanon</li><li><b style="color:rgba(255,255,255,.7)">ritmus.html</b> — Ritmus</li>',
+  sm:'<li><b style="color:rgba(255,255,255,.7)">hallasfejleszto.html</b> — Hallásfejlesztő</li><li><b style="color:rgba(255,255,255,.7)">kottaolvasas.html</b> — Kottaolvasás</li><li><b style="color:rgba(255,255,255,.7)">akkordok.html</b> — Akkordok</li><li><b style="color:rgba(255,255,255,.7)">skalak.html</b> — Skálák</li><li><b style="color:rgba(255,255,255,.7)">hanon.html</b> — Hanon</li><li><b style="color:rgba(255,255,255,.7)">czerny.html</b> — Czerny Op. 599</li>',
   ct:'Akíra Piano Academy — Független oktatási projekt. Visszajelzéshez használd a főoldalon elérhető támogatási lehetőségeket.',
   cl:'Értettem',atl:'Bejelentkezés',atr:'Regisztráció',als:'Bejelentkezés',ars:'Fiók létrehozása',acl:'Mégse',
   stl:'Eredményeim',sts:'XP és előrehaladás',stm:'Modulok',stc:'Bezárás',
@@ -538,11 +538,11 @@ const LM_DATA = {
   t:'Tudj meg többet', s:'Akíra Piano Academy', cl:'Bezárás', btn:'✦ Tudj meg többet',
   h1:'Mi ez az oldal?', h2:'Hogyan jött létre?', h3:'Hogyan kezdj hozzá?',
   h4:'Technikai tudnivalók', h5:'A modulok részletesen',
-  about:'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak készült. Hat interaktív modul segít a zongora különböző területein: zenei hallás fejlesztése, kottaolvasás, akkordok, skálák, ujjtechnika és ritmusérzék. Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel, előrehaladási jelzőkkel és vizuális segítségekkel.',
+  about:'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak készült. Hat interaktív modul segít a zongora különböző területein: zenei hallás fejlesztése, kottaolvasás, akkordok, skálák, ujjtechnika és Czerny etűdök. Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel, előrehaladási jelzőkkel és vizuális segítségekkel.',
   pills:['🎹 Kezdőknek', '🎵 Ingyenes', '🌐 Böngészőben fut', '🎹 MIDI támogatás', '🇭🇺 Magyar nyelvű'],
   story:'Autodidakta zongoratanuló vagyok — és hamar szembesültem azzal, hogy a megfizethető, igazán használható magyar zongora gyakorlóeszközök száma meglepően kevés. Ami elérhető, az vagy drága, vagy csak YouTube videókból lehet összerakni a tudást. Egy egyszerű kottafelismerő oldallal kezdtem, ami fokozatosan bővült — Claude és Gemini AI asszisztensek segítségével — egészen addig amíg ez a hat modulból álló akadémia lett belőle. Remélem másoknak is segít az otthoni zongoratanulásban.',
   steps:[
-   {icon:'1️⃣', text:'Válassz egy modult a főoldalon — ha nem tudod melyikkel kezdj, a Hallásfejlesztő vagy a Ritmus modul ideális kiindulópontok.'},
+   {icon:'1️⃣', text:'Válassz egy modult a főoldalon — ha nem tudod melyikkel kezdj, a Hallásfejlesztő vagy a Czerny modul ideális kiindulópontok.'},
    {icon:'2️⃣', text:'Csatlakoztasd MIDI billentyűzetedet a modul megnyitása előtt — ha van. Ha nincs, az egérrel is kattinthatsz a virtuális zongorán.'},
    {icon:'3️⃣', text:'Nyomd meg a ⓘ Info gombot a jobb sarokban — ez részletesen leírja a modul működését és a vezérlőket.'},
    {icon:'4️⃣', text:'Nyomd meg a ? Súgó gombot, majd kattints bármely gombra vagy elemre — megjelenik annak pontos leírása.'},
@@ -575,10 +575,10 @@ const LM_DATA = {
     desc:'A Hanon ujjgyakorlatok a zongorázás klasszikus technikai alapjai. Valós idejű BPM méréssel és stabilitásmérővel — pontosan látod melyik ujj okoz lassulást vagy egyenetlenséget.',
     details:['A BPM kijelző mutatja az aktuális tempódat — próbálj egyenletes tempót tartani.','A stabilitás sáv jelzi ha az ütések közötti időköz ingadozik.','Különböző ujjgyakorlatok közül választhatsz.','Treble és Basszus kulcs külön-külön bekapcsolható.','Érdemes lassú tempón kezdeni és csak akkor gyorsítani ha teljesen egyenletes a játék.'],
     diff_color:'#cc88ff'},
-   {icon:'🥁', diff:'Kezdő', title:'Ritmus',
-    desc:'A ritmusérzék fejlesztése a zene egyik alapköve. A kottán megjelenik egy ritmusminta — koppints rá a metronómmal együtt szóközzel, MIDI billentyűzettel vagy a virtuális zongorán kattintva. A zöld sáv mutatja a pontosságodat.',
-    details:['Koppintás: szóköz billentyű, MIDI billentyűzet bármely billentyűje, vagy kattintás a virtuális zongorán.','A metronóm ki/bekapcsolható — először hallgasd meg, majd kapcsold ki és próbáld belső érzékkel.','A Count gomb visszaszámlálást indít a lejátszás előtt — segít ráhangolódni.','A Loop gomb folyamatosan ismétli a mintát.','12 minta, 4 nehézségi szinten — P01-P03 kezdőknek, P10-P12 haladóknak.','A pontossági sáv zöld ha 80% felett vagy, sárga 60-80% között, piros alatt.'],
-    diff_color:'#66cc88'},
+   {icon:'🎼', diff:'Haladó', title:'Czerny Op. 599',
+    desc:'Három etűd Czerny Op. 599-ből — A gyakorlati zongorista. Minden gyakorlat C-pozícióban marad (C-D-E-F-G), nincs ujjáttevés szükséges. Mindegyik etűd más koordinációs készséget fejleszt a két kéz között. Ideális átmeneti lépés a Hanon és a valódi zenedarabok között.',
+    details:['No. 1: JK negyedeket játszik (C-D-E-F-G-F-E-D), BK tartott egész C hang — a jobb kéz önállóságát fejleszti.','No. 2: Mindkét kéz párhuzamos negyedeket játszik fel és le — a két kéz szinkronizációját fejleszti.','No. 3: JK nyolcadokat játszik, BK negyedeket — ez a legnehezebb koordinációs kihívás, ahol a két kéz eltérő ritmusban játszik.','A Demo gombra kattintva a rendszer lejátssza az etűdöt és a billentyűzet LED-jei szinkronban villannak a hangokkal.','A Hints/Segéd gomb körkörösen vált: hangneveket, ujjrendet és billentyűzet LED vezérlést kapcsol be és ki.','Sprint, Marathon és Training módok állnak rendelkezésre.'],
+    diff_color:'#ffaa44'},
   ]
  },
  EN: {
@@ -622,8 +622,8 @@ const LM_DATA = {
     desc:'The Hanon exercises are the classical technical foundation of piano playing. With real-time BPM measurement and stability tracking — see exactly which finger causes slowdowns or unevenness.',
     details:['The BPM display shows your current tempo — try to keep it steady.','The stability bar shows when the timing between notes fluctuates.','Multiple different finger exercises to choose from.','Treble and Bass clef can be toggled individually.','Start slow and only increase speed when your playing is completely even.'],
     diff_color:'#cc88ff'},
-   {icon:'🥁', diff:'Beginner', title:'Rhythm',
-    desc:'Rhythm is one of the foundations of music. A rhythmic pattern appears on the staff — tap along with the metronome using spacebar, MIDI keyboard or by clicking the on-screen piano. The green bar shows your accuracy.',
+   {icon:'🎼', diff:'Intermediate', title:'Czerny Op. 599',
+    desc:'Three etudes from Czerny\'s Op. 599. All exercises stay in C position — no position shifts needed. Each etude trains a different two-hand coordination skill.',
     details:['Tap using: spacebar, any MIDI keyboard key, or clicking the on-screen piano.','The metronome can be toggled — listen first, then try without it using your inner sense of beat.','Count-in button starts a countdown before playback — helps you lock in the tempo.','Loop button repeats the pattern continuously.','12 patterns across 4 difficulty levels — P01-P03 for beginners, P10-P12 for advanced.','Accuracy bar is green above 80%, yellow between 60-80%, red below.'],
     diff_color:'#66cc88'},
   ]
@@ -693,7 +693,7 @@ function buildLearnModal(l) {
  const about = document.getElementById('lm-about');
  if (about) about.textContent = isEN
   ? 'Akíra Piano Academy is a free, browser-based piano practice application — designed primarily for beginners and self-learners. Six interactive modules cover every essential area of piano education: ear training, sight reading, chords, scales, technique and rhythm. Each module offers tasks at multiple difficulty levels with instant scoring and a visual progress tracker.'
-  : 'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak. Hat interaktív modul fedi le a zongora tanulás legfontosabb területeit: hallásfejlesztés, kottaolvasás, akkordok, skálák, technika és ritmusérzék. Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel és vizuális előrehaladási jelzéssel.';
+  : 'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak. Hat interaktív modul fedi le a zongora tanulás legfontosabb területeit: hallásfejlesztés, kottaolvasás, akkordok, skálák, technika és Czerny etűdök. Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel és vizuális előrehaladási jelzéssel.';
 
  // Hogyan jött létre
  const story = document.getElementById('lm-story');
@@ -705,7 +705,7 @@ function buildLearnModal(l) {
  const steps = document.getElementById('lm-steps');
  if (steps) {
   const stepData = isEN ? [
-   {n:'1', t:'Open a module', d:'Click any card on the main page. Start with Ear Training or Rhythm if you are a complete beginner.'},
+   {n:'1', t:'Open a module', d:'Click any card on the main page. Start with Ear Training or Czerny if you are a complete beginner.'},
    {n:'2', t:'Press Start', d:'The large START button in the center launches the exercise. STOP ends the session and shows your results.'},
    {n:'3', t:'Use the helpers', d:'Turn on Hints to see note names, Keys to light up the piano, or Fingers for fingering numbers. All optional.'},
    {n:'4', t:'Read the ? Help', d:'Press the ? button then click any control to see what it does. The ⓘ Info button opens the full module guide.'},
@@ -769,9 +769,9 @@ function buildLearnModal(l) {
     desc:'Classic Hanon finger exercises rendered on the staff with real-time BPM tracking. A stability bar shows how evenly you play — the system identifies which finger causes timing irregularities.',
     details:['<b>BPM display</b>: shows your current playing speed in real time','<b>Stability bar</b>: measures timing evenness across all fingers','<b>Finger tracker</b>: highlights the finger that causes the most slowdowns','<b>Multiple exercises</b>: cycle through different Hanon patterns','<b>Modes</b>: Sprint, Marathon, Training'],
    },
-   {icon:'🥁', name:'Rhythm', diff:'Beginner', color:'#66cc88',
-    desc:'A rhythmic pattern is displayed on the staff. Tap along with the metronome using spacebar, MIDI keyboard, or the virtual piano keys. The green accuracy bar shows how well your taps align with the beat grid.',
-    details:['<b>Metro</b>: toggle the metronome click — beat 1 is accented','<b>Loop</b>: repeat the pattern continuously','<b>Count</b>: 4-beat count-in before the pattern starts','<b>12 patterns</b> across 4 difficulty levels (P01–P12)','<b>Accuracy bar</b>: real-time timing precision indicator','<b>Tempo</b>: adjustable from 40–200 BPM'],
+   {icon:'🎼', name:'Czerny Op. 599', diff:'Intermediate', color:'#ffaa44',
+    desc:'Three etudes from Czerny\'s Op. 599 — The Practical Pianist. All exercises stay in C position (C–D–E–F–G), no position shifts needed. Each etude trains a different coordination skill between the hands.',
+    details:['<b>No. 1</b>: RH plays quarter notes (C-D-E-F-G-F-E-D), LH holds a whole note C — trains right hand independence','<b>No. 2</b>: Both hands play quarter notes in parallel motion up and down — trains hand synchronization','<b>No. 3</b>: RH plays eighth notes while LH plays quarter notes — the hardest coordination challenge','<b>Demo</b>: click the Demo cell on the OLED to hear the etude played with keyboard LED highlights','<b>Hints</b>: cycles through note names → fingering → keyboard LED guide → off','<b>Modes</b>: Sprint, Marathon, Training'],
    },
   ] : [
    {icon:'👂', name:'Hallásfejlesztő', diff:'Kezdő', color:'#66cc88',
@@ -794,9 +794,9 @@ function buildLearnModal(l) {
     desc:'Klasszikus Hanon ujjgyakorlatok kottán ábrázolva valós idejű BPM méréssel. A stabilitási sáv megmutatja mennyire egyenletesen játszol — a rendszer azonosítja melyik ujj okozza az időzítési egyenetlenségeket.',
     details:['<b>BPM kijelző</b>: valós idejű tempómérés','<b>Stabilitás sáv</b>: az összes ujj egyenletességét méri','<b>Ujj tracker</b>: megmutatja melyik ujj okozza a legtöbb lassulást','<b>Több gyakorlat</b>: különböző Hanon minták között váltasz','<b>Módok</b>: Sprint, Marathon, Training'],
    },
-   {icon:'🥁', name:'Ritmus', diff:'Kezdő', color:'#66cc88',
-    desc:'Egy ritmikus minta jelenik meg a kottán. Koppints a metronómmal együtt szóközzel, MIDI billentyűzettel vagy a virtuális zongora billentyűivel. A zöld pontossági sáv megmutatja mennyire pontosan ütsz az ütemrácshoz.',
-    details:['<b>Metro</b>: metronóm be/ki — az 1. ütem hangsúlyos','<b>Loop</b>: folyamatos ismétlés','<b>Count</b>: 4 ütem visszaszámlálás indítás előtt','<b>12 minta</b> 4 nehézségi szinten (P01–P12)','<b>Pontossági sáv</b>: valós idejű időzítési visszajelzés','<b>Tempo</b>: 40–200 BPM között állítható'],
+   {icon:'🎼', name:'Czerny Op. 599', diff:'Haladó', color:'#ffaa44',
+    desc:'Három etűd Czerny Op. 599-ből — A gyakorlati zongorista. Minden gyakorlat C-pozícióban marad (C–D–E–F–G), nincs ujjáttevés. Mindegyik etűd más koordinációs készséget fejleszt a két kéz között.',
+    details:['<b>No. 1</b>: JK negyedeket játszik (C-D-E-F-G-F-E-D), BK egész C hangot tart — a jobb kéz önállóságát fejleszti','<b>No. 2</b>: Mindkét kéz párhuzamos negyedeket játszik fel és le — a két kéz szinkronizációját fejleszti','<b>No. 3</b>: JK nyolcadokat, BK negyedeket játszik — a legnehezebb koordinációs kihívás','<b>Demo</b>: kattints a Demo ablakra az OLED-en az etűd meghallgatásához billentyűzet LED kiemelésekkel','<b>Hints/Segéd</b>: körkörösen váltogat: hangneveket → ujjrendet → billentyűzet LED jelzést → ki','<b>Módok</b>: Sprint, Marathon, Training'],
    },
   ];
 
