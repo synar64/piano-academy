@@ -152,8 +152,7 @@
         .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
         .key-glow.ear-hint .key-led { opacity: 1; }
@@ -430,7 +429,7 @@
         {name:'CHORDS',    url:'akkordok.html'},
         {name:'SCALES',    url:'skalak.html'},
         {name:'HANON',     url:'hanon.html'},
-        {name:'CZERNY',    url:'czerny.html'}
+        {name:'RHYTHM',    url:'ritmus.html'}
     ];
     let currentModuleIdx = 0;
     function cycleModule(dir) {
@@ -978,30 +977,40 @@
 
     // ── BILLENTYŰZET ──
     function create88() {
-        const wrap = document.getElementById('hb-wrap');
-        const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
-        for (let m = 21; m <= 108; m++) {
-            const k = document.createElement('div'); const isW = whites.includes(m%12);
-            k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
-            if (isW) { k.style.left = (wIdx*1.92307)+'%'; k.style.width = '1.241%'; k.style.height = '100%'; wIdx++; }
-            else {
-                const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
-                const noteInOctave = m % 12;
-                const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
-                k.style.left = ((wIdx * 1.92307) + offset) + '%';
-                k.style.width = '1.241%';
-                k.style.height = '65%';
-                k.style.zIndex = '200';
-            }
-            k.onmousedown = (e) => { e.preventDefault(); handleNoteOn(m, 100); };
-            k.onmouseup   = () => handleNoteOff(m);
-            k.onmouseleave = () => handleNoteOff(m);
-            const led = document.createElement('div');
-            led.className = 'key-led';
-            k.appendChild(led);
-            wrap.appendChild(k);
+    const wrap = document.getElementById('hb-wrap');
+    const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
+    for (let m = 21; m <= 108; m++) {
+        const k = document.createElement('div'); const isW = whites.includes(m%12);
+        k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
+        
+        if (isW) { 
+            // Fehér billentyűk: Szélesség a 8.32.27-es fájlból (JÓ ÁRNYÉK)
+            k.style.left = (wIdx * 1.92307) + '%'; 
+            k.style.width = '1.92307%'; 
+            k.style.height = '100%'; 
+            wIdx++; 
+        } else {
+            // Fekete billentyűk: Pozíció ÉS a kisebb szélesség a hallasfejleszto.html-ből
+            const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
+            const noteInOctave = m % 12;
+            const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
+            
+            k.style.left = ((wIdx * 1.92307) + offset) + '%';
+            k.style.width = '1.241%'; // Itt a "kisebb, rövidebb" szélesség
+            k.style.height = '65%';
+            k.style.zIndex = '200';
         }
+        
+        k.onmousedown = (e) => { e.preventDefault(); handleNoteOn(m, 100); };
+        k.onmouseup   = () => handleNoteOff(m);
+        k.onmouseleave = () => handleNoteOff(m);
+        
+        const led = document.createElement('div');
+        led.className = 'key-led';
+        k.appendChild(led);
+        wrap.appendChild(k);
     }
+}
 
     window.onload = () => {
         const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
