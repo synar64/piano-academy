@@ -307,6 +307,8 @@
 
 <script>
     let currentLang = 'EN';
+    let midiOutput = null; 
+let midiOutputs = [];
     const MODULE_NAMES = {
         EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
         HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
@@ -430,6 +432,26 @@
 
     // ── AUDIO ──
     let audioInited = false, audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
+    function handleMIDIMessage(msg) {
+        const d = msg.data;
+        const cmd = d[0] & 0xf0;
+        const note = d[1];
+        const vel = d[2];
+
+        if (cmd === 0x90 && vel > 0) { 
+            document.getElementById(`k-${note}`)?.classList.add('pressed'); 
+            handleNoteOn(note, vel); 
+        }
+        else if (cmd === 0x80 || (cmd === 0x90 && vel === 0)) { 
+            document.getElementById(`k-${note}`)?.classList.remove('pressed'); 
+            handleNoteOff(note); 
+        }
+        
+        if (cmd === 0xb0 && note === 64) {
+            if (midiOutput) midiOutput.send([0xb0, 64, vel]);
+        }
+    }
+    
     async function initAudio() {
         if (audioInited) return; audioInited = true;
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -441,14 +463,18 @@
                 sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
             } catch(e) {}
         }
-        if (navigator.requestMIDIAccess) {
+       if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess().then(m => {
-                m.inputs.forEach(input => input.onmidimessage = (msg) => {
-                    const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
-                    if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
-                    else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
-                });
-            }).catch(e => {});
+                m.inputs.forEach(input => input.onmidimessage = handleMIDIMessage);
+                
+                midiOutputs = Array.from(m.outputs.values());
+                // Megkeressük a listában azt, aminek a nevében benne van az "IAC"
+                midiOutput = midiOutputs.find(out => out.name.includes("IAC")) || midiOutputs[0];
+                
+                if (midiOutput) {
+                    console.log("MIDI Output kész:", midiOutput.name);
+                }
+            }).catch(e => { console.error("MIDI hiba:", e); });
         }
     }
 
@@ -794,19 +820,29 @@
         setInfoBar('▶ DEMO: ' + (isHU ? e.infoHU : e.infoEN) + '  |  ' + bpm + ' BPM', null);
     }
 
-    function _scheduleNote(midi, time, dur) {
+  function _scheduleNote(midi, time, dur) {
         if (!sampleBuffers || Object.keys(sampleBuffers).length === 0) return;
-        const src = audioCtx.createBufferSource();
-        let closest = 36, minDiff = 999;
-        for (let b in sampleBuffers) { let diff = Math.abs(midi-b); if(diff<minDiff){minDiff=diff;closest=b;} }
-        if (!sampleBuffers[closest]) return;
-        src.buffer = sampleBuffers[closest];
-        src.playbackRate.value = Math.pow(2, (midi-closest)/12);
-        const g = audioCtx.createGain();
-        g.gain.setValueAtTime(0.6, time);
-        g.gain.exponentialRampToValueAtTime(0.001, time + dur * 2.5);
-        src.connect(g).connect(audioCtx.destination);
-        src.start(time); src.stop(time + dur * 2.8);
+
+        // HA van MIDI kimenet (Pianoteq), CSAK oda küldjük
+        if (midiOutput) {
+            const onset = performance.now() + (time - audioCtx.currentTime) * 1000;
+            midiOutput.send([0x90, midi, 80], onset);
+            midiOutput.send([0x80, midi, 0], onset + (dur * 1000));
+        } else {
+            // HA NINCS külső kimenet, CSAK akkor szólal meg a belső hang
+            const src = audioCtx.createBufferSource();
+            let closest = 36, minDiff = 999;
+            for (let b in sampleBuffers) { let diff = Math.abs(midi-b); if (diff<minDiff){closest=b; minDiff=diff;} }
+            if (!sampleBuffers[closest]) return;
+            src.buffer = sampleBuffers[closest];
+            src.playbackRate.value = Math.pow(2, (midi-closest)/12);
+            const g = audioCtx.createGain();
+            const v_d = parseFloat(document.getElementById('vst_d').value) || 1.0;
+            g.gain.setValueAtTime(0.6 * v_d, time);
+            g.gain.exponentialRampToValueAtTime(0.001, time + dur * 2.5);
+            src.connect(g).connect(audioCtx.destination);
+            src.start(time); src.stop(time + dur * 2.8);
+        }
     }
 
     // ── ETUDE SEQUENCE BUILDERS ──
@@ -1037,7 +1073,7 @@
 
     function draw() {
         ctx.clearRect(0, 0, 2450, 480);
-        if (seqBlocks.length === 0) return;
+        if (!seqBlocks || seqBlocks.length === 0 || !seqBlocks[currentBlockIndex]) return;
         const block = seqBlocks[currentBlockIndex];
         const startX = 180, endX = 2380;
         const spacingX = block.length > 1 ? (endX-startX)/(block.length-1) : 0;
