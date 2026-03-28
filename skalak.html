@@ -58,8 +58,26 @@
         .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
-        .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
+        .key-glow.pressed::after { 
+            content: ''; position: absolute; pointer-events: none; z-index: 150; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            border-radius: 0 0 4px 4px; 
+            background: rgba(0, 0, 0, 0.10); /* Ez adja meg a lenyomás sötétedését */
+            box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); 
+        }
+
+        /* 2. FEKETE BILLENTYŰK (Precíziós fény, ami nem rontja el a fehéret) */
+        .black-glow.pressed::after { 
+            content: '' !important;
+            top: 6px !important; 
+            left: 24% !important; 
+            width: 49% !important; 
+            height: 78.5% !important; 
+            border-radius: 2px !important; 
+            background: rgba(255, 255, 255, 0.17) !important; /* Erős fehér fény a feketén */
+            z-index: 200 !important; /* A fehér fölé emeljük */
+            box-shadow: none !important;
+        }
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
         .key-glow.scale-hint .key-led { opacity: 1; }
         .key-glow.demo-flash .key-led { opacity: 1; background: rgba(179,230,255,0.95) !important; box-shadow: 0 0 12px rgba(179,230,255,0.8) !important; }
