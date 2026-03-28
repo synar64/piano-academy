@@ -8,199 +8,120 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --rack-bg: #1a1a1d; 
-            --rack-border: #2a2a2d;
-            --btn-dark: #101012; 
-            --btn-border: #050505;
-            --text-dim: #555; 
-            --lcd-bg-dark: #111213; 
-            --lcd-label-color: #557799; 
-            --theme-r: 179; --theme-g: 230; --theme-b: 255;
-            --oled-text: #b3e6ff;
+            --rack-bg: #1a1a1d; --rack-border: #2a2a2d; --btn-dark: #101012; --btn-border: #050505;
+            --text-dim: #555; --lcd-bg-dark: #111213; --lcd-label-color: #557799;
+            --theme-r: 179; --theme-g: 230; --theme-b: 255; --oled-text: #b3e6ff;
         }
-        
-        /* TISZTA FEKETE HÁTTÉR, ÁTMENET NÉLKÜL */
-        body { 
-            font-family: 'Inter', sans-serif; background: #000;
-            margin: 0; padding: 0; height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column; justify-content: space-between; color: #fff;
-            -webkit-user-select: none; user-select: none;
-        }
-
-        /* ── KOTTA KIJELZŐ ── */
-        .sheet-container {
-            flex-grow: 1; display: flex; align-items: center; justify-content: center; 
-            padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible;
-        }
-        /* ÁTLÁTSZÓ KOTTA HÁTTÉR, ÁRNYÉK NÉLKÜL */
-        .sheet-viewport { 
-            width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; position: relative; overflow: visible; 
-            background: transparent; border-radius: 6px; box-shadow: none;
-        }
+        body { font-family: 'Inter', sans-serif; background: #000; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; color: #fff; -webkit-user-select: none; user-select: none; }
+        .sheet-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible; }
+        .sheet-viewport { width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; position: relative; overflow: visible; background: transparent; border-radius: 6px; box-shadow: none; }
         .sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; opacity: 0.35; pointer-events: none; }
-        
-        #staffCanvas { 
-            position: absolute; top: 50%; left: 0; width: 100%; height: 140%; transform: translateY(-50%);
-            z-index: 10; pointer-events: none; 
-        }
-
-        /* ── WORKSTATION CHASSIS ── */
+        #staffCanvas { position: absolute; top: 50%; left: 0; width: 100%; height: 140%; transform: translateY(-50%); z-index: 10; pointer-events: none; }
         .lower-section { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; margin-bottom: 0; }
-        .workstation-chassis {
-            display: flex; width: 100%; max-width: 2560px; position: relative;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0; background: var(--rack-bg);
-        }
-        .wood-cheek {
-            width: 24px; background: linear-gradient(to right, #3a1c0d, #1a0c05);
-            box-shadow: inset 1px 0 2px rgba(255,255,255,0.1), inset -2px 0 5px rgba(0,0,0,0.8);
-            border-radius: 6px 0 0 0; z-index: 10;
-        }
+        .workstation-chassis { display: flex; width: 100%; max-width: 2560px; position: relative; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0; background: var(--rack-bg); }
+        .wood-cheek { width: 24px; background: linear-gradient(to right, #3a1c0d, #1a0c05); box-shadow: inset 1px 0 2px rgba(255,255,255,0.1), inset -2px 0 5px rgba(0,0,0,0.8); border-radius: 6px 0 0 0; z-index: 10; }
         .wood-cheek.right { border-radius: 0 6px 0 0; background: linear-gradient(to left, #3a1c0d, #1a0c05); }
-        .synth-core { flex-grow: 1; display: flex; flex-direction: column; position: relative;}
-
-        /* ── INFO SÁV ── */
-        .info-bar-integrated {
-            width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808;
-            display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden;
-        }
-        .info-bar-text { 
-            font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
-            color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
-            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s;
-        }
-        /* ── MIXER OVERLAY ── */
-        .settings-bar { 
-            position: absolute; bottom: 100%; left: 0; width: 100%; height: 85px; background: var(--lcd-bg-dark); 
-            display: none; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #333; 
-            box-shadow: 0 -10px 30px #000; padding: 0 20px; box-sizing: border-box; 
-        }
+        .synth-core { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        .info-bar-integrated { width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808; display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden; }
+        .info-bar-text { font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold; color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px; position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s; }
+        .settings-bar { position: absolute; bottom: 100%; left: 0; width: 100%; height: 85px; background: var(--lcd-bg-dark); display: none; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #333; box-shadow: 0 -10px 30px #000; padding: 0 20px; box-sizing: border-box; }
         .settings-control { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; z-index: 2; position: relative; }
-        .settings-control label { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-transform: uppercase; font-weight: bold;}
+        .settings-control label { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-transform: uppercase; font-weight: bold; }
         .settings-control input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: #111; border-radius: 3px; outline: none; cursor: pointer; box-shadow: inset 0 1px 3px #000; }
         .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 20px; background: #888; border: 1px solid #111; border-radius: 2px; box-shadow: 0 2px 4px #000; cursor: grab; }
-
-        /* ── MASTER DASHBOARD ── */
-        .master-dashboard { 
-            display: flex; justify-content: space-between; align-items: center;
-            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 100% 3px; 
-            /* MEGNÖVELT MAGASSÁG: 25px 30px */
-            padding: 25px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box;
-        }
-        .dashboard-logo { position: absolute; top: -35px; left: 30px; z-index: 5; pointer-events: none;}
+        .master-dashboard { display: flex; justify-content: space-between; align-items: center; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 100% 3px; padding: 25px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box; }
+        .dashboard-logo { position: absolute; top: -35px; left: 30px; z-index: 5; pointer-events: none; }
         .control-group { display: flex; align-items: center; gap: 8px; z-index: 10; }
-
-        /* HARDVER GOMBOK (Zéró glow) */
-        .hardware-btn { 
-            width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim);
-            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
-            font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s; text-shadow: none !important;
-        }
+        .hardware-btn { width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim); border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 0 #000; transition: transform 0.1s; text-shadow: none !important; }
         .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .hardware-btn.active { color: #ffffff; background-color: #121214; }
-        /* START|STOP SPLIT */
-        .start-split {
-            display:flex; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000;
-            overflow:hidden; transition:transform 0.1s; cursor:pointer;
-        }
+        .start-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000; overflow:hidden; transition:transform 0.1s; cursor:pointer; }
         .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .start-split span {
-            display:flex; align-items:center; justify-content:center;
-            font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif;
-            color:#444; transition:color 0.15s; text-transform:uppercase;
-            padding: 0 22px;
-        }
+        .start-split span { display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif; color:#444; transition:color 0.15s; text-transform:uppercase; padding: 0 22px; }
         .start-split span#startLabel { padding: 0 12px 0 22px; }
         .start-split span#stopLabel  { padding: 0 20px 0 12px; }
         .start-split span.active { color:#fff; }
         .start-split .split-div { width:1px; background:#333; margin:6px 0; flex-shrink:0; }
-
-        /* ── 4-RÉSZES LCD + NYILAK (Visszatéve!) ── */
         .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
-        .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px;}
+        .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px; }
         .arrow-row { display: flex; width: 100%; justify-content: space-around; margin: 4px 0; }
         .nav-disk-btn { width: 22px; height: 22px; background: #222; border: 1px solid #111; border-radius: 50%; color: #888; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 2px rgba(0,0,0,0.6); transition: 0.1s; flex-shrink: 0; }
         .nav-disk-btn:active { transform: translateY(2px); box-shadow: 0 0 1px rgba(0,0,0,0.6); }
-
-        .oled-wrapper { background: #111; padding: 2px; border-radius: 4px; width: 100%; box-shadow: 0 2px 4px rgba(255,255,255,0.1); box-sizing: border-box;}
+        .oled-wrapper { background: #111; padding: 2px; border-radius: 4px; width: 100%; box-shadow: 0 2px 4px rgba(255,255,255,0.1); box-sizing: border-box; }
         .oled-screen { background: var(--lcd-bg-dark); border: 2px solid #222; border-radius: 2px; display: flex; box-shadow: inset 0 3px 8px rgba(0,0,0,0.9); overflow: hidden; }
         .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; cursor: pointer; }
         .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
-        .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px;}
-        .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important;}
-
-        /* ── PIANO (2500/248 Egzakt Méretarány!) ── */
+        .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
+        .oled-main { font-size: 18px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important; }
         .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: visible; border-top: 2px solid #000; }
         .piano-inner { width: 100%; aspect-ratio: 2500/284; position: absolute; top: 0; left: 0; }
-        .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none;}
+        .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
-
-        /* LED POZÍCIÓ: Még 10 pixellel feljebb (-22px) */
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
-.key-glow.scale-hint .key-led { opacity: 1; }
+        .key-glow.scale-hint .key-led { opacity: 1; }
         .key-glow.demo-flash .key-led { opacity: 1; background: rgba(179,230,255,0.95) !important; box-shadow: 0 0 12px rgba(179,230,255,0.8) !important; }
-
-        /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
         .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; text-align: center; max-width: 550px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.05); }
         .modal-title { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 16px; margin-top: 0; margin-bottom: 25px; }
-        .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; transition: 0.1s; letter-spacing: 1px;}
+        .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; transition: 0.1s; letter-spacing: 1px; }
         .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
         .patch-browser-content { max-width: 750px; }
         .patch-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 25px; }
         .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 5px; font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: center; }
         .patch-btn:hover { background: #222; color: #fff; }
         .patch-btn:active { transform: translateY(2px); }
-
-        /* KULCS SPLIT GOMB */
-        
         .hints-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
         .hints-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:#444; padding:0 10px; transition:color 0.15s; letter-spacing:1px; text-transform:uppercase; }
         .hints-split button.active { color:#fff; background-color:#121214; }
         .hints-split .hints-div { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+        /* CLEF SPLIT — vertikális */
         .clef-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
-            overflow:hidden; cursor:pointer; padding:0; align-items:center;
-            transition:transform 0.1s;
+            display: flex;
+            flex-direction: column;
+            width: 38px;
+            height: 76px;
+            background: var(--btn-dark);
+            border: 1px solid var(--btn-border);
+            border-radius: 3px;
+            box-shadow: 0 3px 0 #000;
+            overflow: hidden;
+            cursor: pointer;
+            padding: 0;
+            align-items: center;
+            transition: transform 0.1s;
         }
         .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
-        .sq-btn {
-            width: 38px; height: 38px; background-color: var(--btn-dark); color: #444;
-            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
-            font-size: 16px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0;
-        }
+        .clef-split span { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; transition: color 0.15s; padding: 0; }
+        .clef-split span.active { color: #fff; }
+        .clef-divider { height: 1px; width: 100%; background: #222; flex-shrink: 0; }
+        .sq-btn { width: 38px; height: 38px; background-color: var(--btn-dark); color: #444; border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0; }
         .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .sq-btn.active { color: #fff; background-color: #121214; }
-
-        /* LANG SPLIT GOMB */
+        /* LANG SPLIT — vertikális */
         .lang-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
+            display: flex;
+            flex-direction: column;
+            width: 38px;
+            height: 76px;
+            background: var(--btn-dark);
+            border: 1px solid var(--btn-border);
+            border-radius: 3px;
+            box-shadow: 0 3px 0 #000;
+            overflow: hidden;
         }
-        .lang-split button {
-            flex:1; background:transparent; border:none; cursor:pointer;
-            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
-        }
-        .lang-split button.active { color:#fff; }
+        .lang-split button { flex: 1; background: transparent; border: none; cursor: pointer; font-weight: 700; font-size: 11px; font-family: 'Inter', sans-serif; color: var(--text-dim); }
+        .lang-split button.active { color: #fff; }
         .lang-split button:active { background: rgba(255,255,255,0.05); }
-        .lang-divider { width:1px; background:#222; margin:6px 0; }
+        .lang-divider { height: 1px; width: 100%; background: #222; }
         body.help-mode-active, body.help-mode-active * { cursor: help !important; }
-
-        /* AKKORDTÁRCSA */
         #wheelCanvas { position:fixed; right:40px; top:60px; width:400px; height:400px; z-index:10000; pointer-events:auto; background:rgba(5,5,8,0.85); border-radius:50%; box-shadow:0 10px 40px rgba(0,0,0,0.9),inset 0 0 0 2px rgba(255,255,255,0.05); backdrop-filter:blur(8px); display:none; cursor:grab; }
         #wheelCanvas:active { cursor:grabbing; }
     </style>
 </head>
 <body onclick="initAudio()">
-
     <div id="patchBrowserModal" class="modal-overlay">
         <div class="modal-content patch-browser-content">
             <h2 class="modal-title" style="border-bottom: 2px solid #111; padding-bottom: 15px;">SCALE BROWSER</h2>
@@ -225,7 +146,6 @@
             <button class="modal-btn" onclick="closePatchBrowser()">CANCEL</button>
         </div>
     </div>
-
     <div id="resultModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">SESSION COMPLETE</h2>
@@ -241,8 +161,6 @@
             <button class="modal-btn" onclick="closeModal()">ACKNOWLEDGE</button>
         </div>
     </div>
-
-    <!-- INFO MODAL -->
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content" style="max-width:640px;text-align:left;">
             <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Scales — Module Guide</h2>
@@ -253,10 +171,10 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Octave ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Switch between 1 and 2 octave scale runs.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Shows note names and activates the LED light guide on the keyboard.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays the official scale fingering (1–5) on the sheet.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Wheel</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Opens the Circle of Fifths.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Demo</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl7">Plays the selected scale with the current rhythm pattern. Keys light up in sync.</span></div>
             </div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Wheel</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Opens the Circle of Fifths. Click any major key sector to immediately load that scale.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Demo</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl7">Plays the selected scale with the current rhythm pattern. Keys light up in sync with the notes.</span></div>
-            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p></div>
+            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Start with Sprint mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p></div>
             <div style="margin-bottom:22px;">
                 <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-wheelTitle">Circle of Fifths</div>
                 <div style="display:flex;gap:20px;align-items:center;">
@@ -280,33 +198,28 @@
             <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
         </div>
     </div>
-
     <div class="sheet-container">
         <div id="sheetViewport" class="sheet-viewport">
             <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
             <canvas id="staffCanvas" width="2450" height="680"></canvas>
         </div>
     </div>
-
     <canvas id="wheelCanvas" width="400" height="400"></canvas>
     <div class="lower-section">
         <div class="workstation-chassis">
             <div class="wood-cheek"></div>
             <div class="synth-core">
-                
                 <div id="mixerBar" class="settings-bar">
-                    <div class="settings-control" data-help="ATTACK: ENVELOPE CONTROL"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.01"></div>
-                    <div class="settings-control" data-help="DECAY: ENVELOPE CONTROL"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="10.0"></div>
-                    <div class="settings-control" data-help="RELEASE: ENVELOPE CONTROL"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.8"></div>
-                    <div class="settings-control" data-help="VELOCITY: GLOBAL VOLUME"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
-                    <div class="settings-control" data-help="REVERB: ROOM ECHO"><label>Reverb</label><input type="range" id="vst_rev" min="0" max="1" step="0.05" value="0"></div>
-                    <div class="settings-control" data-help="STEREO: PANNING"><label>Stereo Wide</label><input type="range" id="vst_wide" min="0" max="1" step="0.05" value="0"></div>
+                    <div class="settings-control"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.01"></div>
+                    <div class="settings-control"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="10.0"></div>
+                    <div class="settings-control"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.8"></div>
+                    <div class="settings-control"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
+                    <div class="settings-control"><label>Reverb</label><input type="range" id="vst_rev" min="0" max="1" step="0.05" value="0"></div>
+                    <div class="settings-control"><label>Stereo Wide</label><input type="range" id="vst_wide" min="0" max="1" step="0.05" value="0"></div>
                 </div>
-
                 <div id="infoBar" class="info-bar-integrated">
                     <div id="infoBarText" class="info-bar-text" style="left:50%; transform:translateX(-50%);">SELECT SCALE OR PRESS START</div>
                 </div>
-
                 <div class="master-dashboard">
                     <div class="dashboard-logo">
                         <svg viewBox="0 0 300 40" style="height: 25px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8));">
@@ -316,19 +229,18 @@
                             <text x="135" y="28" fill="#444" font-family="'Inter', sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
                         </svg>
                     </div>
-
-                    <!-- BAL — modul-specifikus -->
+                    <!-- BAL -->
                     <div class="control-group">
                         <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
-                            <span id="clefRH" style="font-size:28px; flex:1; display:flex; align-items:center; justify-content:center; color:#fff;">𝄞</span>
+                            <span id="clefRH" class="active" style="font-size:22px;">𝄞</span>
                             <div class="clef-divider"></div>
-                            <span id="clefLH" style="font-size:22px; flex:1; display:flex; align-items:center; justify-content:center; color:#fff;">𝄢</span>
+                            <span id="clefLH" class="active" style="font-size:18px;">𝄢</span>
                         </button>
                         <button id="btnHints" class="hardware-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEYS LED | 4× OFF">Hints</button>
                         <button id="btnOctave" class="hardware-btn" onclick="if(!helpActive) cycleOctave(1)" data-help="OCTAVE: TOGGLE BETWEEN 1 AND 2 OCTAVE SCALE RUN">1 OCT</button>
-                        <button id="btnWheel" class="hardware-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS — CLICK A SECTOR TO SELECT THAT KEY">Wheel</button>
+                        <button id="btnWheel" class="hardware-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS">Wheel</button>
                     </div>
-
+                    <!-- KÖZÉP -->
                     <div class="center-console">
                         <div style="display:flex; align-items:center; gap:32px;">
                             <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE SCALE PRACTICE" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">START</button>
@@ -356,7 +268,6 @@
                                         <div id="oledRhythm" class="oled-section" onclick="if(!helpActive) cycleRhythm(1)" data-help="RHYTHM: SELECT RHYTHMIC PATTERN — USE ARROWS TO CHANGE">
                                             <div class="oled-header">Rhythm</div><div class="oled-main" id="lcdRhythm">EVEN</div>
                                         </div>
-
                                     </div>
                                 </div>
                                 <input type="hidden" id="scaleSelectValue" value="C_DUR">
@@ -370,38 +281,34 @@
                             <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
-
-                    <!-- JOBB — globális + home + info -->
+                    <!-- JOBB -->
                     <div class="control-group">
                         <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
-                            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/>
-                                <rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
-                                <rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
-                                <line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
-                                <line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
-                                <rect x="2" y="3" width="20" height="18" rx="1" fill="none" stroke="none"/>
-                            </svg>
+                            <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
                         </button>
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
-                        <div class="lang-split">
+                        <!-- Vertikális ? / ⓘ páros -->
+                        <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
+                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
+                            <div style="height:1px;background:#222;"></div>
+                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                            </button>
+                        </div>
+                        <!-- Vertikális EN/HU -->
+                        <div class="lang-split" id="langSplit">
                             <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
                         </div>
-                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
                         <div style="width:16px;"></div>
                         <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
                         </a>
-                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
-                        </button>
                     </div>
                 </div>
-
                 <div class="piano-crop-wrapper">
                     <div class="piano-inner">
                         <img src="grandpiano-keys.png" class="piano-img">
@@ -412,863 +319,171 @@
             <div class="wood-cheek right"></div>
         </div>
     </div>
-
 <script>
-    // ── NYELVVÁLTÓ ──
     let currentLang = 'EN';
     const MODULE_NAMES = {
         EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
         HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
     };
     const SKALAK_T = {
-        EN: {
-            infoTitle:'Scales — Module Guide', howTitle:'How It Works',
-            howBody:'Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note is highlighted. Complete the scale up and down to finish the round.',
-            ctrlTitle:'Controls', gotIt:'Got It',
-            ctrl1:'Cycle through all 24 major and minor scales.',
-            ctrl2:'Sprint (1×), Marathon (3×), Training (endless loop).',
-            ctrl3:'Switch between 1 and 2 octave scale runs.',
-            ctrl4:'Shows note names and activates the LED light guide on the keyboard.',
-            ctrl5:'Displays the official scale fingering (1–5) on the sheet.', ctrl6:'Opens the Circle of Fifths. Click any major key sector to immediately load that scale.', wheelTitle:'Circle of Fifths', wheelBody:'Press Wheel to open the draggable Circle of Fifths. Click any sector to instantly load that major scale — the OLED Scale display updates automatically. Drag the wheel anywhere on screen.',
-            tipTitle:'Learning Tip',
-            tipBody:'Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',
-            ready:'SELECT SCALE OR PRESS START',
-            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
-            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnFingers:'Fingers', btnKeys:'Keys', btnWheel:'Wheel',
-            btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
-            hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLES RIGHT HAND NOTES',
-            hBottom:'BOTTOM CLEF: TOGGLES LEFT HAND NOTES', hHints:'HINTS: SHOWS NOTE NAMES AND LED GUIDE',
-            hFingers:'FINGERS: DISPLAYS OFFICIAL SCALE FINGERING', hKeys:'KEYS: BLUE LED LIGHTS UP THE CURRENT NOTE ON THE KEYBOARD', hStart:'START/STOP: BEGIN OR END THE PRACTICE',
-            hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD', hMixer:'MIXER: OPEN ADSR PANEL',
-            hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT', hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
-            hModule:'MODULE: CLICK TO SWITCH — USE ARROWS TO BROWSE',
-            hMode:'MODE: SPRINT (1X) = ONE RUN | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',
-            hScale:'SCALE: CLICK TO BROWSE — CHOOSE FROM 24 MAJOR AND MINOR SCALES',
-            hOctave:'OCTAVE: 1 OCTAVE = BASIC EXERCISE | 2 OCTAVES = EXTENDED RUN',
-            hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
-            oledSprint:'SPRINT', oledMarathon:'MARATHON', oledTraining:'TRAINING',
-            oled1oct:'1 OCT', oled2oct:'2 OCT',
-        },
-        HU: {
-            infoTitle:'Skálák — Modul útmutató', howTitle:'Hogyan működik',
-            howBody:'Válassz skálát és nyomj Startot. A hangok megjelennek a kottán — játszd le őket sorban a zongorán. Az aktív hang kiemelve jelenik meg. Felfelé és lefelé is lejátszva zárul a kör.',
-            ctrlTitle:'Vezérlők', gotIt:'Értettem',
-            ctrl1:'Váltás a 24 dúr és moll skála között.',
-            ctrl2:'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',
-            ctrl3:'Váltás 1 és 2 oktáv terjedelemű skálafutam között.',
-            ctrl4:'Megjeleníti a hangneveket és aktiválja a LED fényvezetőt a billentyűzeten.',
-            ctrl5:'Megjeleníti a hivatalos skálaujjrendet (1–5) a kottán.', ctrl6:'Megnyitja a kvintkor tárcsát. Kattints bármely dúr szektorra a skála azonnali betöltéséhez.', wheelTitle:'Kvintkor', wheelBody:'Nyomd meg a Wheel gombot a mozgatható kvintkor tárcsához. Kattints bármely szektorra az adott dúr skála azonnali betöltéséhez — az OLED Scale kijelző automatikusan frissül. Húzd a tárcsát bárhova.',
-            tipTitle:'Tanulási tipp',
-            tipBody:'Kezdj <strong style="color:var(--oled-text);">Sprint</strong> móddal és 1 oktávval. Ha már tisztán tudod a skálát, válts 2 oktávra és Maratonra az izommemória építéséhez.',
-            ready:'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT',
-            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
-            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnFingers:'Ujjrend', btnKeys:'Billentyű', btnWheel:'Tárcsa',
-            btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
-            hHome:'FŐOLDAL: VISSZA A FŐMENÜBE', hTop:'FELSŐ KULCS: JOBB KÉZ HANGOK BE/KI',
-            hBottom:'ALSÓ KULCS: BAL KÉZ HANGOK BE/KI', hHints:'HANGNEM: HANGNEVEK ÉS LED VEZETŐ',
-            hFingers:'UJJREND: HIVATALOS SKÁLAUJJREND', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKTUÁLIS HANGOT A ZONGORÁN', hWheel:'TÁRCSA: MOZGATHATÓ KVINTKOR — KATTINTS EGY HANGNEMRE A SKÁLA KIVÁLASZTÁSÁHOZ', hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
-            hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI', hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA',
-            hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ', hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',
-            hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
-            hMode:'MÓD: SPRINT (1×) = EGY FUTAM | MARATON (3×) = HÁROMSZOROS | TRAINING = VÉGTELEN HUROK',
-            hScale:'SKÁLA: KATTINTS A BÖNGÉSZŐHÖZ — 24 DÚR ÉS MOLL SKÁLA KÖZÜL VÁLASZTHATSZ',
-            hOctave:'OKTÁV: 1 OKTÁV = ALAPGYAKORLAT | 2 OKTÁV = KIBŐVÍTETT FUTAM',
-            hClef:'KULCS: KÖRKÖRÖSEN VÁLt — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
-            oledSprint:'SPRINT', oledMarathon:'MARATON', oledTraining:'TRÉNING',
-            oled1oct:'1 OKT', oled2oct:'2 OKT',
-        }
+        EN: { infoTitle:'Scales — Module Guide',howTitle:'How It Works',howBody:'Select a scale and press Start. The notes appear on the staff — play them in order on the piano.',ctrlTitle:'Controls',gotIt:'Got It',ctrl1:'Cycle through all 24 major and minor scales.',ctrl2:'Sprint (1×), Marathon (3×), Training (endless loop).',ctrl3:'Switch between 1 and 2 octave scale runs.',ctrl4:'Shows note names and activates the LED light guide on the keyboard.',ctrl5:'Displays the official scale fingering (1–5) on the sheet.',ctrl6:'Opens the Circle of Fifths. Click any major key sector to immediately load that scale.',wheelTitle:'Circle of Fifths',wheelBody:'Press <strong style="color:var(--oled-text);">Wheel</strong> to open the draggable Circle of Fifths. Click any sector to instantly load that major scale — the OLED Scale display updates automatically. Keys arranged by harmonic distance: adjacent keys share 6 out of 7 notes, making scale transitions smooth. Drag the wheel anywhere on screen.',tipTitle:'Learning Tip',tipBody:'Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',ready:'SELECT SCALE OR PRESS START',helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',btnWheel:'Wheel',hHome:'HOME: RETURN TO MAIN MODULE MENU',hHints:'HINTS: CYCLE THROUGH NOTE NAMES, FINGERING, KEYS LED',hWheel:'WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS',hStart:'START/STOP: BEGIN OR END THE PRACTICE',hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH',hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hInfo:'INFO: OPEN MODULE GUIDE',hModule:'MODULE: CLICK TO SWITCH — USE ARROWS TO BROWSE',hMode:'MODE: SPRINT (1X) = ONE RUN | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',hScale:'SCALE: CLICK TO BROWSE — CHOOSE FROM 24 MAJOR AND MINOR SCALES',hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY' },
+        HU: { infoTitle:'Skálák — Modul útmutató',howTitle:'Hogyan működik',howBody:'Válassz skálát és nyomj Startot. A hangok megjelennek a kottán — játszd le őket sorban a zongorán.',ctrlTitle:'Vezérlők',gotIt:'Értettem',ctrl1:'Váltás a 24 dúr és moll skála között.',ctrl2:'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',ctrl3:'Váltás 1 és 2 oktáv terjedelemű skálafutam között.',ctrl4:'Megjeleníti a hangneveket és aktiválja a LED fényvezetőt a billentyűzeten.',ctrl5:'Megjeleníti a hivatalos skálaujjrendet (1–5) a kottán.',ctrl6:'Megnyitja a kvintkor tárcsát. Kattints bármely dúr szektorra a skála azonnali betöltéséhez.',wheelTitle:'Kvintkor',wheelBody:'Nyomd meg a <strong style="color:var(--oled-text);">Wheel</strong> gombot a mozgatható kvintkor tárcsához. Kattints bármely szektorra az adott dúr skála azonnali betöltéséhez — az OLED Scale kijelző automatikusan frissül. A hangnemek harmonikus távolság szerint rendezve: szomszédos hangnemek 7-ből 6 közös hangot tartalmaznak. Húzd a tárcsát bárhova a képernyőn.',tipTitle:'Tanulási tipp',tipBody:'Kezdj <strong style="color:var(--oled-text);">Sprint</strong> móddal és 1 oktávval. Ha már tisztán tudod a skálát, válts 2 oktávra és Maratonra az izommemória építéséhez.',ready:'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT',helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',btnWheel:'Tárcsa',hHome:'FŐOLDAL: VISSZA A FŐMENÜBE',hHints:'HANGNEM: HANGNEVEK ÉS LED VEZETŐ',hWheel:'TÁRCSA: MOZGATHATÓ KVINTKOR — KATTINTS EGY HANGNEMRE A SKÁLA KIVÁLASZTÁSÁHOZ',hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI',hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ',hMode:'MÓD: SPRINT (1×) | MARATON (3×) | TRAINING = VÉGTELEN',hScale:'SKÁLA: KATTINTS A BÖNGÉSZŐHÖZ',hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS' }
     };
-
     function setLang(lang) {
         localStorage.setItem('akira_lang', lang);
         currentLang = lang;
         document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
         document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
+        document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
+        document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
         const T = SKALAK_T[lang];
-        // Info modal
         const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-ctrl6','txt-tipTitle','txt-tipBody','txt-wheelTitle','txt-wheelBody','txt-gotIt'];
         const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.ctrl6,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
-        // Gombok
-        const btnMap={'handRH':T.btnTop,'handLH':T.btnBottom,'btnWheel':T.btnWheel};
+        const btnMap={'btnWheel':T.btnWheel};
         Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
-        // Help szövegek
-        const helpMap={
-            'btnHome':T.hHome,'handRH':T.hTop,'handLH':T.hBottom,
-            'btnHints':T.hHints||'HINTS: CYCLE THROUGH NOTE NAMES, FINGERING, KEYS LED','btnWheel':T.hWheel,
-            'btnStart':T.hStart,'audioToggle':T.hPiano,
-            'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
-            'oledModule':T.hModule,'oledMode':T.hMode,'oledScale':T.hScale,
-            'btnClef':T.hClef,
-            'btnDemo': currentLang==='HU' ? 'DEMÓ: KATTINTS A SKÁLA MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK' : 'DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC'
-        };
+        const helpMap={'btnHome':T.hHome,'btnHints':T.hHints,'btnWheel':T.hWheel,'btnStart':T.hStart,'audioToggle':T.hPiano,'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,'oledModule':T.hModule,'oledMode':T.hMode,'oledScale':T.hScale,'btnClef':T.hClef,'btnDemo':lang==='HU'?'DEMÓ: KATTINTS A SKÁLA MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK':'DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC'};
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
-        // OLED modul név
         document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][3];
-        // Skálanév frissítése az aktuális nyelvnek megfelelően
         const curVal = document.getElementById('scaleSelectValue').value;
         document.getElementById('lcdScaleText').innerText = getScaleName(curVal);
-        // Info sáv
         if(helpActive) setInfoBar(T.helpMode, null);
         else if(!isRunning) setInfoBar(T.ready, null);
     }
-    let audioInited = false, midiInited = false;
-    let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
-
-    async function initAudio() {
-        if(audioInited) return; audioInited = true;
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if(audioCtx.state === 'suspended') await audioCtx.resume();
-        const s = {36:'C2',48:'C3',60:'C4',72:'C5'};
-        for(let k in s){
-            try {
-                const r = await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);
-                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
-            } catch(e){}
-        }
+    let audioInited=false,midiInited=false;
+    let audioCtx,sampleBuffers={},activeNodes={},audioOn=true;
+    async function initAudio(){
+        if(audioInited)return;audioInited=true;
+        if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+        if(audioCtx.state==='suspended')await audioCtx.resume();
+        const s={36:'C2',48:'C3',60:'C4',72:'C5'};
+        for(let k in s){try{const r=await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);sampleBuffers[k]=await audioCtx.decodeAudioData(await r.arrayBuffer());}catch(e){}}
     }
-
-    function initMidi() {
-        if(midiInited || !navigator.requestMIDIAccess) return; midiInited = true;
-        navigator.requestMIDIAccess().then(m => {
-            m.inputs.forEach(input => input.onmidimessage = (msg) => {
-                const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
-                if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
-                else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
+    function initMidi(){
+        if(midiInited||!navigator.requestMIDIAccess)return;midiInited=true;
+        navigator.requestMIDIAccess().then(m=>{m.inputs.forEach(input=>input.onmidimessage=(msg)=>{const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}});}).catch(e=>console.log(e));
+    }
+    function toggleFullScreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen().catch(err=>console.log(err));}else{if(document.exitFullscreen)document.exitFullscreen();}}
+    document.addEventListener('fullscreenchange',()=>{document.getElementById('btnFullscreen').classList.toggle('active',!!document.fullscreenElement);});
+    let helpActive=false;
+    function toggleHelp(){
+        helpActive=!helpActive;
+        const btnHelp=document.getElementById('btnHelp');
+        if(helpActive){btnHelp.style.color='#fff';document.body.classList.add('help-mode-active');setInfoBar(SKALAK_T[currentLang].helpMode,null);}
+        else{btnHelp.style.color='#444';document.body.classList.remove('help-mode-active');setInfoBar(SKALAK_T[currentLang].ready,null);}
+    }
+    function setInfoBar(text,targetEl){
+        const bar=document.getElementById('infoBarText');
+        if(!targetEl){bar.style.left='50%';bar.style.right='auto';bar.style.transform='translateX(-50%)';bar.innerHTML=text;return;}
+        const barRect=bar.parentElement.getBoundingClientRect();
+        const cx=targetEl.getBoundingClientRect().left+targetEl.getBoundingClientRect().width/2-barRect.left;
+        if(cx/barRect.width<0.5){bar.innerHTML='<span style="opacity:0.5;margin-right:8px;">▼</span>'+text;bar.style.left=Math.max(cx-10,20)+'px';bar.style.right='auto';bar.style.transform='none';}
+        else{bar.innerHTML=text+'<span style="opacity:0.5;margin-left:8px;">▼</span>';bar.style.right=Math.max(barRect.width-cx-10,20)+'px';bar.style.left='auto';bar.style.transform='none';}
+    }
+    document.addEventListener('click',(e)=>{if(e.target.closest('#btnHelp'))return;if(helpActive){e.preventDefault();e.stopPropagation();const target=e.target.closest('[data-help]');if(target)setInfoBar(target.dataset.help,target);}},true);
+    function openPatchBrowser(){document.getElementById('patchBrowserModal').style.display='flex';}
+    function closePatchBrowser(){document.getElementById('patchBrowserModal').style.display='none';}
+    const modules=[{name:'EAR TRAIN',url:'hallasfejleszto.html'},{name:'SIGHT READ',url:'kottaolvasas.html'},{name:'CHORDS',url:'akkordok.html'},{name:'SCALES',url:'skalak.html'},{name:'HANON',url:'hanon.html'},{name:'CZERNY',url:'czerny.html'}];
+    let currentModuleIdx=3;
+    function cycleModule(dir){if(helpActive)return;currentModuleIdx=(currentModuleIdx+dir+modules.length)%modules.length;document.getElementById('lcdModuleText').innerText=modules[currentModuleIdx].name;}
+    function loadModule(){if(helpActive)return;if(currentModuleIdx!==3)window.location.href=modules[currentModuleIdx].url;}
+    const scaleDefs={'C_DUR':{midi:[0,2,4,5,7,9,11,12],n:['C','D','E','F','G','A','H','C'],s:['','','','','','','','']},'DB_DUR':{midi:[1,3,5,6,8,10,12,13],n:['D','E','F','G','A','H','C','D'],s:['♭','♭','','♭','♭','♭','','♭']},'D_DUR':{midi:[2,4,6,7,9,11,13,14],n:['D','E','F','G','A','H','C','D'],s:['','','♯','','','','♯','']},'EB_DUR':{midi:[3,5,7,8,10,12,14,15],n:['E','F','G','A','H','C','D','E'],s:['♭','','','♭','♭','','','♭']},'E_DUR':{midi:[4,6,8,9,11,13,15,16],n:['E','F','G','A','H','C','D','E'],s:['','♯','♯','','','♯','♯','']},'F_DUR':{midi:[5,7,9,10,12,14,16,17],n:['F','G','A','H','C','D','E','F'],s:['','','','♭','','','','']},'FS_DUR':{midi:[6,8,10,11,13,15,17,18],n:['F','G','A','H','C','D','E','F'],s:['♯','♯','♯','','♯','♯','♯','♯']},'G_DUR':{midi:[7,9,11,12,14,16,18,19],n:['G','A','H','C','D','E','F','G'],s:['','','','','','','♯','']},'AB_DUR':{midi:[8,10,12,13,15,17,19,20],n:['A','H','C','D','E','F','G','A'],s:['♭','♭','','♭','♭','','','♭']},'A_DUR':{midi:[9,11,13,14,16,18,20,21],n:['A','H','C','D','E','F','G','A'],s:['','','♯','','','♯','♯','']},'B_FLAT_DUR':{midi:[10,12,14,15,17,19,21,22],n:['H','C','D','E','F','G','A','H'],s:['♭','','','♭','','','','♭']},'H_DUR':{midi:[11,13,15,16,18,20,22,23],n:['H','C','D','E','F','G','A','H'],s:['','♯','♯','','♯','♯','♯','']},'C_MOLL':{midi:[0,2,3,5,7,8,10,12],n:['C','D','E','F','G','A','H','C'],s:['','','♭','','','♭','♭','']},'CS_MOLL':{midi:[1,3,4,6,8,9,11,13],n:['C','D','E','F','G','A','H','C'],s:['♯','♯','','♯','♯','','','♯']},'D_MOLL':{midi:[2,4,5,7,9,10,12,14],n:['D','E','F','G','A','H','C','D'],s:['','','','','','♭','','']},'EB_MOLL':{midi:[3,5,6,8,10,11,13,15],n:['E','F','G','A','H','C','D','E'],s:['♭','','♭','♭','♭','♭','♭','♭']},'E_MOLL':{midi:[4,6,7,9,11,12,14,16],n:['E','F','G','A','H','C','D','E'],s:['','♯','','','','','','']},'F_MOLL':{midi:[5,7,8,10,12,13,15,17],n:['F','G','A','H','C','D','E','F'],s:['','','♭','♭','','♭','♭','']},'FS_MOLL':{midi:[6,8,9,11,13,14,16,18],n:['F','G','A','H','C','D','E','F'],s:['♯','♯','','♯','♯','','','♯']},'G_MOLL':{midi:[7,9,10,12,14,15,17,19],n:['G','A','H','C','D','E','F','G'],s:['','','♭','','','♭','','']},'GS_MOLL':{midi:[8,10,11,13,15,16,18,20],n:['G','A','H','C','D','E','F','G'],s:['♯','♯','','♯','♯','','','♯']},'A_MOLL':{midi:[9,11,12,14,16,17,19,21],n:['A','H','C','D','E','F','G','A'],s:['','','','','','','','']},'B_FLAT_MOLL':{midi:[10,12,13,15,17,18,20,22],n:['H','C','D','E','F','G','A','H'],s:['♭','','♭','♭','','♭','♭','♭']},'H_MOLL':{midi:[11,13,14,16,18,19,21,23],n:['H','C','D','E','F','G','A','H'],s:['','♯','','','♯','','','']}};
+    const fingerings={std:{rh1:[1,2,3,1,2,3,4,5,4,3,2,1,3,2,1],rh2:[1,2,3,1,2,3,4,1,2,3,1,2,3,4,5,4,3,2,1,3,2,1,4,3,2,1,3,2,1],lh1:[5,4,3,2,1,3,2,1,2,3,1,2,3,4,5],lh2:[5,4,3,2,1,3,2,1,4,3,2,1,3,2,1,2,3,1,2,3,4,1,2,3,1,2,3,4,5]}};
+    const SCALE_NAMES={EN:{'C_DUR':'C MAJOR','DB_DUR':'Db MAJOR','D_DUR':'D MAJOR','EB_DUR':'Eb MAJOR','E_DUR':'E MAJOR','F_DUR':'F MAJOR','FS_DUR':'F# MAJOR','G_DUR':'G MAJOR','AB_DUR':'Ab MAJOR','A_DUR':'A MAJOR','B_FLAT_DUR':'Bb MAJOR','H_DUR':'B MAJOR','C_MOLL':'C MINOR','CS_MOLL':'C# MINOR','D_MOLL':'D MINOR','EB_MOLL':'Eb MINOR','E_MOLL':'E MINOR','F_MOLL':'F MINOR','FS_MOLL':'F# MINOR','G_MOLL':'G MINOR','GS_MOLL':'G# MINOR','A_MOLL':'A MINOR','B_FLAT_MOLL':'Bb MINOR','H_MOLL':'B MINOR'},HU:{'C_DUR':'C-dúr','DB_DUR':'Desz-dúr','D_DUR':'D-dúr','EB_DUR':'Esz-dúr','E_DUR':'E-dúr','F_DUR':'F-dúr','FS_DUR':'Fisz-dúr','G_DUR':'G-dúr','AB_DUR':'Asz-dúr','A_DUR':'A-dúr','B_FLAT_DUR':'B-dúr','H_DUR':'H-dúr','C_MOLL':'C-moll','CS_MOLL':'Cisz-moll','D_MOLL':'D-moll','EB_MOLL':'Esz-moll','E_MOLL':'E-moll','F_MOLL':'F-moll','FS_MOLL':'Fisz-moll','G_MOLL':'G-moll','GS_MOLL':'Gisz-moll','A_MOLL':'A-moll','B_FLAT_MOLL':'B-moll','H_MOLL':'H-moll'}};
+    const scaleOrder=Object.keys(scaleDefs).map(k=>({v:k,n:SCALE_NAMES['EN'][k]||k}));
+    function getScaleName(val){return SCALE_NAMES[currentLang][val]||SCALE_NAMES['EN'][val]||val;}
+    let currentScaleIdx=0;
+    function cycleScale(dir){if(helpActive)return;currentScaleIdx=(currentScaleIdx+dir+scaleOrder.length)%scaleOrder.length;let s=scaleOrder[currentScaleIdx];document.getElementById('lcdScaleText').innerText=getScaleName(s.v);document.getElementById('scaleSelectValue').value=s.v;if(isRunning)stopPractice();buildSequence();draw();syncWheelToScale();}
+    function selectPatch(val,name){currentScaleIdx=scaleOrder.findIndex(s=>s.v===val);document.getElementById('lcdScaleText').innerText=getScaleName(val);document.getElementById('scaleSelectValue').value=val;closePatchBrowser();if(isRunning)stopPractice();buildSequence();draw();syncWheelToScale();}
+    function toggleVst(){if(helpActive)return;let mb=document.getElementById('mixerBar');mb.style.display=(mb.style.display==='flex')?'none':'flex';}
+    let isRunning=false,activeRH=true,activeLH=true,currentNoteInBlock=0;
+    const MODES=['SPRINT','MARATHON','TRAINING'];
+    let currentModeIdx=0,selectedOctaves=1;
+    let showNames=false,showFinger=false,showKeys=false;
+    const RHYTHMS=[{id:'EVEN',label:'EVEN',labelHU:'EGYENLETES',desc:'Even notes — standard scale tempo',descHU:'Egyenletes hangok — standard skála tempó',ratios:[1,1]},{id:'DOTTED',label:'DOTTED',labelHU:'PUNKTÍROZOTT',desc:'Long-short pairs ♩♪',descHU:'Hosszú-rövid párok ♩♪',ratios:[3,1]},{id:'REVERSE',label:'REVERSE',labelHU:'FORDÍTOTT',desc:'Short-long pairs ♪♩',descHU:'Rövid-hosszú párok ♪♩',ratios:[1,3]},{id:'SWING',label:'SWING',labelHU:'SWING',desc:'Jazz swing feel',descHU:'Jazz swing érzés',ratios:[2,1]},{id:'SYNCOPA',label:'SYNCOPA',labelHU:'SZINKÓPA',desc:'Syncopated rhythm',descHU:'Szinkópa ritmus',ratios:[1,2,1]}];
+    let currentRhythmIdx=0;
+    function cycleRhythm(dir){if(helpActive)return;currentRhythmIdx=(currentRhythmIdx+dir+RHYTHMS.length)%RHYTHMS.length;const R=RHYTHMS[currentRhythmIdx];const isHU=currentLang==='HU';document.getElementById('lcdRhythm').innerText=isHU?R.labelHU:R.label;const hint=isHU?' — KATTINTS A RITMUS ABLAKRA A LEJÁTSZÁSHOZ':' — CLICK RHYTHM CELL TO PREVIEW';setInfoBar((isHU?R.descHU:R.desc).toUpperCase()+hint,null);draw();}
+    function playScaleRhythmDemo(){initAudio().then(()=>{const tryPlay=()=>{if(Object.keys(sampleBuffers).length>=4)_playScaleDemo();else setTimeout(tryPlay,100);};tryPlay();});}
+    function _playScaleDemo(){
+        const R=RHYTHMS[currentRhythmIdx];const baseDur=0.28;let time=audioCtx.currentTime+0.15;
+        const scaleObj=generateScaleNotes(document.getElementById('scaleSelectValue').value);
+        function buildNotes(noteArr){let asc=[...noteArr];if(selectedOctaves===2){const oct2=noteArr.slice(1,8).map(m=>m+12);asc=[...noteArr,...oct2];}return[...asc,...asc.slice(0,-1).reverse()];}
+        const rhNotes=activeRH?buildNotes(scaleObj.rh.slice(0,8).map(n=>n.midi)):[];
+        const lhNotes=activeLH?buildNotes(scaleObj.lh.slice(0,8).map(n=>n.midi)):[];
+        const maxLen=Math.max(rhNotes.length,lhNotes.length);
+        document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
+        demoActiveNoteIdx=-1;
+        const blockSize=seqBlocks.length>0?seqBlocks[0].length:16;
+        for(let i=0;i<maxLen;i++){
+            const R2=RHYTHMS[currentRhythmIdx];const ratio=R2.ratios[i%R2.ratios.length];const dur=baseDur*ratio;
+            const delayMs=(time-audioCtx.currentTime)*1000;const flashDur=Math.min(dur*0.85*1000,400);
+            const capturedBlock=Math.floor(i/blockSize);const capturedNote=i%blockSize;
+            setTimeout(()=>{if(capturedBlock<seqBlocks.length){currentBlockIndex=capturedBlock;currentNoteInBlock=capturedNote;}demoActiveNoteIdx=capturedNote;draw();setTimeout(()=>{demoActiveNoteIdx=-1;},flashDur);},delayMs);
+            const notesToPlay=[];if(activeRH&&rhNotes[i])notesToPlay.push(rhNotes[i]);if(activeLH&&lhNotes[i])notesToPlay.push(lhNotes[i]);
+            notesToPlay.forEach(midi=>{
+                const src=audioCtx.createBufferSource();let closest=36,minDiff=999;for(let b in sampleBuffers){let diff=Math.abs(midi-b);if(diff<minDiff){minDiff=diff;closest=b;}}if(!sampleBuffers[closest])return;
+                src.buffer=sampleBuffers[closest];src.playbackRate.value=Math.pow(2,(midi-closest)/12);const g=audioCtx.createGain();g.gain.setValueAtTime(0.6,time);g.gain.exponentialRampToValueAtTime(0.001,time+dur*2.5);src.connect(g).connect(audioCtx.destination);src.start(time);src.stop(time+dur*2.8);
+                setTimeout(()=>{const key=document.getElementById(`k-${midi}`);if(key){key.classList.add('demo-flash');setTimeout(()=>key.classList.remove('demo-flash'),flashDur);}},delayMs);
             });
-        }).catch(e => console.log(e));
-    }
-
-    function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.log(err)); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
-    document.addEventListener('fullscreenchange', () => {
-        document.getElementById('btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
-    });
-
-    let helpActive = false;
-    function toggleHelp() { 
-        helpActive = !helpActive; 
-        const btnHelp = document.getElementById('btnHelp');
-        if (helpActive) {
-            btnHelp.classList.add('active');
-            document.body.classList.add('help-mode-active');
-            setInfoBar(SKALAK_T[currentLang].helpMode, null);
-        } else {
-            btnHelp.classList.remove('active');
-            document.body.classList.remove('help-mode-active');
-            setInfoBar(SKALAK_T[currentLang].ready, null);
+            time+=dur;
         }
+        const totalMs=(time-audioCtx.currentTime)*1000;setTimeout(()=>{demoActiveNoteIdx=-1;draw();},totalMs);
+        const isHU=currentLang==='HU';setInfoBar((isHU?'▶ MINTA: ':'▶ DEMO: ')+(isHU?R.descHU:R.desc).toUpperCase(),null);
     }
-
-    function setInfoBar(text, targetEl) {
-        const bar = document.getElementById('infoBarText');
-        if (!targetEl) {
-            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
-            bar.innerHTML = text; return;
-        }
-        const barRect = bar.parentElement.getBoundingClientRect();
-        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
-        const cxPct = cx / barRect.width;
-        if (cxPct < 0.5) {
-            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;">▼</span>' + text;
-            bar.style.left = Math.max(cx - 10, 20) + 'px'; bar.style.right='auto'; bar.style.transform='none';
-        } else {
-            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;">▼</span>';
-            bar.style.right = Math.max(barRect.width - cx - 10, 20) + 'px'; bar.style.left='auto'; bar.style.transform='none';
-        }
+    let rhHit=false,lhHit=false,seqBlocks=[];
+    let lastHitTime=0,hitIntervals=[];
+    let demoActiveNoteIdx=-1;
+    let currentBlockIndex=0;
+    function updateKeyboardHints(){document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('scale-hint'));if(showKeys&&seqBlocks.length>0){seqBlocks[0].forEach(n=>{if(activeRH)document.getElementById(`k-${n.m_rh}`)?.classList.add('scale-hint');if(activeLH)document.getElementById(`k-${n.m_lh}`)?.classList.add('scale-hint');});}}
+    function cycleMode(dir){if(helpActive)return;currentModeIdx=(currentModeIdx+dir+MODES.length)%MODES.length;document.getElementById('lcdModeText').innerText=MODES[currentModeIdx];if(isRunning)stopPractice();buildSequence();draw();}
+    function cycleOctave(dir){if(helpActive)return;selectedOctaves=selectedOctaves===1?2:1;const btn=document.getElementById('btnOctave');if(btn)btn.textContent=selectedOctaves+' OCT';const isHU=currentLang==='HU';setInfoBar(isHU?(selectedOctaves+' OKTÁV KIVÁLASZTVA'):(selectedOctaves+' OCTAVE SELECTED'),null);if(isRunning)stopPractice();buildSequence();draw();}
+    let clefState=0;
+    function cycleClef(){if(helpActive)return;clefState=(clefState+1)%3;activeRH=clefState!==2;activeLH=clefState!==1;const DIM='#444',ON='#fff';document.getElementById('clefRH').style.color=activeRH?ON:DIM;document.getElementById('clefLH').style.color=activeLH?ON:DIM;if(isRunning)stopPractice();buildSequence();draw();}
+    let hintsState=0;
+    function cycleHints(){hintsState=(hintsState+1)%4;showNames=hintsState>=1;showFinger=hintsState>=2;showKeys=hintsState>=3;const btn=document.getElementById('btnHints');const isHU=currentLang==='HU';const infoTexts=isHU?['HINTS KIKAPCSOLVA','HANGNÉV AKTÍV','HANGNÉV + UJJREND AKTÍV','HANGNÉV + UJJREND + BILLENTYŰ LED AKTÍV']:['HINTS OFF','NOTE NAMES ON','NAMES + FINGERING ON','NAMES + FINGERING + KEYS LED ON'];btn.classList.toggle('active',hintsState>0);setInfoBar(infoTexts[hintsState],null);updateKeyboardHints();draw();}
+    function toggleAudio(){if(helpActive)return;audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn&&!audioCtx)initAudio();}
+    function midiToStaffStep(midiNote,clef){const MAP=[0,0,1,1,2,3,3,4,4,5,5,6];let s=midiNote%12,o=Math.floor(midiNote/12)-1;return(clef==='treble')?(o*7+MAP[s])+2:(o*7+MAP[s])-3;}
+    function generateScaleNotes(key){let def=scaleDefs[key]||scaleDefs['C_DUR'];let rh=[],lh=[];let rhBase=(60+def.midi[0]>64)?48:60;let lhBase=(48+def.midi[0]>52)?36:48;for(let i=0;i<def.midi.length;i++){let midiRH=rhBase+def.midi[i];let midiLH=lhBase+def.midi[i];rh.push({n:def.n[i],s:def.s[i],midi:midiRH,step:midiToStaffStep(midiRH,'treble')});lh.push({n:def.n[i],s:def.s[i],midi:midiLH,step:midiToStaffStep(midiLH,'bass')});}return{rh,lh};}
+    function buildSequence(){
+        let scaleObj=generateScaleNotes(document.getElementById('scaleSelectValue').value);let fullCycle=[];
+        for(let oct=0;oct<selectedOctaves;oct++){let limit=(oct===selectedOctaves-1)?8:7;for(let i=0;i<limit;i++){let nRH=scaleObj.rh[i],nLH=scaleObj.lh[i];fullCycle.push({n:nRH.n,s:nRH.s,m_rh:nRH.midi+(oct*12),step_rh:nRH.step+(oct*7),m_lh:nLH.midi+(oct*12),step_lh:nLH.step+(oct*7)});}}
+        for(let i=fullCycle.length-2;i>=0;i--){fullCycle.push({...fullCycle[i]});}
+        for(let i=0;i<fullCycle.length;i++){fullCycle[i].f_rh=fingerings.std['rh'+selectedOctaves][i]||'';fullCycle[i].f_lh=fingerings.std['lh'+selectedOctaves][i]||'';}
+        let currentMode=MODES[currentModeIdx];let loops=(currentMode==='SPRINT')?1:(currentMode==='MARATHON'?3:100);
+        seqBlocks=[];const blockSize=15;
+        for(let l=0;l<loops;l++){for(let i=0;i<fullCycle.length;i+=blockSize){seqBlocks.push(JSON.parse(JSON.stringify(fullCycle.slice(i,i+blockSize))));}}
+        currentBlockIndex=0;currentNoteInBlock=0;updateKeyboardHints();
     }
-
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('#btnHelp')) return;
-        if (helpActive) {
-            e.preventDefault(); e.stopPropagation();
-            const target = e.target.closest('[data-help]');
-            if (target) setInfoBar(target.dataset.help, target);
-        }
-    }, true);
-
-    function openPatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'flex'; }
-    function closePatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'none'; }
-
-    const modules = [ {name: 'EAR TRAIN', url: 'hallasfejleszto.html'}, {name: 'SIGHT READ', url: 'kottaolvasas.html'}, {name: 'CHORDS', url: 'akkordok.html'}, {name: 'SCALES', url: 'skalak.html'}, {name: 'HANON', url: 'hanon.html'}, {name: 'CZERNY', url: 'czerny.html'} ];
-    let currentModuleIdx = 3; 
-    function cycleModule(dir) { if (helpActive) return; currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length; document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name; }
-    function loadModule() { if (helpActive) return; if (currentModuleIdx !== 3) window.location.href = modules[currentModuleIdx].url; }
-
-    const scaleDefs = {
-        'C_DUR': { midi:[0,2,4,5,7,9,11,12], n:['C','D','E','F','G','A','H','C'], s:['','','','','','','',''] },
-        'DB_DUR': { midi:[1,3,5,6,8,10,12,13], n:['D','E','F','G','A','H','C','D'], s:['♭','♭','','♭','♭','♭','','♭'] },
-        'D_DUR': { midi:[2,4,6,7,9,11,13,14], n:['D','E','F','G','A','H','C','D'], s:['','','♯','','','','♯',''] },
-        'EB_DUR': { midi:[3,5,7,8,10,12,14,15], n:['E','F','G','A','H','C','D','E'], s:['♭','','','♭','♭','','','♭'] },
-        'E_DUR': { midi:[4,6,8,9,11,13,15,16], n:['E','F','G','A','H','C','D','E'], s:['','♯','♯','','','♯','♯',''] },
-        'F_DUR': { midi:[5,7,9,10,12,14,16,17], n:['F','G','A','H','C','D','E','F'], s:['','','','♭','','','',''] },
-        'FS_DUR': { midi:[6,8,10,11,13,15,17,18], n:['F','G','A','H','C','D','E','F'], s:['♯','♯','♯','','♯','♯','♯','♯'] },
-        'G_DUR': { midi:[7,9,11,12,14,16,18,19], n:['G','A','H','C','D','E','F','G'], s:['','','','','','','♯',''] },
-        'AB_DUR': { midi:[8,10,12,13,15,17,19,20], n:['A','H','C','D','E','F','G','A'], s:['♭','♭','','♭','♭','','','♭'] },
-        'A_DUR': { midi:[9,11,13,14,16,18,20,21], n:['A','H','C','D','E','F','G','A'], s:['','','♯','','','♯','♯',''] },
-        'B_FLAT_DUR': { midi:[10,12,14,15,17,19,21,22], n:['H','C','D','E','F','G','A','H'], s:['♭','','','♭','','','','♭'] },
-        'H_DUR': { midi:[11,13,15,16,18,20,22,23], n:['H','C','D','E','F','G','A','H'], s:['','♯','♯','','♯','♯','♯',''] },
-        'C_MOLL': { midi:[0,2,3,5,7,8,10,12], n:['C','D','E','F','G','A','H','C'], s:['','','♭','','','♭','♭',''] },
-        'CS_MOLL':{ midi:[1,3,4,6,8,9,11,13], n:['C','D','E','F','G','A','H','C'], s:['♯','♯','','♯','♯','','','♯'] },
-        'D_MOLL': { midi:[2,4,5,7,9,10,12,14], n:['D','E','F','G','A','H','C','D'], s:['','','','','','♭','',''] },
-        'EB_MOLL':{ midi:[3,5,6,8,10,11,13,15], n:['E','F','G','A','H','C','D','E'], s:['♭','','♭','♭','♭','♭','♭','♭'] },
-        'E_MOLL': { midi:[4,6,7,9,11,12,14,16], n:['E','F','G','A','H','C','D','E'], s:['','♯','','','','','',''] },
-        'F_MOLL': { midi:[5,7,8,10,12,13,15,17], n:['F','G','A','H','C','D','E','F'], s:['','','♭','♭','','♭','♭',''] },
-        'FS_MOLL':{ midi:[6,8,9,11,13,14,16,18], n:['F','G','A','H','C','D','E','F'], s:['♯','♯','','♯','♯','','','♯'] },
-        'G_MOLL': { midi:[7,9,10,12,14,15,17,19], n:['G','A','H','C','D','E','F','G'], s:['','','♭','','','♭','',''] },
-        'GS_MOLL':{ midi:[8,10,11,13,15,16,18,20], n:['G','A','H','C','D','E','F','G'], s:['♯','♯','','♯','♯','','','♯'] },
-        'A_MOLL': { midi:[9,11,12,14,16,17,19,21], n:['A','H','C','D','E','F','G','A'], s:['','','','','','','',''] },
-        'B_FLAT_MOLL': { midi:[10,12,13,15,17,18,20,22], n:['H','C','D','E','F','G','A','H'], s:['♭','','♭','♭','','♭','♭','♭'] },
-        'H_MOLL': { midi:[11,13,14,16,18,19,21,23], n:['H','C','D','E','F','G','A','H'], s:['','♯','','','♯','','',''] }
-    };
-    
-    const fingerings = {
-        std: { 
-            rh1: [1,2,3,1,2,3,4,5, 4,3,2,1,3,2,1], 
-            rh2: [1,2,3,1,2,3,4,1,2,3,1,2,3,4,5, 4,3,2,1,3,2,1,4,3,2,1,3,2,1], 
-            lh1: [5,4,3,2,1,3,2,1, 2,3,1,2,3,4,5], 
-            lh2: [5,4,3,2,1,3,2,1,4,3,2,1,3,2,1, 2,3,1,2,3,4,1,2,3,1,2,3,4,5] 
-        }
-    };
-
-    const SCALE_NAMES = {
-        EN: {
-            'C_DUR':'C MAJOR','DB_DUR':'Db MAJOR','D_DUR':'D MAJOR','EB_DUR':'Eb MAJOR',
-            'E_DUR':'E MAJOR','F_DUR':'F MAJOR','FS_DUR':'F# MAJOR','G_DUR':'G MAJOR',
-            'AB_DUR':'Ab MAJOR','A_DUR':'A MAJOR','B_FLAT_DUR':'Bb MAJOR','H_DUR':'B MAJOR',
-            'C_MOLL':'C MINOR','CS_MOLL':'C# MINOR','D_MOLL':'D MINOR','EB_MOLL':'Eb MINOR',
-            'E_MOLL':'E MINOR','F_MOLL':'F MINOR','FS_MOLL':'F# MINOR','G_MOLL':'G MINOR',
-            'GS_MOLL':'G# MINOR','A_MOLL':'A MINOR','B_FLAT_MOLL':'Bb MINOR','H_MOLL':'B MINOR'
-        },
-        HU: {
-            'C_DUR':'C-dúr','DB_DUR':'Desz-dúr','D_DUR':'D-dúr','EB_DUR':'Esz-dúr',
-            'E_DUR':'E-dúr','F_DUR':'F-dúr','FS_DUR':'Fisz-dúr','G_DUR':'G-dúr',
-            'AB_DUR':'Asz-dúr','A_DUR':'A-dúr','B_FLAT_DUR':'B-dúr','H_DUR':'H-dúr',
-            'C_MOLL':'C-moll','CS_MOLL':'Cisz-moll','D_MOLL':'D-moll','EB_MOLL':'Esz-moll',
-            'E_MOLL':'E-moll','F_MOLL':'F-moll','FS_MOLL':'Fisz-moll','G_MOLL':'G-moll',
-            'GS_MOLL':'Gisz-moll','A_MOLL':'A-moll','B_FLAT_MOLL':'B-moll','H_MOLL':'H-moll'
-        }
-    };
-    const scaleOrder = Object.keys(scaleDefs).map(k => ({ v: k, n: SCALE_NAMES['EN'][k] || k }));
-
-    function getScaleName(val) {
-        return SCALE_NAMES[currentLang][val] || SCALE_NAMES['EN'][val] || val;
-    }
-    let currentScaleIdx = 0;
-
-    function cycleScale(dir) { if (helpActive) return; currentScaleIdx = (currentScaleIdx + dir + scaleOrder.length) % scaleOrder.length; let s = scaleOrder[currentScaleIdx]; document.getElementById('lcdScaleText').innerText = getScaleName(s.v); document.getElementById('scaleSelectValue').value = s.v; if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
-    function selectPatch(val, name) { currentScaleIdx = scaleOrder.findIndex(s => s.v === val); document.getElementById('lcdScaleText').innerText = getScaleName(val); document.getElementById('scaleSelectValue').value = val; closePatchBrowser(); if(isRunning) stopPractice(); buildSequence(); draw(); syncWheelToScale(); }
-    
-    function toggleVst() { 
-        if (helpActive) return; 
-        let mb = document.getElementById('mixerBar');
-        mb.style.display = (mb.style.display === 'flex') ? 'none' : 'flex';
-        document.getElementById('btnVst').classList.toggle('active');
-    }
-
-    let isRunning = false, activeRH = true, activeLH = true, currentNoteInBlock = 0;
-    const MODES = ['SPRINT', 'MARATHON', 'TRAINING'];
-    let currentModeIdx = 0, selectedOctaves = 1;
-    let showNames = false, showFinger = false, showKeys = false;
-
-    // ── RITMUSKÉPLETEK ──
-    const RHYTHMS = [
-        { id:'EVEN',   label:'EVEN',    labelHU:'EGYENLETES', desc:'Even notes — standard scale tempo',       descHU:'Egyenletes hangok — standard skála tempó', ratios:[1,1] },
-        { id:'DOTTED', label:'DOTTED',  labelHU:'PUNKTÍROZOTT', desc:'Long-short pairs ♩♪',                 descHU:'Hosszú-rövid párok ♩♪',                    ratios:[3,1] },
-        { id:'REVERSE',label:'REVERSE', labelHU:'FORDÍTOTT',  desc:'Short-long pairs ♪♩',                   descHU:'Rövid-hosszú párok ♪♩',                    ratios:[1,3] },
-        { id:'SWING',  label:'SWING',   labelHU:'SWING',      desc:'Jazz swing feel',                        descHU:'Jazz swing érzés',                         ratios:[2,1] },
-        { id:'SYNCOPA',label:'SYNCOPA', labelHU:'SZINKÓPA',   desc:'Syncopated rhythm',                      descHU:'Szinkópa ritmus',                          ratios:[1,2,1] },
-    ];
-    let currentRhythmIdx = 0;
-
-    function cycleRhythm(dir) {
-        if (helpActive) return;
-        currentRhythmIdx = (currentRhythmIdx + dir + RHYTHMS.length) % RHYTHMS.length;
-        const R = RHYTHMS[currentRhythmIdx];
-        const isHU = currentLang === 'HU';
-        document.getElementById('lcdRhythm').innerText = isHU ? R.labelHU : R.label;
-        const hint = isHU ? ' — KATTINTS A RITMUS ABLAKRA A LEJÁTSZÁSHOZ' : ' — CLICK RHYTHM CELL TO PREVIEW';
-        setInfoBar((isHU ? R.descHU : R.desc).toUpperCase() + hint, null);
-        draw();
-    }
-
-    function playScaleRhythmDemo() {
-        initAudio().then(() => {
-            const tryPlay = () => {
-                if (Object.keys(sampleBuffers).length >= 4) _playScaleDemo();
-                else setTimeout(tryPlay, 100);
-            };
-            tryPlay();
-        });
-    }
-
-    function _playScaleDemo() {
-        const R = RHYTHMS[currentRhythmIdx];
-        const baseDur = 0.28;
-        let time = audioCtx.currentTime + 0.15;
-        const scaleObj = generateScaleNotes(document.getElementById('scaleSelectValue').value);
-
-        // Hangok összeállítása kulcs állás szerint
-        function buildNotes(noteArr) {
-            let asc = [...noteArr];
-            if (selectedOctaves === 2) {
-                // noteArr[7] = felső C (1. okt vége), oct2 = 2. okt C-H + záró C
-                // noteArr.slice(0,7) = C..H (7 hang), + záró C = noteArr[0]+24
-                const oct2 = noteArr.slice(1, 8).map(m => m + 12);
-                asc = [...noteArr, ...oct2];
-            }
-            return [...asc, ...asc.slice(0, -1).reverse()];
-        }
-
-        const rhNotes = activeRH ? buildNotes(scaleObj.rh.slice(0, 8).map(n => n.midi)) : [];
-        const lhNotes = activeLH ? buildNotes(scaleObj.lh.slice(0, 8).map(n => n.midi)) : [];
-
-        // Ha mindkettő aktív: RH és LH egyszerre szól (párhuzamosan)
-        // Ha csak egyik: csak azt játssza
-        const maxLen = Math.max(rhNotes.length, lhNotes.length);
-
-        document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('demo-flash'));
-        demoActiveNoteIdx = -1;
-        const blockSize = seqBlocks.length > 0 ? seqBlocks[0].length : 16;
-
-        for (let i = 0; i < maxLen; i++) {
-            const R2 = RHYTHMS[currentRhythmIdx];
-            const ratio = R2.ratios[i % R2.ratios.length];
-            const dur = baseDur * ratio;
-            const delayMs = (time - audioCtx.currentTime) * 1000;
-            const flashDur = Math.min(dur * 0.85 * 1000, 400);
-
-            // Kotta kiemelés — blokk és pozíció frissítése
-            const capturedBlock = Math.floor(i / blockSize);
-            const capturedNote = i % blockSize;
-            setTimeout(() => {
-                if (capturedBlock < seqBlocks.length) {
-                    currentBlockIndex = capturedBlock;
-                    currentNoteInBlock = capturedNote;
-                }
-                demoActiveNoteIdx = capturedNote;
-                draw();
-                setTimeout(() => { demoActiveNoteIdx = -1; }, flashDur);
-            }, delayMs);
-
-            const notesToPlay = [];
-            if (activeRH && rhNotes[i]) notesToPlay.push(rhNotes[i]);
-            if (activeLH && lhNotes[i]) notesToPlay.push(lhNotes[i]);
-
-            notesToPlay.forEach(midi => {
-                const src = audioCtx.createBufferSource();
-                let closest = 36, minDiff = 999;
-                for (let b in sampleBuffers) { let diff = Math.abs(midi-b); if(diff<minDiff){minDiff=diff;closest=b;} }
-                if (!sampleBuffers[closest]) return;
-                src.buffer = sampleBuffers[closest];
-                src.playbackRate.value = Math.pow(2, (midi-closest)/12);
-                const g = audioCtx.createGain();
-                g.gain.setValueAtTime(0.6, time);
-                g.gain.exponentialRampToValueAtTime(0.001, time + dur * 2.5);
-                src.connect(g).connect(audioCtx.destination);
-                src.start(time); src.stop(time + dur * 2.8);
-
-                // LED villanás
-                setTimeout(() => {
-                    const key = document.getElementById(`k-${midi}`);
-                    if (key) {
-                        key.classList.add('demo-flash');
-                        setTimeout(() => key.classList.remove('demo-flash'), flashDur);
-                    }
-                }, delayMs);
-            });
-
-            time += dur;
-        }
-
-        // Demo végén visszaállítás
-        const totalMs = (time - audioCtx.currentTime) * 1000;
-        setTimeout(() => { demoActiveNoteIdx = -1; draw(); }, totalMs);
-
-        const isHU = currentLang === 'HU';
-        setInfoBar((isHU ? '▶ MINTA: ' : '▶ DEMO: ') + (isHU ? R.descHU : R.desc).toUpperCase(), null);
-    }
-    let rhHit = false, lhHit = false, seqBlocks = [];
-    let lastHitTime = 0, hitIntervals = [];
-    let demoActiveNoteIdx = -1;
-
-    function updateKeyboardHints() {
-    // Összes LED leoltása
-    document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('scale-hint'));
-    
-    // Ha a Keys gomb aktív, gyújtsuk meg a LED-eket
-    if (showKeys && seqBlocks.length > 0) { 
-        seqBlocks[0].forEach(n => { 
-            if(activeRH) document.getElementById(`k-${n.m_rh}`)?.classList.add('scale-hint'); 
-            if(activeLH) document.getElementById(`k-${n.m_lh}`)?.classList.add('scale-hint'); 
-        }); 
-    }
-}
-
-    function cycleMode(dir) { if (helpActive) return; currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length; document.getElementById('lcdModeText').innerText = MODES[currentModeIdx]; if(isRunning) stopPractice(); buildSequence(); draw(); }
-    function cycleOctave(dir) {
-        if (helpActive) return;
-        selectedOctaves = selectedOctaves === 1 ? 2 : 1;
-        const btn = document.getElementById('btnOctave');
-        if (btn) btn.textContent = selectedOctaves + ' OCT';
-        const isHU = currentLang === 'HU';
-        setInfoBar(isHU ? (selectedOctaves + ' OKTÁV KIVÁLASZTVA') : (selectedOctaves + ' OCTAVE SELECTED'), null);
-        if(isRunning) stopPractice(); buildSequence(); draw();
-    }
-    // clef állapot: 0=mindkettő, 1=csak violin, 2=csak basszus
-    let clefState = 0;
-    function cycleClef() {
-        if (helpActive) return;
-        clefState = (clefState + 1) % 3;
-        activeRH = clefState !== 2;
-        activeLH = clefState !== 1;
-        const DIM = '#444', ON = '#fff';
-        document.getElementById('clefRH').style.color = activeRH ? ON : DIM;
-        document.getElementById('clefLH').style.color = activeLH ? ON : DIM;
-        if (isRunning) stopPractice();
-        buildSequence(); draw();
-    }
-    // Ciklikus Hints gomb: 0=ki, 1=hangnév, 2=hangnév+ujjrend, 3=hangnév+ujjrend+billentyű
-    let hintsState = 0;
-    function cycleHints() {
-        hintsState = (hintsState + 1) % 4;
-        showNames  = hintsState >= 1;
-        showFinger = hintsState >= 2;
-        showKeys   = hintsState >= 3;
-        const btn = document.getElementById('btnHints');
-        const isHU = currentLang === 'HU';
-        const infoTexts = isHU
-            ? ['HINTS KIKAPCSOLVA', 'HANGNÉV AKTÍV', 'HANGNÉV + UJJREND AKTÍV', 'HANGNÉV + UJJREND + BILLENTYŰ LED AKTÍV']
-            : ['HINTS OFF', 'NOTE NAMES ON', 'NAMES + FINGERING ON', 'NAMES + FINGERING + KEYS LED ON'];
-        btn.classList.toggle('active', hintsState > 0);
-        setInfoBar(infoTexts[hintsState], null);
-        updateKeyboardHints();
-        draw();
-    }
-    function toggleHint(type) {
-        // legacy — cycleHints replaces this
-        cycleHints();
-    }
-    function toggleKeys() {
-        // legacy — handled by cycleHints
-        cycleHints();
-    }
-
-    function toggleKeys() {
-        if(helpActive) return;
-        showKeys = !showKeys;
-        document.getElementById('btnKeys').classList.toggle('active', showKeys);
-        updateKeyboardHints();
-    }
-    function toggleAudio() { if (helpActive) return; audioOn = !audioOn; document.getElementById('audioToggle').classList.toggle('active', audioOn); if(audioOn && !audioCtx) initAudio(); }
-
-    function midiToStaffStep(midiNote, clef) {
-        const MAP = [0,0,1,1,2,3,3,4,4,5,5,6]; 
-        let s = midiNote % 12, o = Math.floor(midiNote / 12) - 1; 
-        return (clef === 'treble') ? (o * 7 + MAP[s]) + 2 : (o * 7 + MAP[s]) - 3;  
-    }
-
-    function generateScaleNotes(key) {
-        let def = scaleDefs[key] || scaleDefs['C_DUR'];
-        let rh=[], lh=[];
-        let rhBase = (60 + def.midi[0] > 64) ? 48 : 60;
-        let lhBase = (48 + def.midi[0] > 52) ? 36 : 48;
-        for(let i=0; i<def.midi.length; i++) {
-            let midiRH = rhBase + def.midi[i];
-            let midiLH = lhBase + def.midi[i];
-            rh.push({ n: def.n[i], s: def.s[i], midi: midiRH, step: midiToStaffStep(midiRH, 'treble') });
-            lh.push({ n: def.n[i], s: def.s[i], midi: midiLH, step: midiToStaffStep(midiLH, 'bass') });
-        }
-        return { rh, lh };
-    }
-
-    function buildSequence() {
-        let scaleObj = generateScaleNotes(document.getElementById('scaleSelectValue').value);
-        let fullCycle = [];
-        
-        for (let oct = 0; oct < selectedOctaves; oct++) {
-            let limit = (oct === selectedOctaves - 1) ? 8 : 7;
-            for (let i = 0; i < limit; i++) {
-                let nRH = scaleObj.rh[i], nLH = scaleObj.lh[i];
-                fullCycle.push({ 
-                    n: nRH.n, s: nRH.s, 
-                    m_rh: nRH.midi + (oct*12), step_rh: nRH.step + (oct*7),
-                    m_lh: nLH.midi + (oct*12), step_lh: nLH.step + (oct*7)
-                });
-            }
-        }
-        for (let i = fullCycle.length - 2; i >= 0; i--) { fullCycle.push({ ...fullCycle[i] }); }
-        
-        for (let i = 0; i < fullCycle.length; i++) { 
-            fullCycle[i].f_rh = fingerings.std['rh'+selectedOctaves][i] || ''; 
-            fullCycle[i].f_lh = fingerings.std['lh'+selectedOctaves][i] || ''; 
-        }
-
-        let currentMode = MODES[currentModeIdx];
-        let loops = (currentMode === 'SPRINT') ? 1 : (currentMode === 'MARATHON' ? 3 : 100);
-        seqBlocks = [];
-        // Max 15 hang per blokk hogy a kottán szépen elférjenek
-        const blockSize = 15;
-        for(let l=0; l<loops; l++) {
-            for(let i=0; i<fullCycle.length; i+=blockSize) {
-                seqBlocks.push(JSON.parse(JSON.stringify(fullCycle.slice(i, i+blockSize))));
-            }
-        }
-        currentBlockIndex = 0; currentNoteInBlock = 0;
-        updateKeyboardHints();
-    }
-
-    function playTone(note, vel) {
-        if(!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
-        if(audioCtx.state === 'suspended') audioCtx.resume();
-        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e){} delete activeNodes[note]; }
-        
-        const source = audioCtx.createBufferSource();
-        let closest = 36, minDiff = 999;
-        for(let b in sampleBuffers) { let diff = Math.abs(note-b); if(diff < minDiff){ minDiff=diff; closest=b; } }
-        source.buffer = sampleBuffers[closest];
-        source.playbackRate.value = Math.pow(2, (note-closest)/12);
-        
-        const gain = audioCtx.createGain(); 
-        const v_d = parseFloat(document.getElementById('vst_d').value) || 1.0;
-        
-        gain.gain.setValueAtTime((vel/127) * v_d, audioCtx.currentTime);
-        
-        source.connect(gain).connect(audioCtx.destination); source.start();
-        activeNodes[note] = { source: source, gain: gain };
-    }
-
-    function handleNoteOff(midi) {
-        if (!activeNodes[midi]) return;
-        const v_r = parseFloat(document.getElementById('vst_r').value) || 0.8;
-        const gainNode = activeNodes[midi].gain;
-        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + v_r);
-        activeNodes[midi].source.stop(audioCtx.currentTime + v_r + 0.1);
-        delete activeNodes[midi];
-    }
-
-    function updateStartStop(running) {
-        const btn = document.getElementById('btnStart');
-        if (btn) btn.textContent = running ? 'STOP' : 'START';
-    }
-
-    function handleMainButton() { 
-        if (helpActive) return;
-        if(!isRunning) { 
-            initAudio(); initMidi(); buildSequence(); isRunning=true;
-            updateStartStop(true);
-            lastHitTime = 0; hitIntervals = []; draw(); 
-        } 
-        else stopPractice();
-    }
-
-    function stopPractice() {
-        isRunning=false; currentNoteInBlock=0; currentBlockIndex=0;
-        updateStartStop(false);
-        draw();
-    }
-
-    function showResults() {
-        isRunning = false; updateStartStop(false);
-        if (hitIntervals.length === 0) { stopPractice(); return; }
-
-        let avgDiff = hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
-        let avgBpm = Math.round(60000 / avgDiff);
-        let dev = Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avgDiff,2),0)/hitIntervals.length);
-        let uniformity = Math.round(Math.max(0, 100-(dev/3))) + '%';
-
-        document.getElementById('modalBpm').innerText = avgBpm + " BPM";
-        document.getElementById('resultModal').style.display = 'flex';
-        currentBlockIndex = 0; currentNoteInBlock = 0; draw();
-    }
-
-    function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
-
-    function handleNoteOn(midi, vel = 100) {
-        playTone(midi, vel);
-        if (!isRunning || seqBlocks.length === 0) return;
-        let note = seqBlocks[currentBlockIndex][currentNoteInBlock];
-        
-        if (activeRH && midi === note.m_rh) rhHit = true;
-        if (activeLH && midi === note.m_lh) lhHit = true;
-        
-        let hit = false;
-        if (activeRH && !activeLH && rhHit) hit = true;
-        else if (!activeRH && activeLH && lhHit) hit = true;
-        else if (activeRH && activeLH && rhHit && lhHit) hit = true;
-
-        if (hit) {
-            rhHit = false; lhHit = false; 
-            let now = performance.now();
-            if (lastHitTime > 0) {
-                hitIntervals.push(now - lastHitTime);
-            }
-            lastHitTime = now;
-
-            currentNoteInBlock++;
-            if(currentNoteInBlock >= seqBlocks[currentBlockIndex].length) {
-                currentNoteInBlock=0; currentBlockIndex++;
-                if(currentBlockIndex >= seqBlocks.length) { showResults(); return; }
-            }
-            draw();
-        }
-    }
-
-    const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
-
-    function drawRhythmNote(ctx, x, y, color, noteIdx, midLineY) {
-        const R = RHYTHMS[currentRhythmIdx];
-        const ratio = R.ratios[noteIdx % R.ratios.length];
-        ctx.fillStyle = color;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2.5;
-        // Szárirány: ha a hang a középső vonal felett → szár lefelé, alatta → szár felfelé
-        const stemUp = !midLineY || y >= midLineY;
-        const sx = stemUp ? x + 11 : x - 11;
-        const sy = stemUp ? y - 50 : y + 50;
-
-        if (ratio === 1) {
-            // Nyolcad: tömör fej + szár + zászló
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
-            if (stemUp) {
-                ctx.beginPath(); ctx.moveTo(sx, sy); ctx.bezierCurveTo(sx+19, sy+10, sx+19, sy+25, sx, sy+20); ctx.stroke();
-            } else {
-                ctx.beginPath(); ctx.moveTo(sx, sy); ctx.bezierCurveTo(sx+19, sy-10, sx+19, sy-25, sx, sy-20); ctx.stroke();
-            }
-        } else if (ratio === 2) {
-            // Negyed: tömör fej + szár
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
-        } else if (ratio === 3) {
-            // Pontozott negyed
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
-            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
-            ctx.beginPath(); ctx.arc(x + 20, y - 4, 4, 0, Math.PI*2); ctx.fill();
-        } else {
-            // Fél: üres fej + szár
-            ctx.beginPath(); ctx.ellipse(x, y, 12, 9, -Math.PI/10, 0, 2*Math.PI); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, sy); ctx.stroke();
-        }
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, 2450, 680); 
-        ctx.save();
-        ctx.translate(0, 100); 
-
-        if (seqBlocks.length === 0) { ctx.restore(); return; }
-        if (currentBlockIndex >= seqBlocks.length) currentBlockIndex = 0; 
-        if (!seqBlocks[currentBlockIndex]) { ctx.restore(); return; }
-        
-        let block = seqBlocks[currentBlockIndex];
-        let totalNotes = block.length; 
-        
-        let startX = 180; let endX = 2250;
-        // Egységes spacing: mindig a maximális blokkméret alapján
-        const maxBlockSize = Math.max(...seqBlocks.map(b => b.length));
-        let spacingX = maxBlockSize > 1 ? (endX - startX) / (maxBlockSize - 1) : 0;
-        
-        block.forEach((n, i) => {
-            const blockSize = block.length;
-            let isActive = (isRunning && i === currentNoteInBlock) || 
-                           (!isRunning && demoActiveNoteIdx < 0 && i === 0 && currentBlockIndex === 0) || 
-                           (demoActiveNoteIdx >= 0 && (demoActiveNoteIdx % blockSize) === i);
-            
-            /* 1. JAVÍTÁS: A zöldes árnyalat visszaállítva a kék helyett! */
-            let color = isActive ? "rgba(179, 230, 255, 1.0)" : "rgba(179, 230, 255, 0.3)";
-            let x = startX + (i * spacingX); 
-            
-            if (activeRH) {
-                let y = 186.6 - ((n.step_rh - 32) * 11.14);
-                ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 0;
-                // Segédvonalak: desaturált, azonos fényerőn
-                ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : 'rgba(210,210,210,0.3)';
-                if (n.step_rh <= 30) { for (let s=30; s>=n.step_rh; s-=2) { let ly = 186.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                if (n.step_rh >= 42) { for (let s=42; s<=n.step_rh; s+=2) { let ly = 186.6 - ((s-32) * 11.14); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                ctx.strokeStyle = color;
-
-                if (n.s !== '') { 
-                    ctx.textAlign = 'center'; 
-                    if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
-                    else if (n.s === '♯') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-28, y+12); }
-                }
-                drawRhythmNote(ctx, x, y, color, i, 142);
-                
-                if (showNames || showFinger) { 
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = "white";
-                    if(showNames) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.n + n.s, x, y - 32); }
-                    if(showFinger) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.f_rh, x, y + 32); }
-                }
-            }
-            
-            if (activeLH) {
-                let y = 417 - ((n.step_lh - 15) * 10.71);
-                
-                ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowBlur = 0;
-                // Segédvonalak: desaturált, azonos fényerőn
-                ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : 'rgba(210,210,210,0.3)';
-                if (n.step_lh <= 13) { for (let s=13; s>=n.step_lh; s-=2) { let ly = 417 - ((s-15) * 10.71); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                if (n.step_lh >= 25) { for (let s=25; s<=n.step_lh; s+=2) { let ly = 417 - ((s-15) * 10.71); ctx.beginPath(); ctx.moveTo(x-20, ly); ctx.lineTo(x+20, ly); ctx.stroke(); } }
-                ctx.strokeStyle = color;
-
-                if (n.s !== '') { 
-                    ctx.textAlign = 'center';
-                    if (n.s === '♭') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-26, y+3); } 
-                    else if (n.s === '♯') { ctx.font = '34px Arial'; ctx.fillText(n.s, x-28, y+12); }
-                }
-                drawRhythmNote(ctx, x, y, color, i, 363);
-                
-                if (showNames || showFinger) { 
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = "white";
-                    if(showNames) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.n + n.s, x, y - 32); }
-                    if(showFinger) { ctx.font = 'bold 20px Inter'; ctx.fillText(n.f_lh, x, y + 32); }
-                }
-            }
-        });
-        
-        ctx.restore(); 
-    }
-
-    // ── AKKORDTÁRCSA ──
-    // Wheel → scale mapping: kvintkor sorrendben C G D A E B F# Db Ab Eb Bb F
-    const WHEEL_TO_SCALE = ['C_DUR','G_DUR','D_DUR','A_DUR','E_DUR','H_DUR','FS_DUR','DB_DUR','AB_DUR','EB_DUR','B_FLAT_DUR','F_DUR'];
-    const WHEEL_MAJORS   = ['C','G','D','A','E','B','F#','Db','Ab','Eb','Bb','F'];
-    const WHEEL_MINORS   = ['Am','Em','Bm','F#m','C#m','G#m','Ebm','Bbm','Fm','Cm','Gm','Dm'];
-    let showWheel = false, activeWheelKeyIndex = 0;
-    let isDraggingWheel=false, dragOffX=0, dragOffY=0, dragStartX=0, dragStartY=0;
-
-    function toggleWheel() {
-        if (helpActive) return;
-        showWheel = !showWheel;
-        document.getElementById('btnWheel').classList.toggle('active', showWheel);
-        const wc = document.getElementById('wheelCanvas');
-        wc.style.display = showWheel ? 'block' : 'none';
-        wheelClose.style.display = showWheel ? 'flex' : 'none';
-        if (showWheel) drawWheel();
-    }
-
-    const wheelClose = document.createElement('div');
-    wheelClose.innerHTML = '×';
-    Object.assign(wheelClose.style, { position:'fixed', width:'28px', height:'28px', background:'#1a1a1d', border:'1px solid #333', borderRadius:'50%', cursor:'pointer', zIndex:'10001', display:'none', alignItems:'center', justifyContent:'center', fontSize:'16px', color:'#888', fontFamily:'Inter', right:'26px', top:'46px' });
-    wheelClose.addEventListener('click', () => toggleWheel());
+    function playTone(note,vel){if(!audioCtx||!audioOn||Object.keys(sampleBuffers).length===0)return;if(audioCtx.state==='suspended')audioCtx.resume();if(activeNodes[note]){try{activeNodes[note].source.stop();}catch(e){}delete activeNodes[note];}const source=audioCtx.createBufferSource();let closest=36,minDiff=999;for(let b in sampleBuffers){let diff=Math.abs(note-b);if(diff<minDiff){minDiff=diff;closest=b;}}source.buffer=sampleBuffers[closest];source.playbackRate.value=Math.pow(2,(note-closest)/12);const gain=audioCtx.createGain();const v_d=parseFloat(document.getElementById('vst_d').value)||1.0;gain.gain.setValueAtTime((vel/127)*v_d,audioCtx.currentTime);source.connect(gain).connect(audioCtx.destination);source.start();activeNodes[note]={source,gain};}
+    function handleNoteOff(midi){if(!activeNodes[midi])return;const v_r=parseFloat(document.getElementById('vst_r').value)||0.8;const gainNode=activeNodes[midi].gain;gainNode.gain.cancelScheduledValues(audioCtx.currentTime);gainNode.gain.setValueAtTime(gainNode.gain.value,audioCtx.currentTime);gainNode.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+v_r);activeNodes[midi].source.stop(audioCtx.currentTime+v_r+0.1);delete activeNodes[midi];}
+    function updateStartStop(running){const btn=document.getElementById('btnStart');if(btn)btn.textContent=running?'STOP':'START';}
+    function handleMainButton(){if(helpActive)return;if(!isRunning){initAudio();initMidi();buildSequence();isRunning=true;updateStartStop(true);lastHitTime=0;hitIntervals=[];draw();}else stopPractice();}
+    function stopPractice(){isRunning=false;currentNoteInBlock=0;currentBlockIndex=0;updateStartStop(false);draw();}
+    function showResults(){isRunning=false;updateStartStop(false);if(hitIntervals.length===0){stopPractice();return;}let avgDiff=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let avgBpm=Math.round(60000/avgDiff);document.getElementById('modalBpm').innerText=avgBpm+' BPM';document.getElementById('resultModal').style.display='flex';currentBlockIndex=0;currentNoteInBlock=0;draw();}
+    function closeModal(){document.getElementById('resultModal').style.display='none';stopPractice();}
+    function handleNoteOn(midi,vel=100){playTone(midi,vel);if(!isRunning||seqBlocks.length===0)return;let note=seqBlocks[currentBlockIndex][currentNoteInBlock];if(activeRH&&midi===note.m_rh)rhHit=true;if(activeLH&&midi===note.m_lh)lhHit=true;let hit=false;if(activeRH&&!activeLH&&rhHit)hit=true;else if(!activeRH&&activeLH&&lhHit)hit=true;else if(activeRH&&activeLH&&rhHit&&lhHit)hit=true;if(hit){rhHit=false;lhHit=false;let now=performance.now();if(lastHitTime>0)hitIntervals.push(now-lastHitTime);lastHitTime=now;currentNoteInBlock++;if(currentNoteInBlock>=seqBlocks[currentBlockIndex].length){currentNoteInBlock=0;currentBlockIndex++;if(currentBlockIndex>=seqBlocks.length){showResults();return;}}draw();}}
+    const canvas=document.getElementById('staffCanvas'),ctx=canvas.getContext('2d');
+    function drawRhythmNote(ctx,x,y,color,noteIdx,midLineY){const R=RHYTHMS[currentRhythmIdx];const ratio=R.ratios[noteIdx%R.ratios.length];ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=2.5;const stemUp=!midLineY||y>=midLineY;const sx=stemUp?x+11:x-11;const sy=stemUp?y-50:y+50;if(ratio===1){ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx,sy);ctx.stroke();if(stemUp){ctx.beginPath();ctx.moveTo(sx,sy);ctx.bezierCurveTo(sx+19,sy+10,sx+19,sy+25,sx,sy+20);ctx.stroke();}else{ctx.beginPath();ctx.moveTo(sx,sy);ctx.bezierCurveTo(sx+19,sy-10,sx+19,sy-25,sx,sy-20);ctx.stroke();}}else if(ratio===2){ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx,sy);ctx.stroke();}else if(ratio===3){ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx,sy);ctx.stroke();ctx.beginPath();ctx.arc(x+20,y-4,4,0,Math.PI*2);ctx.fill();}else{ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.stroke();ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx,sy);ctx.stroke();}}
+    function draw(){ctx.clearRect(0,0,2450,680);ctx.save();ctx.translate(0,100);if(seqBlocks.length===0){ctx.restore();return;}if(currentBlockIndex>=seqBlocks.length)currentBlockIndex=0;if(!seqBlocks[currentBlockIndex]){ctx.restore();return;}let block=seqBlocks[currentBlockIndex];let startX=180;let endX=2250;const maxBlockSize=Math.max(...seqBlocks.map(b=>b.length));let spacingX=maxBlockSize>1?(endX-startX)/(maxBlockSize-1):0;block.forEach((n,i)=>{const blockSize=block.length;let isActive=(isRunning&&i===currentNoteInBlock)||(!isRunning&&demoActiveNoteIdx<0&&i===0&&currentBlockIndex===0)||(demoActiveNoteIdx>=0&&(demoActiveNoteIdx%blockSize)===i);let color=isActive?"rgba(179,230,255,1.0)":"rgba(179,230,255,0.3)";let x=startX+(i*spacingX);if(activeRH){let y=186.6-((n.step_rh-32)*11.14);ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=2;ctx.strokeStyle=isActive?'rgba(210,210,210,1.0)':'rgba(210,210,210,0.3)';if(n.step_rh<=30){for(let s=30;s>=n.step_rh;s-=2){let ly=186.6-((s-32)*11.14);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}if(n.step_rh>=42){for(let s=42;s<=n.step_rh;s+=2){let ly=186.6-((s-32)*11.14);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}ctx.strokeStyle=color;if(n.s!==''){ctx.textAlign='center';if(n.s==='♭'){ctx.font='34px Arial';ctx.fillStyle=color;ctx.fillText(n.s,x-26,y+3);}else if(n.s==='♯'){ctx.font='34px Arial';ctx.fillStyle=color;ctx.fillText(n.s,x-28,y+12);}}drawRhythmNote(ctx,x,y,color,i,142);if(showNames||showFinger){ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='white';if(showNames){ctx.font='bold 20px Inter';ctx.fillText(n.n+n.s,x,y-32);}if(showFinger){ctx.font='bold 20px Inter';ctx.fillText(n.f_rh,x,y+32);}}}if(activeLH){let y=417-((n.step_lh-15)*10.71);ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=2;ctx.strokeStyle=isActive?'rgba(210,210,210,1.0)':'rgba(210,210,210,0.3)';if(n.step_lh<=13){for(let s=13;s>=n.step_lh;s-=2){let ly=417-((s-15)*10.71);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}if(n.step_lh>=25){for(let s=25;s<=n.step_lh;s+=2){let ly=417-((s-15)*10.71);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}ctx.strokeStyle=color;if(n.s!==''){ctx.textAlign='center';if(n.s==='♭'){ctx.font='34px Arial';ctx.fillStyle=color;ctx.fillText(n.s,x-26,y+3);}else if(n.s==='♯'){ctx.font='34px Arial';ctx.fillStyle=color;ctx.fillText(n.s,x-28,y+12);}}drawRhythmNote(ctx,x,y,color,i,363);if(showNames||showFinger){ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='white';if(showNames){ctx.font='bold 20px Inter';ctx.fillText(n.n+n.s,x,y-32);}if(showFinger){ctx.font='bold 20px Inter';ctx.fillText(n.f_lh,x,y+32);}}}});ctx.restore();}
+    const WHEEL_TO_SCALE=['C_DUR','G_DUR','D_DUR','A_DUR','E_DUR','H_DUR','FS_DUR','DB_DUR','AB_DUR','EB_DUR','B_FLAT_DUR','F_DUR'];
+    const WHEEL_MAJORS=['C','G','D','A','E','B','F#','Db','Ab','Eb','Bb','F'];
+    const WHEEL_MINORS=['Am','Em','Bm','F#m','C#m','G#m','Ebm','Bbm','Fm','Cm','Gm','Dm'];
+    let showWheel=false,activeWheelKeyIndex=0;
+    let isDraggingWheel=false,dragOffX=0,dragOffY=0,dragStartX=0,dragStartY=0;
+    function toggleWheel(){if(helpActive)return;showWheel=!showWheel;document.getElementById('btnWheel').classList.toggle('active',showWheel);const wc=document.getElementById('wheelCanvas');wc.style.display=showWheel?'block':'none';wheelClose.style.display=showWheel?'flex':'none';if(showWheel)drawWheel();}
+    const wheelClose=document.createElement('div');
+    wheelClose.innerHTML='×';
+    Object.assign(wheelClose.style,{position:'fixed',width:'28px',height:'28px',background:'#1a1a1d',border:'1px solid #333',borderRadius:'50%',cursor:'pointer',zIndex:'10001',display:'none',alignItems:'center',justifyContent:'center',fontSize:'16px',color:'#888',fontFamily:'Inter',right:'26px',top:'46px'});
+    wheelClose.addEventListener('click',()=>toggleWheel());
     document.body.appendChild(wheelClose);
-
-    const wheelCanvas = document.getElementById('wheelCanvas');
-    wheelCanvas.addEventListener('pointerdown', (e) => {
-        if (helpActive) return;
-        isDraggingWheel=true; dragStartX=e.clientX; dragStartY=e.clientY;
-        const r=wheelCanvas.getBoundingClientRect(); dragOffX=e.clientX-r.left; dragOffY=e.clientY-r.top;
-        wheelCanvas.setPointerCapture(e.pointerId);
-    });
-    wheelCanvas.addEventListener('pointermove', (e) => {
-        if (!isDraggingWheel) return;
-        if (Math.hypot(e.clientX-dragStartX, e.clientY-dragStartY) > 5) {
-            wheelCanvas.style.right='auto';
-            wheelCanvas.style.left=(e.clientX-dragOffX)+'px';
-            wheelCanvas.style.top=(e.clientY-dragOffY)+'px';
-            wheelClose.style.right='auto';
-            wheelClose.style.left=(e.clientX-dragOffX+372)+'px';
-            wheelClose.style.top=(e.clientY-dragOffY-14)+'px';
-        }
-    });
-    wheelCanvas.addEventListener('pointerup', (e) => {
-        isDraggingWheel=false; wheelCanvas.releasePointerCapture(e.pointerId);
-        if (Math.hypot(e.clientX-dragStartX, e.clientY-dragStartY) <= 5) {
-            const r=wheelCanvas.getBoundingClientRect();
-            const x=e.clientX-r.left-200, y=e.clientY-r.top-200, d=Math.hypot(x,y);
-            if (d > 67 && d < 195) {
-                const sector = Math.floor(((Math.atan2(y,x)*180/Math.PI)+90+360+15)%360/30);
-                activeWheelKeyIndex = sector;
-                // Scale szinkron
-                const scaleKey = WHEEL_TO_SCALE[sector];
-                selectPatch(scaleKey, scaleKey.replace('_',' '));
-                setInfoBar(`KEY: ${WHEEL_MAJORS[sector]} — I IV V: ${WHEEL_MAJORS[sector]}, ${WHEEL_MAJORS[(sector+5)%12]}, ${WHEEL_MAJORS[(sector+7)%12]}`, null);
-                drawWheel();
-            }
-        }
-    });
-
-    // Wheel szinkron a cycleScale-lel
-    const _origCycleScale = cycleScale;
-
-    function drawWheel() {
-        if (!showWheel) return;
-        const ctx = wheelCanvas.getContext('2d');
-        ctx.clearRect(0,0,400,400);
-        const cx=200, cy=200, r=195;
-        const iCenter = (activeWheelKeyIndex+0.5)*30-90;
-        const startRad=(iCenter-45)*Math.PI/180, endRad=(iCenter+45)*Math.PI/180;
-        ctx.beginPath(); ctx.arc(cx,cy,r,startRad,endRad); ctx.arc(cx,cy,67,endRad,startRad,true); ctx.closePath();
-        ctx.fillStyle='rgba(179,230,255,0.12)'; ctx.fill();
-        ctx.strokeStyle='rgba(179,230,255,0.7)'; ctx.lineWidth=2; ctx.stroke();
-        ctx.textAlign='center'; ctx.textBaseline='middle';
-        for (let i=0;i<12;i++) {
-            const angle=(i*30-90)*Math.PI/180;
-            ctx.beginPath(); ctx.moveTo(cx+Math.cos(angle)*67,cy+Math.sin(angle)*67); ctx.lineTo(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r);
-            ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1; ctx.stroke();
-            const mid=((i+0.5)*30-90)*Math.PI/180;
-            const mx=cx+Math.cos(mid)*160, my=cy+Math.sin(mid)*160;
-            const nx=cx+Math.cos(mid)*100, ny=cy+Math.sin(mid)*100;
-            const dist=(i-activeWheelKeyIndex+12)%12;
-            const inWedge=dist===0||dist===1||dist===11;
-            const rMaj={0:'I',1:'V',11:'IV'}, rMin={0:'vi',1:'iii',11:'ii'};
-            if (inWedge) {
-                ctx.font="bold 22px 'Share Tech Mono'"; ctx.fillStyle='#b3e6ff'; ctx.fillText(WHEEL_MAJORS[i],mx,my-9);
-                ctx.font="bold 13px 'Inter'"; ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fillText(rMaj[dist]||'',mx,my+10);
-                ctx.font="14px 'Share Tech Mono'"; ctx.fillStyle='rgba(179,230,255,0.6)'; ctx.fillText(WHEEL_MINORS[i],nx,ny-6);
-                ctx.font="11px 'Inter'"; ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fillText(rMin[dist]||'',nx,ny+8);
-            } else {
-                ctx.font="18px 'Share Tech Mono'"; ctx.fillStyle='#4a4a4a'; ctx.fillText(WHEEL_MAJORS[i],mx,my);
-                ctx.font="13px 'Share Tech Mono'"; ctx.fillStyle='#2a2a2a'; ctx.fillText(WHEEL_MINORS[i],nx,ny);
-            }
-        }
-        [[r,'rgba(255,255,255,0.12)'],[127,'rgba(255,255,255,0.04)'],[67,'rgba(255,255,255,0.12)']].forEach(([rad,col])=>{
-            ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.strokeStyle=col; ctx.lineWidth=1; ctx.stroke();
-        });
-        ctx.fillStyle='#444'; ctx.font="12px 'Share Tech Mono'"; ctx.fillText('KEY',cx,cy-16);
-        ctx.fillStyle='#b3e6ff'; ctx.font="bold 28px 'Share Tech Mono'"; ctx.fillText(WHEEL_MAJORS[activeWheelKeyIndex],cx,cy+8);
-    }
-
-    // cycleScale frissíti a wheel indexet is
-    function syncWheelToScale() {
-        const key = scaleOrder[currentScaleIdx]?.v || 'C_DUR';
-        const idx = WHEEL_TO_SCALE.indexOf(key);
-        if (idx !== -1) { activeWheelKeyIndex = idx; if(showWheel) drawWheel(); }
-    }
-
-    function create88() {
-        const wrap = document.getElementById('hb-wrap'); const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
-        for(let m=21; m<=108; m++) {
-            const k = document.createElement('div'); const isW = whites.includes(m%12);
-            k.id = `k-${m}`; k.className = `key-glow ${isW?'white-glow':'black-glow'}`;
-            if(isW) { k.style.left = (wIdx * 1.92307) + "%"; k.style.width = "1.92307%"; k.style.height="100%"; wIdx++; }
-            else {
-                // C#=1, D#=3, F#=6, G#=8, A#=10
-                // 1px ≈ 0.041% (2450px canvas)
-                const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
-                const noteInOctave = m % 12;
-                const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
-                k.style.left = ((wIdx * 1.92307) + offset) + "%";
-                k.style.width = "1.241%";
-                k.style.height = "65%";
-                k.style.zIndex = "200";
-            }
-            const led = document.createElement('div'); led.className = 'key-led'; k.appendChild(led);
-            k.onmousedown = async (e) => { 
-                e.preventDefault(); 
-                if(!helpActive) {
-                    if(!audioInited) initAudio(); 
-                    k.classList.add('pressed'); handleNoteOn(m, 100); 
-                }
-            }; 
-            k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); }; 
-            k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
-            wrap.appendChild(k);
-        }
-    }
-    window.onload = () => { const sl=localStorage.getItem('akira_lang')||'EN'; setLang(sl); create88(); buildSequence(); draw(); };
+    const wheelCanvas=document.getElementById('wheelCanvas');
+    wheelCanvas.addEventListener('pointerdown',(e)=>{if(helpActive)return;isDraggingWheel=true;dragStartX=e.clientX;dragStartY=e.clientY;const r=wheelCanvas.getBoundingClientRect();dragOffX=e.clientX-r.left;dragOffY=e.clientY-r.top;wheelCanvas.setPointerCapture(e.pointerId);});
+    wheelCanvas.addEventListener('pointermove',(e)=>{if(!isDraggingWheel)return;if(Math.hypot(e.clientX-dragStartX,e.clientY-dragStartY)>5){wheelCanvas.style.right='auto';wheelCanvas.style.left=(e.clientX-dragOffX)+'px';wheelCanvas.style.top=(e.clientY-dragOffY)+'px';wheelClose.style.right='auto';wheelClose.style.left=(e.clientX-dragOffX+372)+'px';wheelClose.style.top=(e.clientY-dragOffY-14)+'px';}});
+    wheelCanvas.addEventListener('pointerup',(e)=>{isDraggingWheel=false;wheelCanvas.releasePointerCapture(e.pointerId);if(Math.hypot(e.clientX-dragStartX,e.clientY-dragStartY)<=5){const r=wheelCanvas.getBoundingClientRect();const x=e.clientX-r.left-200,y=e.clientY-r.top-200,d=Math.hypot(x,y);if(d>67&&d<195){const sector=Math.floor(((Math.atan2(y,x)*180/Math.PI)+90+360+15)%360/30);activeWheelKeyIndex=sector;const scaleKey=WHEEL_TO_SCALE[sector];selectPatch(scaleKey,scaleKey.replace('_',' '));setInfoBar(`KEY: ${WHEEL_MAJORS[sector]} — I IV V: ${WHEEL_MAJORS[sector]}, ${WHEEL_MAJORS[(sector+5)%12]}, ${WHEEL_MAJORS[(sector+7)%12]}`,null);drawWheel();}}});
+    function drawWheel(){if(!showWheel)return;const ctx=wheelCanvas.getContext('2d');ctx.clearRect(0,0,400,400);const cx=200,cy=200,r=195;const iCenter=(activeWheelKeyIndex+0.5)*30-90;const startRad=(iCenter-45)*Math.PI/180,endRad=(iCenter+45)*Math.PI/180;ctx.beginPath();ctx.arc(cx,cy,r,startRad,endRad);ctx.arc(cx,cy,67,endRad,startRad,true);ctx.closePath();ctx.fillStyle='rgba(179,230,255,0.12)';ctx.fill();ctx.strokeStyle='rgba(179,230,255,0.7)';ctx.lineWidth=2;ctx.stroke();ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<12;i++){const angle=(i*30-90)*Math.PI/180;ctx.beginPath();ctx.moveTo(cx+Math.cos(angle)*67,cy+Math.sin(angle)*67);ctx.lineTo(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;ctx.stroke();const mid=((i+0.5)*30-90)*Math.PI/180;const mx=cx+Math.cos(mid)*160,my=cy+Math.sin(mid)*160;const nx=cx+Math.cos(mid)*100,ny=cy+Math.sin(mid)*100;const dist=(i-activeWheelKeyIndex+12)%12;const inWedge=dist===0||dist===1||dist===11;const rMaj={0:'I',1:'V',11:'IV'},rMin={0:'vi',1:'iii',11:'ii'};if(inWedge){ctx.font="bold 22px 'Share Tech Mono'";ctx.fillStyle='#b3e6ff';ctx.fillText(WHEEL_MAJORS[i],mx,my-9);ctx.font="bold 13px 'Inter'";ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fillText(rMaj[dist]||'',mx,my+10);ctx.font="14px 'Share Tech Mono'";ctx.fillStyle='rgba(179,230,255,0.6)';ctx.fillText(WHEEL_MINORS[i],nx,ny-6);ctx.font="11px 'Inter'";ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(rMin[dist]||'',nx,ny+8);}else{ctx.font="18px 'Share Tech Mono'";ctx.fillStyle='#4a4a4a';ctx.fillText(WHEEL_MAJORS[i],mx,my);ctx.font="13px 'Share Tech Mono'";ctx.fillStyle='#2a2a2a';ctx.fillText(WHEEL_MINORS[i],nx,ny);}}[[r,'rgba(255,255,255,0.12)'],[127,'rgba(255,255,255,0.04)'],[67,'rgba(255,255,255,0.12)']].forEach(([rad,col])=>{ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);ctx.strokeStyle=col;ctx.lineWidth=1;ctx.stroke();});ctx.fillStyle='#444';ctx.font="12px 'Share Tech Mono'";ctx.fillText('KEY',cx,cy-16);ctx.fillStyle='#b3e6ff';ctx.font="bold 28px 'Share Tech Mono'";ctx.fillText(WHEEL_MAJORS[activeWheelKeyIndex],cx,cy+8);}
+    function syncWheelToScale(){const key=scaleOrder[currentScaleIdx]?.v||'C_DUR';const idx=WHEEL_TO_SCALE.indexOf(key);if(idx!==-1){activeWheelKeyIndex=idx;if(showWheel)drawWheel();}}
+    function create88(){const wrap=document.getElementById('hb-wrap');const whites=[0,2,4,5,7,9,11];let wIdx=0;for(let m=21;m<=108;m++){const k=document.createElement('div');const isW=whites.includes(m%12);k.id=`k-${m}`;k.className=`key-glow ${isW?'white-glow':'black-glow'}`;if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}else{const blackOffsets={1:-0.621,3:-0.477,6:-0.723,8:-0.559,10:-0.415};const noteInOctave=m%12;const offset=blackOffsets[noteInOctave]!==undefined?blackOffsets[noteInOctave]:-0.6;k.style.left=((wIdx*1.92307)+offset)+'%';k.style.width='1.241%';k.style.height='65%';k.style.zIndex='200';}const led=document.createElement('div');led.className='key-led';k.appendChild(led);k.onmousedown=async(e)=>{e.preventDefault();if(!helpActive){if(!audioInited)initAudio();k.classList.add('pressed');handleNoteOn(m,100);}};k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};wrap.appendChild(k);}}
+    window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);create88();buildSequence();draw();};
 </script>
 </body>
 </html>
