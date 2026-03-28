@@ -180,8 +180,26 @@
         .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .key-glow.pressed::after { 
+            content: ''; position: absolute; pointer-events: none; z-index: 150; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            border-radius: 0 0 4px 4px; 
+            background: rgba(0, 0, 0, 0.10); /* Ez adja meg a lenyomás sötétedését */
+            box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); 
+        }
+
+        /* 2. FEKETE BILLENTYŰK (Precíziós fény, ami nem rontja el a fehéret) */
+        .black-glow.pressed::after { 
+            content: '' !important;
+            top: 6px !important; 
+            left: 24% !important; 
+            width: 49% !important; 
+            height: 78.5% !important; 
+            border-radius: 2px !important; 
+            background: rgba(255, 255, 255, 0.17) !important; /* Erős fehér fény a feketén */
+            z-index: 200 !important; /* A fehér fölé emeljük */
+            box-shadow: none !important;
+        }
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
@@ -202,36 +220,36 @@
 
     <!-- LEVEL BROWSER MODAL -->
     <div id="levelBrowserModal" class="modal-overlay">
-        <div class="modal-content" style="max-width:580px;text-align:left;">
+        <div class="modal-content" style="max-width:640px;text-align:left;">
             <h2 class="modal-title" id="txt-levelTitle" style="text-align:center;">Select Level</h2>
             <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
-                <button class="patch-btn" onclick="selectLevel(1)" id="lb-1" style="text-align:left;padding:12px 16px;">
-                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb1-title">1 — ROOT</span>
-                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb1-desc">Root position triads only. The lowest note is always the root.</span>
+                <button class="patch-btn" onclick="selectLevel(1)" id="lb-1" style="text-align:left;padding:14px 18px;">
+                    <span style="font-family:'Share Tech Mono';font-size:16px;color:var(--oled-text);" id="lb1-title">1 — ROOT</span>
+                    <span style="display:block;font-size:14px;color:#888;margin-top:6px;font-family:'Inter';line-height:1.5;" id="lb1-desc">Root position triads only. The lowest note is always the root.</span>
                 </button>
-                <button class="patch-btn" onclick="selectLevel(2)" id="lb-2" style="text-align:left;padding:12px 16px;">
-                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb2-title">2 — 1ST INV</span>
-                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb2-desc">First inversion triads. The third is in the bass (e.g. C/E).</span>
+                <button class="patch-btn" onclick="selectLevel(2)" id="lb-2" style="text-align:left;padding:14px 18px;">
+                    <span style="font-family:'Share Tech Mono';font-size:16px;color:var(--oled-text);" id="lb2-title">2 — 1ST INV</span>
+                    <span style="display:block;font-size:14px;color:#888;margin-top:6px;font-family:'Inter';line-height:1.5;" id="lb2-desc">First inversion triads. The third is in the bass (e.g. C/E).</span>
                 </button>
-                <button class="patch-btn" onclick="selectLevel(3)" id="lb-3" style="text-align:left;padding:12px 16px;">
-                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb3-title">3 — 2ND INV</span>
-                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb3-desc">Second inversion triads. The fifth is in the bass (e.g. C/G).</span>
+                <button class="patch-btn" onclick="selectLevel(3)" id="lb-3" style="text-align:left;padding:14px 18px;">
+                    <span style="font-family:'Share Tech Mono';font-size:16px;color:var(--oled-text);" id="lb3-title">3 — 2ND INV</span>
+                    <span style="display:block;font-size:14px;color:#888;margin-top:6px;font-family:'Inter';line-height:1.5;" id="lb3-desc">Second inversion triads. The fifth is in the bass (e.g. C/G).</span>
                 </button>
-                <button class="patch-btn" onclick="selectLevel(4)" id="lb-4" style="text-align:left;padding:12px 16px;">
-                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb4-title">4 — MIXED</span>
-                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb4-desc">Root position and both inversions mixed. The real test of triad recognition.</span>
+                <button class="patch-btn" onclick="selectLevel(4)" id="lb-4" style="text-align:left;padding:14px 18px;">
+                    <span style="font-family:'Share Tech Mono';font-size:16px;color:var(--oled-text);" id="lb4-title">4 — MIXED</span>
+                    <span style="display:block;font-size:14px;color:#888;margin-top:6px;font-family:'Inter';line-height:1.5;" id="lb4-desc">Root position and both inversions mixed. The real test of triad recognition.</span>
                 </button>
-                <button class="patch-btn" onclick="selectLevel(5)" id="lb-5" style="text-align:left;padding:12px 16px;">
-                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb5-title">5 — 7TH ROOT</span>
-                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb5-desc">Seventh chords in root position. Four notes — adds tension and colour.</span>
+                <button class="patch-btn" onclick="selectLevel(5)" id="lb-5" style="text-align:left;padding:14px 18px;">
+                    <span style="font-family:'Share Tech Mono';font-size:16px;color:var(--oled-text);" id="lb5-title">5 — 7TH ROOT</span>
+                    <span style="display:block;font-size:14px;color:#888;margin-top:6px;font-family:'Inter';line-height:1.5;" id="lb5-desc">Seventh chords in root position. Four notes — adds tension and colour.</span>
                 </button>
-                <button class="patch-btn" onclick="selectLevel(6)" id="lb-6" style="text-align:left;padding:12px 16px;">
-                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb6-title">6 — 7TH INV</span>
-                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb6-desc">All three inversions of seventh chords (⁶, ⁴₃, ²). Advanced level.</span>
+                <button class="patch-btn" onclick="selectLevel(6)" id="lb-6" style="text-align:left;padding:14px 18px;">
+                    <span style="font-family:'Share Tech Mono';font-size:16px;color:var(--oled-text);" id="lb6-title">6 — 7TH INV</span>
+                    <span style="display:block;font-size:14px;color:#888;margin-top:6px;font-family:'Inter';line-height:1.5;" id="lb6-desc">All three inversions of seventh chords (⁶, ⁴₃, ²). Advanced level.</span>
                 </button>
-                <button class="patch-btn" onclick="selectLevel(7)" id="lb-7" style="text-align:left;padding:12px 16px;">
-                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb7-title">7 — 7TH MIX</span>
-                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb7-desc">Root position and all inversions of seventh chords mixed. Maximum difficulty.</span>
+                <button class="patch-btn" onclick="selectLevel(7)" id="lb-7" style="text-align:left;padding:14px 18px;">
+                    <span style="font-family:'Share Tech Mono';font-size:16px;color:var(--oled-text);" id="lb7-title">7 — 7TH MIX</span>
+                    <span style="display:block;font-size:14px;color:#888;margin-top:6px;font-family:'Inter';line-height:1.5;" id="lb7-desc">Root position and all inversions of seventh chords mixed. Maximum difficulty.</span>
                 </button>
             </div>
             <button class="modal-btn" onclick="closeLevelBrowser()" id="txt-levelCancel" style="width:100%;">Cancel</button>
@@ -352,7 +370,7 @@
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▲</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▲</button>
                                     <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
                                 </div>
                                 <div class="oled-wrapper">
@@ -381,7 +399,7 @@
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▼</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▼</button>
                                     <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
                                 </div>
                             </div>
@@ -462,7 +480,7 @@
             btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnKeys:'Keys', btnWheel:'Wheel',
             btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
             hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLE TREBLE CLEF CHORDS',
-            hBottom:'BOTTOM CLEF: TOGGLE BASS CLEF CHORDS', hHints:'HINTS: SHOWS NOTE NAMES WITHIN EACH CHORD', hKeys:'KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE KEYBOARD', hWheel:'WHEEL: DRAGGABLE CHORD WHEEL — SHOWS KEY RELATIONSHIPS',
+            hBottom:'BOTTOM CLEF: TOGGLE BASS CLEF CHORDS', hHints:'HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF', hDemo:'DEMO: PLAYS THE 16 CHORD SEQUENCE — KEYS LIGHT UP IN SYNC', hKeys:'KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE KEYBOARD', hWheel:'WHEEL: DRAGGABLE CHORD WHEEL — SHOWS KEY RELATIONSHIPS',
             hStart:'START/STOP: BEGIN OR END THE CHORD PRACTICE', hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI',
             hMixer:'MIXER: OPEN ADSR PANEL', hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',
             hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
@@ -500,7 +518,7 @@
             btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnKeys:'Billentyű', btnWheel:'Tárcsa',
             btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
             hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE', hTop:'FELSŐ KULCS: VIOLIN KULCSOS AKKORDOK BE/KI',
-            hBottom:'ALSÓ KULCS: BASSZUS KULCSOS AKKORDOK BE/KI', hHints:'HANGNEM: HANGNEVEKET MUTAT AZ AKKORDON BELÜL', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKKORD HANGJAIT A ZONGORÁN', hWheel:'TÁRCSA: MOZGATHATÓ AKKORDTÁRCSA — KVINTKOR KAPCSOLATOK',
+            hBottom:'ALSÓ KULCS: BASSZUS KULCSOS AKKORDOK BE/KI', hHints:'HINTS: 1× HANGNEVEK | 2× + BILLENTYŰ LED | 3× KI', hDemo:'DEMÓ: LEJÁTSSZA A 16 AKKORD SOROZATOT — BILLENTYŰK SZINKRONBAN VILLANNAK', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKKORD HANGJAIT A ZONGORÁN', hWheel:'TÁRCSA: MOZGATHATÓ AKKORDTÁRCSA — KVINTKOR KAPCSOLATOK',
             hStart:'START/STOP: AKKORD GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA', hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI — MIDI-VEL IS MŰKÖDIK',
             hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA', hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',
             hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ — HOGYAN MŰKÖDIK',
@@ -537,7 +555,7 @@
         const btnMap={'btnWheel':T.btnWheel};
         Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
         const helpMap={
-            'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':'HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF','btnWheel':T.hWheel,
+            'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':T.hHints,'btnDemo':T.hDemo,'btnWheel':T.hWheel,
             'btnStart':T.hStart,'audioToggle':T.hPiano,
             'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
             'oledModule':T.hModule,'oledMode':T.hMode,'oledLevel':T.hLevel,'oledProgress':T.hProgress
@@ -1153,26 +1171,46 @@
             let showNotes = (currentMode === 'sheet') || ((currentMode === 'lead' || currentMode === 'roman') && isSolved);
 
             if (showNotes) {
-                item.chord.notes.forEach(n => {
+                // Kottafej eltolás számítása: ha két szomszédos hang off értéke között ≤1 különbség,
+                // az egyiket jobbra toljuk (standard kottaírási konvenció)
+                const notes = item.chord.notes;
+                const offsets = new Array(notes.length).fill(0); // 0=bal, 1=jobb eltolás
+                // Rendezzük off szerint növekvő sorban az indexeket
+                const sortedIdx = [...notes.keys()].sort((a,b) => notes[a].off - notes[b].off);
+                let lastRight = false;
+                for (let ni = 1; ni < sortedIdx.length; ni++) {
+                    const prev = notes[sortedIdx[ni-1]];
+                    const curr = notes[sortedIdx[ni]];
+                    if (Math.abs(curr.off - prev.off) <= 1) {
+                        // Szomszédos hang — ha az előző bal volt, ezt jobbra toljuk
+                        if (!lastRight) { offsets[sortedIdx[ni]] = 1; lastRight = true; }
+                        else lastRight = false;
+                    } else {
+                        lastRight = false;
+                    }
+                }
+                notes.forEach((n, ni) => {
                     let noteY = baseLineY - (n.off * spacing);
+                    let noteX = x + (offsets[ni] === 1 ? 24 : 0);
                     let isActive = (isRunning && i === currentStep);
-                    drawLedgers(x, n.off, baseLineY, spacing, isActive ? activeLedger : inactiveLedger);
+                    drawLedgers(noteX, n.off, baseLineY, spacing, isActive ? activeLedger : inactiveLedger);
                     ctx.fillStyle = color; ctx.shadowBlur = 0;
                     if (n.s !== '') {
                         ctx.font = n.s === '♭' ? '46px Arial' : '34px Arial';
                         ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
-                        ctx.fillText(n.s, x - 28, noteY + (n.s === '♭' ? 6 : 12));
+                        ctx.fillText(n.s, noteX - 28, noteY + (n.s === '♭' ? 6 : 12));
                     }
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                    ctx.beginPath(); ctx.ellipse(x, noteY, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
+                    ctx.beginPath(); ctx.ellipse(noteX, noteY, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
                 });
             }
 
             // Hangnevek (hints) — mindig látszik ha be van kapcsolva, módtól függetlenül
             if (showNames) {
                 ctx.fillStyle = color; ctx.font = '400 16px "Share Tech Mono"'; ctx.textAlign = 'center';
+                ctx.letterSpacing = '-1px';
                 ctx.textBaseline = 'alphabetic';
-                let hintStr = item.chord.notes.map(n => noteName(n.n).replace('#','♯')).join(' + ');
+                let hintStr = item.chord.notes.map(n => noteName(n.n).replace('#','♯')).join('+');
                 let topY = Math.min(...item.chord.notes.map(n => baseLineY - (n.off * spacing)));
                 let hintY;
                 if (currentMode === 'sheet') {
@@ -1183,6 +1221,7 @@
                     if (showNotes && topY < textY + 20) hintY = topY - 20;
                 }
                 ctx.fillText(hintStr, x, hintY);
+                ctx.letterSpacing = '0px';
             }
         });
         ctx.globalAlpha = 1.0;
