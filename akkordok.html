@@ -123,7 +123,7 @@
 
         /* KULCS SPLIT GOMB */
         .clef-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark);
             border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
             overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s;
         }
@@ -133,20 +133,20 @@
             color:#444; transition:color 0.15s; padding:0;
         }
         .clef-split span.active { color:#fff; }
-        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+        .clef-divider { height:1px; width:100%; background:#222; flex-shrink:0; }
 
         /* LANG SPLIT GOMB */
         .lang-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
+            display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark);
             border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
         }
         .lang-split button {
             flex:1; background:transparent; border:none; cursor:pointer;
-            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
+            font-weight:700; font-size:11px; font-family:'Inter',sans-serif; color:var(--text-dim);
         }
         .lang-split button.active { color:#fff; }
         .lang-split button:active { background: rgba(255,255,255,0.05); }
-        .lang-divider { width:1px; background:#222; margin:6px 0; }
+        .lang-divider { height:1px; width:100%; background:#222; }
 
         /* AKKORDTÁRCSA */
         #wheelCanvas {
@@ -180,8 +180,8 @@
         .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0, 0, 0, 0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
@@ -191,12 +191,52 @@
         .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
 
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
-        .key-glow.chord-hint .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
+        .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 16px; font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: left; width: 100%; box-shadow: none; }
+        .patch-btn:hover { background: #1e1e21; color: #fff; border-color: #555; }
+        .patch-btn:active { transform: translateY(1px); }
+        .key-glow.chord-hint .key-led { opacity: 1; }
 
     </style>
 </head>
 <body>
 
+    <!-- LEVEL BROWSER MODAL -->
+    <div id="levelBrowserModal" class="modal-overlay">
+        <div class="modal-content" style="max-width:580px;text-align:left;">
+            <h2 class="modal-title" id="txt-levelTitle" style="text-align:center;">Select Level</h2>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
+                <button class="patch-btn" onclick="selectLevel(1)" id="lb-1" style="text-align:left;padding:12px 16px;">
+                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb1-title">1 — ROOT</span>
+                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb1-desc">Root position triads only. The lowest note is always the root.</span>
+                </button>
+                <button class="patch-btn" onclick="selectLevel(2)" id="lb-2" style="text-align:left;padding:12px 16px;">
+                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb2-title">2 — 1ST INV</span>
+                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb2-desc">First inversion triads. The third is in the bass (e.g. C/E).</span>
+                </button>
+                <button class="patch-btn" onclick="selectLevel(3)" id="lb-3" style="text-align:left;padding:12px 16px;">
+                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb3-title">3 — 2ND INV</span>
+                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb3-desc">Second inversion triads. The fifth is in the bass (e.g. C/G).</span>
+                </button>
+                <button class="patch-btn" onclick="selectLevel(4)" id="lb-4" style="text-align:left;padding:12px 16px;">
+                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb4-title">4 — MIXED</span>
+                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb4-desc">Root position and both inversions mixed. The real test of triad recognition.</span>
+                </button>
+                <button class="patch-btn" onclick="selectLevel(5)" id="lb-5" style="text-align:left;padding:12px 16px;">
+                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb5-title">5 — 7TH ROOT</span>
+                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb5-desc">Seventh chords in root position. Four notes — adds tension and colour.</span>
+                </button>
+                <button class="patch-btn" onclick="selectLevel(6)" id="lb-6" style="text-align:left;padding:12px 16px;">
+                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb6-title">6 — 7TH INV</span>
+                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb6-desc">All three inversions of seventh chords (⁶, ⁴₃, ²). Advanced level.</span>
+                </button>
+                <button class="patch-btn" onclick="selectLevel(7)" id="lb-7" style="text-align:left;padding:12px 16px;">
+                    <span style="font-family:'Share Tech Mono';font-size:13px;color:var(--oled-text);" id="lb7-title">7 — 7TH MIX</span>
+                    <span style="display:block;font-size:12px;color:#777;margin-top:4px;font-family:'Inter';" id="lb7-desc">Root position and all inversions of seventh chords mixed. Maximum difficulty.</span>
+                </button>
+            </div>
+            <button class="modal-btn" onclick="closeLevelBrowser()" id="txt-levelCancel" style="width:100%;">Cancel</button>
+        </div>
+    </div>
     <!-- KOTTA -->
     <!-- INFO MODAL -->
     <div id="infoModal" class="modal-overlay">
@@ -300,19 +340,14 @@
                             <div class="clef-divider"></div>
                             <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
                         </button>
-                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint()" data-help="HINTS: DISPLAYS NOTE NAMES WITHIN EACH CHORD">Hints</button>
-                        <button id="btnKeys" class="hardware-btn" onclick="if(!helpActive) toggleKeys()" data-help="KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE PIANO KEYBOARD">Keys</button>
+                        <button id="btnHints" class="hardware-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF">Hints</button>
                         <button id="btnWheel" class="hardware-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CHORD WHEEL">Wheel</button>
                     </div>
 
                     <!-- KÖZÉP: OLED + START -->
                     <div class="center-console">
                         <div style="display:flex; align-items:center; gap:32px;">
-                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE CHORD PRACTICE SESSION">
-                                <span id="startLabel" class="active">START</span>
-                                <div class="split-div"></div>
-                                <span id="stopLabel">STOP</span>
-                            </div>
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE CHORD PRACTICE SESSION" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
@@ -332,7 +367,7 @@
                                             <div class="oled-main" id="lcdModeText">NOTES</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledLevel" class="oled-section" onclick="if(!helpActive) cycleLevel(1)" data-help="LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS">
+                                        <div id="oledLevel" class="oled-section" onclick="if(!helpActive) openLevelBrowser()" data-help="LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS">
                                             <div class="oled-header">Level</div>
                                             <div class="oled-main" id="lcdLevelText">ROOT</div>
                                         </div>
@@ -350,6 +385,7 @@
                                     <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
                                 </div>
                             </div>
+                            <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playChordDemo()" data-help="DEMO: PLAYS THE 16 CHORD SEQUENCE — KEYS LIGHT UP IN SYNC" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
 
@@ -367,19 +403,24 @@
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
+                        <!-- Vertikális ? / ⓘ páros -->
+                        <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
+                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
+                            <div style="height:1px;background:#222;"></div>
+                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                            </button>
+                        </div>
+                        <!-- Vertikális EN/HU -->
                         <div class="lang-split">
                             <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
                         </div>
-                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
                         <div style="width:16px;"></div>
                         <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
                         </a>
-                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
-                        </button>
                     </div>
                 </div>
 
@@ -399,8 +440,8 @@
 <script>
     let currentLang = 'EN';
     const MODULE_NAMES = {
-        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
-        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
     };
     const AKKORD_T = {
         EN: {
@@ -408,7 +449,7 @@
             howBody:'16 chords appear on the staff. Hold all the correct notes of each chord simultaneously on the piano. Release to advance to the next chord. Wrong notes are highlighted in red.',
             ctrlTitle:'Controls', gotIt:'Got It',
             ctrl1:'Notes (sheet only), Chords (name + notes after solving), Roman (numeral).',
-            ctrl2:'Root position → Inversions → 7th chords.',
+            ctrl2:'7 levels: <strong style="color:var(--oled-text)">Root</strong> (basic triads) → <strong style="color:var(--oled-text)">1st/2nd Inv</strong> (triad inversions) → <strong style="color:var(--oled-text)">Mixed</strong> (all triads) → <strong style="color:var(--oled-text)">7th Root</strong> (seventh chords) → <strong style="color:var(--oled-text)">7th Inv</strong> (all 3 inversions) → <strong style="color:var(--oled-text)">7th Mix</strong> (maximum difficulty). Click the Level display to open the level browser.',
             ctrl3:'Toggle treble and bass clef chord generation independently.',
             ctrl4:'Shows individual note names within each chord and activates LED guides.',
             ctrl5:'Opens the Circle of Fifths wheel. Click any sector to set the tonal center. Drag to reposition.',
@@ -428,17 +469,25 @@
             hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
             hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
             hMode:'MODE: NOTES (SHEET ONLY) → CHORDS (NAME REVEALED) → ROMAN (NUMERAL)',
-            hLevel:'LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS',
+            hLevel:'LEVEL: ROOT → 1ST INV → 2ND INV → MIXED → 7TH ROOT → 7TH INV → 7TH MIX',
             hProgress:'PROGRESS: CURRENT CHORD NUMBER OUT OF 16',
             oledNotes:'NOTES', oledChords:'CHORDS', oledRoman:'ROMAN',
-            oledRoot:'ROOT', oledInv:'INVERSION', oled7th:'7THS',
+            oledRoot:'ROOT', oled1inv:'1ST INV', oled2inv:'2ND INV', oledMix:'MIXED', oled7root:'7TH ROOT', oled7inv:'7TH INV', oled7mix:'7TH MIX',
+            levelTitle:'Select Level', levelCancel:'Cancel',
+            lb1t:'1 — ROOT',     lb1d:'Root position triads only. The lowest note is always the root.',
+            lb2t:'2 — 1ST INV',  lb2d:'First inversion triads. The third is in the bass (e.g. C/E).',
+            lb3t:'3 — 2ND INV',  lb3d:'Second inversion triads. The fifth is in the bass (e.g. C/G).',
+            lb4t:'4 — MIXED',    lb4d:'Root position and both inversions mixed. The real test of triad recognition.',
+            lb5t:'5 — 7TH ROOT', lb5d:'Seventh chords in root position. Four notes — adds tension and colour.',
+            lb6t:'6 — 7TH INV',  lb6d:'All three inversions only — no root position (⁶, ⁴₃, ²). Advanced level.',
+            lb7t:'7 — 7TH MIX',  lb7d:'Root position + all three inversions of seventh chords mixed. Maximum difficulty.',
         },
         HU: {
             infoTitle:'Akkordok — Modul útmutató', howTitle:'Hogyan működik',
             howBody:'16 akkord jelenik meg a kottán. Nyomd le egyszerre az akkord összes hangját a zongorán. Engedd fel a folytatáshoz. A téves hangok pirossal jelennek meg.',
             ctrlTitle:'Vezérlők', gotIt:'Értettem',
             ctrl1:'Hangok (csak kotta), Akkordok (név + hangok megoldás után), Római (szám).',
-            ctrl2:'Alap helyzet → Fordítások → Szeptim akkordok.',
+            ctrl2:'7 szint: <strong style="color:var(--oled-text)">Alap</strong> (hármashangzatok) → <strong style="color:var(--oled-text)">1./2. Ford.</strong> (fordítások) → <strong style="color:var(--oled-text)">Vegyes</strong> (minden hármas) → <strong style="color:var(--oled-text)">Szept. Alap</strong> (szeptim akkordok) → <strong style="color:var(--oled-text)">Szept. Ford.</strong> (mind a 3 fordítás) → <strong style="color:var(--oled-text)">Szept. Vegyes</strong> (max. nehézség). Kattints a Level ablakra a szintválasztóhoz.',
             ctrl3:'Violin és basszus kulcsos akkordok külön-külön be/ki.',
             ctrl4:'Megjeleníti az egyes hangneveket az akkordon belül és aktiválja a LED vezétőket.',
             ctrl5:'Megnyitja a kvintkor tárcsát. Kattints bármely szektorra a hangnem beállításához. Húzd át bárhova.',
@@ -458,10 +507,18 @@
             hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
             hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
             hMode:'MÓD: HANGOK (CSAK KOTTA) → AKKORDOK (NÉV FELTÁRUL) → RÓMAI (SZÁM)',
-            hLevel:'SZINT: ALAP HELYZET → FORDÍTÁSOK → SZEPTIM AKKORDOK',
+            hLevel:'SZINT: ALAP → 1. FORD. → 2. FORD. → VEGYES → SZEPT. ALAP → SZEPT. FORD. → SZEPT. VEGYES',
             hProgress:'HALADÁS: AKTUÁLIS AKKORD SORSZÁMA 16-BÓL',
             oledNotes:'HANGOK', oledChords:'AKKORDOK', oledRoman:'RÓMAI',
-            oledRoot:'ALAP', oledInv:'FORDÍTÁS', oled7th:'SZEPTIM',
+            oledRoot:'ALAP', oled1inv:'1. FORD.', oled2inv:'2. FORD.', oledMix:'VEGYES', oled7root:'SZEPT.', oled7inv:'SZEPT.FORD', oled7mix:'SZEPT.VEG.',
+            levelTitle:'Szint kiválasztása', levelCancel:'Mégse',
+            lb1t:'1 — ALAP HELYZET',   lb1d:'Csak alap helyzetű hármashangzatok. A legalsó hang mindig az alaphang.',
+            lb2t:'2 — 1. FORDÍTÁS',    lb2d:'1. fordítású hármashangzatok. A terc van a basszusban (pl. C/E).',
+            lb3t:'3 — 2. FORDÍTÁS',    lb3d:'2. fordítású hármashangzatok. A kvint van a basszusban (pl. C/G).',
+            lb4t:'4 — VEGYES',         lb4d:'Alap helyzet és mindkét fordítás keverve. Az igazi hármashangzat-felismerési teszt.',
+            lb5t:'5 — SZEPTIM ALAP',   lb5d:'Szeptim akkordok alap helyzetben. Négy hang — feszültséget és színt ad.',
+            lb6t:'6 — SZEPTIM FORD.',  lb6d:'Csak fordítások, alap helyzet nélkül (⁶, ⁴₃, ²). Haladó szint.',
+            lb7t:'7 — SZEPTIM VEGYES', lb7d:'Szeptim alap helyzet + mind a 3 fordítás keverve. Maximális nehézség.',
         }
     };
 
@@ -474,13 +531,13 @@
         document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
         const T = AKKORD_T[lang];
         const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-wheelTitle','txt-wheelBody','txt-gotIt'];
-        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
         // Csak szöveges gombok
-        const btnMap={'btnHintName':T.btnHints,'btnKeys':T.btnKeys,'btnWheel':T.btnWheel};
+        const btnMap={'btnWheel':T.btnWheel};
         Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
         const helpMap={
-            'btnHome':T.hHome,'btnClef':T.hClef,'btnHintName':T.hHints,'btnKeys':T.hKeys,'btnWheel':T.hWheel,
+            'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':'HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF','btnWheel':T.hWheel,
             'btnStart':T.hStart,'audioToggle':T.hPiano,
             'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
             'oledModule':T.hModule,'oledMode':T.hMode,'oledLevel':T.hLevel,'oledProgress':T.hProgress
@@ -490,8 +547,17 @@
         document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][2];
         const modeNames={'sheet':T.oledNotes,'lead':T.oledChords,'roman':T.oledRoman};
         document.getElementById('lcdModeText').innerText = modeNames[currentMode] || T.oledNotes;
-        const levelNames={1:T.oledRoot,2:T.oledInv,3:T.oled7th};
+        const levelNames={1:T.oledRoot,2:T.oled1inv,3:T.oled2inv,4:T.oledMix,5:T.oled7root,6:T.oled7inv,7:T.oled7mix};
         document.getElementById('lcdLevelText').innerText = levelNames[currentLevel] || T.oledRoot;
+        // Level browser szövegek
+        document.getElementById('txt-levelTitle').innerText = T.levelTitle;
+        document.getElementById('txt-levelCancel').innerText = T.levelCancel;
+        for (let i=1; i<=7; i++) {
+            const et = document.getElementById('lb'+i+'-title');
+            const ed = document.getElementById('lb'+i+'-desc');
+            if (et) et.innerText = T['lb'+i+'t'];
+            if (ed) ed.innerText = T['lb'+i+'d'];
+        }
         if(helpActive) setInfoBar(T.helpMode, null);
         else if(!isRunning) setInfoBar(T.ready, null);
         draw();
@@ -515,20 +581,168 @@
     }
 
     function updateStartStop(running) {
-        document.getElementById('startLabel').classList.toggle('active', !running);
-        document.getElementById('stopLabel').classList.toggle('active', running);
+        const btn = document.getElementById('btnStart');
+        if (btn) btn.textContent = running ? 'STOP' : 'START';
     }
     // ── AKKORD ADATOK (eredeti, érintetlen) ──
     const CHORDS = {
         treble: {
-            "1": [ {name:"C", roman:"I", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]}, {name:"F", roman:"IV", notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]}, {name:"Am", roman:"vi", notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]}, {name:"Dm", roman:"ii", notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]}, {name:"G", roman:"V", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]}, {name:"Em", roman:"iii", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]} ],
-            "2": [ {name:"C", roman:"I", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]}, {name:"C", roman:"I", notes:[{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]} ],
-            "3": [ {name:"G7", roman:"V7", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]}, {name:"Cmaj7", roman:"Imaj7", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}, {name:"Am7", roman:"vi7", notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''}]} ]
+            // 1. Alap helyzet
+            "1": [
+                {name:"C",   roman:"I",   notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"F",   roman:"IV",  notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"G",   roman:"V",   notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
+                {name:"Am",  roman:"vi",  notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
+                {name:"Dm",  roman:"ii",  notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                {name:"Em",  roman:"iii", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}
+            ],
+            // 2. 1. fordítás
+            "2": [
+                {name:"C/E",  roman:"I⁶",   notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"F/A",  roman:"IV⁶",  notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:77,n:'F5',off:4,s:''}]},
+                {name:"G/H",  roman:"V⁶",   notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:79,n:'G5',off:5,s:''}]},
+                {name:"Am/C", roman:"vi⁶",  notes:[{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                {name:"Dm/F", roman:"ii⁶",  notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:74,n:'D5',off:2,s:''}]},
+                {name:"Em/G", roman:"iii⁶", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:76,n:'E5',off:3,s:''}]}
+            ],
+            // 3. 2. fordítás
+            "3": [
+                {name:"C/G",  roman:"I⁶₄",   notes:[{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
+                {name:"F/C",  roman:"IV⁶₄",  notes:[{m:72,n:'C5',off:1,s:''},{m:77,n:'F5',off:4,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                {name:"G/D",  roman:"V⁶₄",   notes:[{m:74,n:'D5',off:2,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
+                {name:"Am/E", roman:"vi⁶₄",  notes:[{m:76,n:'E5',off:3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Dm/A", roman:"ii⁶₄",  notes:[{m:69,n:'A4',off:-1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''}]},
+                {name:"Em/H", roman:"iii⁶₄", notes:[{m:71,n:'H4',off:0,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]}
+            ],
+            // 4. Vegyes (1+2+3 keverve) — ugyanazok a poolok összefűzve, buildSequence kezeli
+            "4": [
+                {name:"C",    roman:"I",     notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"C/E",  roman:"I⁶",   notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"C/G",  roman:"I⁶₄",  notes:[{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
+                {name:"F",    roman:"IV",    notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"F/A",  roman:"IV⁶",  notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:77,n:'F5',off:4,s:''}]},
+                {name:"G",    roman:"V",     notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
+                {name:"G/H",  roman:"V⁶",   notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:79,n:'G5',off:5,s:''}]},
+                {name:"Am",   roman:"vi",    notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
+                {name:"Am/C", roman:"vi⁶",  notes:[{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:69,n:'A4',off:-1,s:''}]}
+            ],
+            // 5. Szeptim alap helyzet
+            "5": [
+                {name:"G7",    roman:"V⁷",    notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]},
+                {name:"Cmaj7", roman:"Imaj⁷", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
+                {name:"Am7",   roman:"vi⁷",   notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''}]},
+                {name:"Dm7",   roman:"ii⁷",   notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Em7",   roman:"iii⁷",  notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]}
+            ],
+            // 6. Szeptim fordítások
+            "6": [
+                // G7 mind a 3 fordítása
+                {name:"G7/H",   roman:"V⁷⁶",    notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"G7/D",   roman:"V⁴₃",    notes:[{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
+                {name:"G7/F",   roman:"V²",      notes:[{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
+                // Cmaj7 mind a 3 fordítása
+                {name:"Cmaj7/E",roman:"Imaj⁷⁶",  notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Cmaj7/G",roman:"Imaj⁴₃",  notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''}]},
+                {name:"Cmaj7/H",roman:"Imaj²",   notes:[{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                // Am7 mind a 3 fordítása
+                {name:"Am7/C",  roman:"vi⁷⁶",   notes:[{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                {name:"Am7/E",  roman:"vi⁴₃",   notes:[{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Am7/G",  roman:"vi²",     notes:[{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
+                // Dm7 mind a 3 fordítása
+                {name:"Dm7/F",  roman:"ii⁷⁶",   notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''}]},
+                {name:"Dm7/A",  roman:"ii⁴₃",   notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''}]},
+                {name:"Dm7/C",  roman:"ii²",     notes:[{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                // Em7 mind a 3 fordítása
+                {name:"Em7/G",  roman:"iii⁷⁶",  notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''}]},
+                {name:"Em7/H",  roman:"iii⁴₃",  notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"Em7/D",  roman:"iii²",    notes:[{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}
+            ],
+            // 7. Szeptim vegyes — alap helyzet + mind a 3 fordítás
+            "7": [
+                {name:"G7",     roman:"V⁷",     notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]},
+                {name:"G7/H",   roman:"V⁷⁶",   notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"G7/D",   roman:"V⁴₃",   notes:[{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
+                {name:"G7/F",   roman:"V²",     notes:[{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
+                {name:"Cmaj7",  roman:"Imaj⁷",  notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
+                {name:"Cmaj7/E",roman:"Imaj⁷⁶", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Cmaj7/G",roman:"Imaj⁴₃", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''}]},
+                {name:"Cmaj7/H",roman:"Imaj²",  notes:[{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"Am7",    roman:"vi⁷",    notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''}]},
+                {name:"Am7/C",  roman:"vi⁷⁶",  notes:[{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                {name:"Am7/E",  roman:"vi⁴₃",  notes:[{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Am7/G",  roman:"vi²",    notes:[{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
+                {name:"Dm7",    roman:"ii⁷",    notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
+                {name:"Dm7/F",  roman:"ii⁷⁶",  notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''}]},
+                {name:"Dm7/A",  roman:"ii⁴₃",  notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''}]},
+                {name:"Dm7/C",  roman:"ii²",    notes:[{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
+                {name:"Em7",    roman:"iii⁷",   notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
+                {name:"Em7/G",  roman:"iii⁷⁶", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''}]},
+                {name:"Em7/H",  roman:"iii⁴₃", notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
+                {name:"Em7/D",  roman:"iii²",   notes:[{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}
+            ]
         },
         bass: {
-            "1": [ {name:"C", roman:"I", notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]}, {name:"F", roman:"IV", notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]} ],
-            "2": [ {name:"G", roman:"V", notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''}]} ],
-            "3": [ {name:"D", roman:"II", notes:[{m:50,n:'D3',off:0,s:''},{m:54,n:'F#3',off:2,s:'♯'},{m:57,n:'A3',off:4,s:''}]} ]
+            "1": [
+                {name:"C",  roman:"I",   notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
+                {name:"F",  roman:"IV",  notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]},
+                {name:"G",  roman:"V",   notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
+                {name:"Am", roman:"vi",  notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
+                {name:"Dm", roman:"ii",  notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]}
+            ],
+            "2": [
+                {name:"C/E",  roman:"I⁶",  notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:60,n:'C4',off:6,s:''}]},
+                {name:"F/A",  roman:"IV⁶", notes:[{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''},{m:53,n:'F3',off:2,s:''}]},
+                {name:"G/H",  roman:"V⁶",  notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''}]},
+                {name:"Am/C", roman:"vi⁶", notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:45,n:'A2',off:-3,s:''}]}
+            ],
+            "3": [
+                {name:"C/G",  roman:"I⁶₄",  notes:[{m:55,n:'G3',off:3,s:''},{m:60,n:'C4',off:6,s:''},{m:52,n:'E3',off:1,s:''}]},
+                {name:"F/C",  roman:"IV⁶₄", notes:[{m:48,n:'C3',off:-1,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]},
+                {name:"G/D",  roman:"V⁶₄",  notes:[{m:50,n:'D3',off:0,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''}]}
+            ],
+            "4": [
+                {name:"C",    roman:"I",    notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
+                {name:"C/E",  roman:"I⁶",  notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:60,n:'C4',off:6,s:''}]},
+                {name:"C/G",  roman:"I⁶₄", notes:[{m:55,n:'G3',off:3,s:''},{m:60,n:'C4',off:6,s:''},{m:52,n:'E3',off:1,s:''}]},
+                {name:"F",    roman:"IV",   notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]},
+                {name:"G",    roman:"V",    notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
+                {name:"G/H",  roman:"V⁶",  notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''}]},
+                {name:"Am",   roman:"vi",   notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]}
+            ],
+            "5": [
+                {name:"G7",   roman:"V⁷",   notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
+                {name:"Dm7",  roman:"ii⁷",  notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''}]},
+                {name:"Am7",  roman:"vi⁷",  notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]}
+            ],
+            "6": [
+                // G7 mind a 3 fordítása
+                {name:"G7/H",   roman:"V⁷⁶",   notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''}]},
+                {name:"G7/D",   roman:"V⁴₃",   notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''}]},
+                {name:"G7/F",   roman:"V²",     notes:[{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
+                // Am7 mind a 3 fordítása
+                {name:"Am7/C",  roman:"vi⁷⁶",  notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''}]},
+                {name:"Am7/E",  roman:"vi⁴₃",  notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''}]},
+                {name:"Am7/G",  roman:"vi²",    notes:[{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
+                // Dm7 mind a 3 fordítása
+                {name:"Dm7/F",  roman:"ii⁷⁶",  notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''}]},
+                {name:"Dm7/A",  roman:"ii⁴₃",  notes:[{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
+                {name:"Dm7/C",  roman:"ii²",    notes:[{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]}
+            ],
+            // 7. Szeptim vegyes — alap helyzet + mind a 3 fordítás
+            "7": [
+                {name:"G7",     roman:"V⁷",    notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
+                {name:"G7/H",   roman:"V⁷⁶",   notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''}]},
+                {name:"G7/D",   roman:"V⁴₃",   notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''}]},
+                {name:"G7/F",   roman:"V²",     notes:[{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
+                {name:"Am7",    roman:"vi⁷",   notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
+                {name:"Am7/C",  roman:"vi⁷⁶",  notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''}]},
+                {name:"Am7/E",  roman:"vi⁴₃",  notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''}]},
+                {name:"Am7/G",  roman:"vi²",    notes:[{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
+                {name:"Dm7",    roman:"ii⁷",   notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''}]},
+                {name:"Dm7/F",  roman:"ii⁷⁶",  notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''}]},
+                {name:"Dm7/A",  roman:"ii⁴₃",  notes:[{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
+                {name:"Dm7/C",  roman:"ii²",    notes:[{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]}
+            ]
         }
     };
 
@@ -537,6 +751,7 @@
 
     // ── ÁLLAPOTOK ──
     let isRunning = false, showNames = false, showKeys = false, showWheel = false, helpActive = false, audioOn = true;
+    let hintsState = 0;
     let activeRH = true, activeLH = true;
     let currentMode = 'sheet', currentLevel = 1;
     let seq = [], currentStep = 0, activeMidiNotes = new Set();
@@ -575,7 +790,7 @@
             'CHORDS — recognise and play chord shapes',
             'SCALES — practice all major and minor scales',
             'HANON — classic finger exercises with analysis',
-            'CZERNY — coming soon'
+            'RHYTHM — coming soon'
         ],
         HU: [
             'HALLÁS — azonosítsd a hangokat a zongorán',
@@ -583,7 +798,7 @@
             'AKKORDOK — akkordok felismerése és lejátszása',
             'SKÁLÁK — dúr és moll skálák gyakorlása',
             'HANON — klasszikus ujjgyakorlatok elemzéssel',
-            'CZERNY — hamarosan'
+            'RITMUS — hamarosan'
         ]
     };
 
@@ -605,7 +820,7 @@
     function updateLCD() {
         const T = AKKORD_T[currentLang];
         document.getElementById('lcdModeText').innerText = {'sheet':T.oledNotes,'lead':T.oledChords,'roman':T.oledRoman}[currentMode];
-        document.getElementById('lcdLevelText').innerText = {1:T.oledRoot,2:T.oledInv,3:T.oled7th}[currentLevel];
+        document.getElementById('lcdLevelText').innerText = {1:T.oledRoot,2:T.oled1inv,3:T.oled2inv,4:T.oledMix,5:T.oled7root,6:T.oled7inv,7:T.oled7mix}[currentLevel]||T.oledRoot;
     }
     function updateProgress() {
         document.getElementById('lcdProgress').innerText = `${currentStep} / 16`;
@@ -619,14 +834,9 @@
     // ── HELP ──
     function toggleHelp() {
         helpActive = !helpActive;
-        document.getElementById('btnHelp').classList.toggle('active', helpActive);
-        if (helpActive) {
-            document.body.classList.add('help-mode-active');
-            setInfoBar(AKKORD_T[currentLang].helpMode, null);
-        } else {
-            document.body.classList.remove('help-mode-active');
-            updateInfoBar();
-        }
+        const btnHelp = document.getElementById('btnHelp');
+        if (helpActive) { btnHelp.style.color = '#fff'; document.body.classList.add('help-mode-active'); setInfoBar(AKKORD_T[currentLang].helpMode, null); }
+        else { btnHelp.style.color = '#444'; document.body.classList.remove('help-mode-active'); updateInfoBar(); }
     }
     document.addEventListener('click', (e) => {
         if (e.target.closest('#btnHelp')) return;
@@ -656,9 +866,26 @@
         updateLCD();
         if (isRunning) stopPractice(); else draw();
     }
+    function openLevelBrowser() {
+        // Aktív szint kiemelése
+        for (let i=1; i<=7; i++) {
+            const btn = document.getElementById('lb-'+i);
+            if (btn) btn.style.borderColor = (i === currentLevel) ? 'var(--oled-text)' : '#333';
+        }
+        document.getElementById('levelBrowserModal').style.display = 'flex';
+    }
+    function closeLevelBrowser() {
+        document.getElementById('levelBrowserModal').style.display = 'none';
+    }
+    function selectLevel(level) {
+        currentLevel = level;
+        closeLevelBrowser();
+        updateLCD();
+        if (isRunning) stopPractice();
+    }
     function cycleLevel(dir) {
         if (helpActive) return;
-        currentLevel = ((currentLevel - 1 + dir + 3) % 3) + 1;
+        currentLevel = ((currentLevel - 1 + dir + 7) % 7) + 1;
         updateLCD();
         if (isRunning) stopPractice();
     }
@@ -671,17 +898,59 @@
         }
     }
 
-    function toggleHint() {
+    function cycleHints() {
         if (helpActive) return;
-        showNames = !showNames;
-        document.getElementById('btnHintName').classList.toggle('active', showNames);
+        hintsState = (hintsState + 1) % 3;
+        showNames = hintsState >= 1;
+        showKeys  = hintsState >= 2;
+        const btn = document.getElementById('btnHints');
+        btn.classList.toggle('active', hintsState > 0);
+        const isHU = currentLang === 'HU';
+        const infoTexts = isHU
+            ? ['HINTS KIKAPCSOLVA', 'HANGNEVEK AKTÍV', 'HANGNEVEK + BILLENTYŰ LED AKTÍV']
+            : ['HINTS OFF', 'NOTE NAMES ON', 'NOTE NAMES + KEYS LED ON'];
+        setInfoBar(infoTexts[hintsState], null);
+        updateKeyboardHints();
         draw();
     }
-    function toggleKeys() {
-        if (helpActive) return;
-        showKeys = !showKeys;
-        document.getElementById('btnKeys').classList.toggle('active', showKeys);
-        updateKeyboardHints();
+    function toggleHint() { cycleHints(); }
+    function toggleKeys() { cycleHints(); }
+    function playChordDemo() {
+        if (!audioCtx) { initAudio().then(() => { setTimeout(_playChordDemo, 400); }); return; }
+        const tryPlay = () => { if (Object.keys(sampleBuffers).length >= 4) _playChordDemo(); else setTimeout(tryPlay, 100); };
+        tryPlay();
+    }
+    function _playChordDemo() {
+        if (seq.length === 0) buildSequence();
+        const chordDur = 1.2;
+        let time = audioCtx.currentTime + 0.15;
+        document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
+        seq.forEach((item, i) => {
+            const delayMs = (time - audioCtx.currentTime) * 1000;
+            const flashDur = chordDur * 0.8 * 1000;
+            setTimeout(() => { currentStep = i; updateProgress(); draw(); }, delayMs);
+            item.chord.notes.forEach(n => {
+                const src = audioCtx.createBufferSource();
+                let closest = 36, minDiff = 999;
+                for (let b in sampleBuffers) { let diff = Math.abs(n.m - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
+                if (!sampleBuffers[closest]) return;
+                src.buffer = sampleBuffers[closest];
+                src.playbackRate.value = Math.pow(2, (n.m - closest) / 12);
+                const g = audioCtx.createGain();
+                g.gain.setValueAtTime(0.55, time);
+                g.gain.exponentialRampToValueAtTime(0.001, time + chordDur * 2.2);
+                src.connect(g).connect(audioCtx.destination);
+                src.start(time); src.stop(time + chordDur * 2.5);
+                setTimeout(() => {
+                    const key = document.getElementById(`k-${n.m}`);
+                    if (key) { key.classList.add('chord-hint'); setTimeout(() => key.classList.remove('chord-hint'), flashDur); }
+                }, delayMs);
+            });
+            time += chordDur;
+        });
+        const totalMs = (time - audioCtx.currentTime) * 1000;
+        setTimeout(() => { currentStep = 0; updateProgress(); draw(); }, totalMs);
+        setInfoBar('▶ DEMO — CHORD SEQUENCE', null);
     }
     function toggleAudio() {
         audioOn = !audioOn;
