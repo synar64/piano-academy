@@ -216,6 +216,7 @@
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
         .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1); }
         .modal-title { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 16px; margin-top: 0; margin-bottom: 25px; border-bottom: 2px solid #111; padding-bottom: 15px; }
         .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; transition: 0.1s; letter-spacing: 1px; }
@@ -272,6 +273,7 @@
                 <span style="font-size:14px; color:#999;" id="txt-ctrl5">Megnyitja a kvintkor tárcsát a hangnem beállításához.</span>
             </div>
         </div>
+        
 
         <div style="margin-bottom:22px;">
             <div style="font-family:'Share Tech Mono'; font-size:11px; color:var(--lcd-label-color); text-transform:uppercase; letter-spacing:2px; font-weight:bold; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:5px;" id="txt-wheelTitle">Akkordtárcsa</div>
@@ -575,23 +577,9 @@
             if (et) et.innerText = T['lb'+i+'t'];
             if (ed) ed.innerText = T['lb'+i+'d'];
         }
-        if(helpActive) {
-        setInfoBar(T.helpMode, null);
-    } else if(!isRunning) {
-        // Drasztikus kényszerítés
-        const bar = document.getElementById('infoBarText');
-        if (bar) {
-            bar.innerHTML = T.ready;
-            bar.style.display = 'block'; // Biztosítsuk, hogy látható
-            bar.style.left = '50%';
-            bar.style.right = 'auto';
-            bar.style.transform = 'translateX(-50%)';
-            bar.style.opacity = '1';
-        }
-    } else {
-        setInfoBar(T.playing, null);
-    }
-    draw();
+        if(helpActive) setInfoBar(T.helpMode, null);
+        else if(!isRunning) setInfoBar(T.ready, null);
+        draw();
     }
 
     function setInfoBar(text, targetEl) {
@@ -1550,5 +1538,20 @@
     window.addEventListener('pointerdown', () => initAudio(), { once: true });
 };
 </script>
+<div id="levelBrowserModal" class="modal-overlay" style="z-index: 999999 !important;">
+        <div class="modal-content" style="max-width: 800px; padding: 20px; position: relative; z-index: 1000000;">
+            <h2 class="modal-title" id="txt-levelTitle">SELECT LEVEL</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left;">
+                <button id="lb-1" class="patch-btn" onclick="selectLevel(1)"><b id="lb1-title"></b><br><small id="lb1-desc" style="opacity:0.6;"></small></button>
+                <button id="lb-2" class="patch-btn" onclick="selectLevel(2)"><b id="lb2-title"></b><br><small id="lb2-desc" style="opacity:0.6;"></small></button>
+                <button id="lb-3" class="patch-btn" onclick="selectLevel(3)"><b id="lb3-title"></b><br><small id="lb3-desc" style="opacity:0.6;"></small></button>
+                <button id="lb-4" class="patch-btn" onclick="selectLevel(4)"><b id="lb4-title"></b><br><small id="lb4-desc" style="opacity:0.6;"></small></button>
+                <button id="lb-5" class="patch-btn" onclick="selectLevel(5)"><b id="lb5-title"></b><br><small id="lb5-desc" style="opacity:0.6;"></small></button>
+                <button id="lb-6" class="patch-btn" onclick="selectLevel(6)"><b id="lb6-title"></b><br><small id="lb6-desc" style="opacity:0.6;"></small></button>
+                <button id="lb-7" class="patch-btn" onclick="selectLevel(7)"><b id="lb7-title"></b><br><small id="lb7-desc" style="opacity:0.6;"></small></button>
+            </div>
+            <button class="modal-btn" onclick="closeLevelBrowser()" id="txt-levelCancel">CANCEL</button>
+        </div>
+    </div>
 </body>
 </html>
