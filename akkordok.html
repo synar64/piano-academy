@@ -366,14 +366,35 @@
 
                     <!-- BAL — modul-specifikus -->
                     <div class="control-group">
-                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
-                            <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
-                            <div class="clef-divider"></div>
-                            <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
-                        </button>
-                        <button id="btnHints" class="hardware-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF">Hints</button>
-                        <button id="btnWheel" class="hardware-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CHORD WHEEL">Wheel</button>
-                    </div>
+    <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+    </a>
+        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+        <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
+        <div class="clef-divider"></div>
+        <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
+    </button>
+    
+    <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18h6"></path>
+            <path d="M10 22h4"></path>
+            <path d="M12 2v1"></path>
+            <path d="M12 18V18.01"></path>
+            <path d="M21.2 11.8c.8-1.5.8-3.3 0-4.8C19.3 3.8 15.6 2 12 2S4.7 3.8 2.8 7c-.8 1.5-.8 3.3 0 4.8 1.4 2.6 3.2 3.2 4.2 5.2h10c1-2 2.8-2.6 4.2-5.2z"></path>
+        </svg>
+    </button>
+
+    <button id="btnWheel" class="sq-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CHORD WHEEL">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 12L12 2" opacity="0.5"></path>
+            <path d="M12 12L20.66 7" opacity="0.5"></path>
+            <path d="M12 2A10 10 0 0 1 20.66 7" fill="currentColor" opacity="0.3" stroke="none"></path>
+            <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+    </button>
+</div>
 
                     <!-- KÖZÉP: OLED + START -->
                     <div class="center-console">
@@ -447,11 +468,8 @@
                             <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
-                        </div>
-                        <div style="width:16px;"></div>
-                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
-                        </a>
+                        </div>                       
+                       
                     </div>
                 </div>
 
@@ -565,8 +583,7 @@
         const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
         // Csak szöveges gombok
-        const btnMap={'btnWheel':T.btnWheel};
-        Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
+        
         const helpMap={
             'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':T.hHints,'btnDemo':T.hDemo,'btnWheel':T.hWheel,
             'btnStart':T.hStart,'audioToggle':T.hPiano,
