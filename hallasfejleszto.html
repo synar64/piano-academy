@@ -110,13 +110,6 @@
         .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .sq-btn.active { color: #ffffff; background-color: #121214; }
 
-        .start-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000; overflow:hidden; cursor:pointer; transition:transform 0.1s; }
-        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .start-split span { display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif; color:#444; text-transform:uppercase; }
-        .start-split span#startLabel { padding: 0 12px 0 22px; }
-        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
-        .start-split span.active { color:#fff; }
-        .start-split .split-div { width:1px; background:#333; margin:6px 0; }
         .lang-split { display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
         .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:11px; font-family:'Inter',sans-serif; color:var(--text-dim); }
         .lang-split button.active { color:#fff; }
@@ -285,11 +278,7 @@
                     <!-- KÖZÉP: START + OLED -->
                     <div class="center-console">
                         <div style="display:flex; align-items:center; gap:32px;">
-                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EAR TRAINING SESSION">
-                                <span id="startLabel" class="active">START</span>
-                                <div class="split-div"></div>
-                                <span id="stopLabel">STOP</span>
-                            </div>
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EAR TRAINING SESSION" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
@@ -435,19 +424,23 @@
     let audioCtx, sampleBuffers = {}, activeNodes = {};
 
     // ── MODULE VÁLTÓ ──
+    const MODULE_NAMES = {
+        EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
+        HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
+    };
     const modules = [
-        {name:'EAR TRAIN', url:'hallasfejleszto.html'},
-        {name:'SIGHT READ', url:'kottaolvasas.html'},
-        {name:'CHORDS',    url:'akkordok.html'},
-        {name:'SCALES',    url:'skalak.html'},
-        {name:'HANON',     url:'hanon.html'},
-        {name:'RHYTHM',    url:'ritmus.html'}
+        {url:'hallasfejleszto.html'},
+        {url:'kottaolvasas.html'},
+        {url:'akkordok.html'},
+        {url:'skalak.html'},
+        {url:'hanon.html'},
+        {url:'czerny.html'}
     ];
     let currentModuleIdx = 0;
     function cycleModule(dir) {
         if (helpActive) return;
         currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length;
-        document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name;
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[currentLang][currentModuleIdx];
     }
     function loadModule() {
         if (helpActive) return;
@@ -498,7 +491,7 @@
             // result
             'resultMsg100fast': 'Perfect score at maximum speed! Your ear training is at professional level.',
             'resultMsg100': 'Perfect round! You\'ve advanced — now you have <strong>{t} seconds</strong> per note.',
-            'resultMsgFail': 'Good effort! You need 100% to advance. Keep practicing at {t} seconds per note.',
+            'msgListening':'LISTENING — IDENTIFY NOTE {n} OF {t}','msgTimeUp':'TIME UP! — THE NOTE WAS {note}','msgCorrect':'CORRECT! — {note}','msgHigher':'HIGHER ↑ — TRY AGAIN','msgLower':'LOWER ↓ — TRY AGAIN','resultMsgFail': 'Good effort! You need 100% to advance. Keep practicing at {t} seconds per note.',
         },
         HU: {
             'txt-roundComplete': 'Kör lezárva',
@@ -531,7 +524,7 @@
             // result
             'resultMsg100fast': 'Tökéletes pontszám maximális sebességen! Hallásfejlesztésed profi szintű.',
             'resultMsg100': 'Tökéletes kör! Szintet léptél — most <strong>{t} másodperced</strong> van hangjegyenként.',
-            'resultMsgFail': 'Szép munka! A szintlépéshez 100% kell. Gyakorolj még {t} másodperces tempónál!',
+            'msgListening':'FIGYELJ — AZONOSÍTSD A {n}. HANGOT A {t}-BÓL','msgTimeUp':'LEJÁRT AZ IDŐ! — A HANG: {note}','msgCorrect':'HELYES! — {note}','msgHigher':'MAGASABB ↑ — PRÓBÁLD ÚJRA','msgLower':'MÉLYEBB ↓ — PRÓBÁLD ÚJRA','resultMsgFail': 'Szép munka! A szintlépéshez 100% kell. Gyakorolj még {t} másodperces tempónál!',
         }
     };
 
@@ -557,15 +550,48 @@
         });
         // Csak szöveges gombok fordítása — ikonos sq-btn-eket kihagyjuk
         // (btnAcc, btnHints, btnRepeat már ikonok, nem kell szöveget frissíteni)
-        // Clef help szövegek
-        const btnClef = document.getElementById('btnClef');
-        if (btnClef) btnClef.dataset.help = currentLang === 'EN'
-            ? 'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY'
-            : 'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS';
+        // Help szövegek minden gombra
+        const helpMap = currentLang === 'EN' ? {
+            'btnHome':'HOME: RETURN TO MAIN MODULE MENU',
+            'btnClef':'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
+            'btnHints':'HINTS: 1× NOTE NAMES | 2× + KEY LEDS | 3× OFF',
+            'btnAcc':'CHROMATIC: ADD BLACK KEY NOTES (SHARPS/FLATS) TO THE POOL',
+            'btnRepeat':'REPLAY: PLAY THE CURRENT NOTE AGAIN',
+            'btnStart':'START/STOP: BEGIN OR END THE EAR TRAINING SESSION',
+            'audioToggle':'PIANO AUDIO: TOGGLE INTERNAL SYNTH',
+            'btnFullscreen':'FULLSCREEN MODE — PRESS AGAIN TO EXIT',
+            'btnHelp':'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            'btnInfo':'INFO: OPEN MODULE GUIDE',
+            'oledModule':'MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE',
+            'oledTimer':'TIMER: SECONDS PER NOTE — REACH 100% TO SPEED UP AUTOMATICALLY',
+            'oledProgress':'PROGRESS: CURRENT NOTE IN THE 10-NOTE ROUND',
+            'oledScore':'SCORE: CORRECT HITS / MISTAKES THIS ROUND',
+        } : {
+            'btnHome':'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE',
+            'btnClef':'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
+            'btnHints':'SEGÉDEK: 1× HANGNEVEK | 2× + BILLENTYŰ LED | 3× KI',
+            'btnAcc':'KROMATIKUS: FEKETE BILLENTYŰS HANGOK (KERESZTEK/BÉK) HOZZÁADÁSA',
+            'btnRepeat':'ÚJRAJÁTSZÁS: AKTUÁLIS HANG ISMÉTLÉSE BÜNTETÉS NÉLKÜL',
+            'btnStart':'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
+            'audioToggle':'ZONGORA HANG: SZINTETIZÁTOR BE/KI',
+            'btnFullscreen':'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',
+            'btnHelp':'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            'btnInfo':'INFO: MODUL ÚTMUTATÓ',
+            'oledModule':'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
+            'oledTimer':'IDŐKORLÁT: MÁSODPERC HANGJEGYENKÉNT — 100%-NÁL AUTOMATIKUSAN GYORSÍT',
+            'oledProgress':'ELŐREHALADÁS: AKTUÁLIS HANG A 10 HANGOS KÖRBEN',
+            'oledScore':'EREDMÉNY: HELYES / HIBÁS LEÜTÉSEK A KÖRBEN',
+        };
+        Object.entries(helpMap).forEach(([id,txt])=>{
+            const el=document.getElementById(id);
+            if(el) el.dataset.help=txt;
+        });
         // Info sáv — csak ha nem fut
         if (!isRunning && !helpActive) {
             setInfoBar(T['ready'], null);
         }
+        // Module név frissítése
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[currentLang][currentModuleIdx];
     }
 
     // ── HELP ──
@@ -691,8 +717,8 @@
 
     // ── PRACTICE KONTROL ──
     function updateStartStop(running) {
-        document.getElementById('startLabel').classList.toggle('active', !running);
-        document.getElementById('stopLabel').classList.toggle('active', running);
+        const btn = document.getElementById('btnStart');
+        if (btn) btn.textContent = running ? 'STOP' : 'START';
     }
 
         function handleMainButton() {
@@ -722,7 +748,7 @@
     function playCurrentAndStartTimer() {
         if (!isRunning || currentStep >= seq.length) return;
         playMidi(seq[currentStep].midi, 100);
-        setInfo(`LISTENING — IDENTIFY NOTE ${currentStep + 1} OF ${seq.length}`, '');
+        setInfo(TRANSLATIONS[currentLang]['msgListening'].replace('{n}',currentStep+1).replace('{t}',seq.length), '');
         updateKeyLed();
         if (timerTicker) clearInterval(timerTicker);
         timeLeft = sessionTimer;
@@ -742,7 +768,7 @@
         scoreBad++;
         seq[currentStep].revealed = true;
         seq[currentStep].wrong = true;
-        setInfo(`TIME UP! — THE NOTE WAS ${seq[currentStep].n}`, 'hint-wrong');
+        setInfo(TRANSLATIONS[currentLang]['msgTimeUp'].replace('{note}',seq[currentStep].n), 'hint-wrong');
         draw();
         updateOLED();
         waitingNext = true;
@@ -819,7 +845,7 @@
             scoreOk++;
             target.revealed = true;
             target.correct = true;
-            setInfo(`CORRECT! — ${target.n}`, 'hint-correct');
+            setInfo(TRANSLATIONS[currentLang]['msgCorrect'].replace('{note}',target.n), 'hint-correct');
             draw();
             updateOLED();
             waitingNext = true;
@@ -829,9 +855,9 @@
             scoreBad++;
             updateOLED();
             if (midi < target.midi) {
-                setInfo('HIGHER ↑ — TRY AGAIN', 'hint-higher');
+                setInfo(TRANSLATIONS[currentLang]['msgHigher'], 'hint-higher');
             } else {
-                setInfo('LOWER ↓ — TRY AGAIN', 'hint-lower');
+                setInfo(TRANSLATIONS[currentLang]['msgLower'], 'hint-lower');
             }
             draw();
         }
