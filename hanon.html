@@ -95,7 +95,6 @@
                 <div class="modal-stat-box"><div class="modal-stat-label">Stability</div><div id="modalUni" class="modal-stat-value">100%</div></div>
             </div>
             <div id="modalTip" class="modal-tip">Excellent work!</div>
-            <div id="modalHistory" style="background:#0a0a0c;border:1px solid #222;border-radius:4px;padding:12px;margin-bottom:20px;min-height:30px;"></div>
             <button class="modal-btn" onclick="closeModal()">Acknowledge</button>
         </div>
     </div>
@@ -137,7 +136,6 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Exercise ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Select from 20 Hanon exercises. Click to browse all.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Treble and bass clef staves — toggle independently.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#b3e6ff;font-family:'Share Tech Mono';font-size:14px;font-weight:bold;">C</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl7">Transpose the exercise to any of the 12 keys. Click to open the key selector.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Rhythm ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Select a rhythmic pattern. Click Demo to preview.</span></div>
             </div>
             <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-metroTitle">Metronome</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-metroBody">Built-in metronome with adjustable BPM (40–200). Use the ▲▼ arrows to set tempo. Click the ˅ button to open settings: choose from 4 click sounds (Woodblock, Mechanical, Drumsticks, Electronic), adjust volume, and toggle first-beat accent.</p></div>
@@ -186,27 +184,6 @@
                         <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEY LEDS | 4× OFF">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
                         </button>
-                        <div style="position:relative;">
-                            <button id="btnKey" class="sq-btn" onclick="if(!helpActive) toggleKeyPopup()" data-help="KEY: TRANSPOSE THE EXERCISE TO ANY KEY">
-                                <span id="btnKeyLabel" style="font-family:'Share Tech Mono';font-size:15px;font-weight:bold;">C</span>
-                            </button>
-                            <div id="keyPopup" style="display:none;position:absolute;bottom:48px;left:50%;transform:translateX(-50%);background:#1a1a1d;border:1px solid #333;padding:8px;border-radius:4px;z-index:1001;box-shadow:0 10px 30px #000;">
-                                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
-                                    <button class="metro-preset" onclick="selectKey(0)">C</button>
-                                    <button class="metro-preset" onclick="selectKey(1)">C#</button>
-                                    <button class="metro-preset" onclick="selectKey(2)">D</button>
-                                    <button class="metro-preset" onclick="selectKey(3)">D#</button>
-                                    <button class="metro-preset" onclick="selectKey(4)">E</button>
-                                    <button class="metro-preset" onclick="selectKey(5)">F</button>
-                                    <button class="metro-preset" onclick="selectKey(6)">F#</button>
-                                    <button class="metro-preset" onclick="selectKey(7)">G</button>
-                                    <button class="metro-preset" onclick="selectKey(8)">G#</button>
-                                    <button class="metro-preset" onclick="selectKey(9)">A</button>
-                                    <button class="metro-preset" onclick="selectKey(10)">A#</button>
-                                    <button class="metro-preset" onclick="selectKey(11)">H</button>
-                                </div>
-                            </div>
-                        </div>
                         <div style="width:8px;"></div>
                         <div class="metronome-block" style="display:flex;align-items:center;gap:4px;position:relative;">
                             <button id="metroToggle" class="sq-btn" onclick="if(!helpActive) toggleMetronome()" data-help="METRONOME: START/STOP CLICK">
@@ -352,8 +329,8 @@
     let currentLang='EN';
     const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']};
     const HANON_T={
-        EN:{infoTitle:'Hanon — Module Guide',howTitle:'How It Works',howBody:'Classic Hanon finger exercises on the staff. Play each note in sequence. BPM and stability tracked in real time.',ctrlTitle:'Controls',gotIt:'Got It',ctrl1:'Sprint (1×), Marathon (3×), Training (endless).',ctrl2:'Select from 20 Hanon exercises. Click to browse all.',ctrl3:'Treble and bass clef staves — toggle independently.',ctrl4:'Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.',ctrl6:'Select a rhythmic pattern. Click Demo to preview.',ctrl7:'Transpose the exercise to any of the 12 keys. Click to open the key selector.',metroTitle:'Metronome',metroBody:'Built-in metronome with adjustable BPM (40–200). Use the ▲▼ arrows to set tempo. Click the ˅ button to open settings: choose from 4 click sounds (Woodblock, Mechanical, Drumsticks, Electronic), adjust volume, and toggle first-beat accent.',tipTitle:'Learning Tip',tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher and keep your wrist relaxed.',ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hHome:'HOME: RETURN TO MAIN MODULE MENU',hHints:'HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEY LEDS | 4× OFF',hStart:'START/STOP: BEGIN OR END THE EXERCISE',hDemo:'DEMO: CLICK TO HEAR THE EXERCISE — KEYS LIGHT UP IN SYNC',hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH',hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hInfo:'INFO: OPEN MODULE GUIDE',hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',hMode:'MODE: SPRINT (1X) | MARATHON (3X) | TRAINING = ENDLESS',hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',hRhythm:'RHYTHM: ARROWS TO CHANGE — CLICK TO CYCLE',hKey:'KEY: TRANSPOSE THE EXERCISE TO ANY KEY — USE ARROWS TO CHANGE',hMetro:'METRONOME: START/STOP CLICK — BPM SYNCED WITH EXERCISE'},
-        HU:{infoTitle:'Hanon — Modul útmutató',howTitle:'Hogyan működik',howBody:'Klasszikus Hanon ujjgyakorlatok a kottán. Játszd le a hangokat sorban. BPM és stabilitás valós időben követhető.',ctrlTitle:'Vezérlők',gotIt:'Értettem',ctrl1:'Sprint (1×), Maraton (3×), Tréning (végtelen).',ctrl2:'20 Hanon gyakorlat közül választhatsz. Kattints a böngészéshez.',ctrl3:'Violin és basszus kulcs — külön-külön kapcsolható.',ctrl4:'Körkörösen kapcsol: 1× hangnevek, 2× + ujjrend, 3× + billentyű LED, 4× mind ki.',ctrl6:'Ritmusképlet kiválasztása. Kattints a Demo gombra a lejátszáshoz.',ctrl7:'Transzponáld a gyakorlatot bármely hangnembe. Kattints a hangnem választóhoz.',metroTitle:'Metronóm',metroBody:'Beépített metronóm állítható BPM-mel (40–200). A ▲▼ nyilakkal állítsd a tempót. A ˅ gombbal nyisd meg a beállításokat: 4 kattanáshang (Woodblock, Mechanical, Drumsticks, Electronic), hangerő és első ütés hangsúlyozás.',tipTitle:'Tanulási tipp',tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld és tartsd lazán a csuklódat.',ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE',hHints:'SEGÉDEK: 1× HANGNEVEK | 2× + UJJREND | 3× + BILLENTYŰ LED | 4× KI',hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',hDemo:'DEMÓ: KATTINTS A GYAKORLAT MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK',hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI',hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hInfo:'INFO: MODUL ÚTMUTATÓ',hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',hMode:'MÓD: SPRINT (1×) | MARATON (3×) | TRAINING = VÉGTELEN',hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',hRhythm:'RITMUS: NYILAKKAL VÁLTASZ — KATTINTS A CIKLÁLÁSHOZ',hKey:'HANGNEM: TRANSZPONÁLÁS BÁRMELY HANGNEMBE — NYILAKKAL VÁLTHATSZ',hMetro:'METRONÓM: KATTANÁS BE/KI — BPM SZINKRONBAN A GYAKORLATTAL'}
+        EN:{infoTitle:'Hanon — Module Guide',howTitle:'How It Works',howBody:'Classic Hanon finger exercises on the staff. Play each note in sequence. BPM and stability tracked in real time.',ctrlTitle:'Controls',gotIt:'Got It',ctrl1:'Sprint (1×), Marathon (3×), Training (endless).',ctrl2:'Select from 20 Hanon exercises. Click to browse all.',ctrl3:'Treble and bass clef staves — toggle independently.',ctrl4:'Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.',ctrl6:'Select a rhythmic pattern. Click Demo to preview.',metroTitle:'Metronome',metroBody:'Built-in metronome with adjustable BPM (40–200). Use the ▲▼ arrows to set tempo. Click the ˅ button to open settings: choose from 4 click sounds (Woodblock, Mechanical, Drumsticks, Electronic), adjust volume, and toggle first-beat accent.',tipTitle:'Learning Tip',tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher and keep your wrist relaxed.',ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hHome:'HOME: RETURN TO MAIN MODULE MENU',hHints:'HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEY LEDS | 4× OFF',hStart:'START/STOP: BEGIN OR END THE EXERCISE',hDemo:'DEMO: CLICK TO HEAR THE EXERCISE — KEYS LIGHT UP IN SYNC',hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH',hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hInfo:'INFO: OPEN MODULE GUIDE',hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',hMode:'MODE: SPRINT (1X) | MARATHON (3X) | TRAINING = ENDLESS',hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',hRhythm:'RHYTHM: ARROWS TO CHANGE — CLICK TO CYCLE',hMetro:'METRONOME: START/STOP CLICK — BPM SYNCED WITH EXERCISE'},
+        HU:{infoTitle:'Hanon — Modul útmutató',howTitle:'Hogyan működik',howBody:'Klasszikus Hanon ujjgyakorlatok a kottán. Játszd le a hangokat sorban. BPM és stabilitás valós időben követhető.',ctrlTitle:'Vezérlők',gotIt:'Értettem',ctrl1:'Sprint (1×), Maraton (3×), Tréning (végtelen).',ctrl2:'20 Hanon gyakorlat közül választhatsz. Kattints a böngészéshez.',ctrl3:'Violin és basszus kulcs — külön-külön kapcsolható.',ctrl4:'Körkörösen kapcsol: 1× hangnevek, 2× + ujjrend, 3× + billentyű LED, 4× mind ki.',ctrl6:'Ritmusképlet kiválasztása. Kattints a Demo gombra a lejátszáshoz.',metroTitle:'Metronóm',metroBody:'Beépített metronóm állítható BPM-mel (40–200). A ▲▼ nyilakkal állítsd a tempót. A ˅ gombbal nyisd meg a beállításokat: 4 kattanáshang (Woodblock, Mechanical, Drumsticks, Electronic), hangerő és első ütés hangsúlyozás.',tipTitle:'Tanulási tipp',tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld és tartsd lazán a csuklódat.',ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE',hHints:'SEGÉDEK: 1× HANGNEVEK | 2× + UJJREND | 3× + BILLENTYŰ LED | 4× KI',hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',hDemo:'DEMÓ: KATTINTS A GYAKORLAT MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK',hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI',hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hInfo:'INFO: MODUL ÚTMUTATÓ',hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',hMode:'MÓD: SPRINT (1×) | MARATON (3×) | TRAINING = VÉGTELEN',hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',hRhythm:'RITMUS: NYILAKKAL VÁLTASZ — KATTINTS A CIKLÁLÁSHOZ',hMetro:'METRONÓM: KATTANÁS BE/KI — BPM SZINKRONBAN A GYAKORLATTAL'}
     };
     function setLang(lang){
         localStorage.setItem('akira_lang',lang);currentLang=lang;
@@ -362,10 +339,10 @@
         document.getElementById('btnLangEN').style.color=lang==='EN'?'#fff':'var(--text-dim)';
         document.getElementById('btnLangHU').style.color=lang==='HU'?'#fff':'var(--text-dim)';
         const T=HANON_T[lang];
-        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl7','txt-ctrl6','txt-metroTitle','txt-metroBody','txt-tipTitle','txt-tipBody','txt-gotIt'];
-        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl7,T.ctrl6,T.metroTitle,T.metroBody,T.tipTitle,T.tipBody,T.gotIt];
+        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl6','txt-metroTitle','txt-metroBody','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl6,T.metroTitle,T.metroBody,T.tipTitle,T.tipBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
-        const helpMap={'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':T.hHints,'btnStart':T.hStart,'btnDemo':T.hDemo,'audioToggle':T.hPiano,'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledRhythm':T.hRhythm,'btnKey':T.hKey,'metroToggle':T.hMetro};
+        const helpMap={'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':T.hHints,'btnStart':T.hStart,'btnDemo':T.hDemo,'audioToggle':T.hPiano,'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledRhythm':T.hRhythm,'metroToggle':T.hMetro};
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
         document.getElementById('lcdModuleText').innerText=MODULE_NAMES[lang][4];
         const R=RHYTHMS[currentRhythmIdx];
@@ -577,33 +554,7 @@
     }
     function toggleAudio(){audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn&&!audioCtx)initAudio();}
     const C_MAJOR_MIDI=[0,2,4,5,7,9,11];const NOTE_NAMES=['C','D','E','F','G','A','H'];
-    const KEY_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','H'];
-    const KEY_NAMES_HU=['C','Cisz','D','Disz','E','F','Fisz','G','Gisz','A','Aisz','H'];
-    let transposeKey=0;
-    function selectKey(keyIdx){
-        if(helpActive)return;
-        transposeKey=keyIdx;
-        const isHU=currentLang==='HU';
-        const keyName=isHU?KEY_NAMES_HU[transposeKey]:KEY_NAMES[transposeKey];
-        document.getElementById('btnKeyLabel').innerText=keyName;
-        document.getElementById('btnKey').classList.toggle('active',transposeKey!==0);
-        document.getElementById('keyPopup').style.display='none';
-        setInfoBar('KEY: '+keyName+(isHU?' — TRANSZPONÁLÁS':' — TRANSPOSITION'),null);
-        if(isRunning)stopPractice();buildSequence();draw();
-    }
-    function toggleKeyPopup(){
-        const popup=document.getElementById('keyPopup');
-        popup.style.display=(popup.style.display==='none'||popup.style.display==='')?'grid':'none';
-    }
-    function getNoteInfo(diatonicStep){
-        let octave=Math.floor(diatonicStep/7);let noteIndex=diatonicStep%7;
-        let baseMidi=(octave*12)+12+C_MAJOR_MIDI[noteIndex];
-        let midi=baseMidi+transposeKey;
-        // Note name based on transposed pitch
-        let pc=(C_MAJOR_MIDI[noteIndex]+transposeKey)%12;
-        let name=KEY_NAMES[pc];
-        return{midi,name};
-    }
+    function getNoteInfo(diatonicStep){let octave=Math.floor(diatonicStep/7);let noteIndex=diatonicStep%7;let midi=(octave*12)+12+C_MAJOR_MIDI[noteIndex];return{midi,name:NOTE_NAMES[noteIndex]};}
     function buildSequence(){
         let exerciseNum=hanonList[currentHanonIdx].val;
         let rawSeq=buildHanonExercise(exerciseNum);
@@ -682,7 +633,7 @@
         if(hitIntervals.length===0){stopPractice();return;}
         let avgDiff=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let avgBpm=Math.round(60000/avgDiff);
         let avg2=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let dev=Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avg2,2),0)/hitIntervals.length);
-        let uniformityNum=Math.round(Math.max(0,100-(dev/3)));let uniformity=uniformityNum+'%';
+        let uniformity=Math.round(Math.max(0,100-(dev/3)))+'%';
         let weakestFinger=0,maxAvgTime=0;
         for(let f=1;f<=5;f++){if(fingerTimes[f].length>0){let avg=fingerTimes[f].reduce((a,b)=>a+b)/fingerTimes[f].length;if(avg>maxAvgTime){maxAvgTime=avg;weakestFinger=f;}}}
         const fingerNames=['','Thumb (1)','Index (2)','Middle (3)','Ring (4)','Pinky (5)'];
@@ -690,53 +641,7 @@
         if(weakestFinger===4||weakestFinger===5)tipText=`The data shows your <b>${fingerNames[weakestFinger]}</b> was the slowest. Focus on lifting that finger higher before each keystroke.`;
         else if(weakestFinger>0)tipText=`Your <b>${fingerNames[weakestFinger]}</b> caused the most slowdowns. Check your hand position and keep your wrist relaxed.`;
         document.getElementById('modalBpm').innerText=avgBpm+' BPM';document.getElementById('modalUni').innerText=uniformity;document.getElementById('modalTip').innerHTML=tipText;
-        // Save session to localStorage
-        saveSession(avgBpm,uniformityNum,weakestFinger);
-        // Show history in modal
-        renderSessionHistory();
         document.getElementById('resultModal').style.display='flex';draw();
-    }
-
-    function saveSession(avgBpm,uniformity,weakestFinger){
-        try{
-            const key='akira_hanon_history';
-            let history=JSON.parse(localStorage.getItem(key)||'[]');
-            history.push({
-                date:new Date().toISOString(),
-                exercise:hanonList[currentHanonIdx].name,
-                key:KEY_NAMES[transposeKey],
-                mode:MODES[currentModeIdx],
-                rhythm:RHYTHMS[currentRhythmIdx].id,
-                bpm:avgBpm,
-                stability:uniformity,
-                weakFinger:weakestFinger
-            });
-            // Keep last 50 sessions
-            if(history.length>50)history=history.slice(-50);
-            localStorage.setItem(key,JSON.stringify(history));
-        }catch(e){console.warn('Could not save session:',e);}
-    }
-
-    function renderSessionHistory(){
-        const el=document.getElementById('modalHistory');
-        if(!el)return;
-        try{
-            const history=JSON.parse(localStorage.getItem('akira_hanon_history')||'[]');
-            const last5=history.slice(-6,-1).reverse(); // last 5 before current
-            if(last5.length===0){el.innerHTML='<div style="color:#444;font-size:12px;font-family:\'Share Tech Mono\';">No previous sessions yet.</div>';return;}
-            let html='<div style="font-family:\'Share Tech Mono\';font-size:10px;color:#557799;text-transform:uppercase;margin-bottom:6px;">Recent Sessions</div>';
-            html+='<div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:2px 12px;font-family:\'Share Tech Mono\';font-size:11px;">';
-            last5.forEach(s=>{
-                const d=new Date(s.date);
-                const dateStr=(d.getMonth()+1)+'/'+d.getDate();
-                html+=`<span style="color:#555;">${dateStr}</span>`;
-                html+=`<span style="color:#888;">${s.exercise} ${s.key||'C'}</span>`;
-                html+=`<span style="color:#b3e6ff;">${s.bpm} BPM</span>`;
-                html+=`<span style="color:${s.stability>=80?'#6c6':'#c66'};">${s.stability}%</span>`;
-            });
-            html+='</div>';
-            el.innerHTML=html;
-        }catch(e){el.innerHTML='';}
     }
     function handleNoteOn(midi,vel=100){
         playTone(midi,vel);if(!isRunning||seqBlocks.length===0)return;
@@ -982,9 +887,6 @@
         const popup=document.getElementById('bpmPresetsPopup');
         const bpmBox=document.getElementById('metroBpmBox');
         if(popup&&bpmBox&&!popup.contains(e.target)&&!bpmBox.contains(e.target)) popup.style.display='none';
-        const kp=document.getElementById('keyPopup');
-        const kb=document.getElementById('btnKey');
-        if(kp&&kb&&!kp.contains(e.target)&&!kb.contains(e.target)) kp.style.display='none';
     });
 
     const _origCycleTempo=cycleTempo;
