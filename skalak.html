@@ -35,13 +35,6 @@
         .hardware-btn { width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim); border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 0 #000; transition: transform 0.1s; text-shadow: none !important; }
         .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .hardware-btn.active { color: #ffffff; background-color: #121214; }
-        .start-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000; overflow:hidden; transition:transform 0.1s; cursor:pointer; }
-        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .start-split span { display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif; color:#444; transition:color 0.15s; text-transform:uppercase; padding: 0 22px; }
-        .start-split span#startLabel { padding: 0 12px 0 22px; }
-        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
-        .start-split span.active { color:#fff; }
-        .start-split .split-div { width:1px; background:#333; margin:6px 0; flex-shrink:0; }
         .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
         .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px; }
         .arrow-row { display: flex; width: 100%; justify-content: space-around; margin: 4px 0; }
@@ -91,10 +84,6 @@
         .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 5px; font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: center; }
         .patch-btn:hover { background: #222; color: #fff; }
         .patch-btn:active { transform: translateY(2px); }
-        .hints-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
-        .hints-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:#444; padding:0 10px; transition:color 0.15s; letter-spacing:1px; text-transform:uppercase; }
-        .hints-split button.active { color:#fff; background-color:#121214; }
-        .hints-split .hints-div { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
         /* CLEF SPLIT — vertikális */
         .clef-split {
             display: flex;
@@ -115,6 +104,9 @@
         .clef-split span { flex: 1; display: flex; align-items: center; justify-content: center; color: #444; transition: color 0.15s; padding: 0; }
         .clef-split span.active { color: #fff; }
         .clef-divider { height: 1px; width: 100%; background: #222; flex-shrink: 0; }
+        .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
+        .metro-preset:hover { background:#333;color:#fff; }
+        .metro-preset:active { transform:translateY(1px); }
         .sq-btn { width: 38px; height: 38px; background-color: var(--btn-dark); color: #444; border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0; }
         .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .sq-btn.active { color: #fff; background-color: #121214; }
@@ -184,13 +176,12 @@
             <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Scales — Module Guide</h2>
             <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note is highlighted. Complete the scale up and down to finish the round.</p></div>
             <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl0">Toggle Treble and Bass clef staves.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="10" width="8" height="10" rx="1"/><rect x="14" y="4" width="8" height="16" rx="1"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Toggle between 1 and 2 octave scale runs.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Opens the Circle of Fifths. Click any sector to load that scale.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Scale ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Cycle through all 24 major and minor scales.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Sprint (1×), Marathon (3×), Training (endless loop).</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Octave ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Switch between 1 and 2 octave scale runs.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Shows note names and activates the LED light guide on the keyboard.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays the official scale fingering (1–5) on the sheet.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Wheel</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Opens the Circle of Fifths.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Demo</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl7">Plays the selected scale with the current rhythm pattern. Keys light up in sync.</span></div>
             </div>
             <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">Start with Sprint mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p></div>
             <div style="margin-bottom:22px;">
@@ -247,16 +238,82 @@
                             <text x="135" y="28" fill="#444" font-family="'Inter', sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
                         </svg>
                     </div>
-                    <!-- BAL -->
+                    <!-- BAL — Home + Clef + Eye + Octave + Metronóm -->
                     <div class="control-group">
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
                         <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
                             <span id="clefRH" class="active" style="font-size:22px;">𝄞</span>
                             <div class="clef-divider"></div>
                             <span id="clefLH" class="active" style="font-size:18px;">𝄢</span>
                         </button>
-                        <button id="btnHints" class="hardware-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEYS LED | 4× OFF">Hints</button>
-                        <button id="btnOctave" class="hardware-btn" onclick="if(!helpActive) cycleOctave(1)" data-help="OCTAVE: TOGGLE BETWEEN 1 AND 2 OCTAVE SCALE RUN">1 OCT</button>
-                        <button id="btnWheel" class="hardware-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS">Wheel</button>
+                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEYS LED | 4× OFF">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+                        </button>
+                        <button id="btnOctave" class="sq-btn" onclick="if(!helpActive) toggleOctave()" data-help="OCTAVE: TOGGLE BETWEEN 1 AND 2 OCTAVE SCALE RUN">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="10" width="8" height="10" rx="1"/><rect x="14" y="4" width="8" height="16" rx="1"/></svg>
+                        </button>
+                        <button id="btnWheel" class="sq-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+                        </button>
+                        <div style="width:8px;"></div>
+                        <div class="metronome-block" style="display:flex;align-items:center;gap:4px;position:relative;">
+                            <button id="metroToggle" class="sq-btn" onclick="if(!helpActive) toggleMetronome()" data-help="METRONOME: START/STOP CLICK">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L7 22h10l-5-20z"/><circle cx="12" cy="18" r="1"/></svg>
+                            </button>
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                                <button class="nav-disk-btn metro-tempo-btn" data-dir="1" style="width:24px;height:24px;border-radius:50%;font-size:9px;padding:0;display:flex;align-items:center;justify-content:center;">▲</button>
+                                <div id="metroBpmBox" onclick="if(!helpActive) toggleBpmPresets()" style="width:70px;height:38px;background:#111;display:flex;align-items:center;justify-content:center;border:1px solid #050505;border-radius:3px;box-shadow:inset 0 2px 5px rgba(0,0,0,0.8);cursor:pointer;position:relative;">
+                                    <div id="metroBpmDisplay" style="font-family:'Share Tech Mono';font-size:20px;color:#b3e6ff;font-weight:bold;">80</div>
+                                </div>
+                                <button class="nav-disk-btn metro-tempo-btn" data-dir="-1" style="width:24px;height:24px;border-radius:50%;font-size:9px;padding:0;display:flex;align-items:center;justify-content:center;">▼</button>
+                            </div>
+                            <div id="bpmPresetsPopup" style="display:none;position:absolute;bottom:55px;left:42px;background:#1a1a1d;border:1px solid #333;padding:8px;border-radius:4px;z-index:1001;box-shadow:0 10px 30px #000;">
+                                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
+                                    <button class="metro-preset" onclick="setTempoPreset(40)">40</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(60)">60</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(72)">72</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(80)">80</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(92)">92</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(100)">100</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(108)">108</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(120)">120</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(140)">140</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(160)">160</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(180)">180</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(208)">208</button>
+                                </div>
+                            </div>
+                            <button id="metroMenuBtn" class="sq-btn" onclick="if(!helpActive) toggleMetroMenu()" data-help="METRONOME SETTINGS: SOUND, VOLUME, ACCENT, PRESETS">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+                            </button>
+                            <div id="metroSettingsMenu" style="display:none;position:absolute;bottom:55px;left:0;background:#1a1a1d;border:1px solid #333;padding:15px;border-radius:4px;z-index:1000;flex-direction:column;gap:10px;box-shadow:0 10px 30px #000;width:200px;">
+                                <div style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;">Sound Type</div>
+                                <select id="metroSoundSelect" style="background:#111;color:#eee;border:1px solid #333;padding:5px;font-family:'Share Tech Mono';border-radius:3px;width:100%;">
+                                    <option value="woodblock">Woodblock</option>
+                                    <option value="mechanical" selected>Mechanical</option>
+                                    <option value="drumstick">Drumsticks</option>
+                                    <option value="electronic">Electronic</option>
+                                </select>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <label style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;white-space:nowrap;">Volume</label>
+                                    <input type="range" id="metroVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="-webkit-appearance:none;width:100%;height:6px;background:#111;border-radius:3px;outline:none;cursor:pointer;">
+                                </div>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <input type="checkbox" id="metroAccentCheck" checked style="cursor:pointer;">
+                                    <label for="metroAccentCheck" style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;cursor:pointer;">Accent on 1</label>
+                                </div>
+                                <div style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;margin-top:8px;">Time Signature</div>
+                                <select id="metroTimeSigSelect" style="background:#111;color:#eee;border:1px solid #333;padding:5px;font-family:'Share Tech Mono';border-radius:3px;width:100%;">
+                                    <option value="1">1/1</option><option value="2">2/2</option><option value="2">2/4</option>
+                                    <option value="3">3/4</option><option value="4" selected>4/4</option><option value="5">5/4</option>
+                                    <option value="8">8/4</option><option value="3">3/8</option><option value="6">6/8</option>
+                                    <option value="7">7/8</option><option value="8">8/8</option><option value="9">9/8</option>
+                                    <option value="12">12/8</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <!-- KÖZÉP -->
                     <div class="center-console">
@@ -299,32 +356,26 @@
                             <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC" style="width:80px; font-size:14px; font-weight:800; letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
-                    <!-- JOBB -->
+                    <!-- JOBB — Audio + Fullscreen + ?/ⓘ + EN/HU -->
                     <div class="control-group">
-                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH">
                             <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
                         </button>
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
-                        <!-- Vertikális ? / ⓘ páros -->
                         <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
-                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
+                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
                             <div style="height:1px;background:#222;"></div>
-                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="7" x2="12" y2="7" stroke-width="3"/><line x1="12" y1="11" x2="12" y2="17" stroke-width="3"/></svg>
                             </button>
                         </div>
-                        <!-- Vertikális EN/HU -->
                         <div class="lang-split" id="langSplit">
                             <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
                         </div>
-                        <div style="width:16px;"></div>
-                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
-                        </a>
                     </div>
                 </div>
                 <div class="piano-crop-wrapper">
@@ -344,8 +395,8 @@
         HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
     };
     const SKALAK_T = {
-        EN: { infoTitle:'Scales — Module Guide',howTitle:'How It Works',howBody:'Select a scale and press Start. The notes appear on the staff — play them in order on the piano.',ctrlTitle:'Controls',gotIt:'Got It',ctrl1:'Cycle through all 24 major and minor scales.',ctrl2:'Sprint (1×), Marathon (3×), Training (endless loop).',ctrl3:'Switch between 1 and 2 octave scale runs.',ctrl4:'Shows note names and activates the LED light guide on the keyboard.',ctrl5:'Displays the official scale fingering (1–5) on the sheet.',ctrl6:'Opens the Circle of Fifths. Click any major key sector to immediately load that scale.',wheelTitle:'Circle of Fifths',wheelBody:'Press <strong style="color:var(--oled-text);">Wheel</strong> to open the draggable Circle of Fifths. Click any sector to instantly load that major scale — the OLED Scale display updates automatically. Keys arranged by harmonic distance: adjacent keys share 6 out of 7 notes, making scale transitions smooth. Drag the wheel anywhere on screen.',tipTitle:'Learning Tip',tipBody:'Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',ready:'SELECT SCALE OR PRESS START',helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',btnWheel:'Wheel',hHome:'HOME: RETURN TO MAIN MODULE MENU',hHints:'HINTS: CYCLE THROUGH NOTE NAMES, FINGERING, KEYS LED',hWheel:'WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS',hStart:'START/STOP: BEGIN OR END THE PRACTICE',hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH',hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hInfo:'INFO: OPEN MODULE GUIDE',hModule:'MODULE: CLICK TO SWITCH — USE ARROWS TO BROWSE',hMode:'MODE: SPRINT (1X) = ONE RUN | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',hScale:'SCALE: CLICK TO BROWSE — CHOOSE FROM 24 MAJOR AND MINOR SCALES',hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY' },
-        HU: { infoTitle:'Skálák — Modul útmutató',howTitle:'Hogyan működik',howBody:'Válassz skálát és nyomj Startot. A hangok megjelennek a kottán — játszd le őket sorban a zongorán.',ctrlTitle:'Vezérlők',gotIt:'Értettem',ctrl1:'Váltás a 24 dúr és moll skála között.',ctrl2:'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',ctrl3:'Váltás 1 és 2 oktáv terjedelemű skálafutam között.',ctrl4:'Megjeleníti a hangneveket és aktiválja a LED fényvezetőt a billentyűzeten.',ctrl5:'Megjeleníti a hivatalos skálaujjrendet (1–5) a kottán.',ctrl6:'Megnyitja a kvintkor tárcsát. Kattints bármely dúr szektorra a skála azonnali betöltéséhez.',wheelTitle:'Kvintkor',wheelBody:'Nyomd meg a <strong style="color:var(--oled-text);">Wheel</strong> gombot a mozgatható kvintkor tárcsához. Kattints bármely szektorra az adott dúr skála azonnali betöltéséhez — az OLED Scale kijelző automatikusan frissül. A hangnemek harmonikus távolság szerint rendezve: szomszédos hangnemek 7-ből 6 közös hangot tartalmaznak. Húzd a tárcsát bárhova a képernyőn.',tipTitle:'Tanulási tipp',tipBody:'Kezdj <strong style="color:var(--oled-text);">Sprint</strong> móddal és 1 oktávval. Ha már tisztán tudod a skálát, válts 2 oktávra és Maratonra az izommemória építéséhez.',ready:'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT',helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',btnWheel:'Tárcsa',hHome:'FŐOLDAL: VISSZA A FŐMENÜBE',hHints:'HANGNEM: HANGNEVEK ÉS LED VEZETŐ',hWheel:'TÁRCSA: MOZGATHATÓ KVINTKOR — KATTINTS EGY HANGNEMRE A SKÁLA KIVÁLASZTÁSÁHOZ',hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI',hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ',hMode:'MÓD: SPRINT (1×) | MARATON (3×) | TRAINING = VÉGTELEN',hScale:'SKÁLA: KATTINTS A BÖNGÉSZŐHÖZ',hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS' }
+        EN: { infoTitle:'Scales — Module Guide',howTitle:'How It Works',howBody:'Select a scale and press Start. The notes appear on the staff — play them in order on the piano.',ctrlTitle:'Controls',gotIt:'Got It',ctrl0:'Toggle Treble and Bass clef staves.',ctrl1:'Cycle through all 24 major and minor scales.',ctrl2:'Sprint (1×), Marathon (3×), Training (endless loop).',ctrl3:'Switch between 1 and 2 octave scale runs.',ctrl4:'Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.',ctrl5:'Displays the official scale fingering (1–5) on the sheet.',ctrl6:'Opens the Circle of Fifths. Click any major key sector to immediately load that scale.',wheelTitle:'Circle of Fifths',wheelBody:'Press <strong style="color:var(--oled-text);">Wheel</strong> to open the draggable Circle of Fifths. Click any sector to instantly load that major scale — the OLED Scale display updates automatically. Keys arranged by harmonic distance: adjacent keys share 6 out of 7 notes, making scale transitions smooth. Drag the wheel anywhere on screen.',tipTitle:'Learning Tip',tipBody:'Start with <strong style="color:var(--oled-text);">Sprint</strong> mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',ready:'SELECT SCALE OR PRESS START',helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',btnWheel:'Wheel',hHome:'HOME: RETURN TO MAIN MODULE MENU',hHints:'HINTS: CYCLE THROUGH NOTE NAMES, FINGERING, KEYS LED',hWheel:'WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS',hStart:'START/STOP: BEGIN OR END THE PRACTICE',hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH',hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hInfo:'INFO: OPEN MODULE GUIDE',hModule:'MODULE: CLICK TO SWITCH — USE ARROWS TO BROWSE',hMode:'MODE: SPRINT (1X) = ONE RUN | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',hScale:'SCALE: CLICK TO BROWSE — CHOOSE FROM 24 MAJOR AND MINOR SCALES',hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY' },
+        HU: { infoTitle:'Skálák — Modul útmutató',howTitle:'Hogyan működik',howBody:'Válassz skálát és nyomj Startot. A hangok megjelennek a kottán — játszd le őket sorban a zongorán.',ctrlTitle:'Vezérlők',gotIt:'Értettem',ctrl0:'Violin és basszus kulcs be/ki kapcsolása.',ctrl1:'Váltás a 24 dúr és moll skála között.',ctrl2:'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',ctrl3:'Váltás 1 és 2 oktáv terjedelemű skálafutam között.',ctrl4:'Körkörösen kapcsol: 1× hangnevek, 2× + ujjrend, 3× + billentyű LED, 4× mind ki.',ctrl5:'Megjeleníti a hivatalos skálaujjrendet (1–5) a kottán.',ctrl6:'Megnyitja a kvintkor tárcsát. Kattints bármely dúr szektorra a skála azonnali betöltéséhez.',wheelTitle:'Kvintkor',wheelBody:'Nyomd meg a <strong style="color:var(--oled-text);">Wheel</strong> gombot a mozgatható kvintkor tárcsához. Kattints bármely szektorra az adott dúr skála azonnali betöltéséhez — az OLED Scale kijelző automatikusan frissül. A hangnemek harmonikus távolság szerint rendezve: szomszédos hangnemek 7-ből 6 közös hangot tartalmaznak. Húzd a tárcsát bárhova a képernyőn.',tipTitle:'Tanulási tipp',tipBody:'Kezdj <strong style="color:var(--oled-text);">Sprint</strong> móddal és 1 oktávval. Ha már tisztán tudod a skálát, válts 2 oktávra és Maratonra az izommemória építéséhez.',ready:'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT',helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',btnWheel:'Tárcsa',hHome:'FŐOLDAL: VISSZA A FŐMENÜBE',hHints:'HANGNEM: HANGNEVEK ÉS LED VEZETŐ',hWheel:'TÁRCSA: MOZGATHATÓ KVINTKOR — KATTINTS EGY HANGNEMRE A SKÁLA KIVÁLASZTÁSÁHOZ',hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI',hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hInfo:'INFO: MODUL ÚTMUTATÓ MEGNYITÁSA',hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ',hMode:'MÓD: SPRINT (1×) | MARATON (3×) | TRAINING = VÉGTELEN',hScale:'SKÁLA: KATTINTS A BÖNGÉSZŐHÖZ',hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS' }
     };
     function setLang(lang) {
         localStorage.setItem('akira_lang', lang);
@@ -355,12 +406,26 @@
         document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
         document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
         const T = SKALAK_T[lang];
-        const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-ctrl6','txt-tipTitle','txt-tipBody','txt-wheelTitle','txt-wheelBody','txt-gotIt'];
-        const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.ctrl6,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
+        const ids = ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl0','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl6','txt-tipTitle','txt-tipBody','txt-wheelTitle','txt-wheelBody','txt-gotIt'];
+        const vals = [T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl0,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl6,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
-        const btnMap={'btnWheel':T.btnWheel};
-        Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
-        const helpMap={'btnHome':T.hHome,'btnHints':T.hHints,'btnWheel':T.hWheel,'btnStart':T.hStart,'audioToggle':T.hPiano,'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,'oledModule':T.hModule,'oledMode':T.hMode,'oledScale':T.hScale,'btnClef':T.hClef,'btnDemo':lang==='HU'?'DEMÓ: KATTINTS A SKÁLA MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK':'DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC'};
+        const helpMap={
+            'btnHome':lang==='HU'?'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE':'HOME: RETURN TO MAIN MODULE MENU',
+            'btnClef':T.hClef,
+            'btnHints':T.hHints,
+            'btnOctave':lang==='HU'?'OKTÁV: VÁLTÁS 1 ÉS 2 OKTÁVOS FUTAM KÖZÖTT':'OCTAVE: TOGGLE BETWEEN 1 AND 2 OCTAVE SCALE RUN',
+            'btnWheel':T.hWheel,
+            'btnStart':T.hStart,
+            'btnDemo':lang==='HU'?'DEMÓ: KATTINTS A SKÁLA MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK':'DEMO: CLICK TO HEAR THE SCALE — KEYS LIGHT UP IN SYNC',
+            'audioToggle':T.hPiano,
+            'btnFullscreen':T.hFullscr,
+            'btnHelp':T.hHelp,
+            'btnInfo':T.hInfo,
+            'oledModule':T.hModule,
+            'oledMode':T.hMode,
+            'oledScale':T.hScale,
+            'oledRhythm':lang==='HU'?'RITMUS: RITMUSKÉPLET KIVÁLASZTÁSA — NYILAKKAL VÁLTHATSZ':'RHYTHM: SELECT RHYTHMIC PATTERN — USE ARROWS TO CHANGE'
+        };
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
         document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][3];
         const curVal = document.getElementById('scaleSelectValue').value;
@@ -421,9 +486,22 @@
     const RHYTHMS=[{id:'EVEN',label:'EVEN',labelHU:'EGYENLETES',desc:'Even notes — standard scale tempo',descHU:'Egyenletes hangok — standard skála tempó',ratios:[1,1]},{id:'DOTTED',label:'DOTTED',labelHU:'PUNKTÍROZOTT',desc:'Long-short pairs ♩♪',descHU:'Hosszú-rövid párok ♩♪',ratios:[3,1]},{id:'REVERSE',label:'REVERSE',labelHU:'FORDÍTOTT',desc:'Short-long pairs ♪♩',descHU:'Rövid-hosszú párok ♪♩',ratios:[1,3]},{id:'SWING',label:'SWING',labelHU:'SWING',desc:'Jazz swing feel',descHU:'Jazz swing érzés',ratios:[2,1]},{id:'SYNCOPA',label:'SYNCOPA',labelHU:'SZINKÓPA',desc:'Syncopated rhythm',descHU:'Szinkópa ritmus',ratios:[1,2,1]}];
     let currentRhythmIdx=0;
     function cycleRhythm(dir){if(helpActive)return;currentRhythmIdx=(currentRhythmIdx+dir+RHYTHMS.length)%RHYTHMS.length;const R=RHYTHMS[currentRhythmIdx];const isHU=currentLang==='HU';document.getElementById('lcdRhythm').innerText=isHU?R.labelHU:R.label;const hint=isHU?' — KATTINTS A RITMUS ABLAKRA A LEJÁTSZÁSHOZ':' — CLICK RHYTHM CELL TO PREVIEW';setInfoBar((isHU?R.descHU:R.desc).toUpperCase()+hint,null);draw();}
-    function playScaleRhythmDemo(){initAudio().then(()=>{const tryPlay=()=>{if(Object.keys(sampleBuffers).length>=4)_playScaleDemo();else setTimeout(tryPlay,100);};tryPlay();});}
+    let demoPlaying=false, demoTimeouts=[], demoSources=[];
+    function playScaleRhythmDemo(){
+        if(demoPlaying){stopDemo();return;}
+        initAudio().then(()=>{const tryPlay=()=>{if(Object.keys(sampleBuffers).length>=4){demoPlaying=true;document.getElementById('btnDemo').classList.add('active');_playScaleDemo();}else setTimeout(tryPlay,100);};tryPlay();});
+    }
+    function stopDemo(){
+        demoPlaying=false;document.getElementById('btnDemo').classList.remove('active');
+        demoTimeouts.forEach(t=>clearTimeout(t));demoTimeouts=[];
+        demoSources.forEach(s=>{try{s.stop();}catch(e){}});demoSources=[];
+        demoActiveNoteIdx=-1;document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));draw();
+        const isHU=currentLang==='HU';setInfoBar(SKALAK_T[currentLang].ready,null);
+    }
     function _playScaleDemo(){
-        const R=RHYTHMS[currentRhythmIdx];const baseDur=0.28;let time=audioCtx.currentTime+0.15;
+        demoTimeouts.forEach(t=>clearTimeout(t));demoTimeouts=[];
+        demoSources.forEach(s=>{try{s.stop();}catch(e){}});demoSources=[];
+        const R=RHYTHMS[currentRhythmIdx];const baseDur=60.0/bpm;let time=audioCtx.currentTime+0.15;
         const scaleObj=generateScaleNotes(document.getElementById('scaleSelectValue').value);
         function buildNotes(noteArr){let asc=[...noteArr];if(selectedOctaves===2){const oct2=noteArr.slice(1,8).map(m=>m+12);asc=[...noteArr,...oct2];}return[...asc,...asc.slice(0,-1).reverse()];}
         const rhNotes=activeRH?buildNotes(scaleObj.rh.slice(0,8).map(n=>n.midi)):[];
@@ -436,16 +514,17 @@
             const R2=RHYTHMS[currentRhythmIdx];const ratio=R2.ratios[i%R2.ratios.length];const dur=baseDur*ratio;
             const delayMs=(time-audioCtx.currentTime)*1000;const flashDur=Math.min(dur*0.85*1000,400);
             const capturedBlock=Math.floor(i/blockSize);const capturedNote=i%blockSize;
-            setTimeout(()=>{if(capturedBlock<seqBlocks.length){currentBlockIndex=capturedBlock;currentNoteInBlock=capturedNote;}demoActiveNoteIdx=capturedNote;draw();setTimeout(()=>{demoActiveNoteIdx=-1;},flashDur);},delayMs);
+            demoTimeouts.push(setTimeout(()=>{if(!demoPlaying)return;if(capturedBlock<seqBlocks.length){currentBlockIndex=capturedBlock;currentNoteInBlock=capturedNote;}demoActiveNoteIdx=capturedNote;draw();demoTimeouts.push(setTimeout(()=>{demoActiveNoteIdx=-1;},flashDur));},delayMs));
             const notesToPlay=[];if(activeRH&&rhNotes[i])notesToPlay.push(rhNotes[i]);if(activeLH&&lhNotes[i])notesToPlay.push(lhNotes[i]);
             notesToPlay.forEach(midi=>{
                 const src=audioCtx.createBufferSource();let closest=36,minDiff=999;for(let b in sampleBuffers){let diff=Math.abs(midi-b);if(diff<minDiff){minDiff=diff;closest=b;}}if(!sampleBuffers[closest])return;
                 src.buffer=sampleBuffers[closest];src.playbackRate.value=Math.pow(2,(midi-closest)/12);const g=audioCtx.createGain();g.gain.setValueAtTime(0.6,time);g.gain.exponentialRampToValueAtTime(0.001,time+dur*2.5);src.connect(g).connect(audioCtx.destination);src.start(time);src.stop(time+dur*2.8);
-                setTimeout(()=>{const key=document.getElementById(`k-${midi}`);if(key){key.classList.add('demo-flash');setTimeout(()=>key.classList.remove('demo-flash'),flashDur);}},delayMs);
+                demoSources.push(src);
+                demoTimeouts.push(setTimeout(()=>{if(!demoPlaying)return;const key=document.getElementById(`k-${midi}`);if(key){key.classList.add('demo-flash');demoTimeouts.push(setTimeout(()=>key.classList.remove('demo-flash'),flashDur));}},delayMs));
             });
             time+=dur;
         }
-        const totalMs=(time-audioCtx.currentTime)*1000;setTimeout(()=>{demoActiveNoteIdx=-1;draw();},totalMs);
+        const totalMs=(time-audioCtx.currentTime)*1000;demoTimeouts.push(setTimeout(()=>{stopDemo();},totalMs));
         const isHU=currentLang==='HU';setInfoBar((isHU?'▶ MINTA: ':'▶ DEMO: ')+(isHU?R.descHU:R.desc).toUpperCase(),null);
     }
     let rhHit=false,lhHit=false,seqBlocks=[];
@@ -454,7 +533,7 @@
     let currentBlockIndex=0;
     function updateKeyboardHints(){document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('scale-hint'));if(showKeys&&seqBlocks.length>0){seqBlocks[0].forEach(n=>{if(activeRH)document.getElementById(`k-${n.m_rh}`)?.classList.add('scale-hint');if(activeLH)document.getElementById(`k-${n.m_lh}`)?.classList.add('scale-hint');});}}
     function cycleMode(dir){if(helpActive)return;currentModeIdx=(currentModeIdx+dir+MODES.length)%MODES.length;document.getElementById('lcdModeText').innerText=MODES[currentModeIdx];if(isRunning)stopPractice();buildSequence();draw();}
-    function cycleOctave(dir){if(helpActive)return;selectedOctaves=selectedOctaves===1?2:1;const btn=document.getElementById('btnOctave');if(btn)btn.textContent=selectedOctaves+' OCT';const isHU=currentLang==='HU';setInfoBar(isHU?(selectedOctaves+' OKTÁV KIVÁLASZTVA'):(selectedOctaves+' OCTAVE SELECTED'),null);if(isRunning)stopPractice();buildSequence();draw();}
+    function toggleOctave(){if(helpActive)return;selectedOctaves=selectedOctaves===1?2:1;document.getElementById('btnOctave').classList.toggle('active',selectedOctaves===2);const isHU=currentLang==='HU';setInfoBar(isHU?(selectedOctaves+' OKTÁV KIVÁLASZTVA'):(selectedOctaves+' OCTAVE SELECTED'),null);if(isRunning)stopPractice();buildSequence();draw();}
     let clefState=0;
     function cycleClef(){if(helpActive)return;clefState=(clefState+1)%3;activeRH=clefState!==2;activeLH=clefState!==1;const DIM='#444',ON='#fff';document.getElementById('clefRH').style.color=activeRH?ON:DIM;document.getElementById('clefLH').style.color=activeLH?ON:DIM;if(isRunning)stopPractice();buildSequence();draw();}
     let hintsState=0;
@@ -501,6 +580,149 @@
     function drawWheel(){if(!showWheel)return;const ctx=wheelCanvas.getContext('2d');ctx.clearRect(0,0,400,400);const cx=200,cy=200,r=195;const iCenter=(activeWheelKeyIndex+0.5)*30-90;const startRad=(iCenter-45)*Math.PI/180,endRad=(iCenter+45)*Math.PI/180;ctx.beginPath();ctx.arc(cx,cy,r,startRad,endRad);ctx.arc(cx,cy,67,endRad,startRad,true);ctx.closePath();ctx.fillStyle='rgba(179,230,255,0.12)';ctx.fill();ctx.strokeStyle='rgba(179,230,255,0.7)';ctx.lineWidth=2;ctx.stroke();ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<12;i++){const angle=(i*30-90)*Math.PI/180;ctx.beginPath();ctx.moveTo(cx+Math.cos(angle)*67,cy+Math.sin(angle)*67);ctx.lineTo(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r);ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;ctx.stroke();const mid=((i+0.5)*30-90)*Math.PI/180;const mx=cx+Math.cos(mid)*160,my=cy+Math.sin(mid)*160;const nx=cx+Math.cos(mid)*100,ny=cy+Math.sin(mid)*100;const dist=(i-activeWheelKeyIndex+12)%12;const inWedge=dist===0||dist===1||dist===11;const rMaj={0:'I',1:'V',11:'IV'},rMin={0:'vi',1:'iii',11:'ii'};if(inWedge){ctx.font="bold 22px 'Share Tech Mono'";ctx.fillStyle='#b3e6ff';ctx.fillText(WHEEL_MAJORS[i],mx,my-9);ctx.font="bold 13px 'Inter'";ctx.fillStyle='rgba(255,255,255,0.7)';ctx.fillText(rMaj[dist]||'',mx,my+10);ctx.font="14px 'Share Tech Mono'";ctx.fillStyle='rgba(179,230,255,0.6)';ctx.fillText(WHEEL_MINORS[i],nx,ny-6);ctx.font="11px 'Inter'";ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillText(rMin[dist]||'',nx,ny+8);}else{ctx.font="18px 'Share Tech Mono'";ctx.fillStyle='#4a4a4a';ctx.fillText(WHEEL_MAJORS[i],mx,my);ctx.font="13px 'Share Tech Mono'";ctx.fillStyle='#2a2a2a';ctx.fillText(WHEEL_MINORS[i],nx,ny);}}[[r,'rgba(255,255,255,0.12)'],[127,'rgba(255,255,255,0.04)'],[67,'rgba(255,255,255,0.12)']].forEach(([rad,col])=>{ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);ctx.strokeStyle=col;ctx.lineWidth=1;ctx.stroke();});ctx.fillStyle='#444';ctx.font="12px 'Share Tech Mono'";ctx.fillText('KEY',cx,cy-16);ctx.fillStyle='#b3e6ff';ctx.font="bold 28px 'Share Tech Mono'";ctx.fillText(WHEEL_MAJORS[activeWheelKeyIndex],cx,cy+8);}
     function syncWheelToScale(){const key=scaleOrder[currentScaleIdx]?.v||'C_DUR';const idx=WHEEL_TO_SCALE.indexOf(key);if(idx!==-1){activeWheelKeyIndex=idx;if(showWheel)drawWheel();}}
     function create88(){const wrap=document.getElementById('hb-wrap');const whites=[0,2,4,5,7,9,11];let wIdx=0;for(let m=21;m<=108;m++){const k=document.createElement('div');const isW=whites.includes(m%12);k.id=`k-${m}`;k.className=`key-glow ${isW?'white-glow':'black-glow'}`;if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}else{const blackOffsets={1:-0.621,3:-0.477,6:-0.723,8:-0.559,10:-0.415};const noteInOctave=m%12;const offset=blackOffsets[noteInOctave]!==undefined?blackOffsets[noteInOctave]:-0.6;k.style.left=((wIdx*1.92307)+offset)+'%';k.style.width='1.241%';k.style.height='65%';k.style.zIndex='200';}const led=document.createElement('div');led.className='key-led';k.appendChild(led);k.onmousedown=async(e)=>{e.preventDefault();if(!helpActive){if(!audioInited)initAudio();k.classList.add('pressed');handleNoteOn(m,100);}};k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};wrap.appendChild(k);}}
+    let bpm=80;
+    function cycleTempo(delta){bpm=Math.max(40,Math.min(208,bpm+delta));document.getElementById('metroBpmDisplay').innerText=bpm;}
+    let metroSoundType='mechanical', metroVolume=0.5, metroAccent=true, metroTimeSig=4;
+    let metroIsRunning=false, metroNextNoteTime=0, metroCurrentBeat=0;
+    const metroSamples={};
+    let metroSamplesLoaded=false;
+
+    const METRO_B64={
+        'woodblock':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAGhACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrKysrKysrKysrKysrKysrKysrKysrKysrK6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAZiQQAB4AAABoSA0XNPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAAECRnUnT3gCrhoSf/O1AAAAtt3pR48VisiUeM64G4BcAIADgG4Xg3wcgOQXAuCGKxkiU///pAeP1eh5pnWo47Ycg9ZCzrV8ffAMPf//4f/+AAAAHh4eXSAAAAAAeHh4eGAAAACA8PDw9IAAAAIDw8PH4AAAAAAeHh4eGAAAACA8PDw9IAAAAIDw8PD8AAAAPTllgAgAArldAAATAYCgQBgGAYJBwJmDANmDYeUXmEwymFZXTIEFfwgOji1ATj4JTHj4TI4YzQo4TTELQMODUDDQTE7BQQCbADiqBjYdgEgoDA4GBQihsohonTAFBABALAwQJQOTkFIV4GgtA2MPo+wIBAImkDDpcAweCAbFJJAPEYkp/AxoFAoCyQyFHKEFhZVf/45JNE8TSJiQH//SSMkUTFJIy///RRRUkZCUFj3/lhcJA0JQkDQlWwlEAAA7AHAAAhOP/6ey5kVmbIzIZGBQYYXDxidHHBYoapLBjULBACTlQCpgvzLef9rHH///3zGluO0w5dwqSHMmxjokYAAoowKIj1OBWW4G2BxAA57w6u5YpcFpSeseFaG6iXjQ5Y+kBxjIm0E2/3ZGtR0jB3gMsTJXDEIwD6qqmoqgBqDjfgACE1KTCvG7fIMc5uo6BZGZjpRIgLfxivAEDUdTDnzfeof+Mwg71h0TwfI8XdwgwAzPAMDI7RkBkfAmHiYAFgKH5AAH2d6vDMZ4+z9P85SjhEqkL3LjTFkGbxwiesyq1jjXstbMma1HECJrAnMes99a+yYutLnoVr2rXYRwNiaFYnAvDo3TYVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7MMT6AEmMYTn9zYAgzAxnfKxIrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7MMT9gAg4ZTHsgfIpM5DlPYAyRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMTWA8AAAf4AAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'woodblock_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAGNgCfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5/MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM6enp6enp6enp6enp6enp6enp6enp6enp6f////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAU6QQAB4AAABjZHN40VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAAEDSbSVWMgCp7FCl/OdIA0AAAAAT/jDDWGGFJKH8ctrbD1h1TrHedLQ0MOOE4XTXPBRbfIYAAABAIKK7Z2zt34ft9wwp6fPv//////4VIxDjls7Xeqdd7v0boJiFpy8am793IYfyHIxD8bl9PmP/+AAB//////gAADv+OHh62AAACA8PDx/4AAAIDw8PfgAAAA34XaAqAADuXgAgAQIAAAAjiYVI0YgK95g0KK0hUBGSQd4wKTB4MNd3pVUWKowFDCAdOFC2PlwMMBGUMzwYMRTcMDQCMMBRMJxGMMQcMFA/WjAhieFP+YTgUzqfUpMCQHSpcyC///aUgmAIEBYAUkP/7jM//6qjhpeIZjiTBhCBiea5nGMQhDMEADk3f8wTDoWAqe5/yKsFTx38soSnSyuAP/EAAACggABK1//lJSWEP0W1AQj+FuL8W5ChngtHA3zAXCJxLBBjZF1////U6taKLBG4BURBYgzxbAAAHEGADhiQ//iqyloOWQgSTggcDTQvUP///+panugmXB3gcsiKjLigTBMDqkAAIggAwOIAAA5/8M6SNsVbtAMhj4UuqEBifW5d0mm3///9LqWPwC/B2iyWj7DNttvQp/3IAARrLbLaImzJFwCwWU8FETurKxD9comY990zGeSzvLRL2pndPrO6avikOLfGrxkYBiYEIR24kO0ScsjCB5BHIWRz2LI5MQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoAACRl5JVJtDMlBIFVG3AyBSP/+ZCRF1VMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE0oBHUIVH/PmACLMQ5rzdzY1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sgxPwABdiHL+ViSSksEaT0bL2NVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMTiA8LkMxqAASEAAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'mechanical':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAHiQB7e3t7e3t7e3t7e3t7e3t7e3t7sLCwsLCwsLCwsLCwsLCwsLCwsLDPz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz+7u7u7u7u7u7u7u7u7u7u7u7u7u//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAPtQQAB4AAAB4mdBNrvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABrgBZfQQACOgsy2/NYAIpjMAEXEAAGVtwQWJz4jD6gQjwsUDBQEAx+CZ8EAQGggc/+flz//h+CDuCDv4g5Q58Mf//8o7Mx4i0KGVBBUQNNuolFt+5zTBv1tGSiiNEYdWhka5ghuYk6ZI+JUzECBJiBgS4TFK19M9EhPIISIPjBFK0ChpC2GiwLQs9rRNfskaeqo6b/tzRTqvqyGkfZoFLTlUzJ5DqUF5giyvoGrv5D9HOVY27VLK52JQZSxqvhIWVUjB3UbegcCQSehbI+3Id1LqsVoLk9S0+sOyu3LMOVc4TZoYjGqbWFyGpVGqszLcK9vOkpLFPG5fYzq4VbNV2dVed39am1TO1ljjv4vRSufnM88Ofz/ypKWtWz7l/5d///XbtzGevVsqb///uN2HaCAwAAEEv6aQydkQgVM96ZsFPEIhrsQFWnFXU60qmR+uVHWBYhyQalpQfiJLaja100q6UWkktNjAufB7tvta7//l1/y2r4aa0d+G+2uHO4c73bb/+a/h5qdr////9rUTU6bHkTVv//8X8o1LTVukSf21wanhYO/5a8iWIDQAK9k6FCCE0/Lh0SVaX7TQQsRBbjMpHF+jjKpHIbdcN0GYqC7HGhp6QHNUxGLCiT6p+adtTsW64O5PJ8YRdD/UbKJxpQevuc35CMX+qTCQQxQDJbKl//Q7//kIqjU9/w7//CT8jRXu+ZgUcAbEjAAcU41TOPp2amGUTZNJoRk4uAlHALAqCFR5gzPkwTOsdFIj2SC9t3kzpwoz9imCDZaLPpVC9daRZzBx+rflHP+K3KOQDtJ/+68NTgKYrgAEVPhk1TpmSFREymlOrSjys5da0mEzKpNrB6wXUnahBayuHoSv/oH4Tt2Z6cMrS0fNrWVjbHCzmDjdf6DH/HzjlGhEVk2v2nVZgQLDjAAlAJocrxWXr0AfXEtMiYhVbA7qA2KTbRsazzxLOHj/+3DE1ACPUWlZ/YWAIaeeqL2HqbQuzLCWvlGp7vrfarvQOnJxJ2VJ3Uat/8eOb6jk1jlBaWk43byTuBBYKYAClKpUETrQ6Q4A817N2RzLggpuMsau1eMuzlVdKXZ2CRrAY68x8IjyPZd4JJtoMKDqCNlepL/+gvb8eyE0lKBPHMqXq7uqeXMrhNwAD+ZzJU2Q/gAoAVCZOlcmXQrwsQBh2Dk+SiCTcuck2mQiSpK0ijBFAk6LEq3+gYKS00FSs0jn////rvhqq2cokSx5OJHhIkK/ekxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tAxPOACcyxR+ywr0E1lij9lhXsVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+0DE9gAJELE/7CTxIS4XJ32DKiRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMT8g8pAsTPnsMzoAAA/wAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'mechanical_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAH1wCGhoaGhoaGhoaGhoaGhoaGhoaGsLCwsLCwsLCwsLCwsLCwsLCwsLDR0dHR0dHR0dHR0dHR0dHR0dHR0e/v7+/v7+/v7+/v7+/v7+/v7+/v//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJASTQQAB4AAAB9fIRHnDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAABtABafQQACPxsy2/NaAQiVQSMzQACAgBwQGic+XPlAQghBA4UDEH3g//nBO9HwQ5R31h8uf/6gQcCDv4IOLg/icH4P8u+ZZlVEGZQnE3EsOBkAgkRykJA8eJRdKRA2XBAhAaSkguBOOuAIFg4NCltgIxA7xhIwEFDCRIAjhw6UqZoTwADFogBBhUGX7AI9Fu3NUJacZFkR1ERTIKHR5CsN2rTsxa1F38IBSaqoWQvIY9AXZac7Mpiz2O3MUUocprU5K4ddJ5nooLc7E4vt2IdjmHKGk1Rurdl7cWk2muxC3T2/r2/tXbk3Uw3diV29DUpa7P1pfe3KbMTi8sw5T1bl6xTdlWeGWOdLqmgzrY5Xeyu0tBWo45GnYik9Y+ksfhzPnv1uta3ytruX91/tKlNHcmYzDvzTw1ZVHZie////893PhVcSAAAAAABUuIDwawto3QvR6QjQVwZpPQ8Ftaw/gH2kRMRhgQoTJJIxHqUSoKIBlByxtCKiSiaEuMkyTDkl00ZaJIpl08gMl0SURIgWoTIkg3h7JEsuyT1oonUkuvOpGyVZiipLUbGSy4g1Ziykn/qSSSpJJf/6P///omJqjpf//rRapJFFEkTXMks4UsFSM3rUIgYgD7LKCMtWxQQiWGfceGYAujJVsMXrKYFgM+h2mEeNoV7q2Ccg/ySIc7AeYa+sYVx5LlYMpy8s/jPE9bosZylSInwpaYOM9lW9teLv2b+QAi36DCEhcPlgJCOWnCcEWNN/5z48SXR5ym84qIxNn///5vN////5vN6C7t+MQSEgAAR4Ackx1EzqGnfMkAKpjyoZDQS6KH0DRBoS3maY1Xdsdu9mfzh5Stnb2R9eDz0WH60wdf8787R/oIg+hL5FhJ3ut7+9/nf5xn+25s8WRbPmAdvOjUU2MAAAOAJgEaF3LjjrRCwEeEzda0dWKpa/K7W9aflMQDP/jhSUv5v8wavIGA6jh7DMiI1v+/0/yWCBFEgCxoTCrZ7bt9f9Tv6vWkqUC+YwMgaTq+2+VzhQBAz4AjArMVHmLYzRIus5YXPBQFwGsoDbhFLQlKsTVfdzm0XGjIaTQkVLP/fKBqLFCJB8snZ/T/MP/7YMT9gJIdl0389oAB+LKofYedvKt+pevHR8MGOIA993J2VSEEUD2gBD84wjeIVxOWyQVriOE6i8ji78yupgELpywkLDn4c7LB9a1isbXmbsmA9BHec/n4OQXChxxhQ//S357//8oy//0b6VCCX6GCNZiYh0NTBIL0ABmIAGx1YZMZB6B2swAw14C70WeFUsMM6l1WxDUPJHBW+tanbTSOvLEtmZ//7zOGoLBUAZJ/MtQpmb/jMzND//iqpeGAlUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7UMTuAAsAz0HtMVaBVxon/YSqnFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+0DE9IAJKNFB7LDs4UWZ532WIeRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMT3g8moxSnsGHFAAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'drumstick':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAHvQCIiIiIiIiIiIiIiIiIiIiIiIiIu7u7u7u7u7u7u7u7u7u7u7u7u7vV1dXV1dXV1dXV1dXV1dXV1dXV1e7u7u7u7u7u7u7u7u7u7u7u7u7u//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAWgQQAB4AAAB739+mZYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAAE30ZWbQXgCPFI6o/NcBAsdZAAAAAAA4AAAAACjkAAAAX/owJxDFBE3SjxOIYhiGIYaZ1qN/vFGBOGmaaHs8icQw0DQJ2abPaA8eMCGE7LmdaHoer1ec5BwkAhhLHCGr1eh5OxNB6C4Kir9+/jxMsafOc61Gz2Y1er1er39mA0B6x6x6y5qOMwKxkZ37+Pe93794rE4hiGIYySoePQQg6FZELg+CAIAg7/lw/+cqUAAAOAAAEAAAAAIB+AkqZSDVdrvpUiMJsvL4wLLzExwGkRbqna3q0DAYMaUXbflK8xGQQg7AkBGJpOHA5o4MAMzNphmAQkgsW+UBCoATMLpwBee1piCYwiIDCoRMjjhoA8EH0LTmFjCAhy+r6sxXxfMBg5xFrIJTFw/QCpeCgElJggPgUNDQqlMqiTdX2X6AgSDAeCgKm4Fgy4hapdRgUACoDBwFTEh9TB88I8xt5qstVKspAMFAGYdCUpyuwzLr77GAAyYSDJQAf/eO4NeOKd//dJL8FA0RAFXMt/9/+aNqlr7WzmKiXlRE8FREeDSqw39kDIAAAAN//wVCLMWIP5ChZWEnotAQ2CrcvxiP5QYnUFUoAWPt9ldjVNWaVROzbdWzCarVWbRGTN402GZQr1pKOSwyWq97P5U3flUGO/ZcqCn/W1ThwgcImiqx0FL1yR/LHHkugGzhVazDEagJ2WmRaGuf////+OM11GgHd8SwAOAH+tS2J8ZhMiANeDaIb2aYzhIfyPlCvrif51+3YundYr22J6v95zPKJ4ICLQ3Z//9bQPD7lKdJ0sNUo3pWut9w3DBhwxwmx1R/mBtXAAA53hAAAA4Af/oG9IJsViK1sN7RqLwwYyim+2cmxdWp6iDdJKTTQqEyC4C3E5/SWtV76TqMCkJGg0amk8npN+R6qWPHgLDTKujKlBjKFAAf/YbKUBNLoE9rmQO+kIohGxVf/qPUNj0F00Tei2tr9IaR7N//64iOmqD0UqnXK1Hx0e/hq4hiAHaWzKqAAANuoPsE0AB//7cIcDiD1/WxRb0xlhFpSid/R6kA/YfVJpQdudo8hNEUNv30OzyFxqMSEhZ2+b8sJIhQFZmcytmjHoP/7cMTQAI+M3UPc/AABSBupPReJ+AKgD7m5rmnM7FEMgySImziqWZxaa2gpJDqPt6c4keI/WjdWlBK0ztR8Box/6mjxUSUBcLjSg2PNb/o84bEvrppMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv//rb26xUW/iwrVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+zDE+oIJSL9H5rz8IQOYKLwXrUlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+zDE+AAHyL9B4L1LARkYJzyXnaVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xDE24PBRAEMAAAAAAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==',
+        'drumstick_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAHBwCHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4fKysrKysrKysrKysrKysrKysrKysrKysrK7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7P////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAOIQQAB4AAABwdwX253AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAAB7C5f/QRACOoLWv/NaBA3v6qd1Qm6mBHwAAAAJwABAAEyEIQhCZCZCEIx30IQn0IRvIQn/5CEIRv/QgGBg/BAEwf/ygIf/8CBj/lwf2durIDpdMMMEAoDAALHC3MEdNYiuCGVwVVGgLodxJADkCLAMDiAcPIQKYKJC8yYikiZ0pBQFLscEhRi4YcBWGMZPVA7YPKgkiSjyoDC4oxZgDAV0koQwyNycnGMSEU2nmdKHg4U6r8Rt5zAF2su4pmMlUaG+YC7UMy13mG2JM1lxmetyfKPS2BbkoZzQ8HDBkjACnM7Ym9zoAEQY8wDQkZl//G1yt5bdqXN0bEy2lmojZjtIoFBicVHNP13X1ZV3/////x/boyCU0uv//xdp6XdiVH///////y3/1Mwim3j//////8w1eXfqX8dvgAUAAAAGAelQGiVWYEAhByX5TgljwggsMuyIKh2Zmy7TXn+y/KJNeBEUfFxWv3h95vplUrXzFEi6zDKmlL30VNMwlvUwS/o61FJY4aNpd6VNVpJ/K/HnWavNOFLca0bTpT6XM87qOE41LS8/cRXbFUkU+QQwKHHWkoFp3WJOVGbPP//1p6UOSCMkQPT5lQVz4bfAaAM8oBZlHSolPHt6jVgFl/1D1A25m19qDhXv8m8dQdJ1V//hRMLsIaegCqideydr/WOol0HAA6i0i4Qd9PWjfOtxPj/MGAT1K0hQt///tR1DmUjeON4h0WPr/x0MgJAFCiqs6t70X2DEKggDv7qVxwYlW5nnLIH/NHVXMI+H3IlVL6IMg+Oarrk2HtqRIoDSX8f3B1IdREHoPJpea9/5jx+ikIMS1Nf6KecAOE8ocb/+hqEw9mqwKZ9YGVAiAH2TAoI/mmzs4IJExFD8n9tfpdSFPFL1n//DXJmZPK5vg/++v4sFyvFSYub2Jqyivb/879R6W/8oUFUSQfC7Gpo9Lf/QuRINnq7s3/+4DEzwDSOOVF/YwAIZWcqDmHnjj/veZqho6AFcwsTXS68tmKXElRAWxPhqRAS+oxAmUhpzZxlqUUjNnHKU0RApDf+UsAKJDzZFaWaskVr/2cVS6v+e14DkFoqKmqvM9/88CxxJrVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7QMT/AApI40fsLVGBRBynfSepuFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxP2DyoTlQeeVFKgAAD/AAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=',
+        'electronic':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAADAAAFtACzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Pm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ub///////////////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAVGQQAB4AAABbR9xADeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABwQhYVRgACMZJin3OYBQIAAAAetXi+2Pd7BMLJkyadjgfPiAEAyJwfB8P4Pg+DgIcvxIcE4Pv/4Pg+D/Lg+//5d5cHwfPwwAAgcAwSAAqG6qjxIKAYLFAEHJCDjPLyMLDcxt7TCY0TdMNhEymHjQwLDiuDQAYBBxg8smHQKYEIQ8FyFRdoQ8ih0KCTMlk6E0vS+wCMZwQcOrEZC8KhrXJsus07qQS04dLrp6vbSxKNtfUzgRQaFLtfd2J/kYfWdmKW/zctrbdnuu/WWlOS2tKqWgjSZWr+vrU1Nl///1ZTJKGipu46pn1EAZhnUua6/sO/+v/+/9WlginlE/Xs6//4+9NErWPP//+U2W5YSqpAZFAAAvAQCVZaqAwJE2EBNhGAWUXtWQnS7MMt44LWbDomAJBOEWLItjEEEQJhpGFyDaFCAJBdC5HoqjEelDwuCYeEp49OkI9GpU4Wjv//4xFk3////////84fCtgLmgGAuEcQhy7AIsGsDBjwUxhkKTpa0ADU1gJuoBaO6IIkqC6pUD8WDw5XWqHIek1sRmjs9MWRJc+iU7hYKE5yWFkZFHJUxBTUUzLjEwMFWyyOWJGAAAJAqJxXEQZFlp6JVQ0hSbJSKBMISBMaSNMjZxnyjXILRK7UxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE44BLkQ81vYUAKRiOZTWGGa1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxOqDxRhRG4YkxwgAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=',
+        'electronic_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAADAAAFtACzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Pm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ub///////////////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAVEQQAB4AAABbTklhU+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABhQBZ1QAACL7qGr3N4CRACAEA/eTgEAwXB8HDgnB+sHz8Rh/LggCAY1AgCGJwfD/wf/wf1eQB8P8uD4f//Lg+AABgAAgAAwbdvXBUcBWEZigGOkICUEMx8iqEFkT1ygyYxNtBDDRISYDEygUAyIzHAdRZcqsybZIdVVMJK5i18FdRSSJbZjdO2O06LemhaYqhqJMHoSX6p0em/bra2/rgR13esoZfCYddqSOTKs4lLluxCL2JqHoc/v/8vpoLgyJS668OZdQAqd3C7+n+lXP+tTW8spqU5UGOVLVs6iUvX1//////Ga26tnW5mg3RVu6//+CW1+Xf////uz/O1plwALRAAAI4ACZqU8cSqMbEgkRy1SA6WuSmu7My/Dpw7K+HBSwLQ9YXQQjyhg0VNYVBcFhYQB7UeKyDw9WdaNVTTYn///////lQ5D1VRYCiKqkRCnAxgEURPABKAKgDjK3IE32LxSOC2Cz0QbaIAy0WB88jPBZtdQZdFV29aSbJFNmpvQhViW51sOwCYV/+yKSCGTkU8gYLIo5CypMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqcjabcFwAAAoeEZAKxIPCkRHLi2ejSirxzj0AqXzZOHP6JJVE4aIktUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE6wBJfLE3vYQAITwPpj2Eje1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxOoDxPRBF4SkwOgAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=',
+    };
+
+    async function loadMetroSamples(){
+        if(metroSamplesLoaded) return;
+        for(const [key,dataUri] of Object.entries(METRO_B64)){
+            try{
+                const res=await fetch(dataUri);
+                metroSamples[key]=await audioCtx.decodeAudioData(await res.arrayBuffer());
+            }catch(e){console.warn('Metro sample decode error:',key,e);}
+        }
+        metroSamplesLoaded=true;
+    }
+
+    function metroScheduler(){
+        if(!metroIsRunning) return;
+        while(metroNextNoteTime<audioCtx.currentTime+0.1){
+            playMetroClick(metroNextNoteTime,metroCurrentBeat);
+            metroNextNoteTime+=60.0/bpm;
+            metroCurrentBeat=(metroCurrentBeat+1)%metroTimeSig;
+        }
+        setTimeout(metroScheduler,25);
+    }
+
+    function playMetroClick(time,beat){
+        const isAccent=(beat===0&&metroAccent);
+        const sampleKey=isAccent?metroSoundType+'_accent':metroSoundType;
+        const buf=metroSamples[sampleKey]||metroSamples[metroSoundType];
+        if(!buf) return;
+        const src=audioCtx.createBufferSource();
+        src.buffer=buf;
+        const g=audioCtx.createGain();
+        g.gain.setValueAtTime(metroVolume,time);
+        src.connect(g).connect(audioCtx.destination);
+        src.start(time);
+    }
+
+    async function toggleMetronome(){
+        if(!audioCtx) await initAudio();
+        else if(audioCtx.state==='suspended') await audioCtx.resume();
+        metroIsRunning=!metroIsRunning;
+        document.getElementById('metroToggle').classList.toggle('active',metroIsRunning);
+        if(metroIsRunning){
+            document.getElementById('metroBpmDisplay').innerText=bpm;
+            if(!metroSamplesLoaded) await loadMetroSamples();
+            metroNextNoteTime=audioCtx.currentTime+0.05;
+            metroCurrentBeat=0;
+            metroScheduler();
+        }
+    }
+
+    function toggleMetroMenu(){
+        const menu=document.getElementById('metroSettingsMenu');
+        menu.style.display=(menu.style.display==='none'||menu.style.display==='')?'flex':'none';
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+        const sel=document.getElementById('metroSoundSelect');
+        if(sel) sel.addEventListener('change',function(){metroSoundType=this.value;});
+        const vol=document.getElementById('metroVolumeSlider');
+        if(vol) vol.addEventListener('input',function(){metroVolume=parseFloat(this.value);});
+        const acc=document.getElementById('metroAccentCheck');
+        if(acc) acc.addEventListener('change',function(){metroAccent=this.checked;});
+        const tsig=document.getElementById('metroTimeSigSelect');
+        if(tsig) tsig.addEventListener('change',function(){metroTimeSig=parseInt(this.value);metroCurrentBeat=0;});
+
+        // Hold-to-repeat for tempo arrows (accelerating)
+        document.querySelectorAll('.metro-tempo-btn').forEach(btn=>{
+            let holdTimer=null,repeatTimer=null,repeatCount=0;
+            const dir=parseInt(btn.dataset.dir);
+            function getStep(){
+                // Enyhe: 1,1,1,2,2,5,5,5,10,10...
+                if(repeatCount<3) return 1;
+                if(repeatCount<5) return 2;
+                if(repeatCount<8) return 5;
+                return 10;
+            }
+            function doStep(){
+                if(helpActive) return;
+                cycleTempo(dir*getStep());
+                repeatCount++;
+            }
+            function startHold(){
+                repeatCount=0;
+                doStep();
+                holdTimer=setTimeout(()=>{
+                    repeatTimer=setInterval(doStep,120);
+                },400);
+            }
+            function stopHold(){
+                clearTimeout(holdTimer);
+                clearInterval(repeatTimer);
+                holdTimer=null;repeatTimer=null;repeatCount=0;
+            }
+            btn.addEventListener('mousedown',e=>{e.preventDefault();startHold();});
+            btn.addEventListener('mouseup',stopHold);
+            btn.addEventListener('mouseleave',stopHold);
+            btn.addEventListener('touchstart',e=>{e.preventDefault();startHold();},{passive:false});
+            btn.addEventListener('touchend',stopHold);
+            btn.addEventListener('touchcancel',stopHold);
+        });
+    });
+
+    function setTempoPreset(val){
+        if(helpActive) return;
+        bpm=val;
+        const isHU=currentLang==='HU';
+        setInfoBar((isHU?'TEMPÓ: ':'TEMPO: ')+bpm+' BPM',null);
+        const d=document.getElementById('metroBpmDisplay');
+        if(d) d.innerText=bpm;
+        // Close the popup
+        document.getElementById('bpmPresetsPopup').style.display='none';
+    }
+
+    function toggleBpmPresets(){
+        const popup=document.getElementById('bpmPresetsPopup');
+        popup.style.display=(popup.style.display==='none'||popup.style.display==='')?'grid':'none';
+    }
+
+    document.addEventListener('click',function(e){
+        const menu=document.getElementById('metroSettingsMenu');
+        const btn=document.getElementById('metroMenuBtn');
+        if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)) menu.style.display='none';
+        const popup=document.getElementById('bpmPresetsPopup');
+        const bpmBox=document.getElementById('metroBpmBox');
+        if(popup&&bpmBox&&!popup.contains(e.target)&&!bpmBox.contains(e.target)) popup.style.display='none';
+    });
+
     window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);create88();buildSequence();draw();};
 </script>
 </body>
