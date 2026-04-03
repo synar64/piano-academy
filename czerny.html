@@ -344,9 +344,21 @@
     </div>
 
 <script>
-    let currentLang = 'EN';
-    let midiOutput = null; 
-let midiOutputs = [];
+    // === MASTER TIMELINE ENGINE ===
+    function getMsFromVex(vexStr, bpm) {
+        const quarterNoteMs = (60 / bpm) * 1000;
+        if (vexStr.includes('/q')) return quarterNoteMs;      // Quarter
+        if (vexStr.includes('/8')) return quarterNoteMs / 2;  // Eighth
+        if (vexStr.includes('/16')) return quarterNoteMs / 4; // Sixteenth
+        if (vexStr.includes('/h')) return quarterNoteMs * 2;  // Half
+        if (vexStr.includes('/w')) return quarterNoteMs * 4;  // Whole
+        return quarterNoteMs; 
+    }
+
+    let currentLang = 'EN'; 
+    let midiOutput = null;
+    let midiOutputs = [];
+
     const MODULE_NAMES = {
         EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
         HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
