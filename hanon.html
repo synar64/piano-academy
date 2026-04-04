@@ -9,11 +9,12 @@
     <style>
         :root { --rack-bg:#1a1a1d; --rack-border:#2a2a2d; --btn-dark:#101012; --btn-border:#050505; --text-dim:#555; --lcd-bg-dark:#111213; --lcd-label-color:#557799; --oled-text:#b3e6ff; }
         body { font-family:'Inter',sans-serif; background:#000; margin:0; padding:0; height:100vh; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; color:#fff; -webkit-user-select:none; user-select:none; }
-        .sheet-container { flex-grow:1; display:flex; align-items:center; justify-content:center; padding:10px 20px; width:100%; box-sizing:border-box; overflow:visible; }
-        .sheet-viewport { width:100%; max-width:2450px; aspect-ratio:2450/480; position:relative; overflow:visible; background:transparent; }
-        .sheet-image { width:100%; height:100%; object-fit:contain; z-index:1; position:absolute; opacity:0.35; pointer-events:none; }
-        #staffCanvas { position:absolute; top:0; left:0; width:100%; height:100%; z-index:10; pointer-events:none; }
-        .lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
+        .sheet-container { flex-grow:1; display:flex; justify-content:center; align-items:flex-start; padding:30px 20px 100px 20px; width:100%; box-sizing:border-box; overflow-y:auto; position:relative; }
+.sheet-viewport { width:100%; max-width:2450px; position:relative; overflow:visible; background:transparent; }
+.lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; position:relative; z-index:9999; box-shadow: 0 -20px 40px rgba(0,0,0,0.9); }
+.zoom-controls { position:fixed; right:20px; top:20px; display:flex; flex-direction:column; gap:6px; z-index:1000; }
+.zoom-btn { background:#111; border:1px solid #444; color:#aaa; width:38px; height:38px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,0.8); transition:0.2s; user-select:none; }
+.zoom-btn:hover { background:#222; color:#fff; transform:scale(1.1); }
         .workstation-chassis { display:flex; width:100%; max-width:2560px; position:relative; box-shadow:0 -10px 40px rgba(0,0,0,0.9); border-radius:6px 6px 0 0; background:var(--rack-bg); }
         .wood-cheek { width:24px; background:linear-gradient(to right,#3a1c0d,#1a0c05); box-shadow:inset 1px 0 2px rgba(255,255,255,0.1),inset -2px 0 5px rgba(0,0,0,0.8); border-radius:6px 0 0 0; z-index:10; }
         .wood-cheek.right { border-radius:0 6px 0 0; background:linear-gradient(to left,#3a1c0d,#1a0c05); }
@@ -86,6 +87,7 @@
         .modal-btn { background-color:var(--btn-dark); color:#aaa; border:1px solid var(--btn-border); border-radius:4px; font-weight:800; cursor:pointer; text-transform:uppercase; font-size:14px; padding:12px 40px; box-shadow:0 3px 0 #000; transition:0.1s; letter-spacing:1px; }
         .modal-btn:active { transform:translateY(3px); box-shadow:0 0 0 #000; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 </head>
 <body>
     <div id="resultModal" class="modal-overlay">
@@ -145,9 +147,14 @@
         </div>
     </div>
     <div class="sheet-container">
-        <div class="sheet-viewport">
-            <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
-            <canvas id="staffCanvas" width="2450" height="480"></canvas>
+        <div class="sheet-viewport" id="vexflow-container" style="display:flex; justify-content:center; align-items:flex-start; width:100%; height:100%; padding-top:20px;"></div>
+        
+        <div class="zoom-controls">
+            <div class="zoom-btn" onclick="zoomKotta(0.1)" title="Zoom In">+</div>
+            <div class="zoom-btn" onclick="zoomKotta(-0.1)" title="Zoom Out">−</div>
+            <div class="zoom-btn" onclick="fitWidth()" title="Fit Width" style="font-size:18px;">↔</div>
+            <div class="zoom-btn" onclick="fitHeight()" title="Fit Height" style="font-size:18px;">↕</div>
+            <div class="zoom-btn" id="btnBookView" onclick="toggleBookView()" title="Book View" style="font-size:16px;">📖</div>
         </div>
     </div>
     <div class="lower-section">
@@ -437,12 +444,17 @@
         showFinger=hintState>=2;
         showLeds=hintState>=3;
         document.getElementById('btnHints').classList.toggle('active',hintState>0);
+        // Info bar feedback
+        const stateLabels = currentLang==='HU'
+            ? ['SEGÉDEK KI','HANGNEVEK','HANGNEVEK + UJJREND','HANGNEVEK + UJJREND + LED']
+            : ['HINTS OFF','NOTE NAMES','NOTE NAMES + FINGERING','NOTE NAMES + FINGERING + LEDS'];
+        setInfoBar(stateLabels[hintState], document.getElementById('btnHints'));
         updateKeyLeds();
         draw();
     }
     function updateKeyLeds(){
         document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('chord-hint'));
-        if(!showLeds||!isRunning||seqBlocks.length===0)return;
+        if(!showLeds||seqBlocks.length===0)return;
         let note=seqBlocks[currentBlockIndex]?seqBlocks[currentBlockIndex][currentNoteInBlock]:null;
         if(!note)return;
         if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-hint');}
@@ -495,7 +507,7 @@
     const HANON_PATTERNS={
         1:{asc:[0,2,3,4,5,4,3,2], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
         2:{asc:[0,3,4,2,5,4,3,2], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
-        3:{asc:[0,3,4,2,5,4,3,2], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
+        3:{asc:[0,2,4,3,5,4,3,2], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
         4:{asc:[0,2,3,5,4,3,2,4], f_rh_asc:[1,2,3,5,4,3,2,4], f_lh_asc:[5,4,3,1,2,3,4,2]},
         5:{asc:[0,2,4,3,2,4,5,4], f_rh_asc:[1,2,4,3,2,4,5,4], f_lh_asc:[5,4,2,3,4,2,1,2]},
         6:{asc:[0,2,4,5,4,2,3,4], f_rh_asc:[1,2,4,5,4,2,3,4], f_lh_asc:[5,4,2,1,2,4,3,2]},
@@ -556,72 +568,343 @@
     function toggleAudio(){audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn&&!audioCtx)initAudio();}
     const C_MAJOR_MIDI=[0,2,4,5,7,9,11];const NOTE_NAMES=['C','D','E','F','G','A','H'];
     function getNoteInfo(diatonicStep){let octave=Math.floor(diatonicStep/7);let noteIndex=diatonicStep%7;let midi=(octave*12)+12+C_MAJOR_MIDI[noteIndex];return{midi,name:NOTE_NAMES[noteIndex]};}
+    const VF = Vex.Flow;
+
+    // VexFlow 4.x kompatibilitás — biztonságos osztály-feloldás
+    const VFAnnotation = VF.Annotation || Vex.Flow.Annotation;
+    const VJ_TOP = (VFAnnotation && VFAnnotation.VerticalJustify) ? VFAnnotation.VerticalJustify.TOP : 1;
+    const VJ_BOTTOM = (VFAnnotation && VFAnnotation.VerticalJustify) ? VFAnnotation.VerticalJustify.BOTTOM : 4;
+
+    // 1. OKOSÍTOTT MIDI FORDÍTÓ (Felismeri a # és b hangokat)
+    function midiToVexFlow(midi) {
+        if (!midi) return { key: "c/4", accidental: null };
+        const notes = [
+            {n:"c", a:null}, {n:"c", a:"#"}, {n:"d", a:null}, {n:"e", a:"b"},
+            {n:"e", a:null}, {n:"f", a:null}, {n:"f", a:"#"}, {n:"g", a:null},
+            {n:"a", a:"b"}, {n:"a", a:null}, {n:"b", a:"b"}, {n:"b", a:null}
+        ];
+        const octave = Math.floor(midi / 12) - 1;
+        const noteInfo = notes[midi % 12];
+        return { key: `${noteInfo.n}/${octave}`, accidental: noteInfo.a };
+    }
+
+    // === AKÍRA ZOOM ÉS STÍLUS BEÁLLÍTÁSOK ===
+    let KOTTA_ZOOM = 1.1; 
+    let bookViewActive = false;
+    const VEXFLOW_BASE_WIDTH = 1100; // px — alap kottaszélesség zoom nélkül
+    const VEXFLOW_ROW_HEIGHT = 230;  // px — egy sor magassága zoom nélkül
+
+    const C_LINES  = '#4a4a4a'; 
+    const C_BRIGHT = '#c3c3c3'; 
+    const C_PAST   = '#888888';
+    const C_ACTIVE = '#00d0ff'; 
+
+    function getMaxZoom() {
+        // A zoom ne takarja el a jobb oldali gombokat — max a rendelkezésre álló szélesség 95%-a
+        const container = document.querySelector('.sheet-container');
+        if (!container) return 2.5;
+        const availW = container.clientWidth - 100; // 100px margó a zoom gomboknak
+        return Math.min(2.5, availW / VEXFLOW_BASE_WIDTH);
+    }
+
+    function zoomKotta(delta) {
+        KOTTA_ZOOM = Math.max(0.5, Math.min(getMaxZoom(), KOTTA_ZOOM + delta));
+        draw();
+    }
+
+    function fitWidth() {
+        const container = document.querySelector('.sheet-container');
+        if (!container) return;
+        const availW = container.clientWidth - (bookViewActive ? 120 : 80); // margó a zoom gomboknak
+        const targetW = bookViewActive ? (availW / 2 - 20) : availW;
+        KOTTA_ZOOM = Math.max(0.5, Math.min(getMaxZoom(), targetW / VEXFLOW_BASE_WIDTH));
+        draw();
+    }
+
+    function fitHeight() {
+        const lowerSection = document.querySelector('.lower-section');
+        const workstationH = lowerSection ? lowerSection.offsetHeight : 300;
+        const availH = window.innerHeight - workstationH - 60;
+        // Cél: pontosan annyi sor férjen el amennyit az aktuális lap tartalmaz
+        const currentPageRows = Math.min(seqBlocks.length, 4); // max 4 sor reális
+        const targetZoom = availH / (currentPageRows * VEXFLOW_ROW_HEIGHT + 50);
+        KOTTA_ZOOM = Math.max(0.5, Math.min(getMaxZoom(), targetZoom));
+        draw();
+    }
+
+    function toggleBookView() {
+        bookViewActive = !bookViewActive;
+        document.getElementById('btnBookView').style.background = bookViewActive ? '#333' : '#111';
+        document.getElementById('btnBookView').style.color = bookViewActive ? '#fff' : '#aaa';
+        // Auto fit-width a könyv nézethez
+        fitWidth();
+    }
+
     function buildSequence(){
         let exerciseNum=hanonList[currentHanonIdx].val;
         let rawSeq=buildHanonExercise(exerciseNum);
         let loops=MODES[currentModeIdx]==='SPRINT'?1:MODES[currentModeIdx]==='MARATHON'?3:100;
         let flatSeq=[];for(let l=0;l<loops;l++)flatSeq=flatSeq.concat(rawSeq);
-        seqBlocks=[];for(let i=0;i<flatSeq.length;i+=16)seqBlocks.push(flatSeq.slice(i,i+16));
+        seqBlocks=[];
+        for(let i=0;i<flatSeq.length;i+=32) seqBlocks.push(flatSeq.slice(i,i+32));
         currentBlockIndex=0;currentNoteInBlock=0;rhythmNoteIdx=0;
     }
-    const KOTTA_E4_Y=187.6,KOTTA_VONALKOZ_FEL_RH=11.14,KOTTA_G2_Y=417,KOTTA_VONALKOZ_FEL_LH=10.71;
-    const canvas=document.getElementById('staffCanvas'),ctx=canvas.getContext('2d');
-    function drawRhythmNote(ctx,x,y,color,noteIdx,stemUp){
-        const R=RHYTHMS[currentRhythmIdx];const ratio=R.ratios[noteIdx%R.ratios.length];
-        ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=2.5;
-        const sDir=stemUp?-1:1;
-        const sX=stemUp?11:-11; // stem attaches to right side going up, left side going down
-        const sY1=y;const sY2=y+sDir*50;
-        if(ratio===1){
-            ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();
-            ctx.beginPath();ctx.moveTo(x+sX,sY1);ctx.lineTo(x+sX,sY2);ctx.stroke();
-            if(stemUp){ctx.beginPath();ctx.moveTo(x+sX,sY2);ctx.bezierCurveTo(x+sX+19,sY2+10,x+sX+19,sY2+25,x+sX,sY2+20);ctx.stroke();}
-            else{ctx.beginPath();ctx.moveTo(x+sX,sY2);ctx.bezierCurveTo(x+sX-19,sY2-10,x+sX-19,sY2-25,x+sX,sY2-20);ctx.stroke();}
+
+    function draw() {
+        const container = document.getElementById('vexflow-container');
+        container.innerHTML = ''; 
+        if (seqBlocks.length === 0) return;
+
+        try {
+        const lowerSection = document.querySelector('.lower-section');
+        const workstationHeight = lowerSection ? lowerSection.offsetHeight : 300; 
+        const availableHeight = window.innerHeight - workstationHeight - 60; 
+        
+        const rowHeight = VEXFLOW_ROW_HEIGHT * KOTTA_ZOOM;
+        let ROWS_PER_PAGE = Math.floor(availableHeight / rowHeight);
+        if (ROWS_PER_PAGE < 1) ROWS_PER_PAGE = 1; 
+
+        if (bookViewActive) {
+            // === KÖNYV NÉZET — két oldal egymás mellett ===
+            const totalRowsPerSpread = ROWS_PER_PAGE * 2; // bal + jobb oldal
+            const spreadIndex = Math.floor(currentBlockIndex / totalRowsPerSpread);
+            const startIndex = spreadIndex * totalRowsPerSpread;
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'display:flex; gap:30px; justify-content:center; width:100%;';
+            container.appendChild(wrapper);
+
+            // Bal és jobb oldal renderelése
+            for (let page = 0; page < 2; page++) {
+                const pageDiv = document.createElement('div');
+                pageDiv.style.cssText = 'flex-shrink:0;';
+                wrapper.appendChild(pageDiv);
+
+                const renderer = new VF.Renderer(pageDiv, VF.Renderer.Backends.SVG);
+                renderer.resize(VEXFLOW_BASE_WIDTH * KOTTA_ZOOM, (ROWS_PER_PAGE * VEXFLOW_ROW_HEIGHT + 50) * KOTTA_ZOOM);
+                const ctx = renderer.getContext();
+                ctx.scale(KOTTA_ZOOM, KOTTA_ZOOM);
+
+                for (let i = 0; i < ROWS_PER_PAGE; i++) {
+                    const blockIdx = startIndex + (page * ROWS_PER_PAGE) + i;
+                    const block = seqBlocks[blockIdx];
+                    if (!block) break;
+
+                    let active = -1;
+                    if (currentBlockIndex === blockIdx) active = currentNoteInBlock;
+                    else if (currentBlockIndex > blockIdx) active = 999;
+
+                    renderSystem(ctx, block, 30, i * VEXFLOW_ROW_HEIGHT, active);
+                }
+
+                // Oldalszám alul
+                const pageNum = spreadIndex * 2 + page + 1;
+                const totalPages = Math.ceil(seqBlocks.length / ROWS_PER_PAGE);
+                if (pageNum <= totalPages) {
+                    const label = document.createElement('div');
+                    label.style.cssText = 'text-align:center; font-family:"Share Tech Mono"; font-size:11px; color:#444; margin-top:5px;';
+                    label.textContent = pageNum + ' / ' + totalPages;
+                    pageDiv.appendChild(label);
+                }
+            }
+        } else {
+            // === NORMÁL NÉZET — egy oldal középen ===
+            const pageIndex = Math.floor(currentBlockIndex / ROWS_PER_PAGE);
+            const startIndex = pageIndex * ROWS_PER_PAGE;
+
+            const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
+            renderer.resize(VEXFLOW_BASE_WIDTH * KOTTA_ZOOM, (ROWS_PER_PAGE * VEXFLOW_ROW_HEIGHT + 50) * KOTTA_ZOOM); 
+            const ctx = renderer.getContext();
+            ctx.scale(KOTTA_ZOOM, KOTTA_ZOOM);
+
+            for (let i = 0; i < ROWS_PER_PAGE; i++) {
+                const block = seqBlocks[startIndex + i];
+                if (!block) break; 
+
+                let active = -1;
+                if (currentBlockIndex === startIndex + i) active = currentNoteInBlock;
+                else if (currentBlockIndex > startIndex + i) active = 999; 
+
+                renderSystem(ctx, block, 30, i * VEXFLOW_ROW_HEIGHT, active);
+            }
+
+            // Oldalszám
+            const totalPages = Math.ceil(seqBlocks.length / ROWS_PER_PAGE);
+            if (totalPages > 1) {
+                const label = document.createElement('div');
+                label.style.cssText = 'text-align:center; font-family:"Share Tech Mono"; font-size:11px; color:#444; margin-top:5px;';
+                label.textContent = (pageIndex + 1) + ' / ' + totalPages;
+                container.appendChild(label);
+            }
         }
-        else if(ratio===2){
-            ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();
-            ctx.beginPath();ctx.moveTo(x+sX,sY1);ctx.lineTo(x+sX,sY2);ctx.stroke();
+        } catch(e) {
+            console.error('VexFlow draw error:', e);
         }
-        else if(ratio===3){
-            ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.fill();
-            ctx.beginPath();ctx.moveTo(x+sX,sY1);ctx.lineTo(x+sX,sY2);ctx.stroke();
-            ctx.beginPath();ctx.arc(stemUp?x+20:x-20,y+(stemUp?-4:4),4,0,Math.PI*2);ctx.fill();
-        }
-        else{
-            ctx.beginPath();ctx.ellipse(x,y,12,9,-Math.PI/10,0,2*Math.PI);ctx.stroke();
-            ctx.beginPath();ctx.moveTo(x+sX,sY1);ctx.lineTo(x+sX,sY2);ctx.stroke();
-        }
+
+        updateKeyLeds(); 
     }
-    function draw(){
-        ctx.clearRect(0,0,2450,480);if(seqBlocks.length===0)return;
-        let block=seqBlocks[currentBlockIndex];let startX=180,endX=2380;
-        let spacingX=block.length>1?(endX-startX)/(block.length-1):0;
-        block.forEach((n,i)=>{
-            let x=startX+(i*spacingX);
-            let isActive=(isRunning&&i===currentNoteInBlock)||(demoActiveNoteIdx>=0&&demoActiveNoteIdx===i);
-            let isPast=isRunning&&i<currentNoteInBlock;
-            let color=isActive?'rgba(179,230,255,1.0)':isPast?'rgba(179,230,255,0.15)':'rgba(179,230,255,0.3)';
-            if(activeRH){
-                ctx.globalAlpha=1.0;let y=KOTTA_E4_Y-((n.step_rh-30)*KOTTA_VONALKOZ_FEL_RH);
-                ctx.save();ctx.strokeStyle=isActive?'rgba(210,210,210,1.0)':isPast?'rgba(210,210,210,0.15)':'rgba(210,210,210,0.3)';ctx.lineWidth=2;
-                if(n.step_rh<=28){for(let s=28;s>=n.step_rh;s-=2){let ly=KOTTA_E4_Y-((s-30)*KOTTA_VONALKOZ_FEL_RH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
-                if(n.step_rh>=40){for(let s=40;s<=n.step_rh;s+=2){let ly=KOTTA_E4_Y-((s-30)*KOTTA_VONALKOZ_FEL_RH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
-                ctx.restore();let stemUpRH=n.step_rh<34;drawRhythmNote(ctx,x,y,color,i,stemUpRH);
-                if(showNames){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.n,x,stemUpRH?y-22:y+28);}
-                if(showFinger){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.f_rh,x,stemUpRH?y+34:y-16);}
+
+    function renderSystem(ctx, block, x, y, activeIndex) {
+        const measures = [];
+        for (let i = 0; i < block.length; i += 8) {
+            measures.push(block.slice(i, i + 8));
+        }
+
+        function createVoice(notesData, isTreble, baseIndex) {
+            const notes = notesData.map((n, i) => {
+                const globalNoteIndex = baseIndex + i;
+                const midi = isTreble ? n.m_rh : n.m_lh;
+                
+                const vfInfo = midiToVexFlow(midi);
+                
+                const vfNote = new VF.StaveNote({
+                    clef: isTreble ? "treble" : "bass",
+                    keys: [vfInfo.key],
+                    duration: "16" 
+                });
+
+                // Módosítójelek automatikus hozzáadása
+                if (vfInfo.accidental) {
+                    vfNote.addModifier(new VF.Accidental(vfInfo.accidental));
+                }
+
+                let color = C_BRIGHT;
+                if (globalNoteIndex === activeIndex) color = C_ACTIVE;
+                else if (activeIndex !== -1 && globalNoteIndex < activeIndex) color = C_PAST;
+
+                vfNote.setStyle({ fillStyle: color, strokeStyle: color });
+                vfNote.setStyle({ fillStyle: color, strokeStyle: color });
+
+            // --- FINOMHANGOLT SEGÉDVONALAK ---
+            // Ha a hang éppen aktív (kék), a vonal is kék. Minden más esetben egy elegáns középszürke!
+            let ledgerColor = (globalNoteIndex === activeIndex) ? C_ACTIVE : '#666666';
+            
+            if (vfNote.setLedgerLineStyle) {
+                vfNote.setLedgerLineStyle({ 
+                    strokeStyle: ledgerColor, 
+                    fillStyle: ledgerColor, 
+                    lineWidth: 1.5 // Visszavettük 1.5-ra, ahogy kérted!
+                });
             }
-            if(activeLH){
-                ctx.globalAlpha=1.0;let y=KOTTA_G2_Y-((n.step_lh-19)*KOTTA_VONALKOZ_FEL_LH);
-                ctx.save();ctx.strokeStyle=isActive?'rgba(210,210,210,1.0)':isPast?'rgba(210,210,210,0.15)':'rgba(210,210,210,0.3)';ctx.lineWidth=2;
-                if(n.step_lh<=17){for(let s=17;s>=n.step_lh;s-=2){let ly=KOTTA_G2_Y-((s-19)*KOTTA_VONALKOZ_FEL_LH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
-                if(n.step_lh>=29){for(let s=29;s<=n.step_lh;s+=2){let ly=KOTTA_G2_Y-((s-19)*KOTTA_VONALKOZ_FEL_LH);ctx.beginPath();ctx.moveTo(x-20,ly);ctx.lineTo(x+20,ly);ctx.stroke();}}
-                ctx.restore();let stemUpLH=n.step_lh<22;drawRhythmNote(ctx,x,y,color,i,stemUpLH);
-                if(showNames){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.n,x,stemUpLH?y-22:y+28);}
-                if(showFinger){ctx.font='bold 18px Inter';ctx.fillStyle='#b3e6ff';ctx.textAlign='center';ctx.fillText(n.f_lh,x,stemUpLH?y+34:y-16);}
+            // ---------------------------------
+
+                // === HANGNEVEK (showNames) ===
+                if (showNames) {
+                    const midi = isTreble ? n.m_rh : n.m_lh;
+                    const noteIdx = midi % 12;
+                    const noteLetters = currentLang === 'HU'
+                        ? ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','H']
+                        : ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+                    const noteName = noteLetters[noteIdx];
+                    // Position: treble = above (3), bass = below (4)
+                    const ann = new VFAnnotation(noteName)
+                        .setFont('Inter', 9, 'bold')
+                        .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
+                    ann.setStyle({ fillStyle: color, strokeStyle: color });
+                    vfNote.addModifier(ann);
+                }
+
+                // === UJJREND (showFinger) ===
+                if (showFinger) {
+                    const finger = isTreble ? n.f_rh : n.f_lh;
+                    if (finger !== undefined && finger !== null) {
+                        // Ujjrend Annotation-ként — treble: lent, bass: fent (ellenkezője a hangneveknek)
+                        const fAnn = new VFAnnotation(finger.toString())
+                            .setFont('Inter', 10, 'bold')
+                            .setVerticalJustification(isTreble ? VJ_BOTTOM : VJ_TOP);
+                        fAnn.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT });
+                        vfNote.addModifier(fAnn);
+                    }
+                }
+                return vfNote;
+            });
+
+            const voice = new VF.Voice({ num_beats: 2, beat_value: 4 }).addTickables(notes);
+            voice.setStrict(false);
+            const beams = VF.Beam.generateBeams(notes);
+            beams.forEach(b => b.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
+            
+            return { voice, beams };
+        }
+
+        let currentX = x;
+        const stavesTreble = [];
+        const stavesBass = [];
+        const voicesTreble = [];
+        const voicesBass = [];
+
+        measures.forEach((measureData, mIndex) => {
+            const isFirst = (mIndex === 0);
+            const isLast = (mIndex === measures.length - 1);
+            
+            const mWidth = isFirst ? 300 : 250; 
+
+            const staveTreble = new VF.Stave(currentX, y, mWidth);
+            const staveBass = new VF.Stave(currentX, y + 110, mWidth); // 110px a pótvonalaknak
+
+            if (isFirst) {
+                staveTreble.addClef("treble").addTimeSignature("2/4");
+                staveBass.addClef("bass").addTimeSignature("2/4");
             }
+            if (isLast) {
+                staveTreble.setEndBarType(VF.Barline.type.SINGLE);
+                staveBass.setEndBarType(VF.Barline.type.SINGLE);
+            }
+
+            stavesTreble.push(staveTreble);
+            stavesBass.push(staveBass);
+
+            if (activeRH) voicesTreble.push(createVoice(measureData, true, mIndex * 8));
+            if (activeLH) voicesBass.push(createVoice(measureData, false, mIndex * 8));
+
+            currentX += mWidth;
         });
-        ctx.globalAlpha=1.0;
-        updateKeyLeds();
+
+        stavesTreble.forEach((stave, i) => {
+            stave.setContext(ctx);
+            ctx.setLineWidth(0.5); 
+            ctx.setStrokeStyle(C_LINES);
+            ctx.setFillStyle(C_LINES);
+            stave.getModifiers().forEach(mod => mod.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
+            stave.draw();
+            
+            const bStave = stavesBass[i];
+            bStave.setContext(ctx);
+            bStave.getModifiers().forEach(mod => mod.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
+            bStave.draw();
+            
+            ctx.setLineWidth(1.0); 
+        });
+
+        ctx.setStrokeStyle(C_BRIGHT);
+        ctx.setFillStyle(C_BRIGHT);
+        if (stavesTreble.length > 0) {
+            new VF.StaveConnector(stavesTreble[0], stavesBass[0]).setType(VF.StaveConnector.type.BRACE).setContext(ctx).draw();
+            new VF.StaveConnector(stavesTreble[0], stavesBass[0]).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
+            new VF.StaveConnector(stavesTreble[stavesTreble.length-1], stavesBass[stavesBass.length-1]).setType(VF.StaveConnector.type.SINGLE_RIGHT).setContext(ctx).draw();
+        }
+
+        voicesTreble.forEach((v, i) => {
+            const width = (i === 0) ? 220 : 210;
+            new VF.Formatter().joinVoices([v.voice]).format([v.voice], width);
+            v.voice.draw(ctx, stavesTreble[i]);
+            v.beams.forEach(b => {
+                const globalBase = i * 8;
+                if(activeIndex !== -1 && activeIndex >= globalBase + 8) b.setStyle({fillStyle: C_PAST, strokeStyle: C_PAST});
+                b.setContext(ctx).draw();
+            });
+        });
+
+        voicesBass.forEach((v, i) => {
+            const width = (i === 0) ? 220 : 210;
+            new VF.Formatter().joinVoices([v.voice]).format([v.voice], width);
+            v.voice.draw(ctx, stavesBass[i]);
+            v.beams.forEach(b => {
+                const globalBase = i * 8;
+                if(activeIndex !== -1 && activeIndex >= globalBase + 8) b.setStyle({fillStyle: C_PAST, strokeStyle: C_PAST});
+                b.setContext(ctx).draw();
+            });
+        });
     }
     function handleMainButton(){
         if(demoRunning)stopDemo();
@@ -687,19 +970,21 @@
         const rawSeq=buildHanonExercise(hanonList[currentHanonIdx].val);
         const R=RHYTHMS[currentRhythmIdx];const baseDur=60/bpm;
         let time=audioCtx.currentTime+0.15;
-        // Clean up any previous demo
         demoTimeouts.forEach(t=>clearTimeout(t));
         demoTimeouts=[];demoSources=[];
         demoActiveNoteIdx=-1;document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
         if(seqBlocks.length===0)buildSequence();
         demoRunning=true;
         document.getElementById('btnDemo').classList.add('active');
-        // Play the FULL sequence (ascending + descending + final note)
+        
         let globalIdx=0;
         rawSeq.forEach((note,i)=>{
             const ratio=R.ratios[i%R.ratios.length];const dur=baseDur*ratio;
             const delayMs=(time-audioCtx.currentTime)*1000;const flashDur=Math.min(dur*0.85*1000,400);
-            const blockIdx=Math.floor(i/16);const noteIdx=i%16;
+            
+            // JAVÍTÁS: 16 helyett 32, mert most 32 hang van egy sorban (4 ütem)
+            const blockIdx=Math.floor(i/32);const noteIdx=i%32;
+            
             const tid1=setTimeout(()=>{
                 if(!demoRunning)return;
                 demoActiveNoteIdx=noteIdx;currentBlockIndex=blockIdx;currentNoteInBlock=noteIdx;draw();
@@ -896,7 +1181,7 @@
         const d=document.getElementById('metroBpmDisplay');
         if(d) d.innerText=bpm;
     };
-
+    window.addEventListener('resize', () => { if(seqBlocks.length > 0) draw(); });
     window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);create88();buildSequence();draw();window.addEventListener('pointerdown',()=>initAudio(),{once:true});};
 </script>
 </body>
