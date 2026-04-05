@@ -27,9 +27,20 @@
 
         /* ── KOTTA ── */
         .sheet-container {
-            flex-grow: 1; display: flex; align-items: center; justify-content: center;
-            padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible;
-        }
+    flex-grow: 1; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; /* Ez középre teszi a tartalmat */
+    padding: 10px 20px; 
+    width: 100%; 
+    box-sizing: border-box; 
+    overflow: auto; /* Ha nagyobb a kotta, lehessen görgetni */
+}
+
+#vexflow-container svg {
+    margin: 0 auto; /* Ez az SVG-t magát kényszeríti középre a div-en belül */
+    display: block;
+}
 .sheet-viewport {
     width: 100%;
     max-width: 2450px;
