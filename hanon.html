@@ -790,10 +790,11 @@
                     const noteLetters = currentLang === 'HU'
                         ? ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','H']
                         : ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
-                    const noteName = noteLetters[noteIdx];
+                    const oct = Math.floor(midi / 12) - 1;
+                    const noteName = noteLetters[noteIdx] + oct;
                     // Position: treble = above (3), bass = below (4)
                     const ann = new VFAnnotation(noteName)
-                        .setFont('Inter', 9, 'bold')
+                        .setFont('Share Tech Mono', 8, 'bold')
                         .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
                     ann.setStyle({ fillStyle: color, strokeStyle: color });
                     vfNote.addModifier(ann);
@@ -805,7 +806,7 @@
                     if (finger !== undefined && finger !== null) {
                         // Ujjrend Annotation-ként — treble: lent, bass: fent (ellenkezője a hangneveknek)
                         const fAnn = new VFAnnotation(finger.toString())
-                            .setFont('Inter', 10, 'bold')
+                            .setFont('Inter', 7, 'bold')
                             .setVerticalJustification(isTreble ? VJ_BOTTOM : VJ_TOP);
                         fAnn.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT });
                         vfNote.addModifier(fAnn);

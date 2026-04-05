@@ -564,12 +564,14 @@
                     const accStr=n.na==='#'?'♯':n.na==='b'?'♭':'';
                     let letter=n.nl.toUpperCase();
                     if(currentLang==='HU'&&letter==='B'&&!n.na)letter='H';
-                    const ann=new VFAnnotation(letter+accStr).setFont('Inter',9,'bold').setVerticalJustification(isTreble?VJ_TOP:VJ_BOTTOM);
+                    const midiForOct=isTreble?n.m_rh:n.m_lh;
+                    const oct=Math.floor(midiForOct/12)-1;
+                    const ann=new VFAnnotation(letter+accStr+oct).setFont('Share Tech Mono',8,'bold').setVerticalJustification(isTreble?VJ_TOP:VJ_BOTTOM);
                     ann.setStyle({fillStyle:color,strokeStyle:color});vfn.addModifier(ann);
                 }
                 if(showFinger){
                     const f=isTreble?n.f_rh:n.f_lh;
-                    if(f){const fa=new VFAnnotation(String(f)).setFont('Inter',10,'bold').setVerticalJustification(isTreble?VJ_BOTTOM:VJ_TOP);fa.setStyle({fillStyle:C_BRIGHT,strokeStyle:C_BRIGHT});vfn.addModifier(fa);}
+                    if(f){const fa=new VFAnnotation(String(f)).setFont('Inter',7,'bold').setVerticalJustification(isTreble?VJ_BOTTOM:VJ_TOP);fa.setStyle({fillStyle:C_BRIGHT,strokeStyle:C_BRIGHT});vfn.addModifier(fa);}
                 }
                 return vfn;
             });

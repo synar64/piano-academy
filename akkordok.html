@@ -1388,8 +1388,8 @@
                         vfn.addModifier(ann);
                     }
                     if (showNames) {
-                        const names = staveNotes.map(n => noteName(n.n).replace(/\d/g, '').replace('#', '♯')).join(' ');
-                        const ann   = new VFAnnotation(names).setFont('Share Tech Mono', 9, 'bold')
+                        const names = staveNotes.map(n => noteName(n.n).replace('#', '♯')).join(' ');
+                        const ann   = new VFAnnotation(names).setFont('Share Tech Mono', 8, 'bold')
                             .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
                         ann.setStyle({ fillStyle: color, strokeStyle: color });
                         vfn.addModifier(ann);
@@ -1410,8 +1410,8 @@
                     vfn.setLedgerLineStyle({ strokeStyle: lc, fillStyle: lc, lineWidth: 1.5 });
                 }
                 if (showNames) {
-                    const names = staveNotes.map(n => noteName(n.n).replace(/\d/g, '').replace('#', '♯')).join(' ');
-                    const ann   = new VFAnnotation(names).setFont('Share Tech Mono', 9, 'bold')
+                    const names = staveNotes.map(n => noteName(n.n).replace('#', '♯')).join(' ');
+                    const ann   = new VFAnnotation(names).setFont('Share Tech Mono', 8, 'bold')
                         .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
                     ann.setStyle({ fillStyle: color, strokeStyle: color });
                     vfn.addModifier(ann);

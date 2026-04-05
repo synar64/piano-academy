@@ -1227,8 +1227,9 @@
             const noteLetters = currentLang === 'HU'
                 ? ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'H']
                 : ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
-            const ann = new VFAnnotation(noteLetters[noteIdx])
-                .setFont('Inter', 9, 'bold')
+            const oct = Math.floor(midi / 12) - 1;
+            const ann = new VFAnnotation(noteLetters[noteIdx] + oct)
+                .setFont('Share Tech Mono', 8, 'bold')
                 .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
             ann.setStyle({ fillStyle: col, strokeStyle: col });
             sn.addModifier(ann);
@@ -1237,7 +1238,7 @@
             const finger = isTreble ? n.f_rh : n.f_lh;
             if (finger != null) {
                 const fa = new VFAnnotation(String(finger))
-                    .setFont('Inter', 10, 'bold')
+                    .setFont('Inter', 7, 'bold')
                     .setVerticalJustification(isTreble ? VJ_BOTTOM : VJ_TOP);
                 fa.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT });
                 sn.addModifier(fa);
