@@ -150,8 +150,6 @@
         <div class="sheet-viewport" id="vexflow-container" style="display:flex; justify-content:center; align-items:flex-start; width:100%; height:100%; padding-top:20px;"></div>
         
         <div class="zoom-controls">
-            <div class="zoom-btn" onclick="zoomKotta(0.1)" title="Zoom In">+</div>
-            <div class="zoom-btn" onclick="zoomKotta(-0.1)" title="Zoom Out">−</div>
             <div class="zoom-btn" onclick="fitWidth()" title="Fit Width" style="font-size:18px;">↔</div>
             <div class="zoom-btn" onclick="fitHeight()" title="Fit Height" style="font-size:18px;">↕</div>
             <div class="zoom-btn" id="btnBookView" onclick="toggleBookView()" title="Book View" style="font-size:16px;">📖</div>
@@ -239,17 +237,13 @@
                                 </div>
                                 <div style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;margin-top:8px;">Time Signature</div>
                                 <select id="metroTimeSigSelect" style="background:#111;color:#eee;border:1px solid #333;padding:5px;font-family:'Share Tech Mono';border-radius:3px;width:100%;">
-                                    <option value="1">1/1</option>
-                                    <option value="2">2/2</option>
-                                    <option value="2">2/4</option>
+                                    <option value="1">1/4</option>
+                                    <option value="2" selected>2/4</option>
                                     <option value="3">3/4</option>
-                                    <option value="4" selected>4/4</option>
+                                    <option value="4">4/4</option>
                                     <option value="5">5/4</option>
-                                    <option value="8">8/4</option>
-                                    <option value="3">3/8</option>
                                     <option value="6">6/8</option>
                                     <option value="7">7/8</option>
-                                    <option value="8">8/8</option>
                                     <option value="9">9/8</option>
                                     <option value="12">12/8</option>
                                 </select>
@@ -648,6 +642,7 @@
         seqBlocks=[];
         for(let i=0;i<flatSeq.length;i+=32) seqBlocks.push(flatSeq.slice(i,i+32));
         currentBlockIndex=0;currentNoteInBlock=0;rhythmNoteIdx=0;
+        syncMetroTimeSig();
     }
 
     function draw() {
@@ -819,7 +814,7 @@
                 return vfNote;
             });
 
-            const voice = new VF.Voice({ num_beats: 2, beat_value: 4 }).addTickables(notes);
+            const voice = new VF.Voice({ num_beats: scoreTimeSig, beat_value: 4 }).addTickables(notes);
             voice.setStrict(false);
             const beams = VF.Beam.generateBeams(notes);
             beams.forEach(b => b.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
@@ -843,8 +838,8 @@
             const staveBass = new VF.Stave(currentX, y + 110, mWidth); // 110px a pótvonalaknak
 
             if (isFirst) {
-                staveTreble.addClef("treble").addTimeSignature("2/4");
-                staveBass.addClef("bass").addTimeSignature("2/4");
+                staveTreble.addClef("treble").addTimeSignature(scoreTimeSig + "/4");
+                staveBass.addClef("bass").addTimeSignature(scoreTimeSig + "/4");
             }
             if (isLast) {
                 staveTreble.setEndBarType(VF.Barline.type.SINGLE);
@@ -970,6 +965,7 @@
         const rawSeq=buildHanonExercise(hanonList[currentHanonIdx].val);
         const R=RHYTHMS[currentRhythmIdx];const baseDur=60/bpm;
         let time=audioCtx.currentTime+0.15;
+        snapMetroToBeat0(time);
         demoTimeouts.forEach(t=>clearTimeout(t));
         demoTimeouts=[];demoSources=[];
         demoActiveNoteIdx=-1;document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
@@ -1035,7 +1031,18 @@
     }
     // --- METRONOME ---
     let metroIsRunning=false, metroNextNoteTime=0, metroCurrentBeat=0;
-    let metroSoundType='mechanical', metroVolume=0.5, metroAccent=true, metroTimeSig=4;
+    let metroSoundType='mechanical', metroVolume=0.5, metroAccent=true, metroTimeSig=2;
+
+    // Single source of truth: beats per measure derived from the VexFlow score.
+    // All Hanon exercises are in 2/4 → 2 beats per measure.
+    let scoreTimeSig = 2;
+
+    function syncMetroTimeSig() {
+        metroTimeSig = scoreTimeSig;
+        metroCurrentBeat = 0;
+        const sel = document.getElementById('metroTimeSigSelect');
+        if (sel) sel.value = String(scoreTimeSig);
+    }
     const metroSamples={};
     let metroSamplesLoaded=false;
 
@@ -1084,6 +1091,15 @@
         src.start(time);
     }
 
+    // Re-align the metronome so beat 1 (accent) fires at exactly `t`.
+    // Any clicks already queued in Web Audio before `t` will still fire, but from `t`
+    // onward the phase is perfectly locked to the demo's first note.
+    function snapMetroToBeat0(t){
+        if(!metroIsRunning) return;
+        metroNextNoteTime=t;
+        metroCurrentBeat=0;
+    }
+
     async function toggleMetronome(){
         if(!audioCtx) await initAudio();
         else if(audioCtx.state==='suspended') await audioCtx.resume();
@@ -1111,7 +1127,11 @@
         const acc=document.getElementById('metroAccentCheck');
         if(acc) acc.addEventListener('change',function(){metroAccent=this.checked;});
         const tsig=document.getElementById('metroTimeSigSelect');
-        if(tsig) tsig.addEventListener('change',function(){metroTimeSig=parseInt(this.value);metroCurrentBeat=0;});
+        if(tsig) tsig.addEventListener('change',function(){
+            scoreTimeSig=parseInt(this.value);
+            metroTimeSig=scoreTimeSig;
+            metroCurrentBeat=0;
+        });
 
         // Hold-to-repeat for tempo arrows (accelerating)
         document.querySelectorAll('.metro-tempo-btn').forEach(btn=>{
