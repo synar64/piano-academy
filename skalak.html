@@ -70,8 +70,9 @@
         .key-glow.pressed::after { content:''; position:absolute; pointer-events:none; z-index:150; top:0; left:0; width:100%; height:100%; border-radius:0 0 4px 4px; background:rgba(0,0,0,0.11); box-shadow:inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top:6px; left:25%; width:50%; height:77%; border-radius:2px; background:rgba(255,255,255,0.36); z-index:40; }
         .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:9999; }
+        .key-glow.scale-hint .key-led { opacity:0.4; }
         .key-glow.demo-flash .key-led { opacity:1; background:rgba(179,230,255,0.95) !important; box-shadow:0 0 12px rgba(179,230,255,0.8) !important; }
-        .key-glow.chord-hint .key-led { opacity:1; }
+        .key-glow.chord-hint .key-led { opacity:1; background:var(--oled-text); box-shadow:0 0 10px rgba(179,230,255,0.7); }
         .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
         .metro-preset:hover { background:#333;color:#fff; }
         .metro-preset:active { transform:translateY(1px); }
@@ -87,39 +88,75 @@
 </head>
 <body onclick="initAudio()">
     <div id="patchBrowserModal" class="modal-overlay">
-        <div class="modal-content patch-browser-content">
-            <h2 class="modal-title">Scale Browser</h2>
-            <div style="text-align:left;margin-bottom:10px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;">MAJOR SCALES</div>
-            <div class="patch-grid">
-                <button class="patch-btn" onclick="selectPatch('C_DUR','C MAJOR')">C Maj</button>
-                <button class="patch-btn" onclick="selectPatch('DB_DUR','Db MAJOR')">Db Maj</button>
-                <button class="patch-btn" onclick="selectPatch('D_DUR','D MAJOR')">D Maj</button>
-                <button class="patch-btn" onclick="selectPatch('EB_DUR','Eb MAJOR')">Eb Maj</button>
-                <button class="patch-btn" onclick="selectPatch('E_DUR','E MAJOR')">E Maj</button>
-                <button class="patch-btn" onclick="selectPatch('F_DUR','F MAJOR')">F Maj</button>
-                <button class="patch-btn" onclick="selectPatch('FS_DUR','F# MAJOR')">F# Maj</button>
-                <button class="patch-btn" onclick="selectPatch('G_DUR','G MAJOR')">G Maj</button>
-                <button class="patch-btn" onclick="selectPatch('AB_DUR','Ab MAJOR')">Ab Maj</button>
-                <button class="patch-btn" onclick="selectPatch('A_DUR','A MAJOR')">A Maj</button>
-                <button class="patch-btn" onclick="selectPatch('B_FLAT_DUR','Bb MAJOR')">Bb Maj</button>
-                <button class="patch-btn" onclick="selectPatch('H_DUR','B MAJOR')">B Maj</button>
+        <div class="modal-content patch-browser-content" style="max-width:660px;max-height:90vh;overflow-y:auto;">
+            <h2 class="modal-title" id="pbTitle">Scale Encyclopedia</h2>
+            <div style="display:flex;gap:0;margin-bottom:18px;border-radius:3px;overflow:hidden;border:1px solid #222;">
+                <button id="catBtnSTANDARD" onclick="selectCategory('STANDARD')" style="flex:1;padding:9px 4px;background:#1a1a1d;border:none;border-right:1px solid #222;color:#b3e6ff;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">STANDARD</button>
+                <button id="catBtnMODAL" onclick="selectCategory('MODAL')" style="flex:1;padding:9px 4px;background:#111;border:none;border-right:1px solid #222;color:#555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">MODAL</button>
+                <button id="catBtnEXOTIC" onclick="selectCategory('EXOTIC')" style="flex:1;padding:9px 4px;background:#111;border:none;color:#555;font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">EXOTIC</button>
             </div>
-            <div style="text-align:left;margin-bottom:10px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;">MINOR SCALES</div>
-            <div class="patch-grid" style="margin-bottom:10px;">
-                <button class="patch-btn" onclick="selectPatch('C_MOLL','C MINOR')">C Min</button>
-                <button class="patch-btn" onclick="selectPatch('CS_MOLL','C# MINOR')">C# Min</button>
-                <button class="patch-btn" onclick="selectPatch('D_MOLL','D MINOR')">D Min</button>
-                <button class="patch-btn" onclick="selectPatch('EB_MOLL','Eb MINOR')">Eb Min</button>
-                <button class="patch-btn" onclick="selectPatch('E_MOLL','E MINOR')">E Min</button>
-                <button class="patch-btn" onclick="selectPatch('F_MOLL','F MINOR')">F Min</button>
-                <button class="patch-btn" onclick="selectPatch('FS_MOLL','F# MINOR')">F# Min</button>
-                <button class="patch-btn" onclick="selectPatch('G_MOLL','G MINOR')">G Min</button>
-                <button class="patch-btn" onclick="selectPatch('GS_MOLL','G# MINOR')">G# Min</button>
-                <button class="patch-btn" onclick="selectPatch('A_MOLL','A MINOR')">A Min</button>
-                <button class="patch-btn" onclick="selectPatch('B_FLAT_MOLL','Bb MINOR')">Bb Min</button>
-                <button class="patch-btn" onclick="selectPatch('H_MOLL','B MINOR')">B Min</button>
+            <div id="catSectionSTANDARD">
+                <div style="text-align:left;margin-bottom:8px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;" id="pbLblMajor">MAJOR SCALES</div>
+                <div class="patch-grid" style="margin-bottom:14px;">
+                    <button class="patch-btn" onclick="selectPatch('C_DUR','C MAJOR')">C Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('DB_DUR','Db MAJOR')">Db Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('D_DUR','D MAJOR')">D Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('EB_DUR','Eb MAJOR')">Eb Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('E_DUR','E MAJOR')">E Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('F_DUR','F MAJOR')">F Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('FS_DUR','F# MAJOR')">F# Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('G_DUR','G MAJOR')">G Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('AB_DUR','Ab MAJOR')">Ab Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('A_DUR','A MAJOR')">A Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('B_FLAT_DUR','Bb MAJOR')">Bb Maj</button>
+                    <button class="patch-btn" onclick="selectPatch('H_DUR','B MAJOR')">B Maj</button>
+                </div>
+                <div style="text-align:left;margin-bottom:8px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;" id="pbLblMinor">MINOR SCALES</div>
+                <div class="patch-grid" style="margin-bottom:10px;">
+                    <button class="patch-btn" onclick="selectPatch('C_MOLL','C MINOR')">C Min</button>
+                    <button class="patch-btn" onclick="selectPatch('CS_MOLL','C# MINOR')">C# Min</button>
+                    <button class="patch-btn" onclick="selectPatch('D_MOLL','D MINOR')">D Min</button>
+                    <button class="patch-btn" onclick="selectPatch('EB_MOLL','Eb MINOR')">Eb Min</button>
+                    <button class="patch-btn" onclick="selectPatch('E_MOLL','E MINOR')">E Min</button>
+                    <button class="patch-btn" onclick="selectPatch('F_MOLL','F MINOR')">F Min</button>
+                    <button class="patch-btn" onclick="selectPatch('FS_MOLL','F# MINOR')">F# Min</button>
+                    <button class="patch-btn" onclick="selectPatch('G_MOLL','G MINOR')">G Min</button>
+                    <button class="patch-btn" onclick="selectPatch('GS_MOLL','G# MINOR')">G# Min</button>
+                    <button class="patch-btn" onclick="selectPatch('A_MOLL','A MINOR')">A Min</button>
+                    <button class="patch-btn" onclick="selectPatch('B_FLAT_MOLL','Bb MINOR')">Bb Min</button>
+                    <button class="patch-btn" onclick="selectPatch('H_MOLL','B MINOR')">B Min</button>
+                </div>
             </div>
-            <button class="modal-btn" onclick="closePatchBrowser()">Cancel</button>
+            <div id="catSectionMODAL" style="display:none;">
+                <div style="text-align:left;margin-bottom:8px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;" id="pbLblModal">MODAL (CHURCH) — GREEK MODES FROM C</div>
+                <div class="patch-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px;">
+                    <button class="patch-btn" onclick="selectPatch('IONIAN','IONIAN')">Ionian</button>
+                    <button class="patch-btn" onclick="selectPatch('DORIAN','DORIAN')">Dorian</button>
+                    <button class="patch-btn" onclick="selectPatch('PHRYGIAN','PHRYGIAN')">Phrygian</button>
+                    <button class="patch-btn" onclick="selectPatch('LYDIAN','LYDIAN')">Lydian</button>
+                    <button class="patch-btn" onclick="selectPatch('MIXOLYDIAN','MIXOLYDIAN')">Mixolydian</button>
+                    <button class="patch-btn" onclick="selectPatch('AEOLIAN','AEOLIAN')">Aeolian</button>
+                    <button class="patch-btn" onclick="selectPatch('LOCRIAN','LOCRIAN')">Locrian</button>
+                </div>
+                <div style="padding:12px;background:#111;border:1px solid #222;border-radius:3px;font-family:'Share Tech Mono';font-size:13px;color:#7ab8d4;text-align:left;line-height:1.8;margin-bottom:10px;" id="pbModalInfo">I · Ionian = Major &nbsp;·&nbsp; II · Dorian = Nat.Min +♮6 &nbsp;·&nbsp; III · Phrygian = Nat.Min +♭2<br>IV · Lydian = Major +♯4 &nbsp;·&nbsp; V · Mixolydian = Major +♭7 &nbsp;·&nbsp; VI · Aeolian = Nat.Minor<br>VII · Locrian = Diminished</div>
+            </div>
+            <div id="catSectionEXOTIC" style="display:none;">
+                <div style="text-align:left;margin-bottom:8px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;" id="pbLblExotic">EXOTIC (WORLD SCALES) — ALL FROM C</div>
+                <div class="patch-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px;">
+                    <button class="patch-btn" onclick="selectPatch('MIDDLE_EAST','MID EAST')">Middle East</button>
+                    <button class="patch-btn" onclick="selectPatch('CENT_EUROPE','CENT EUR')">Cent. Europe</button>
+                    <button class="patch-btn" onclick="selectPatch('INDIAN_RAGA','INDIA')">Indian (Raga)</button>
+                    <button class="patch-btn" onclick="selectPatch('CHINA_PENTA','CHINA')">China (Penta)</button>
+                    <button class="patch-btn" onclick="selectPatch('NA_BLUES','NA BLUES')">N.Am. Blues</button>
+                    <button class="patch-btn" onclick="selectPatch('JAPAN_HIRA','HIRAJOSHI')">Japan (Hira)</button>
+                    <button class="patch-btn" onclick="selectPatch('WEST_AFRICA','W.AFRICA')">West African</button>
+                    <button class="patch-btn" onclick="selectPatch('S_AMERICA','S.AMERICA')">South America</button>
+                    <button class="patch-btn" onclick="selectPatch('CENT_ASIA','C.ASIA')">Central Asia</button>
+                    <button class="patch-btn" onclick="selectPatch('SCANDINAVIAN','SCAND')">Scandinavian</button>
+                </div>
+                <div style="padding:12px;background:#111;border:1px solid #222;border-radius:3px;font-family:'Share Tech Mono';font-size:13px;color:#7ab8d4;text-align:left;line-height:1.8;margin-bottom:10px;" id="pbExoticInfo">All scales from root C &nbsp;·&nbsp; Pentatonic = 5 notes &nbsp;·&nbsp; Blues = 6 notes &nbsp;·&nbsp; All others = 7 notes<br>Keyboard highlights show all scale notes simultaneously across the full 88 keys</div>
+            </div>
+            <button class="modal-btn" onclick="closePatchBrowser()" style="width:100%;" id="pbCancel">Cancel</button>
         </div>
     </div>
     <div id="resultModal" class="modal-overlay">
@@ -269,8 +306,8 @@
                                             <div class="oled-main" id="lcdModeText">SPRINT</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledScale" class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE: CLICK TO BROWSE — CHOOSE FROM 24 MAJOR AND MINOR SCALES">
-                                            <div class="oled-header">Scale</div>
+                                        <div id="oledScale" class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="SCALE: CLICK TO BROWSE — STANDARD / MODAL / EXOTIC ENCYCLOPEDIA">
+                                            <div class="oled-header" id="oledScaleHeader">Scale</div>
                                             <div class="oled-main" id="lcdScaleText">C MAJOR</div>
                                         </div>
                                         <div class="oled-divider"></div>
@@ -334,7 +371,7 @@
         document.getElementById('btnLangHU').style.color=lang==='HU'?'#fff':'var(--text-dim)';
         document.getElementById('lcdModuleText').innerText=MODULE_NAMES[lang][3];
         const curVal=document.getElementById('scaleSelectValue').value;
-        document.getElementById('lcdScaleText').innerText=getScaleName(curVal);
+        _updateScaleOled(curVal);
         const R=RHYTHMS[currentRhythmIdx];
         document.getElementById('lcdRhythm').innerText=lang==='HU'?R.labelHU:R.label;
         if(helpActive)setInfoBar(lang==='HU'?'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT':'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',null);
@@ -412,50 +449,110 @@
         KOTTA_ZOOM=Math.max(0.5,Math.min(getMaxZoom(),availH/(rows*VEXFLOW_ROW_HEIGHT+50)));draw();
     }
 
-    // ── 24-Scale data ─────────────────────────────────────────────────────────
-    const SCALE_DEFS_2OCT={
-        'C_DUR':     {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:null,s:4},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:null,s:9},{l:'b',a:null,s:11}],rh:60,lh:48},
-        'DB_DUR':    {n:[{l:'d',a:'b',s:0},{l:'e',a:'b',s:2},{l:'f',a:null,s:4},{l:'g',a:'b',s:5},{l:'a',a:'b',s:7},{l:'b',a:'b',s:9},{l:'c',a:null,s:11}],rh:61,lh:49},
-        'D_DUR':     {n:[{l:'d',a:null,s:0},{l:'e',a:null,s:2},{l:'f',a:'#',s:4},{l:'g',a:null,s:5},{l:'a',a:null,s:7},{l:'b',a:null,s:9},{l:'c',a:'#',s:11}],rh:62,lh:50},
-        'EB_DUR':    {n:[{l:'e',a:'b',s:0},{l:'f',a:null,s:2},{l:'g',a:null,s:4},{l:'a',a:'b',s:5},{l:'b',a:'b',s:7},{l:'c',a:null,s:9},{l:'d',a:null,s:11}],rh:63,lh:51},
-        'E_DUR':     {n:[{l:'e',a:null,s:0},{l:'f',a:'#',s:2},{l:'g',a:'#',s:4},{l:'a',a:null,s:5},{l:'b',a:null,s:7},{l:'c',a:'#',s:9},{l:'d',a:'#',s:11}],rh:64,lh:52},
-        'F_DUR':     {n:[{l:'f',a:null,s:0},{l:'g',a:null,s:2},{l:'a',a:null,s:4},{l:'b',a:'b',s:5},{l:'c',a:null,s:7},{l:'d',a:null,s:9},{l:'e',a:null,s:11}],rh:53,lh:41},
-        'FS_DUR':    {n:[{l:'f',a:'#',s:0},{l:'g',a:'#',s:2},{l:'a',a:'#',s:4},{l:'b',a:null,s:5},{l:'c',a:'#',s:7},{l:'d',a:'#',s:9},{l:'e',a:'#',s:11}],rh:54,lh:42},
-        'G_DUR':     {n:[{l:'g',a:null,s:0},{l:'a',a:null,s:2},{l:'b',a:null,s:4},{l:'c',a:null,s:5},{l:'d',a:null,s:7},{l:'e',a:null,s:9},{l:'f',a:'#',s:11}],rh:55,lh:43},
-        'AB_DUR':    {n:[{l:'a',a:'b',s:0},{l:'b',a:'b',s:2},{l:'c',a:null,s:4},{l:'d',a:'b',s:5},{l:'e',a:'b',s:7},{l:'f',a:null,s:9},{l:'g',a:null,s:11}],rh:56,lh:44},
-        'A_DUR':     {n:[{l:'a',a:null,s:0},{l:'b',a:null,s:2},{l:'c',a:'#',s:4},{l:'d',a:null,s:5},{l:'e',a:null,s:7},{l:'f',a:'#',s:9},{l:'g',a:'#',s:11}],rh:57,lh:45},
-        'B_FLAT_DUR':{n:[{l:'b',a:'b',s:0},{l:'c',a:null,s:2},{l:'d',a:null,s:4},{l:'e',a:'b',s:5},{l:'f',a:null,s:7},{l:'g',a:null,s:9},{l:'a',a:null,s:11}],rh:58,lh:46},
-        'H_DUR':     {n:[{l:'b',a:null,s:0},{l:'c',a:'#',s:2},{l:'d',a:'#',s:4},{l:'e',a:null,s:5},{l:'f',a:'#',s:7},{l:'g',a:'#',s:9},{l:'a',a:'#',s:11}],rh:59,lh:47},
-        'C_MOLL':    {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:'b',s:10}],rh:60,lh:48},
-        'CS_MOLL':   {n:[{l:'c',a:'#',s:0},{l:'d',a:'#',s:2},{l:'e',a:null,s:3},{l:'f',a:'#',s:5},{l:'g',a:'#',s:7},{l:'a',a:null,s:8},{l:'b',a:null,s:10}],rh:61,lh:49},
-        'D_MOLL':    {n:[{l:'d',a:null,s:0},{l:'e',a:null,s:2},{l:'f',a:null,s:3},{l:'g',a:null,s:5},{l:'a',a:null,s:7},{l:'b',a:'b',s:8},{l:'c',a:null,s:10}],rh:62,lh:50},
-        'EB_MOLL':   {n:[{l:'e',a:'b',s:0},{l:'f',a:null,s:2},{l:'g',a:'b',s:3},{l:'a',a:'b',s:5},{l:'b',a:'b',s:7},{l:'c',a:'b',s:8},{l:'d',a:'b',s:10}],rh:63,lh:51},
-        'E_MOLL':    {n:[{l:'e',a:null,s:0},{l:'f',a:'#',s:2},{l:'g',a:null,s:3},{l:'a',a:null,s:5},{l:'b',a:null,s:7},{l:'c',a:null,s:8},{l:'d',a:null,s:10}],rh:64,lh:52},
-        'F_MOLL':    {n:[{l:'f',a:null,s:0},{l:'g',a:null,s:2},{l:'a',a:'b',s:3},{l:'b',a:'b',s:5},{l:'c',a:null,s:7},{l:'d',a:'b',s:8},{l:'e',a:'b',s:10}],rh:53,lh:41},
-        'FS_MOLL':   {n:[{l:'f',a:'#',s:0},{l:'g',a:'#',s:2},{l:'a',a:null,s:3},{l:'b',a:null,s:5},{l:'c',a:'#',s:7},{l:'d',a:null,s:8},{l:'e',a:null,s:10}],rh:54,lh:42},
-        'G_MOLL':    {n:[{l:'g',a:null,s:0},{l:'a',a:null,s:2},{l:'b',a:'b',s:3},{l:'c',a:null,s:5},{l:'d',a:null,s:7},{l:'e',a:'b',s:8},{l:'f',a:null,s:10}],rh:55,lh:43},
-        'GS_MOLL':   {n:[{l:'g',a:'#',s:0},{l:'a',a:'#',s:2},{l:'b',a:null,s:3},{l:'c',a:'#',s:5},{l:'d',a:'#',s:7},{l:'e',a:null,s:8},{l:'f',a:'#',s:10}],rh:56,lh:44},
-        'A_MOLL':    {n:[{l:'a',a:null,s:0},{l:'b',a:null,s:2},{l:'c',a:null,s:3},{l:'d',a:null,s:5},{l:'e',a:null,s:7},{l:'f',a:null,s:8},{l:'g',a:null,s:10}],rh:57,lh:45},
-        'B_FLAT_MOLL':{n:[{l:'b',a:'b',s:0},{l:'c',a:null,s:2},{l:'d',a:'b',s:3},{l:'e',a:'b',s:5},{l:'f',a:null,s:7},{l:'g',a:'b',s:8},{l:'a',a:'b',s:10}],rh:58,lh:46},
-        'H_MOLL':    {n:[{l:'b',a:null,s:0},{l:'c',a:'#',s:2},{l:'d',a:null,s:3},{l:'e',a:null,s:5},{l:'f',a:'#',s:7},{l:'g',a:null,s:8},{l:'a',a:null,s:10}],rh:59,lh:47},
+    // ── Global Scale Encyclopedia Database ───────────────────────────────────
+    const SCALES_DATABASE={
+        // ── STANDARD (24 major + minor) ──────────────────────────────────────
+        'C_DUR':      {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:null,s:4},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:null,s:9},{l:'b',a:null,s:11}],rh:60,lh:48,cat:'STANDARD'},
+        'DB_DUR':     {n:[{l:'d',a:'b',s:0},{l:'e',a:'b',s:2},{l:'f',a:null,s:4},{l:'g',a:'b',s:5},{l:'a',a:'b',s:7},{l:'b',a:'b',s:9},{l:'c',a:null,s:11}],rh:61,lh:49,cat:'STANDARD'},
+        'D_DUR':      {n:[{l:'d',a:null,s:0},{l:'e',a:null,s:2},{l:'f',a:'#',s:4},{l:'g',a:null,s:5},{l:'a',a:null,s:7},{l:'b',a:null,s:9},{l:'c',a:'#',s:11}],rh:62,lh:50,cat:'STANDARD'},
+        'EB_DUR':     {n:[{l:'e',a:'b',s:0},{l:'f',a:null,s:2},{l:'g',a:null,s:4},{l:'a',a:'b',s:5},{l:'b',a:'b',s:7},{l:'c',a:null,s:9},{l:'d',a:null,s:11}],rh:63,lh:51,cat:'STANDARD'},
+        'E_DUR':      {n:[{l:'e',a:null,s:0},{l:'f',a:'#',s:2},{l:'g',a:'#',s:4},{l:'a',a:null,s:5},{l:'b',a:null,s:7},{l:'c',a:'#',s:9},{l:'d',a:'#',s:11}],rh:64,lh:52,cat:'STANDARD'},
+        'F_DUR':      {n:[{l:'f',a:null,s:0},{l:'g',a:null,s:2},{l:'a',a:null,s:4},{l:'b',a:'b',s:5},{l:'c',a:null,s:7},{l:'d',a:null,s:9},{l:'e',a:null,s:11}],rh:53,lh:41,cat:'STANDARD'},
+        'FS_DUR':     {n:[{l:'f',a:'#',s:0},{l:'g',a:'#',s:2},{l:'a',a:'#',s:4},{l:'b',a:null,s:5},{l:'c',a:'#',s:7},{l:'d',a:'#',s:9},{l:'e',a:'#',s:11}],rh:54,lh:42,cat:'STANDARD'},
+        'G_DUR':      {n:[{l:'g',a:null,s:0},{l:'a',a:null,s:2},{l:'b',a:null,s:4},{l:'c',a:null,s:5},{l:'d',a:null,s:7},{l:'e',a:null,s:9},{l:'f',a:'#',s:11}],rh:55,lh:43,cat:'STANDARD'},
+        'AB_DUR':     {n:[{l:'a',a:'b',s:0},{l:'b',a:'b',s:2},{l:'c',a:null,s:4},{l:'d',a:'b',s:5},{l:'e',a:'b',s:7},{l:'f',a:null,s:9},{l:'g',a:null,s:11}],rh:56,lh:44,cat:'STANDARD'},
+        'A_DUR':      {n:[{l:'a',a:null,s:0},{l:'b',a:null,s:2},{l:'c',a:'#',s:4},{l:'d',a:null,s:5},{l:'e',a:null,s:7},{l:'f',a:'#',s:9},{l:'g',a:'#',s:11}],rh:57,lh:45,cat:'STANDARD'},
+        'B_FLAT_DUR': {n:[{l:'b',a:'b',s:0},{l:'c',a:null,s:2},{l:'d',a:null,s:4},{l:'e',a:'b',s:5},{l:'f',a:null,s:7},{l:'g',a:null,s:9},{l:'a',a:null,s:11}],rh:58,lh:46,cat:'STANDARD'},
+        'H_DUR':      {n:[{l:'b',a:null,s:0},{l:'c',a:'#',s:2},{l:'d',a:'#',s:4},{l:'e',a:null,s:5},{l:'f',a:'#',s:7},{l:'g',a:'#',s:9},{l:'a',a:'#',s:11}],rh:59,lh:47,cat:'STANDARD'},
+        'C_MOLL':     {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'STANDARD'},
+        'CS_MOLL':    {n:[{l:'c',a:'#',s:0},{l:'d',a:'#',s:2},{l:'e',a:null,s:3},{l:'f',a:'#',s:5},{l:'g',a:'#',s:7},{l:'a',a:null,s:8},{l:'b',a:null,s:10}],rh:61,lh:49,cat:'STANDARD'},
+        'D_MOLL':     {n:[{l:'d',a:null,s:0},{l:'e',a:null,s:2},{l:'f',a:null,s:3},{l:'g',a:null,s:5},{l:'a',a:null,s:7},{l:'b',a:'b',s:8},{l:'c',a:null,s:10}],rh:62,lh:50,cat:'STANDARD'},
+        'EB_MOLL':    {n:[{l:'e',a:'b',s:0},{l:'f',a:null,s:2},{l:'g',a:'b',s:3},{l:'a',a:'b',s:5},{l:'b',a:'b',s:7},{l:'c',a:'b',s:8},{l:'d',a:'b',s:10}],rh:63,lh:51,cat:'STANDARD'},
+        'E_MOLL':     {n:[{l:'e',a:null,s:0},{l:'f',a:'#',s:2},{l:'g',a:null,s:3},{l:'a',a:null,s:5},{l:'b',a:null,s:7},{l:'c',a:null,s:8},{l:'d',a:null,s:10}],rh:64,lh:52,cat:'STANDARD'},
+        'F_MOLL':     {n:[{l:'f',a:null,s:0},{l:'g',a:null,s:2},{l:'a',a:'b',s:3},{l:'b',a:'b',s:5},{l:'c',a:null,s:7},{l:'d',a:'b',s:8},{l:'e',a:'b',s:10}],rh:53,lh:41,cat:'STANDARD'},
+        'FS_MOLL':    {n:[{l:'f',a:'#',s:0},{l:'g',a:'#',s:2},{l:'a',a:null,s:3},{l:'b',a:null,s:5},{l:'c',a:'#',s:7},{l:'d',a:null,s:8},{l:'e',a:null,s:10}],rh:54,lh:42,cat:'STANDARD'},
+        'G_MOLL':     {n:[{l:'g',a:null,s:0},{l:'a',a:null,s:2},{l:'b',a:'b',s:3},{l:'c',a:null,s:5},{l:'d',a:null,s:7},{l:'e',a:'b',s:8},{l:'f',a:null,s:10}],rh:55,lh:43,cat:'STANDARD'},
+        'GS_MOLL':    {n:[{l:'g',a:'#',s:0},{l:'a',a:'#',s:2},{l:'b',a:null,s:3},{l:'c',a:'#',s:5},{l:'d',a:'#',s:7},{l:'e',a:null,s:8},{l:'f',a:'#',s:10}],rh:56,lh:44,cat:'STANDARD'},
+        'A_MOLL':     {n:[{l:'a',a:null,s:0},{l:'b',a:null,s:2},{l:'c',a:null,s:3},{l:'d',a:null,s:5},{l:'e',a:null,s:7},{l:'f',a:null,s:8},{l:'g',a:null,s:10}],rh:57,lh:45,cat:'STANDARD'},
+        'B_FLAT_MOLL':{n:[{l:'b',a:'b',s:0},{l:'c',a:null,s:2},{l:'d',a:'b',s:3},{l:'e',a:'b',s:5},{l:'f',a:null,s:7},{l:'g',a:'b',s:8},{l:'a',a:'b',s:10}],rh:58,lh:46,cat:'STANDARD'},
+        'H_MOLL':     {n:[{l:'b',a:null,s:0},{l:'c',a:'#',s:2},{l:'d',a:null,s:3},{l:'e',a:null,s:5},{l:'f',a:'#',s:7},{l:'g',a:null,s:8},{l:'a',a:null,s:10}],rh:59,lh:47,cat:'STANDARD'},
+        // ── MODAL / CHURCH MODES (all from C) ────────────────────────────────
+        'IONIAN':     {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:null,s:4},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:null,s:9},{l:'b',a:null,s:11}],rh:60,lh:48,cat:'MODAL'},
+        'DORIAN':     {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:null,s:9},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'MODAL'},
+        'PHRYGIAN':   {n:[{l:'c',a:null,s:0},{l:'d',a:'b',s:1},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'MODAL'},
+        'LYDIAN':     {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:null,s:4},{l:'f',a:'#',s:6},{l:'g',a:null,s:7},{l:'a',a:null,s:9},{l:'b',a:null,s:11}],rh:60,lh:48,cat:'MODAL'},
+        'MIXOLYDIAN': {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:null,s:4},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:null,s:9},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'MODAL'},
+        'AEOLIAN':    {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'MODAL'},
+        'LOCRIAN':    {n:[{l:'c',a:null,s:0},{l:'d',a:'b',s:1},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:'b',s:6},{l:'a',a:'b',s:8},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'MODAL'},
+        // ── EXOTIC / WORLD SCALES (all from C) ───────────────────────────────
+        // Middle East  [0,1,4,5,7,8,10] → C Db E F G Ab Bb
+        'MIDDLE_EAST':{n:[{l:'c',a:null,s:0},{l:'d',a:'b',s:1},{l:'e',a:null,s:4},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'EXOTIC'},
+        // Central Europe [0,2,3,6,7,8,11] → C D Eb F# G Ab B
+        'CENT_EUROPE':{n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'f',a:'#',s:6},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:null,s:11}],rh:60,lh:48,cat:'EXOTIC'},
+        // Indian Raga  [0,1,4,6,7,8,11] → C Db E F# G Ab B
+        'INDIAN_RAGA':{n:[{l:'c',a:null,s:0},{l:'d',a:'b',s:1},{l:'e',a:null,s:4},{l:'f',a:'#',s:6},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:null,s:11}],rh:60,lh:48,cat:'EXOTIC'},
+        // China Penta  [0,2,4,7,9]       → C D E G A  (5 notes)
+        'CHINA_PENTA':{n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:null,s:4},{l:'g',a:null,s:7},{l:'a',a:null,s:9}],rh:60,lh:48,cat:'EXOTIC'},
+        // Blues N.Am.  [0,3,5,6,7,10]    → C Eb F Gb G(n) Bb  (6 notes)
+        'NA_BLUES':   {n:[{l:'c',a:null,s:0},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:'b',s:6},{l:'g',a:'n',s:7},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'EXOTIC'},
+        // Japan Hirajoshi [0,2,3,7,8]    → C D Eb G Ab  (5 notes)
+        'JAPAN_HIRA': {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'g',a:null,s:7},{l:'a',a:'b',s:8}],rh:60,lh:48,cat:'EXOTIC'},
+        // West African [0,2,4,7,9]       → C D E G A   (5 notes)
+        'WEST_AFRICA':{n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:null,s:4},{l:'g',a:null,s:7},{l:'a',a:null,s:9}],rh:60,lh:48,cat:'EXOTIC'},
+        // South America [0,2,3,5,7,8,10] → C D Eb F G Ab Bb
+        'S_AMERICA':  {n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:'b',s:10}],rh:60,lh:48,cat:'EXOTIC'},
+        // Central Asia [0,1,4,5,7,8,11]  → C Db E F G Ab B
+        'CENT_ASIA':  {n:[{l:'c',a:null,s:0},{l:'d',a:'b',s:1},{l:'e',a:null,s:4},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:null,s:11}],rh:60,lh:48,cat:'EXOTIC'},
+        // Scandinavian [0,2,3,5,7,8,11]  → C D Eb F G Ab B
+        'SCANDINAVIAN':{n:[{l:'c',a:null,s:0},{l:'d',a:null,s:2},{l:'e',a:'b',s:3},{l:'f',a:null,s:5},{l:'g',a:null,s:7},{l:'a',a:'b',s:8},{l:'b',a:null,s:11}],rh:60,lh:48,cat:'EXOTIC'},
     };
     const NOTE_CHROMA={c:0,d:2,e:4,f:5,g:7,a:9,b:11};
-    const fingerings={std:{rh1:[1,2,3,1,2,3,4,5,4,3,2,1,3,2,1],rh2:[1,2,3,1,2,3,4,1,2,3,1,2,3,4,5,4,3,2,1,3,2,1,4,3,2,1,3,2,1],lh1:[5,4,3,2,1,3,2,1,2,3,1,2,3,4,5],lh2:[5,4,3,2,1,3,2,1,4,3,2,1,3,2,1,2,3,1,2,3,4,1,2,3,1,2,3,4,5]}};
+    // Fingerings: std=7-note, penta=5-note, hex=6-note
+    // Arrays: rh1/lh1 = 1-octave (2n+1 notes), rh2/lh2 = 2-octave (4n+1 notes)
+    // 2-oct rule: final finger of oct1 becomes '1' (thumb tuck) to start oct2
+    // Closest-Comfort: avoid thumb(1)/pinky(5) on BLACK keys during tuck
+    const fingerings={
+        std:{
+            rh1:[1,2,3,1,2,3,4,5,4,3,2,1,3,2,1],
+            rh2:[1,2,3,1,2,3,4,1,2,3,1,2,3,4,5,4,3,2,1,3,2,1,4,3,2,1,3,2,1],
+            lh1:[5,4,3,2,1,3,2,1,2,3,1,2,3,4,5],
+            lh2:[5,4,3,2,1,3,2,1,4,3,2,1,3,2,1,2,3,1,2,3,4,1,2,3,1,2,3,4,5]
+        },
+        penta:{
+            // 5-note, 1-oct: 11 positions (5+1 up + 5 down)
+            rh1:[1,2,3,1,2,3,2,1,3,2,1],
+            lh1:[5,4,3,2,1,2,1,2,3,4,5],
+            // 5-note, 2-oct: 21 positions; oct1 ends on 2 → tuck 1 for oct2
+            rh2:[1,2,3,1,2,1,2,3,1,2,3,2,1,3,2,1,2,1,3,2,1],
+            lh2:[5,4,3,2,1,5,4,3,2,1,2,1,2,3,4,5,1,2,3,4,5]
+        },
+        hex:{
+            // 6-note, 1-oct: 13 positions (6+1 up + 6 down)
+            // C Eb F Gb G Bb — avoid thumb on black during tuck; tuck on F(white)→Gb or Gb→G(white)
+            rh1:[1,2,3,4,1,2,3,2,1,4,3,2,1],
+            lh1:[5,4,3,2,1,2,1,2,1,2,3,4,5],
+            // 6-note, 2-oct: 25 positions; oct1 ends on 2 → tuck 1 for oct2
+            rh2:[1,2,3,4,1,2,1,2,3,4,1,2,3,2,1,4,3,2,1,2,1,4,3,2,1],
+            lh2:[5,4,3,2,1,2,5,4,3,2,1,2,1,2,1,2,3,4,5,2,1,2,3,4,5]
+        }
+    };
 
     function getVexKey(midi,noteLetter,acc){
+        // 'n' = natural sign: no semitone offset, but explicit natural accidental on staff
         const accVal=acc==='#'?1:acc==='b'?-1:0;
         const nc=NOTE_CHROMA[noteLetter]+accVal;
         const octave=Math.round((midi-nc)/12)-1;
         return{key:noteLetter+'/'+octave,accidental:acc};
     }
     function buildScaleSequence(scaleKey,octaves){
-        const def=SCALE_DEFS_2OCT[scaleKey];if(!def)return[];
+        const def=SCALES_DATABASE[scaleKey];if(!def)return[];
+        const nLen=def.n.length;
         const seq=[];
         for(let oct=0;oct<octaves;oct++){
-            const limit=(oct===octaves-1)?8:7;
+            const limit=(oct===octaves-1)?(nLen+1):nLen;
             for(let i=0;i<limit;i++){
-                const noteIdx=i%7;const nd=def.n[noteIdx];
-                const octShift=(i===7)?(oct+1):oct;
+                const noteIdx=i%nLen;const nd=def.n[noteIdx];
+                const octShift=(i===nLen)?(oct+1):oct;
                 const mRH=def.rh+octShift*12+nd.s;const mLH=def.lh+octShift*12+nd.s;
                 const vRH=getVexKey(mRH,nd.l,nd.a);const vLH=getVexKey(mLH,nd.l,nd.a);
                 seq.push({m_rh:mRH,m_lh:mLH,rh_key:vRH.key,rh_acc:vRH.accidental,lh_key:vLH.key,lh_acc:vLH.accidental,nl:nd.l,na:nd.a});
@@ -463,8 +560,12 @@
         }
         const descTop=seq.length-2;
         for(let i=descTop;i>=0;i--)seq.push({...seq[i]});
-        const rhF=fingerings.std['rh'+octaves]||fingerings.std.rh2;
-        const lhF=fingerings.std['lh'+octaves]||fingerings.std.lh2;
+        // Select fingering set based on note count per octave
+        let fset=fingerings.std;
+        if(nLen===5)fset=fingerings.penta;
+        else if(nLen===6)fset=fingerings.hex;
+        const rhF=fset['rh'+octaves]||fset.rh2||fingerings.std.rh2;
+        const lhF=fset['lh'+octaves]||fset.lh2||fingerings.std.lh2;
         seq.forEach((n,i)=>{n.f_rh=rhF[i]||'';n.f_lh=lhF[i]||'';});
         return seq;
     }
@@ -529,6 +630,7 @@
             }
         }catch(e){console.error('VexFlow draw error:',e);}
         updateKeyLeds();
+        paintScaleKeys(document.getElementById('scaleSelectValue').value);
     }
 
     function renderScaleSystem(ctx,block,x,y,activeIndex,showClef){
@@ -606,6 +708,7 @@
             :['HINTS OFF','NOTE NAMES','NOTE NAMES + FINGERING','NOTE NAMES + FINGERING + LEDS'];
         setInfoBar(labels[hintState],document.getElementById('btnHints'));
         updateKeyLeds();draw();
+        paintScaleKeys(document.getElementById('scaleSelectValue').value);
     }
     function updateKeyLeds(){
         document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('chord-hint'));
@@ -615,11 +718,23 @@
         if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-hint');}
         if(activeLH){const el=document.getElementById('k-'+note.m_lh);if(el)el.classList.add('chord-hint');}
     }
+    // Lights the LED dot above every key that belongs to the scale (respects hints level + octave button + active clefs)
+    function paintScaleKeys(scaleKey){
+        document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('scale-hint'));
+        if(!showLeds)return;
+        if(!scaleKey||!SCALES_DATABASE[scaleKey])return;
+        const seq=buildScaleSequence(scaleKey,selectedOctaves);
+        seq.forEach(n=>{
+            if(activeRH){const el=document.getElementById('k-'+n.m_rh);if(el)el.classList.add('scale-hint');}
+            if(activeLH){const el=document.getElementById('k-'+n.m_lh);if(el)el.classList.add('scale-hint');}
+        });
+    }
     function cycleClef(){
         if(helpActive)return;clefState=(clefState+1)%3;activeRH=clefState!==2;activeLH=clefState!==1;
         document.getElementById('clefRH').style.color=activeRH?'#fff':'#444';
         document.getElementById('clefLH').style.color=activeLH?'#fff':'#444';
         if(isRunning)stopPractice();buildSequence();draw();
+        paintScaleKeys(document.getElementById('scaleSelectValue').value);
     }
     function cycleMode(dir){if(helpActive)return;currentModeIdx=(currentModeIdx+dir+MODES.length)%MODES.length;document.getElementById('lcdModeText').innerText=MODES[currentModeIdx];if(isRunning)stopPractice();buildSequence();draw();}
     function cycleRhythm(dir){
@@ -633,21 +748,57 @@
         document.getElementById('btnOctave').classList.toggle('active',selectedOctaves===2);
         setInfoBar((currentLang==='HU'?selectedOctaves+' OKTÁV':selectedOctaves+' OCTAVE'),null);
         if(isRunning)stopPractice();buildSequence();draw();
+        paintScaleKeys(document.getElementById('scaleSelectValue').value);
     }
 
     // ── Scale selection ───────────────────────────────────────────────────────
-    const SCALE_NAMES={EN:{'C_DUR':'C MAJOR','DB_DUR':'Db MAJOR','D_DUR':'D MAJOR','EB_DUR':'Eb MAJOR','E_DUR':'E MAJOR','F_DUR':'F MAJOR','FS_DUR':'F# MAJOR','G_DUR':'G MAJOR','AB_DUR':'Ab MAJOR','A_DUR':'A MAJOR','B_FLAT_DUR':'Bb MAJOR','H_DUR':'B MAJOR','C_MOLL':'C MINOR','CS_MOLL':'C# MINOR','D_MOLL':'D MINOR','EB_MOLL':'Eb MINOR','E_MOLL':'E MINOR','F_MOLL':'F MINOR','FS_MOLL':'F# MINOR','G_MOLL':'G MINOR','GS_MOLL':'G# MINOR','A_MOLL':'A MINOR','B_FLAT_MOLL':'Bb MINOR','H_MOLL':'B MINOR'},HU:{'C_DUR':'C-dúr','DB_DUR':'Desz-dúr','D_DUR':'D-dúr','EB_DUR':'Esz-dúr','E_DUR':'E-dúr','F_DUR':'F-dúr','FS_DUR':'Fisz-dúr','G_DUR':'G-dúr','AB_DUR':'Asz-dúr','A_DUR':'A-dúr','B_FLAT_DUR':'B-dúr','H_DUR':'H-dúr','C_MOLL':'C-moll','CS_MOLL':'Cisz-moll','D_MOLL':'D-moll','EB_MOLL':'Esz-moll','E_MOLL':'E-moll','F_MOLL':'F-moll','FS_MOLL':'Fisz-moll','G_MOLL':'G-moll','GS_MOLL':'Gisz-moll','A_MOLL':'A-moll','B_FLAT_MOLL':'B-moll','H_MOLL':'H-moll'}};
-    const scaleOrder=Object.keys(SCALE_DEFS_2OCT).map(k=>({v:k,n:SCALE_NAMES.EN[k]||k}));
+    const SCALE_NAMES={
+        EN:{
+            // Standard
+            'C_DUR':'C MAJOR','DB_DUR':'Db MAJOR','D_DUR':'D MAJOR','EB_DUR':'Eb MAJOR','E_DUR':'E MAJOR','F_DUR':'F MAJOR','FS_DUR':'F# MAJOR','G_DUR':'G MAJOR','AB_DUR':'Ab MAJOR','A_DUR':'A MAJOR','B_FLAT_DUR':'Bb MAJOR','H_DUR':'B MAJOR',
+            'C_MOLL':'C MINOR','CS_MOLL':'C# MINOR','D_MOLL':'D MINOR','EB_MOLL':'Eb MINOR','E_MOLL':'E MINOR','F_MOLL':'F MINOR','FS_MOLL':'F# MINOR','G_MOLL':'G MINOR','GS_MOLL':'G# MINOR','A_MOLL':'A MINOR','B_FLAT_MOLL':'Bb MINOR','H_MOLL':'B MINOR',
+            // Modal
+            'IONIAN':'C IONIAN','DORIAN':'C DORIAN','PHRYGIAN':'C PHRYGIAN','LYDIAN':'C LYDIAN','MIXOLYDIAN':'C MIXOLYD','AEOLIAN':'C AEOLIAN','LOCRIAN':'C LOCRIAN',
+            // Exotic
+            'MIDDLE_EAST':'MID EAST','CENT_EUROPE':'CENT EUR','INDIAN_RAGA':'INDIA','CHINA_PENTA':'CHINA','NA_BLUES':'NA BLUES','JAPAN_HIRA':'HIRAJOSHI','WEST_AFRICA':'W.AFRICA','S_AMERICA':'S.AMERICA','CENT_ASIA':'C.ASIA','SCANDINAVIAN':'SCAND'
+        },
+        HU:{
+            // Standard
+            'C_DUR':'C-dúr','DB_DUR':'Desz-dúr','D_DUR':'D-dúr','EB_DUR':'Esz-dúr','E_DUR':'E-dúr','F_DUR':'F-dúr','FS_DUR':'Fisz-dúr','G_DUR':'G-dúr','AB_DUR':'Asz-dúr','A_DUR':'A-dúr','B_FLAT_DUR':'B-dúr','H_DUR':'H-dúr',
+            'C_MOLL':'C-moll','CS_MOLL':'Cisz-moll','D_MOLL':'D-moll','EB_MOLL':'Esz-moll','E_MOLL':'E-moll','F_MOLL':'F-moll','FS_MOLL':'Fisz-moll','G_MOLL':'G-moll','GS_MOLL':'Gisz-moll','A_MOLL':'A-moll','B_FLAT_MOLL':'B-moll','H_MOLL':'H-moll',
+            // Modal
+            'IONIAN':'C IÓN','DORIAN':'C DÓR','PHRYGIAN':'C FRÍG','LYDIAN':'C LÍD','MIXOLYDIAN':'C MIXOLÍD','AEOLIAN':'C AEOL','LOCRIAN':'C LOKR',
+            // Exotic
+            'MIDDLE_EAST':'KÖZEL-K','CENT_EUROPE':'KP-EURÓPA','INDIAN_RAGA':'INDIAI','CHINA_PENTA':'KÍNA','NA_BLUES':'NA BLUES','JAPAN_HIRA':'HIRAJOSHI','WEST_AFRICA':'NY-AFRIK','S_AMERICA':'DÉL-AM','CENT_ASIA':'KP-ÁZSIA','SCANDINAVIAN':'SKANDINÁV'
+        }
+    };
+    // scaleOrder: STANDARD first, then MODAL, then EXOTIC
+    const _stdKeys=Object.keys(SCALES_DATABASE).filter(k=>SCALES_DATABASE[k].cat==='STANDARD');
+    const _modalKeys=Object.keys(SCALES_DATABASE).filter(k=>SCALES_DATABASE[k].cat==='MODAL');
+    const _exoticKeys=Object.keys(SCALES_DATABASE).filter(k=>SCALES_DATABASE[k].cat==='EXOTIC');
+    const scaleOrder=[..._stdKeys,..._modalKeys,..._exoticKeys].map(k=>({v:k,n:SCALE_NAMES.EN[k]||k,cat:SCALES_DATABASE[k].cat}));
     function getScaleName(val){return SCALE_NAMES[currentLang][val]||SCALE_NAMES.EN[val]||val;}
+    const CAT_LABELS={
+        EN:{STANDARD:'Scale',MODAL:'Modal',EXOTIC:'Exotic'},
+        HU:{STANDARD:'Skála',MODAL:'Modális',EXOTIC:'Egzotikus'}
+    };
+    function _updateScaleOled(val){
+        const cat=(SCALES_DATABASE[val]||{}).cat||'STANDARD';
+        const hdr=document.getElementById('oledScaleHeader');
+        if(hdr)hdr.innerText=(CAT_LABELS[currentLang]||CAT_LABELS.EN)[cat]||'Scale';
+        document.getElementById('lcdScaleText').innerText=getScaleName(val);
+    }
     let currentScaleIdx=0;
     function cycleScale(dir){
         if(helpActive)return;currentScaleIdx=(currentScaleIdx+dir+scaleOrder.length)%scaleOrder.length;
-        const s=scaleOrder[currentScaleIdx];document.getElementById('lcdScaleText').innerText=getScaleName(s.v);document.getElementById('scaleSelectValue').value=s.v;
+        const s=scaleOrder[currentScaleIdx];_updateScaleOled(s.v);document.getElementById('scaleSelectValue').value=s.v;
+        paintScaleKeys(s.v);
         if(isRunning)stopPractice();buildSequence();draw();syncWheelToScale();
     }
     function selectPatch(val,name){
         currentScaleIdx=scaleOrder.findIndex(s=>s.v===val);if(currentScaleIdx<0)currentScaleIdx=0;
-        document.getElementById('lcdScaleText').innerText=getScaleName(val);document.getElementById('scaleSelectValue').value=val;
+        _updateScaleOled(val);document.getElementById('scaleSelectValue').value=val;
+        paintScaleKeys(val);
         closePatchBrowser();if(isRunning)stopPractice();buildSequence();draw();syncWheelToScale();
     }
     function buildSequence(){
@@ -660,7 +811,9 @@
             const loopSeq=l===0?rawSeq:rawSeq.slice(1);
             for(let i=0;i<loopSeq.length;i+=blockSize){seqBlocks.push(loopSeq.slice(i,i+blockSize).map(n=>({...n})));}
         }
-        currentBlockIndex=0;currentNoteInBlock=0;syncMetroTimeSig();updateKeyLeds();
+        currentBlockIndex=0;currentNoteInBlock=0;syncMetroTimeSig();
+        paintScaleKeys(scaleKey);
+        updateKeyLeds();
     }
 
     // ── Practice & Demo ───────────────────────────────────────────────────────
@@ -741,7 +894,42 @@
     },true);
     function toggleFullScreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen();}
     document.addEventListener('fullscreenchange',()=>{document.getElementById('btnFullscreen').classList.toggle('active',!!document.fullscreenElement);});
-    function openPatchBrowser(){document.getElementById('patchBrowserModal').style.display='flex';}
+    // ── Scale Encyclopedia Browser ────────────────────────────────────────────
+    let _activeCat='STANDARD';
+    const CAT_SECTION_IDS=['STANDARD','MODAL','EXOTIC'];
+    const CAT_LABELS_LONG={
+        EN:{STANDARD:'STANDARD',MODAL:'MODAL (CHURCH)',EXOTIC:'EXOTIC (WORLD)'},
+        HU:{STANDARD:'SZABVÁNYOS',MODAL:'MODÁLIS (EGYHÁZI)',EXOTIC:'EGZOTIKUS (VILÁG)'}
+    };
+    function selectCategory(cat){
+        _activeCat=cat;
+        CAT_SECTION_IDS.forEach(c=>{
+            const sec=document.getElementById('catSection'+c);
+            const btn=document.getElementById('catBtn'+c);
+            if(sec)sec.style.display=(c===cat)?'block':'none';
+            if(btn){btn.style.background=(c===cat)?'#1a1a1d':'#111';btn.style.color=(c===cat)?'#b3e6ff':'#555';}
+        });
+        // Update category label text for current language
+        const L=currentLang||'EN';
+        const labels=CAT_LABELS_LONG[L]||CAT_LABELS_LONG.EN;
+        const lblModal=document.getElementById('pbLblModal');
+        const lblExotic=document.getElementById('pbLblExotic');
+        if(lblModal)lblModal.innerText=labels.MODAL+' — GREEK MODES FROM C';
+        if(lblExotic)lblExotic.innerText=labels.EXOTIC+' — ALL FROM C';
+        const btnMod=document.getElementById('catBtnMODAL');
+        const btnExo=document.getElementById('catBtnEXOTIC');
+        const btnStd=document.getElementById('catBtnSTANDARD');
+        if(btnMod)btnMod.innerText=labels.MODAL;
+        if(btnExo)btnExo.innerText=labels.EXOTIC;
+        if(btnStd)btnStd.innerText=labels.STANDARD;
+    }
+    function openPatchBrowser(){
+        // Auto-jump to the category of the currently selected scale
+        const curKey=document.getElementById('scaleSelectValue').value;
+        const curCat=(SCALES_DATABASE[curKey]||{}).cat||'STANDARD';
+        document.getElementById('patchBrowserModal').style.display='flex';
+        selectCategory(curCat);
+    }
     function closePatchBrowser(){document.getElementById('patchBrowserModal').style.display='none';}
     const modules=[{name:'EAR TRAIN',url:'hallasfejleszto.html'},{name:'SIGHT READ',url:'kottaolvasas.html'},{name:'CHORDS',url:'akkordok.html'},{name:'SCALES',url:'skalak.html'},{name:'HANON',url:'hanon.html'},{name:'CZERNY',url:'czerny.html'}];
     let currentModuleIdx=3;
