@@ -167,16 +167,31 @@
         </div>
     </div>
     <div id="infoModal" class="modal-overlay">
-        <div class="modal-content" style="max-width:640px;text-align:left;">
+        <div class="modal-content" style="max-width:640px;text-align:left;max-height:90vh;overflow-y:auto;">
             <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;color:var(--oled-text);border-bottom:1px solid #333;padding-bottom:15px;">Scales — Module Guide</h2>
-            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter';" id="txt-howBody">Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note highlights in blue.</p></div>
-            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl0">Toggle Treble and Bass clef staves.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Scale ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Cycle through all 24 major and minor scales.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Sprint (1×), Marathon (3×), Training (endless loop).</span></div>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.6;margin:0;font-family:'Inter';" id="txt-howBody">Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note highlights in blue.</p>
             </div>
-            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter';" id="txt-tipBody">Start with Sprint mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p></div>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl0">Toggle Treble and Bass clef staves.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl4">Cycles: 1× note names, 2× + fingering, 3× + keyboard LED visualization, 4× all off.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Scale ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl1">Cycle through scales. Click the SCALE display to open the Encyclopedia.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl2">Sprint (1×), Marathon (3×), Training (endless loop).</span></div>
+            </div>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-encTitle">Scale Encyclopedia</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.6;margin:0;font-family:'Inter';" id="txt-encBody">Click the SCALE display to open the Scale Encyclopedia. Browse Standard, Modal (Church) and Exotic (World) scales from around the globe.</p>
+            </div>
+            <div style="margin-bottom:18px;">
+                <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-wheelTitle">Circle of Fifths</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.6;margin:0;font-family:'Inter';" id="txt-wheelBody">Use the Wheel icon to open the Circle of Fifths. Click sectors to jump to keys and see I-IV-V relationships.</p>
+            </div>
+            <div style="margin-bottom:22px;">
+                <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div>
+                <p style="font-size:14px;color:#aaa;line-height:1.6;margin:0;font-family:'Inter';" id="txt-tipBody">Start with Sprint mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.</p>
+            </div>
             <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
         </div>
     </div>
@@ -363,6 +378,42 @@
     // ── Language ──────────────────────────────────────────────────────────────
     let currentLang='EN';
     const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']};
+    const MODAL_STRINGS={
+        EN:{
+            'txt-infoTitle': 'Scales — Module Guide',
+            'txt-howTitle':  'How It Works',
+            'txt-howBody':   'Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note highlights in blue.',
+            'txt-ctrlTitle': 'Controls',
+            'txt-ctrl0':     'Toggle Treble and Bass clef staves.',
+            'txt-ctrl4':     'Cycles: 1× note names, 2× + fingering, 3× + keyboard LED visualization, 4× all off.',
+            'txt-ctrl1':     'Cycle through scales. Click the SCALE display to open the Encyclopedia.',
+            'txt-ctrl2':     'Sprint (1×), Marathon (3×), Training (endless loop).',
+            'txt-encTitle':  'Scale Encyclopedia',
+            'txt-encBody':   'Click the SCALE display to open the Scale Encyclopedia. Browse Standard, Modal (Church) and Exotic (World) scales from around the globe.',
+            'txt-wheelTitle':'Circle of Fifths',
+            'txt-wheelBody': 'Use the Wheel icon to open the Circle of Fifths. Click sectors to jump to keys and see I-IV-V relationships.',
+            'txt-tipTitle':  'Learning Tip',
+            'txt-tipBody':   'Start with Sprint mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',
+            'txt-gotIt':     'Got It'
+        },
+        HU:{
+            'txt-infoTitle': 'Skálák — Modul útmutató',
+            'txt-howTitle':  'Hogyan működik',
+            'txt-howBody':   'Válassz skálát és nyomj Startot. A hangok megjelennek a kottán — játszd le őket sorban a zongorán. Az aktív hang kékkel jelölődik.',
+            'txt-ctrlTitle': 'Vezérlők',
+            'txt-ctrl0':     'Violin és basszus kulcs be/ki kapcsolása.',
+            'txt-ctrl4':     'Körkörösen kapcsol: 1× hangnevek, 2× + ujjrend, 3× billentyű LED vizualizáció, 4× mind ki.',
+            'txt-ctrl1':     'Váltás a skálák között. Kattints a SKÁLA kijelzőre az Enciklopédia megnyitásához.',
+            'txt-ctrl2':     'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',
+            'txt-encTitle':  'Skála Enciklopédia',
+            'txt-encBody':   'Kattints a SKÁLA kijelzőre a Skála Enciklopédia megnyitásához. Böngészd a Szabványos, Modális (Egyházi) és Egzotikus (Világi) skálákat a világ minden tájáról.',
+            'txt-wheelTitle':'Kvintkör',
+            'txt-wheelBody': 'Használd a Kerék ikont a kvintkör megnyitásához. Kattints a szektorokra a hangnemváltáshoz és az I-IV-V fokok megjelenítéséhez.',
+            'txt-tipTitle':  'Tanulási tipp',
+            'txt-tipBody':   'Kezdj Sprint módban és 1 oktávval. Ha tisztán tudod játszani a skálát, válts 2 oktávra és Maratonra az izommemória fejlesztéséhez.',
+            'txt-gotIt':     'Értettem'
+        }
+    };
     function setLang(lang){
         localStorage.setItem('akira_lang',lang);currentLang=lang;
         document.getElementById('btnLangEN').classList.toggle('active',lang==='EN');
@@ -374,6 +425,9 @@
         _updateScaleOled(curVal);
         const R=RHYTHMS[currentRhythmIdx];
         document.getElementById('lcdRhythm').innerText=lang==='HU'?R.labelHU:R.label;
+        // Update info modal text
+        const T=MODAL_STRINGS[lang]||MODAL_STRINGS.EN;
+        Object.keys(T).forEach(id=>{const el=document.getElementById(id);if(el)el.innerText=T[id];});
         if(helpActive)setInfoBar(lang==='HU'?'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT':'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',null);
         else if(!isRunning)setInfoBar(lang==='HU'?'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT':'SELECT SCALE OR PRESS START',null);
     }
