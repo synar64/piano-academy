@@ -26,6 +26,10 @@
         .synth-core { flex-grow:1; display:flex; flex-direction:column; position:relative; }
         .info-bar-integrated { width:100%; height:45px; background-color:var(--lcd-bg-dark); border-bottom:2px solid #080808; display:flex; align-items:center; z-index:10; position:relative; overflow:hidden; }
         .info-bar-text { font-family:'Share Tech Mono',monospace; font-size:18px; font-weight:bold; color:var(--oled-text); text-transform:uppercase; letter-spacing:2px; position:absolute; white-space:nowrap; }
+        @keyframes oled-l3-pulse { 0%,100%{opacity:1;} 50%{opacity:0.38;} }
+        .oled-lvl-lbl { font-size:15px;color:var(--lcd-label-color);letter-spacing:0.5px;font-weight:bold; }
+        .oled-l3-uncal { animation:oled-l3-pulse 1.15s ease-in-out infinite; }
+        .oled-l3-bang { color:#ff9f1c;font-weight:800;margin-left:4px; }
         .settings-bar { position:absolute; bottom:100%; left:0; width:100%; height:85px; background:var(--lcd-bg-dark); display:none; align-items:center; justify-content:space-around; z-index:50; border-top:2px solid #333; box-shadow:0 -10px 30px #000; padding:0 20px; box-sizing:border-box; }
         .settings-control { display:flex; flex-direction:column; align-items:center; gap:8px; width:150px; z-index:2; position:relative; }
         .settings-control label { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono',monospace; cursor:pointer; text-transform:uppercase; font-weight:bold; }
@@ -122,6 +126,7 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Cycles through: 1× note names on staff, 2× + key LED highlights, 3× all off.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#557799;font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:bold;">C</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrlC">Keyboard labels: 1× middle C (C4) marker, 2× all white key names (HU uses H for B), 3× off.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-family:'Share Tech Mono';font-size:12px;font-weight:bold;">L1–L3</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Level: (1) Basic — white keys, treble C4–G5 &amp; bass F2–H3. (2) Intermediate — same + ♯/♭. (3) Pro — chromatic in clef range (treble ≥ C4, bass ≤ H3), or narrowed by connected MIDI device.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#557799;font-family:'Share Tech Mono';font-size:11px;font-weight:bold;flex-shrink:0;">MIDI</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrlMidiCal"><strong>MIDI calibration (Level 3):</strong> Before you start, play your controller’s lowest and highest keys once. The app learns your range and remembers it after refresh (e.g. 37-key boards).</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:18px;">♩</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3b">Adds note values (quarter, half, whole notes). Can be combined with chromatic.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Session: one round then results. Flow: endless auto-continue.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Level ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Diatonic (white keys) → Rhythm (note values) → Chromatic (all keys).</span></div>
@@ -304,6 +309,7 @@
             'txt-ctrl2':'Cycles through: 1× note names on staff, 2× + key LED highlights, 3× all off.',
             'txt-ctrlC':'Keyboard labels: 1× middle C (C4) marker, 2× all white key names (B in English, H in Hungarian), 3× off.',
             'txt-ctrl3':'Level: (1) Basic — white keys, treble C4–G5 &amp; bass F2–H3. (2) Intermediate — same + ♯/♭. (3) Pro — chromatic in clef-appropriate range (treble ≥ C4, bass ≤ H3), or narrowed after ≥1 octave on a connected MIDI device.',
+            'txt-ctrlMidiCal':'<strong>MIDI calibration (Level 3):</strong> Before you start, play your controller’s lowest and highest keys once. The app learns your range and saves it (survives page refresh — e.g. 37-key controllers).',
             'txt-ctrl3b':'Adds note values (quarter, half, whole notes). Works with any level.',
             'txt-ctrl4':'Session: one round then results. Flow: endless auto-continue.',
             'txt-ctrl5':'Rhythm adds note lengths. Use the Level button (L1–L3) for diatonic vs chromatic pools.',
@@ -312,6 +318,7 @@
             'txt-tipBody':'The eye button cycles through three assist levels: note names on the staff, then key LEDs on the piano, then off. Start with both aids, then gradually turn them off as your reading improves.',
             'txt-gotIt':'Got It',
             ready:'SYSTEM READY — SELECT MODE AND PRESS START',
+            readyProCalibrate:'READY — TAP LOWEST &amp; HIGHEST KEYS TO CALIBRATE RANGE (PRO)',
             helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
             // gomb feliratok
             
@@ -351,6 +358,7 @@
             'txt-ctrl2':'Körkörösen kapcsol: 1× hangnevek a kottán, 2× + billentyű LED jelzés, 3× mind ki.',
             'txt-ctrlC':'Billentyűfeliratok: 1× középső C (C4) jelölés, 2× minden fehér billentyű neve (B helyett H), 3× kikapcsolva.',
             'txt-ctrl3':'Nehézség: (1) Alap — fehér bill., vl. C4–G5, bsz. F2–H3. (2) Közép — ugyanaz + ♯/♭. (3) Pro — kromatikus a kulcshoz illően (vl. legalább C4, bsz. legfeljebb H3), vagy MIDI eszköz által szűkítve.',
+            'txt-ctrlMidiCal':'<strong>MIDI kalibrálás (3. szint):</strong> Indítás előtt üsd le egyszer a legalsó és a legfelső billentyűt. A program eltárolja a tartományt (localStorage), az oldal frissítése után is megmarad (pl. Launchkey 37).',
             'txt-ctrl3b':'Hanghosszak (negyed, fél, egész). Bármely szinttel használható.',
             'txt-ctrl4':'Vizsga: egy kör, majd eredmény. Folyamat: végtelen automatikus folytatás.',
             'txt-ctrl5':'A ritmus hanghosszakat ad. A szintet az L1–L3 gombbal választod.',
@@ -359,6 +367,7 @@
             'txt-tipBody':'A szem ikon három segítségi szintet kínál: hangnevek a kottán, majd billentyű LED-ek, majd kikapcsol. Kezdd mindkét segítséggel, majd fokozatosan kapcsold ki ahogy fejlődsz.',
             'txt-gotIt':'Értettem',
             ready:'RENDSZER KÉSZ — VÁLASSZ MÓDOT ÉS NYOMJ STARTOT',
+            readyProCalibrate:'KÉSZ — ÜSD LE A SZÉLSŐ BILLENTYŰKET A KALIBRÁLÁSHOZ (PRO)',
             helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
             // gomb feliratok
             
@@ -398,7 +407,7 @@
         document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
         const T = TRANSLATIONS[lang];
         // Info modal szövegek
-        ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrlC','txt-ctrl3','txt-ctrl3b',
+        ['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrlC','txt-ctrl3','txt-ctrlMidiCal','txt-ctrl3b',
          'txt-ctrl4','txt-ctrl5','txt-ctrlVex','txt-tipTitle','txt-tipBody','txt-gotIt'].forEach(id=>{
             const el=document.getElementById(id); if(el) el.innerHTML=T[id];
         });
@@ -475,10 +484,30 @@
         const r=rows[po];
         return{n:r[0]+oct,s:r[1]};
     }
+    const LS_SIGHT_MIDI_MIN='akira_sightread_midi_min';
+    const LS_SIGHT_MIDI_MAX='akira_sightread_midi_max';
     function getProMidiRange(){
         if(midiHwMin===null||midiHwMax===null)return{lo:21,hi:108};
         if((midiHwMax-midiHwMin)<11)return{lo:21,hi:108};
         return{lo:Math.max(21,midiHwMin),hi:Math.min(108,midiHwMax)};
+    }
+    function isProMidiUncalibrated(){
+        return midiHwMin===null||midiHwMax===null||(midiHwMax-midiHwMin)<11;
+    }
+    function loadMidiHwRangeFromStorage(){
+        try{
+            const a=parseInt(localStorage.getItem(LS_SIGHT_MIDI_MIN)||'',10);
+            const b=parseInt(localStorage.getItem(LS_SIGHT_MIDI_MAX)||'',10);
+            if(Number.isFinite(a)&&Number.isFinite(b)&&a>=21&&a<=108&&b>=21&&b<=108&&a<=b){
+                midiHwMin=a;midiHwMax=b;
+            }
+        }catch(e){}
+    }
+    function persistMidiHwRange(){
+        if(midiHwMin!==null&&midiHwMax!==null&&midiHwMin<=midiHwMax){
+            localStorage.setItem(LS_SIGHT_MIDI_MIN,String(midiHwMin));
+            localStorage.setItem(LS_SIGHT_MIDI_MAX,String(midiHwMax));
+        }
     }
     function getLevelBannerHtml(){
         const T=TRANSLATIONS[currentLang], i=Math.max(0,Math.min(2,difficultyLevel-1));
@@ -488,7 +517,9 @@
             const t=T.levelProDevice||'{a}–{b}';
             ex+=' · '+t.replace('{a}',String(midiHwMin)).replace('{b}',String(midiHwMax));
         }
-        return'<span style="font-size:15px;color:var(--lcd-label-color);letter-spacing:0.5px;font-weight:bold;">'+lbl+'</span> <span style="font-size:15px;color:var(--oled-text);opacity:1.0;">'+ex+'</span>';
+        const unc=difficultyLevel===3&&isProMidiUncalibrated();
+        const bang=unc?' <span class="oled-l3-bang">!</span>':'';
+        return'<span class="oled-lvl-lbl'+(unc?' oled-l3-uncal':'')+'">'+lbl+bang+'</span> <span style="font-size:15px;color:var(--oled-text);opacity:1.0;">'+ex+'</span>';
     }
     function updateDifficultyButton(){
         const lab=document.getElementById('btnAccLabel');
@@ -498,7 +529,6 @@
     }
     function cycleDifficultyLevel(){
         if(helpActive)return;
-        midiHwMin=midiHwMax=null;
         difficultyLevel=difficultyLevel>=3?1:difficultyLevel+1;
         localStorage.setItem('akira_sightread_level',String(difficultyLevel));
         updateDifficultyButton();
@@ -579,7 +609,8 @@
             document.getElementById('lcdStats').innerText=`${bpm} / ${mistakes}`;
             updateScore();
         } else {
-            const ready=T?.ready||'SYSTEM READY — SELECT MODE AND PRESS START';
+            let ready=T?.ready||'SYSTEM READY — SELECT MODE AND PRESS START';
+            if(difficultyLevel===3&&isProMidiUncalibrated()&&T?.readyProCalibrate)ready=T.readyProCalibrate;
             bar.innerHTML=`${lv} &nbsp;<span style="opacity:0.35">|</span> &nbsp; <span style="font-size:15px;color:var(--oled-text)">${ready}</span>`;
             document.getElementById('lcdStats').innerText='0 / 0';
             const sc=document.getElementById('lcdScore');if(sc) sc.innerText='0 / 0';
@@ -652,7 +683,7 @@
         masterReverb.connect(reverbGain).connect(audioCtx.destination);
         const s={36:'C2',48:'C3',60:'C4',72:'C5'};
         for(let k in s){try{const r=await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);sampleBuffers[k]=await audioCtx.decodeAudioData(await r.arrayBuffer());}catch(e){}}
-        if(navigator.requestMIDIAccess){navigator.requestMIDIAccess().then(ma=>{ma.inputs.forEach(input=>{input.onmidimessage=(msg)=>{const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];if(cmd===9&&v>0){if(n>=21&&n<=108){if(midiHwMin===null){midiHwMin=n;midiHwMax=n;}else{midiHwMin=Math.min(midiHwMin,n);midiHwMax=Math.max(midiHwMax,n);}if(difficultyLevel===3&&!isRunning&&!helpActive)updateInfoBar();}document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}};});}).catch(()=>{});}
+        if(navigator.requestMIDIAccess){navigator.requestMIDIAccess().then(ma=>{ma.inputs.forEach(input=>{input.onmidimessage=(msg)=>{const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];if(cmd===9&&v>0){if(n>=21&&n<=108){if(midiHwMin===null){midiHwMin=n;midiHwMax=n;}else{midiHwMin=Math.min(midiHwMin,n);midiHwMax=Math.max(midiHwMax,n);}persistMidiHwRange();if(difficultyLevel===3&&!isRunning&&!helpActive)updateInfoBar();}document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}};});}).catch(()=>{});}
     }
 
     function playTone(note,vel){
@@ -895,6 +926,7 @@
         const sl=localStorage.getItem('akira_lang')||'EN';
         const sv=parseInt(localStorage.getItem('akira_sightread_level')||'1',10);
         if(sv>=1&&sv<=3)difficultyLevel=sv;
+        loadMidiHwRangeFromStorage();
         setLang(sl);
         const wrap=document.getElementById('hb-wrap');const whites=[0,2,4,5,7,9,11];let wIdx=0;
         for(let m=21;m<=108;m++){const k=document.createElement('div');const isW=whites.includes(m%12);k.id=`k-${m}`;k.className=`key-glow ${isW?'white-glow':'black-glow'}`;if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}else{const blackOffsets={1:-0.621,3:-0.477,6:-0.723,8:-0.559,10:-0.415};const noteInOctave=m%12;const offset=blackOffsets[noteInOctave]!==undefined?blackOffsets[noteInOctave]:-0.6;k.style.left=((wIdx*1.92307)+offset)+'%';k.style.width='1.241%';k.style.height='65%';k.style.zIndex='200';}k.onmousedown=(e)=>{e.preventDefault();k.classList.add('pressed');handleNoteOn(m,100);};k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};const led=document.createElement('div');led.className='key-led';k.appendChild(led);wrap.appendChild(k);}
