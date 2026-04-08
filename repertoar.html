@@ -13,6 +13,12 @@
     <style>
         :root { --rack-bg:#1a1a1d; --rack-border:#2a2a2d; --btn-dark:#101012; --btn-border:#050505; --text-dim:#555; --lcd-bg-dark:#111213; --lcd-label-color:#557799; --oled-text:#b3e6ff; --info-bar-height:25px; }
         body { font-family:'Inter',sans-serif; background:#000; margin:0; padding:0; height:100vh; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-start; color:#fff; -webkit-user-select:none; user-select:none; }
+        /* Teljes képernyős kotta: alsó rack + billentyűzet rejtve; böngésző fullscreen mellett a teljes monitor */
+        body.score-theater-mode .lower-section { display:none !important; }
+        body.score-theater-mode .sheet-container { flex:1 1 auto; min-height:0; padding-bottom:28px; }
+        /* Jobb felső: kotta vezérlők + alatta teljes képernyős kotta gomb */
+        .zoom-controls-dock { position:fixed; right:20px; top:20px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:10px; pointer-events:none; }
+        .zoom-controls-dock > * { pointer-events:auto; }
         /* jobb padding: fix ~38px gombok + right:20px + presets — ne lógjon a kotta a zoom oszlop alá (háttér = kotta színe, nem fekete csík) */
         .sheet-container { flex:1 1 auto; min-height:0; display:flex; justify-content:center; align-items:flex-start; padding:30px 100px 100px 20px; width:100%; box-sizing:border-box; overflow-y:auto; position:relative; background:#fff; }
         /* Kotta mód: 1 hasáb = görgethető; 2 hasáb = fix „könyvoldal”, lapozás */
@@ -32,7 +38,7 @@
         .sheet-container.score-layout-3up #osmd-container { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; overflow-x:hidden; overflow-y:visible; padding:10px 5px 10px; box-sizing:border-box; }
         .sheet-viewport { width:100%; max-width:2450px; position:relative; overflow:visible; background:transparent; }
         .lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; position:relative; z-index:9999; }
-        .zoom-controls { position:fixed; right:20px; top:20px; display:flex; flex-direction:column; gap:6px; z-index:1000; pointer-events:auto; }
+        .zoom-controls { display:flex; flex-direction:column; gap:6px; align-items:center; }
         /* Sötét kotta: egybefüggő fekete — a gombok #111-je és a #000 háttér csíkozása; presetek ugyanabban a panelben */
         .sheet-container:has(#osmd-container.osmd-dark) .zoom-controls {
             background:#000;
@@ -51,6 +57,28 @@
             border-color:#484848;
             color:#eee;
         }
+        .sheet-container:has(#osmd-container.osmd-dark) .zoom-fullscore-btn {
+            background:#000;
+            border-color:#383838;
+            color:#ddd;
+            box-shadow:0 2px 8px rgba(0,0,0,0.45);
+        }
+        .sheet-container:has(#osmd-container.osmd-dark) .zoom-fullscore-btn:hover {
+            background:#121212;
+            border-color:#484848;
+            color:#fff;
+        }
+        .zoom-fullscore-btn {
+            width:38px; min-height:52px; padding:6px 4px; box-sizing:border-box;
+            background:#111; border:1px solid #444; border-radius:10px; color:#aaa;
+            font-family:'Share Tech Mono',monospace; font-size:8px; font-weight:700; line-height:1.2;
+            letter-spacing:0; text-align:center; cursor:pointer; user-select:none;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+            box-shadow:0 3px 10px rgba(0,0,0,0.8); transition:0.2s;
+        }
+        .zoom-fullscore-btn:hover { background:#222; color:#fff; transform:scale(1.03); }
+        .zoom-fullscore-btn.active { border-color:#557799; color:#b3e6ff; background:#151518; }
+        .zoom-fullscore-btn svg { flex-shrink:0; opacity:0.9; }
         .zoom-btn { background:#111; border:1px solid #444; color:#aaa; width:38px; height:38px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,0.8); transition:0.2s; user-select:none; }
         .zoom-btn:hover { background:#222; color:#fff; transform:scale(1.1); }
         .zoom-presets { display:flex; flex-direction:column; align-items:center; gap:5px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.15); width:38px; }
@@ -376,6 +404,7 @@
         <div class="sheet-viewport" id="osmd-container"
              style="display:block;width:100%;background:#fff;min-height:300px;box-sizing:border-box;"></div>
         <div id="score-measure-highlight" class="score-measure-highlight" aria-hidden="true"></div>
+        <div class="zoom-controls-dock">
         <div class="zoom-controls">
             <div class="zoom-btn" onclick="zoomSheet(1)" title="Zoom in" style="font-size:24px;line-height:1;font-weight:300;">+</div>
             <div class="zoom-btn" onclick="zoomSheet(-1)" title="Zoom out" style="font-size:24px;line-height:1;font-weight:300;">−</div>
@@ -404,6 +433,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <button type="button" class="zoom-fullscore-btn" id="btnScoreFullScore" onclick="toggleScoreFullScoreView()" title="Full score view">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            <span id="btnScoreFullScoreLbl">FULL</span>
+        </button>
         </div>
     </div>
     <div class="lower-section">
@@ -572,7 +606,7 @@
         EN:{
             'txt-infoTitle': 'Score',
             'txt-howTitle':  'How it works',
-            'txt-howBody':   'Upload MusicXML / MXL (XML button on the right). START = step practice; DEMO = playback. OLED: ▲▼ = previous/next piece in the active library; tap title = library window (switch libraries there). Ms = measure range; B = bookmarks + log. Keys: ←→ spreads, +/− zoom, Space = START/STOP.',
+            'txt-howBody':   'Upload MusicXML / MXL (XML button on the right). START = step practice; DEMO = playback. OLED: ▲▼ = previous/next piece in the active library; tap title = library window (switch libraries there). Ms = measure range; B = bookmarks + log. Keys: ←→ spreads, +/− zoom, Space = START/STOP. BOOK cycles 1–3 columns (1 = fixed portrait pages + vertical scroll; 2–3 = spreads). The FULL button under the score controls hides the keyboard and rack, fills the window with the score, and requests browser fullscreen when allowed (Esc exits).',
             'txt-ctrlTitle': 'Controls',
             'txt-ctrl0':     'Treble / bass staff visibility (hints & practice).',
             'txt-ctrl4':     'Practice hints: key LEDs plus ▼ markers in the strip above the keyboard — tap the eye to toggle off.',
@@ -600,7 +634,7 @@
         HU:{
             'txt-infoTitle': 'Kotta',
             'txt-howTitle':  'Hogyan működik',
-            'txt-howBody':   'MusicXML / MXL: a jobb oldali XML gombbal. START = lépésenkénti gyakorlás; DEMO = lejátszás. OLED: ▲▼ = előző/következő darab; katt a címre = könyvtár (könyvtár váltás a listában). ÜT = ütem; B = könyvjelző + napló. Bill.: ←→, +/− zoom, Szóköz = START/STOP.',
+            'txt-howBody':   'MusicXML / MXL: a jobb oldali XML gombbal. START = lépésenkénti gyakorlás; DEMO = lejátszás. OLED: ▲▼ = előző/következő darab; katt a címre = könyvtár (könyvtár váltás a listában). ÜT = ütem; B = könyvjelző + napló. Bill.: ←→, +/− zoom, Szóköz = START/STOP. BOOK: 1–3 hasáb (1 = fix álló lapok, függőleges görgetés; 2–3 = spread). A kotta gombok alatti TELJ: billentyűzet + rack eltűnik, csak kotta tölti a képernyőt, és ha a böngésző engedi, teljes képernyő (Esc kilép).',
             'txt-ctrlTitle': 'Vezérlők',
             'txt-ctrl0':     'Violin / basszus kottasor láthatósága (segédletekhez).',
             'txt-ctrl4':     'Gyakorlás: billentyű LED + ▼ jelölők a billentyűzet fölötti sávban — szem gomb: ki.',
@@ -1371,6 +1405,7 @@
                 setInfoBar(hu?'KOTTA · START / DEMO':'SCORE · START / DEMO',null);
         }
         updateBookViewButtonChrome();
+        updateScoreFullScoreButtonChrome();
         syncZoomSliderFromState();
         updateViewPresetTitles();
         updateViewPresetChrome();
@@ -1700,7 +1735,7 @@
     const LS_OSMD_ZOOM='skalak_osmd_zoom',LS_OSMD_DARK='skalak_osmd_dark',LS_VIEW_PRESETS='skalak_view_presets_v1';
     const LS_SCORE_META='skalak_score_session_meta',LS_SCORE_XML_FB='skalak_score_xml_fb';
     /** Növeld, ha változik a könyv / hasáb margó, lapozás vagy kapcsolódó elrendezés — régi mentés újraszámolódik. */
-    const SCORE_LAYOUT_REVISION=6;
+    const SCORE_LAYOUT_REVISION=7;
     const IDB_SCORE_NAME='skalak-score-persist',IDB_SCORE_VER=1,IDB_SCORE_STORE='scores';
     function openScoreIdb(){
         return new Promise((res,rej)=>{
@@ -1785,7 +1820,7 @@
         osmdInstance.zoom=z;
         try{
             await osmdInstance.render();
-            if(bookViewColumns>1){layoutOsmdBookSpread();applyOsmdSpreadPaging();}
+            relayoutOsmdPagesAfterRender();
             syncZoomSliderFromState();
         }catch(e){console.warn(e);}
     }
@@ -1835,7 +1870,7 @@
                 void (async()=>{
                     try{
                         await osmdInstance.render();
-                        if(bookViewColumns>1){layoutOsmdBookSpread();applyOsmdSpreadPaging();}
+                        relayoutOsmdPagesAfterRender();
                         persistOsmdZoomValue(osmdInstance.zoom);
                     }catch(e){console.warn(e);}
                 })();
@@ -1854,7 +1889,7 @@
         osmdInstance.zoom=z;
         try{
             await osmdInstance.render();
-            if(bookViewColumns>1){layoutOsmdBookSpread();applyOsmdSpreadPaging();}
+            relayoutOsmdPagesAfterRender();
             syncZoomSliderFromState();
             persistOsmdZoomValue(osmdInstance.zoom);
         }catch(e){console.warn(e);}
@@ -1870,11 +1905,40 @@
         btn.style.color=on?'#fff':'#aaa';
         const hu=currentLang==='HU';
         if(bookViewColumns<=1)
-            btn.title=hu?'Könyv: 1 hasáb, középre, görgetés':'Book: 1 column, centered, scroll';
+            btn.title=hu?'Könyv: 1 hasáb, fix A4 lapok, függőleges görgetés':'Book: 1 column, fixed A4 pages, vertical scroll';
         else if(bookViewColumns===2)
             btn.title=hu?'Könyv: 2 hasáb (lapozás ◀▶)':'Book: 2 columns (◀▶ pages)';
         else
             btn.title=hu?'Könyv: 3 hasáb (lapozás ◀▶)':'Book: 3 columns (◀▶ pages)';
+    }
+    let scoreFullViewActive=false;
+    function updateScoreFullScoreButtonChrome(){
+        const b=document.getElementById('btnScoreFullScore');
+        const lbl=document.getElementById('btnScoreFullScoreLbl');
+        if(!b)return;
+        const hu=currentLang==='HU';
+        b.title=hu?'Teljes képernyős kotta: rack + billentyűzet elrejtve, opcionálisan böngésző fullscreen':'Full score view: hide rack & keyboard; browser fullscreen when allowed';
+        b.setAttribute('data-help',hu
+            ?'TELJES KOTTA: eltünteti az alsó vezérlőt és a billentyűzetet; a kotta kitölti a területet. Ha a böngésző engedi, teljes képernyő. Esc vagy újra a gomb kilép. A +/- és BOOK továbbra is itt, jobb fent.'
+            :'FULL SCORE: hides the bottom rack and keyboard; the score fills the area. Requests fullscreen when the browser allows. Esc or the button again to exit. Zoom and BOOK stay on the right.');
+        if(lbl)lbl.textContent=hu?'TELJ':'FULL';
+    }
+    async function toggleScoreFullScoreView(){
+        if(helpActive)return;
+        const btn=document.getElementById('btnScoreFullScore');
+        if(scoreFullViewActive||document.body.classList.contains('score-theater-mode')){
+            scoreFullViewActive=false;
+            document.body.classList.remove('score-theater-mode');
+            if(btn)btn.classList.remove('active');
+            try{if(document.fullscreenElement)await document.exitFullscreen();}catch(e){}
+            requestAnimationFrame(()=>{void osmdFitWidth();});
+            return;
+        }
+        scoreFullViewActive=true;
+        document.body.classList.add('score-theater-mode');
+        if(btn)btn.classList.add('active');
+        try{await document.documentElement.requestFullscreen();}catch(e){}
+        requestAnimationFrame(()=>{void osmdFitWidth();});
     }
     function toggleBookView(){
         bookViewColumns=bookViewColumns>=3?1:bookViewColumns+1;
@@ -2080,12 +2144,23 @@
     }
     document.addEventListener('click',(e)=>{
         if(e.target.closest('#btnHelp'))return;
-        if(e.target.closest('.zoom-controls'))return;
+        if(e.target.closest('.zoom-controls-dock'))return;
         if(e.target.closest('#bookmarksModal')||e.target.closest('#measureRangeModal')||e.target.closest('#scoreLibraryModal'))return;
         if(helpActive){e.preventDefault();e.stopPropagation();const target=e.target.closest('[data-help]');if(target)setInfoBar(target.dataset.help,target);}
     },true);
     function toggleFullScreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen();}
-    document.addEventListener('fullscreenchange',()=>{document.getElementById('btnFullscreen').classList.toggle('active',!!document.fullscreenElement);});
+    document.addEventListener('fullscreenchange',()=>{
+        const fs=!!document.fullscreenElement;
+        const rackFs=document.getElementById('btnFullscreen');
+        if(rackFs)rackFs.classList.toggle('active',fs);
+        if(!fs&&scoreFullViewActive){
+            scoreFullViewActive=false;
+            document.body.classList.remove('score-theater-mode');
+            const b=document.getElementById('btnScoreFullScore');
+            if(b)b.classList.remove('active');
+            requestAnimationFrame(()=>{void osmdFitWidth();});
+        }
+    });
     // ── Modul váltó (7. slot = ez az oldal) ────────────────────────────────────
     const modules=[
         {name:'EAR TRAIN',url:'hallasfejleszto.html'},
@@ -2189,13 +2264,12 @@
                         await configureOsmdPaginationForBook();
                         osmdInstance.zoom=1;
                         await osmdInstance.render();
-                        layoutOsmdBookSpread();
+                        relayoutOsmdPagesAfterRender();
                         await osmdFitWidth();
-                        applyOsmdSpreadPaging();
                     }catch(e){console.warn(e);}
                 })();
             }else{
-                void (async()=>{try{configureOsmdScrollOneUp();await osmdInstance.render();await osmdFitWidth();}catch(e){console.warn(e);}})();
+                void (async()=>{try{configureOsmdScrollOneUp();await osmdFitWidth();}catch(e){console.warn(e);}})();
             }
         },RESIZE_OSMD_MS);
     });
@@ -2211,6 +2285,20 @@
             for(let i=0;i<order.length;i++){
                 const m=document.getElementById(order[i]);
                 if(m&&m.style.display==='flex'){m.style.display='none';e.preventDefault();return;}
+            }
+            if(document.fullscreenElement){
+                try{document.exitFullscreen();}catch(err){}
+                e.preventDefault();
+                return;
+            }
+            if(scoreFullViewActive||document.body.classList.contains('score-theater-mode')){
+                scoreFullViewActive=false;
+                document.body.classList.remove('score-theater-mode');
+                const tb=document.getElementById('btnScoreFullScore');
+                if(tb)tb.classList.remove('active');
+                e.preventDefault();
+                requestAnimationFrame(()=>{void osmdFitWidth();});
+                return;
             }
         }
         if(e.repeat)return;
@@ -2552,7 +2640,7 @@
                 const saveSheet=outer&&!willFollow?{t:outer.scrollTop,l:outer.scrollLeft}:null;
                 const sx=window.scrollX,sy=window.scrollY;
                 await osmdInstance.render();
-                if(scoreMode&&bookViewColumns>1){layoutOsmdBookSpread();applyOsmdSpreadPaging();}
+                if(scoreMode)relayoutOsmdPagesAfterRender();
                 window.scrollTo(sx,sy);
                 if(saveSheet&&outer){
                     outer.scrollTop=saveSheet.t;
@@ -2707,6 +2795,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         positionScoreMeasureHighlightFromClientRect(r);
     }
     function pxToOsmdMm(px){return Math.max(30,px*25.4/96);}
+    /** Álló A4 arány (magasság/szélesség, mm): fix lap — a tördelés nem függ a néző magasságától; zoom csak skáláz. */
+    const OSMD_FIXED_PAGE_H_OVER_W_MM=297/210;
     /** Belső tartalmi szélesség #osmd-container (padding nélkül) — zoom / mm számítás */
     function osmdContainerContentWidthPx(cont){
         if(!cont)return 400;
@@ -2780,19 +2870,26 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         applyOsmdSpreadPaging();
         queuePersistScoreSession();
     }
-    /** 1 hasáb: végtelen oldal, teljes szélesség. */
+    /** 1 hasáb: fix A4-arányú lapok (nem Endless), függőleges görgetés — a sorok nem tördelődnek újra minden szélesség-/magasság-változásnál. */
     function configureOsmdScrollOneUp(){
         if(!osmdInstance)return;
         const cont=document.getElementById('osmd-container');
         if(!cont)return;
-        cont.classList.remove('osmd-book-layout');
+        cont.classList.add('osmd-book-layout');
         cont.style.width='100%';
         cont.style.maxWidth='';
         cont.style.marginLeft='';
         cont.style.marginRight='';
-        try{osmdInstance.setOptions({autoResize:true});}catch(e){}
-        try{osmdInstance.setPageFormat('Endless');}catch(e){}
+        try{osmdInstance.setOptions({autoResize:false});}catch(e){}
+        const innerW=osmdContainerContentWidthPx(cont);
+        const widthMm=Math.max(40,pxToOsmdMm(innerW));
+        const heightMm=widthMm*OSMD_FIXED_PAGE_H_OVER_W_MM;
+        osmdInstance.setCustomPageFormat(widthMm,heightMm);
         try{osmdInstance.updateGraphic();}catch(e){}
+    }
+    function relayoutOsmdPagesAfterRender(){
+        layoutOsmdBookSpread();
+        if(bookViewColumns>1)applyOsmdSpreadPaging();
     }
     function configureOsmdEndless(){
         if(!osmdInstance)return;
@@ -2829,7 +2926,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         try{osmdInstance.updateGraphic();}catch(e){}
     }
     function layoutOsmdBookSpread(){
-        if(!scoreMode||bookViewColumns<=1||!osmdInstance)return;
+        if(!scoreMode||!osmdInstance)return;
         const cont=document.getElementById('osmd-container');
         if(!cont)return;
         let br=cont.querySelector(':scope > .osmd-book-root');
@@ -2880,9 +2977,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }else configureOsmdScrollOneUp();
         osmdInstance.zoom=1;
         try{await osmdInstance.render();}catch(e){console.warn(e);}
-        if(bookViewColumns>1)layoutOsmdBookSpread();
+        relayoutOsmdPagesAfterRender();
         await osmdFitWidth();
-        if(bookViewColumns>1)applyOsmdSpreadPaging();
         await applyPersistedOsmdZoomIfSaved();
     }
     /** Sötét kotta: ne írjunk #333 inline hátteret — szétüt a #000 panellel; a CSS egyesíti. */
@@ -2945,9 +3041,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             osmdInstance.zoom=oz;
             try{
                 await osmdInstance.render();
-                if(bookViewColumns>1)layoutOsmdBookSpread();
+                layoutOsmdBookSpread();
                 osmdBookSpreadIndex=Math.max(0,Math.floor(Number(p.sp)||0));
-                applyOsmdSpreadPaging();
+                if(bookViewColumns>1)applyOsmdSpreadPaging();
                 persistOsmdZoomValue(osmdInstance.zoom);
             }catch(e){console.warn(e);}
         }
@@ -3211,7 +3307,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             :Math.max(200,(outer?outer.clientWidth:cont.clientWidth)-100);
         try{
             await osmdInstance.render();
-            if(scoreMode&&bookViewColumns>1)layoutOsmdBookSpread();
+            if(scoreMode)relayoutOsmdPagesAfterRender();
             const curZ=osmdInstance.zoom||1;
             let nativeW;
             const row=cont.querySelector('.osmd-book-spread');
@@ -3227,15 +3323,14 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(nativeW<40){
                     osmdInstance.zoom=1;
                     await osmdInstance.render();
-                    if(scoreMode&&bookViewColumns>1)layoutOsmdBookSpread();
+                    if(scoreMode)relayoutOsmdPagesAfterRender();
                     nativeW=Math.max((cont.scrollWidth||0),cont.querySelector('svg')?.getBoundingClientRect().width||0);
                 }
             }
             let z=Math.max(0.12,Math.min(3.2,(availW-28)/Math.max(nativeW,60)));
             osmdInstance.zoom=z;
             await osmdInstance.render();
-            if(scoreMode&&bookViewColumns>1)layoutOsmdBookSpread();
-            if(scoreMode&&bookViewColumns>1)applyOsmdSpreadPaging();
+            if(scoreMode)relayoutOsmdPagesAfterRender();
             syncZoomSliderFromState();
         }catch(e){console.warn('osmdFitWidth',e);}
     }
@@ -3248,7 +3343,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         const availW=Math.max(200,(outer?outer.clientWidth:cont.clientWidth)-100);
         try{
             await osmdInstance.render();
-            if(scoreMode&&bookViewColumns>1)layoutOsmdBookSpread();
+            if(scoreMode)relayoutOsmdPagesAfterRender();
             const curZ=osmdInstance.zoom||1;
             let nativeH,nativeW;
             const row=cont.querySelector('.osmd-book-spread');
@@ -3273,7 +3368,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             const zoomW=(availW-28)/Math.max(nativeW,60);
             osmdInstance.zoom=Math.max(0.12,Math.min(3.2,Math.min(zoomH,zoomW)));
             await osmdInstance.render();
-            if(scoreMode&&bookViewColumns>1)layoutOsmdBookSpread();
+            if(scoreMode)relayoutOsmdPagesAfterRender();
             syncZoomSliderFromState();
         }catch(e){console.warn('osmdFitHeight',e);}
     }
@@ -3640,11 +3735,11 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             if(bookViewColumns>1){
                 await configureOsmdPaginationForBook();
                 await osmdInstance.render();
-                layoutOsmdBookSpread();
-                applyOsmdSpreadPaging();
+                relayoutOsmdPagesAfterRender();
             }else{
                 configureOsmdScrollOneUp();
                 await osmdInstance.render();
+                relayoutOsmdPagesAfterRender();
             }
             await osmdFitWidth();
             if(useSaved)await applyPersistedOsmdZoomIfSaved();
@@ -3813,7 +3908,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 else configureOsmdScrollOneUp();
                 osmdInstance.zoom=1;
                 await osmdInstance.render();
-                if(bookViewColumns>1)layoutOsmdBookSpread();
+                relayoutOsmdPagesAfterRender();
             }catch(e){console.warn(e);}
             applyTimeSignatureFromLoadedOsmdScore();
             try{if(osmdInstance.cursor&&typeof osmdInstance.cursor.hide==='function')osmdInstance.cursor.hide();}catch(e){}
