@@ -25,10 +25,12 @@
         /* 1 hasáb: kevesebb alsó padding (100px helyett) + háttér = ne legyen fekete „csík” a fehér kotta alatt görgetéskor */
         /* justify-content:flex-start: ne legyen függőlegesen középre tolva a kotta — különben üres „görgethető” sáv + elcsúszó ütemkiemelés 1 hasábnál */
         .sheet-container.score-layout-1up { flex-direction:column; align-items:stretch; justify-content:flex-start; overflow-y:auto; overflow-x:hidden; padding-bottom:24px; padding-top:20px; }
-        .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-dark){background:#000;}
+        .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-dark),
+        .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-darksepia){background:#000;}
         .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-sepia){background:var(--score-paper-bg);}
         .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-light){background:#fff;}
-        .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-dark),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-dark){background:#000;}
+        .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-dark),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-dark),
+        .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-darksepia),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-darksepia){background:#000;}
         .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-sepia),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-sepia){background:var(--score-paper-bg);}
         .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-light),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-light){background:#fff;}
         /* 2–3 hasáb: görgetés a .sheet-container-en; #osmd-container ne nőjön flex-grow-ral üres fehér „szegéllyé” (demó követés + kiemelés) */
@@ -46,19 +48,22 @@
         .lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; position:relative; z-index:9999; }
         .zoom-controls { display:flex; flex-direction:column; gap:6px; align-items:center; }
         /* Sötét kotta: egybefüggő fekete — a gombok és a #000 háttér csíkozásának elkerülése */
-        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls {
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls,
+        .sheet-container:has(#osmd-container.osmd-theme-darksepia) .zoom-controls {
             background:#000;
             padding:8px 6px 10px;
             border-radius:12px;
             box-sizing:border-box;
             border:1px solid #161616;
         }
-        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls .zoom-btn {
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls .zoom-btn,
+        .sheet-container:has(#osmd-container.osmd-theme-darksepia) .zoom-controls .zoom-btn {
             background:#000;
             border-color:#383838;
             box-shadow:0 2px 8px rgba(0,0,0,0.45);
         }
-        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls .zoom-btn:hover {
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls .zoom-btn:hover,
+        .sheet-container:has(#osmd-container.osmd-theme-darksepia) .zoom-controls .zoom-btn:hover {
             background:#121212;
             border-color:#484848;
             color:#eee;
@@ -76,7 +81,8 @@
             background:#1a1a1d; border:1px solid #333; padding:12px 14px; border-radius:8px; z-index:1001;
             box-shadow:0 12px 36px rgba(0,0,0,0.9); min-width:200px; max-width:min(280px,calc(100vw - 120px));
         }
-        .sheet-container:has(#osmd-container.osmd-theme-dark) .score-layout-popup {
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .score-layout-popup,
+        .sheet-container:has(#osmd-container.osmd-theme-darksepia) .score-layout-popup {
             background:#000; border-color:#161616; box-shadow:0 12px 36px rgba(0,0,0,0.95);
         }
         .score-layout-popup-row { margin-bottom:12px; }
@@ -112,11 +118,6 @@
         .key-hint-strip-inner { position:relative; width:100%; height:100%; pointer-events:none; }
         .key-hint-marker { position:absolute; bottom:3px; left:0; transform:translateX(-50%); width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid var(--oled-text); filter:drop-shadow(0 0 4px rgba(179,230,255,0.45)); }
         .key-hint-marker--alt { border-top-color:#7eb8dc; bottom:5px; border-left-width:4px; border-right-width:4px; border-top-width:6px; }
-        .settings-bar { position:absolute; bottom:100%; left:0; width:100%; height:85px; background:var(--lcd-bg-dark); display:none; align-items:center; justify-content:space-around; z-index:50; border-top:2px solid #333; box-shadow:0 -10px 30px #000; padding:0 20px; box-sizing:border-box; }
-        .settings-control { display:flex; flex-direction:column; align-items:center; gap:8px; width:150px; z-index:2; position:relative; }
-        .settings-control label { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono',monospace; cursor:pointer; text-transform:uppercase; font-weight:bold; }
-        .settings-control input[type="range"] { -webkit-appearance:none; width:100%; height:6px; background:#111; border-radius:3px; outline:none; cursor:pointer; box-shadow:inset 0 1px 3px #000; }
-        .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:20px; background:#888; border:1px solid #111; border-radius:2px; box-shadow:0 2px 4px #000; cursor:grab; }
         .master-dashboard { display:flex; justify-content:space-between; align-items:center; margin-top: 3px; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px); background-size:100% 3px; padding:2px 2px; border-top:1px solid #333; position:relative; width:100%; box-sizing:border-box; }
         .dashboard-logo { position:absolute; top:-35px; left:30px; z-index:5; pointer-events:none; }
         .control-group { display:flex; align-items:center; gap:8px; z-index:10; }
@@ -138,7 +139,8 @@
         .lang-divider { height:1px; width:100%; background:#222; }
         body.help-mode-active, body.help-mode-active * { cursor:help !important; }
         .center-console { flex:1; display:flex; justify-content:center; position:relative; }
-        .lcd-arrow-wrapper { display:flex; flex-direction:column; align-items:center; width:620px; max-width:min(620px,96vw); flex-shrink:0; box-sizing:border-box; }
+        /* Középső cím/OLED: ~25% keskenyebb (iPad / tablet egyensúly), START+DEMO a flexben továbbra is középre zár */
+        .lcd-arrow-wrapper { display:flex; flex-direction:column; align-items:center; width:min(465px,72vw); max-width:100%; flex-shrink:0; box-sizing:border-box; }
         .arrow-row { display:flex; width:100%; justify-content:space-around; margin:4px 0; }
         .arrow-row.arrow-row-center { justify-content:center; }
         .nav-disk-btn { width:22px; height:22px; background:#222; border:1px solid #111; border-radius:50%; color:#888; font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 2px rgba(0,0,0,0.6); transition:0.1s; flex-shrink:0; }
@@ -183,6 +185,11 @@
         #osmd-container.osmd-theme-sepia { background:var(--score-paper-bg) !important; }
         #osmd-container.osmd-theme-dark { background:#000 !important; }
         #osmd-container.osmd-theme-dark svg { filter: invert(1) hue-rotate(180deg) brightness(1.06) contrast(1.03); }
+        #osmd-container.osmd-theme-darksepia { background:#000 !important; }
+        /* Fekete háttér + sötétebb meleg bézs jegyzet (élénkebben különbözik a fehér „dark” módtól) */
+        #osmd-container.osmd-theme-darksepia svg {
+            filter: invert(1) hue-rotate(180deg) sepia(0.58) saturate(0.44) brightness(0.68) contrast(1.1);
+        }
         .osmd-book-root { width: 100%; box-sizing: border-box; }
         .osmd-book-spread { box-sizing: border-box; }
         /* Két / három hasáb: oszlop = kotta szélessége + kis gap (flex:1 üresen kitöltötte a sort → óriási „gutter”) */
@@ -214,6 +221,28 @@
             visibility: hidden !important;
             pointer-events: none !important;
         }
+        .score-practice-range-layer {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            min-height: 100%;
+            pointer-events: none;
+            z-index: 40;
+            overflow: visible;
+        }
+        .score-practice-range-cell {
+            position: absolute;
+            border-radius: 2px;
+            background: rgba(255, 200, 90, 0.2);
+            box-shadow: inset 0 0 0 1px rgba(220, 150, 40, 0.55);
+        }
+        .score-osmd-stack:has(#osmd-container.osmd-theme-dark) .score-practice-range-cell,
+        .score-osmd-stack:has(#osmd-container.osmd-theme-darksepia) .score-practice-range-cell {
+            background: rgba(255, 210, 120, 0.14);
+            box-shadow: inset 0 0 0 1px rgba(255, 190, 90, 0.4);
+        }
         .score-measure-highlight {
             display: none;
             position: absolute;
@@ -223,11 +252,14 @@
             background: rgba(100, 185, 255, 0.22);
             box-shadow: inset 0 0 0 0px rgba(130, 205, 255, 1);
         }
-        .score-osmd-stack:has(#osmd-container.osmd-theme-dark) .score-measure-highlight {
+        .score-osmd-stack:has(#osmd-container.osmd-theme-dark) .score-measure-highlight,
+        .score-osmd-stack:has(#osmd-container.osmd-theme-darksepia) .score-measure-highlight {
             background: rgba(100, 185, 255, 0.12);
             box-shadow: inset 0 0 0 0px rgba(120, 200, 255, 0.35);
         }
         /* Kotta + ütemkiemelő együtt görgetődik; a kiemelő offsetje a stackhez képest (nem sheet scrollTop-mal). */
+        /* Csak ha be van kapcsolva az „egérrel ütem” mód — egyébként a kotta kattintása nem változtat tartományt */
+        #osmd-container.practice-range-click-pick-on { cursor: crosshair; }
         .score-osmd-stack { position: relative; width: 100%; box-sizing: border-box; }
         /* Kotta modálok: alapértelmezett modal mérethez közel (nem „magasított” panel) */
         .modal-overlay .modal-content.workshop-tools-grid {
@@ -299,6 +331,46 @@
         #practiceLogBody { font: 18px 'Share Tech Mono',monospace; color: #bbb; max-height: 50vh; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
         .zoom-btn.zoom-btn-mono { font-size: 11px; font-weight: 700; font-family: 'Share Tech Mono',monospace; letter-spacing: 0.02em; color: #9a9a9a; }
         .zoom-btn.zoom-btn-mono:hover { color: #ddd; }
+        #infoModal .modal-content.info-guide-modal {
+            max-width: min(780px, 94vw);
+            max-height: min(90vh, 720px);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .info-guide-modal .info-guide-modal-header {
+            flex-shrink: 0;
+            text-align: center;
+            color: var(--oled-text);
+            border-bottom: 1px solid #333;
+            padding: 20px 28px 14px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .info-guide-modal .info-guide-scroll {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 18px 28px 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .info-guide-modal .info-guide-footer {
+            flex-shrink: 0;
+            padding: 12px 28px 22px;
+            margin: 0;
+            border-top: 1px solid #2a2a2a;
+            background: linear-gradient(to bottom, rgba(24,24,24,0.92), var(--modal-bg, #1a1a1a));
+            box-sizing: border-box;
+        }
+        .info-guide-modal .info-guide-footer .modal-btn {
+            width: 100%;
+            margin: 0;
+        }
         .info-guide-modal .info-guide-sec { margin-bottom: 20px; }
         .info-guide-modal .info-guide-h {
             font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--lcd-label-color);
@@ -320,49 +392,61 @@
 <body onclick="initAudio()">
     <input type="file" id="score-file-input" accept=".xml,.musicxml,.mxl" style="display:none">
     <input type="file" id="score-file-input-multi" accept=".xml,.musicxml,.mxl" multiple style="display:none">
-    <div id="resultModal" class="modal-overlay">
-        <div class="modal-content">
+    <div id="resultModal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <h2 class="modal-title">Session Complete</h2>
             <div style="margin-bottom:20px;"><div class="oled-header" style="margin-bottom:8px;">Avg Tempo</div><div id="modalBpm" style="font-family:'Share Tech Mono';font-size:28px;color:var(--oled-text);font-weight:bold;">0 BPM</div></div>
             <button class="modal-btn" onclick="closeModal()">Acknowledge</button>
         </div>
     </div>
-    <div id="infoModal" class="modal-overlay">
-        <div class="modal-content info-guide-modal" style="max-width:min(640px,96vw);text-align:left;max-height:90vh;overflow-y:auto;padding:28px 32px;">
-            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;color:var(--oled-text);border-bottom:1px solid #333;padding-bottom:15px;margin-top:0;">Score</h2>
-            <div class="info-guide-sec">
-                <div class="info-guide-h" id="txt-infoScoresTitle">Score files</div>
-                <p class="info-guide-body" id="txt-infoScoresBody"></p>
+    <div id="infoModal" class="modal-overlay" onclick="if(event.target===this)closeInfoGuideModal()">
+        <div class="modal-content info-guide-modal" onclick="event.stopPropagation()">
+            <h2 class="modal-title info-guide-modal-header" id="txt-infoTitle">Score</h2>
+            <div class="info-guide-scroll">
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-infoScoresTitle">Score files</div>
+                    <p class="info-guide-body" id="txt-infoScoresBody"></p>
+                </div>
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-howTitle">How it works</div>
+                    <p class="info-guide-body" id="txt-howBody"></p>
+                </div>
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-infoMeasureGuideTitle"></div>
+                    <p class="info-guide-body" id="txt-infoMeasureGuideBody"></p>
+                </div>
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-infoBookmarksGuideTitle"></div>
+                    <p class="info-guide-body" id="txt-infoBookmarksGuideBody"></p>
+                </div>
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-infoPanelTitle">Score toolbar</div>
+                    <p class="info-guide-body" id="txt-infoPanelBody"></p>
+                </div>
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-infoShortcutsTitle">Keyboard</div>
+                    <p class="info-guide-body" id="txt-infoShortcutsBody"></p>
+                </div>
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-ctrlTitle">Rack</div>
+                    <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;flex-shrink:0;">𝄞 / 𝄢</div><span class="info-guide-body" style="display:block;padding-top:2px;" id="txt-ctrl0"></span></div>
+                    <div style="display:flex;gap:10px;margin-bottom:0;align-items:flex-start;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span class="info-guide-body" style="display:block;padding-top:2px;" id="txt-ctrl4"></span></div>
+                </div>
+                <div class="info-guide-sec">
+                    <div class="info-guide-h" id="txt-infoHelpTitle">Help mode</div>
+                    <p class="info-guide-body" id="txt-infoHelpBody"></p>
+                </div>
             </div>
-            <div class="info-guide-sec">
-                <div class="info-guide-h" id="txt-howTitle">How it works</div>
-                <p class="info-guide-body" id="txt-howBody"></p>
+            <div class="info-guide-footer">
+                <button class="modal-btn" onclick="closeInfoGuideModal()" id="txt-gotIt">Got It</button>
             </div>
-            <div class="info-guide-sec">
-                <div class="info-guide-h" id="txt-infoPanelTitle">Score toolbar</div>
-                <p class="info-guide-body" id="txt-infoPanelBody"></p>
-            </div>
-            <div class="info-guide-sec">
-                <div class="info-guide-h" id="txt-infoShortcutsTitle">Keyboard</div>
-                <p class="info-guide-body" id="txt-infoShortcutsBody"></p>
-            </div>
-            <div class="info-guide-sec">
-                <div class="info-guide-h" id="txt-ctrlTitle">Rack</div>
-                <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;flex-shrink:0;">𝄞 / 𝄢</div><span class="info-guide-body" style="display:block;padding-top:2px;" id="txt-ctrl0"></span></div>
-                <div style="display:flex;gap:10px;margin-bottom:0;align-items:flex-start;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span class="info-guide-body" style="display:block;padding-top:2px;" id="txt-ctrl4"></span></div>
-            </div>
-            <div class="info-guide-sec">
-                <div class="info-guide-h" id="txt-infoHelpTitle">Help mode</div>
-                <p class="info-guide-body" id="txt-infoHelpBody"></p>
-            </div>
-            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;margin-top:8px;">Got It</button>
         </div>
     </div>
-    <div id="practiceLogModal" class="modal-overlay">
-        <div class="modal-content">
+    <div id="practiceLogModal" class="modal-overlay" onclick="if(event.target===this)closePracticeLogModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <h2 class="modal-title" id="txt-logTitle">Practice log</h2>
             <div id="practiceLogBody"></div>
-            <button class="modal-btn" onclick="document.getElementById('practiceLogModal').style.display='none'" id="txt-logClose" style="margin-top:16px;">Close</button>
+            <button class="modal-btn" onclick="closePracticeLogModal()" id="txt-logClose" style="margin-top:16px;">Close</button>
         </div>
     </div>
     <div id="measureRangeModal" class="modal-overlay" onclick="if(event.target===this)closeMeasureRangeModal()">
@@ -376,6 +460,10 @@
                 <button type="button" class="sq-btn practice-tools-sq" id="btnPracticeRangeApply" onclick="void applyPracticeRangeFromInputs()">OK</button>
                 <button type="button" class="sq-btn practice-tools-sq" id="btnPracticeRangeClear" onclick="void clearPracticeRangeAndRebuild()">∅</button>
             </div>
+            <label class="practice-tools-row" style="margin-bottom:14px;cursor:pointer;user-select:none;align-items:center;gap:10px;color:#bbb;font-size:13px;">
+                <input type="checkbox" id="chkPracticeRangeClickPick" onchange="onPracticeRangeClickPickCheckboxChange()" style="width:16px;height:16px;accent-color:#6a9;flex-shrink:0;">
+                <span id="txt-measureRangeClickPickLabel">Pick measures by clicking the score</span>
+            </label>
             <button class="modal-btn" onclick="closeMeasureRangeModal()" id="txt-measureRangeClose" style="width:100%;">Close</button>
         </div>
     </div>
@@ -430,12 +518,13 @@
         <div class="score-osmd-stack" id="score-osmd-stack">
         <div class="sheet-viewport" id="osmd-container"
              style="display:block;width:100%;background:#fff;min-height:300px;box-sizing:border-box;"></div>
+        <div id="score-practice-range-shade" class="score-practice-range-layer" aria-hidden="true"></div>
         <div id="score-measure-highlight" class="score-measure-highlight" aria-hidden="true"></div>
         </div>
         <div class="zoom-controls-dock">
         <div class="zoom-controls">
             <button type="button" class="zoom-btn" id="btnScoreFullScore" onclick="toggleScoreFullScoreView()"
-                    title="Full score view" aria-label="Full score view" data-help="">
+                    title="Full-screen score view" aria-label="Full-screen score view" data-help="">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
             </button>
             <div id="scoreLayoutToggleWrap" style="display:none;position:relative;">
@@ -457,18 +546,24 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="zoom-btn zoom-btn-mono" id="btnBookView" onclick="toggleBookView()" title="Book view">BOOK</button>
+            <button type="button" class="zoom-btn zoom-btn-mono" id="btnBookView" onclick="toggleBookView()" title="Book view" aria-label="Book view">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </button>
             <div class="zoom-btn" id="btnOsmdPrevSpread" onclick="osmdStepBookSpread(-1)" title="Previous spread" style="display:none;font-size:20px;font-weight:300;">←</div>
             <span id="osmdSpreadLbl" aria-hidden="true" style="display:none;font:10px 'Share Tech Mono',monospace;color:#888;text-align:center;width:38px;line-height:1.25;padding:2px 0;user-select:none;">1 / 1</span>
             <div class="zoom-btn" id="btnOsmdNextSpread" onclick="osmdStepBookSpread(1)" title="Next spread" style="display:none;font-size:20px;font-weight:300;">→</div>
             <button type="button" class="zoom-btn zoom-btn-mono" id="btnOsmdDark" onclick="cycleOsmdScoreTheme()" title="" style="display:none;" aria-label="">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3a6 6 0 1 0 0 18 9 9 0 0 1 0-18z"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
             </button>
             <label class="zoom-btn zoom-btn-mono" for="score-file-input" id="btnUploadScore"
-                   title="Upload MusicXML / MXL" style="cursor:pointer;">XML</label>
+                   title="Upload MusicXML / MXL" aria-label="Upload MusicXML / MXL" style="cursor:pointer;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="8" y1="18" x2="15" y2="18"/></svg>
+            </label>
             <!-- Presetek: egyetlen gomb mögötti felugró -->
-            <div style="position:relative;">
-                <button type="button" class="zoom-btn zoom-btn-mono" id="btnPresetsToggle" onclick="togglePresetsPopup()" title="View presets">PRE</button>
+            <div id="presetsToggleWrap" style="position:relative;">
+                <button type="button" class="zoom-btn zoom-btn-mono" id="btnPresetsToggle" onclick="togglePresetsPopup()" title="View presets" aria-label="View presets">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </button>
                 <div id="presetsPopup" style="display:none;position:absolute;right:46px;top:0;background:#1a1a1d;border:1px solid #333;padding:6px;border-radius:4px;z-index:1001;box-shadow:0 10px 30px #000;">
                     <div style="display:flex;flex-direction:column;gap:4px;">
                         <button type="button" class="zoom-btn zoom-preset-btn" id="btnViewPreset0" onclick="handleViewPresetClick(0,event)" style="width:38px;height:32px;font-size:13px;">1</button>
@@ -486,14 +581,8 @@
         <div class="workstation-chassis">
             <div class="wood-cheek"></div>
             <div class="synth-core">
-                <div id="mixerBar" class="settings-bar">
-                    <div class="settings-control"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.0"></div>
-                    <div class="settings-control"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="5.0"></div>
-                    <div class="settings-control"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.8"></div>
-                    <div class="settings-control"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
-                </div>
                 <div class="info-bar-integrated info-bar-top">
-                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">LOAD SCORE (XML) · START / DEMO</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">Repertoire: open XML/MXL — then START or DEMO</div>
                 </div>
                 <div class="master-dashboard">
                     <div class="control-group">
@@ -575,7 +664,7 @@
                         </div>
                     </div>
                     <div class="center-console">
-                        <div style="display:flex;align-items:center;gap:16px;justify-content:center;width:100%;flex-wrap:wrap;">
+                        <div style="display:flex;align-items:center;gap:12px;justify-content:center;width:100%;flex-wrap:wrap;">
                             <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;flex-shrink:0;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row arrow-row-center">
@@ -601,14 +690,24 @@
                         <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="">
                             <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
                         </button>
-                        <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
-                            <button type="button" id="btnMeasureRange" onclick="if(!helpActive) openMeasureRangeModal()" data-help="" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4v16"/><path d="M18 4v16"/><path d="M6 12h12"/><path d="M9 8l-3 4 3 4"/><path d="M15 8l3 4-3 4"/></svg>
-                            </button>
-                            <div style="height:1px;background:#222;"></div>
-                            <button type="button" id="btnBookmarksTools" onclick="if(!helpActive) openBookmarksModal()" data-help="" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                            </button>
+                        <div style="display:flex;flex-direction:column;width:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
+                            <div style="display:flex;flex-direction:row;height:38px;min-height:38px;">
+                                <button type="button" id="btnMeasureClickPick" onclick="if(!helpActive) togglePracticeRangeClickPickMode()" data-help="" title="" aria-label="" style="flex:1;min-width:0;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s,background 0.15s;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(-24 12 12)"><path d="M7 4v12l3.2-2.4 2.6 6.8 1.9-1-2.5-6.4h4.3L7 4z"/></g></svg>
+                                </button>
+                                <div style="width:1px;background:#222;flex-shrink:0;"></div>
+                                <button type="button" id="btnMeasureRange" onclick="if(!helpActive) openMeasureRangeModal()" data-help="" title="Measure range" aria-label="Measure range" style="flex:1;min-width:0;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="5" x2="6" y2="19"/><line x1="18" y1="5" x2="18" y2="19"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
+                                </button>
+                            </div>
+                            <div style="height:1px;background:#222;flex-shrink:0;"></div>
+                            <div style="display:flex;flex-direction:row;height:38px;min-height:38px;">
+                                <button type="button" id="btnPracticeRangeClearToolbar" onclick="if(!helpActive) void toolbarClearPracticeRange()" data-help="" title="" aria-label="" style="flex:1;min-width:0;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:400;line-height:1;font-family:'Inter',system-ui,sans-serif;transition:color 0.15s,background 0.15s;">∅</button>
+                                <div style="width:1px;background:#222;flex-shrink:0;"></div>
+                                <button type="button" id="btnBookmarksTools" onclick="if(!helpActive) openBookmarksModal()" data-help="" title="Bookmarks" aria-label="Bookmarks" style="flex:1;min-width:0;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                                </button>
+                            </div>
                         </div>
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
@@ -643,16 +742,20 @@
 <script>
     // ── Language ──────────────────────────────────────────────────────────────
     let currentLang='EN';
-    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY','SCORE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY','KOTTA']};
+    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY','REPERTOIRE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY','REPERTOÁR']};
     const MODAL_STRINGS={
         EN:{
-            'txt-infoTitle': 'Score module — guide',
+            'txt-infoTitle': 'Repertoire module — guide',
             'txt-infoScoresTitle': 'Score files & sources',
-            'txt-infoScoresBody': 'Formats: MusicXML (.xml, .musicxml) and compressed .mxl (ZIP with MusicXML). Standard interchange for notation software.\n\nLoad:\n• XML (right toolbar) — pick a file; opens at once.\n• Library (tap score title) — + File / + Batch copies into browser storage; Link folder (Chrome/Edge) lists every .xml / .mxl in a folder you choose.\n• URL — paste a direct link to .musicxml or .mxl. Many sites block cross-site downloads (CORS); saving the file and using XML is often easier.\n\nWhere to find scores:\n• MuseScore (musescore.com) — online scores are often playback/PDF only. For MusicXML use MuseScore Desktop: File → Export → MusicXML. Licensing varies by piece.\n• IMSLP — huge public-domain library; most files are PDF scans. Use a MusicXML edition if available, or typeset/export from another editor.\n• Flat.io, Noteflight, Finale, Dorico, etc. — export MusicXML, then open here.',
+            'txt-infoScoresBody': 'This module only reads MusicXML (.xml, .musicxml) and compressed .mxl (ZIP with MusicXML). There is no PDF import — PDF is not machine-readable for practice, cursor, MIDI, or measure range; MusicXML is easy to export from any notation app.\n\nLoad:\n• Score file icon (right toolbar, document with staff lines) — pick a file; opens at once.\n• Library (tap score title) — + File / + Batch copies into browser storage; Link folder (Chrome/Edge) lists every .xml / .mxl in a folder you choose.\n• URL — paste a direct link to .musicxml or .mxl. Many sites block cross-site downloads (CORS); saving the file and using the score file icon is often easier.\n\nWhere to get MusicXML:\n• MuseScore Desktop — File → Export → MusicXML (licensing varies by piece).\n• IMSLP and other libraries — choose a MusicXML edition when available, or export from MuseScore / Finale / Dorico / etc.\n• Flat.io, Noteflight, and similar — export MusicXML, then open here.',
             'txt-howTitle':  'Practice flow',
-            'txt-howBody':   'START — step practice: play highlighted notes in order. Space starts or stops.\nDEMO — plays the score with measure highlight and optional built-in piano. If BOOK is on 1 column, the app switches to 2 columns during DEMO for smoother page follow, then restores your layout when DEMO ends.\n\nÜT (Ms) — limits START and DEMO to a measure range.\nB / B1–B3 — bookmarks: click loads; Shift+click saves scroll, spread, and range.\nOLED ▲▼ — previous/next piece in the active library. Tap the title for the full library.',
+            'txt-howBody':   'START — step-by-step practice: play only the notes the score highlights, in order. Spacebar starts or stops.\nDEMO — the app plays the piece with the current measure highlighted and optional built-in piano sound. If book view uses one column, DEMO temporarily switches to two columns for smoother page scrolling, then restores your layout when DEMO ends.\n\nWhen a measure range is set (soft amber band on the score), START and DEMO work only in that range — not the whole piece.\nNext to the title display, ▲ / ▼ loads the previous or next piece in the library; tap the title to open the full library.\n\nThe sections below explain measure selection and bookmarks in more detail.',
+            'txt-infoMeasureGuideTitle': 'Measure range — choosing and clearing',
+            'txt-infoMeasureGuideBody': 'What it does: limits START and DEMO to certain measures. The selected area is shown as a light amber tint on the score.\n\nHow to set the range:\n• Open the measure range dialog (staff-lines icon, top right of the 2×2 control block). Enter the first and last measure number, then tap OK.\n• Click-to-select on the score: turn ON the tilted pointer (top left of that block), or use the checkbox in the measure range dialog. It is OFF by default so normal clicks on the score do not change the selection.\n\nWith click-to-select ON:\n• One click on a measure — only that measure stays selected (previous selection is replaced).\n• Shift+click another measure — every measure from the one you last clicked up to the new click is included (you can extend the range in several steps).\n• Cmd+click (Mac) or Ctrl+click (Windows) — add or remove single measures without clearing the rest.\n\nHow to clear the range (whole piece again):\n• Tap ∅ bottom left of the 2×2 block — same as ∅ next to OK in the measure range dialog.\n• Bookmarks open from bottom right. Turning click-to-select OFF only stops further clicks from changing the range; it does not remove the amber band — use ∅ to clear the range.\n\nWhen you are done, turn click-to-select OFF if you do not want accidental changes.',
+            'txt-infoBookmarksGuideTitle': 'Bookmarks B1 · B2 · B3',
+            'txt-infoBookmarksGuideBody': 'Saved only in your browser, separately for each score file.\n\n• Click B1, B2, or B3 — loads that slot for the current score: restores the saved measure range, scroll position in the score area, and (in two- or three-column book view) which page spread you were on.\n• Shift+click the same button — saves the current state into that slot (for this file only).\n\nSaved: the active measure selection (amber band), vertical scroll in the score panel, and the spread index in multi-column book view.\n\nNot saved: zoom, number of columns (1 / 2 / 3), tempo, or other files. If nothing was saved in a slot, a normal click tells you it is empty.\n\nLOG in the bookmark panel shows a short history of completed practice runs (tempo, steps, measure range if any).',
             'txt-infoPanelTitle': 'Toolbar (right of the sheet)',
-            'txt-infoPanelBody': 'Expand corners — theater / full score: hides rack and keyboard; score fills the area; may use browser fullscreen (Esc exits).\nSliders — zoom, page margins, staff spacing.\nBOOK — cycles 1 / 2 / 3 columns (scroll vs spreads). With 2–3 columns, ◀ ▶ flip spreads.\nHalf-moon — background: light, paper (sepia), dark (inverts notation).\nXML — open .xml / .musicxml / .mxl from disk.\nPRE — five slots: click loads saved zoom + layout; Shift+click saves the current view.',
+            'txt-infoPanelBody': 'Expand corners — full-screen score view: hides rack and keyboard; score fills the area; browser fullscreen optional (Esc exits).\nSliders — zoom, page margins, staff spacing.\nOpen book — cycles 1 / 2 / 3 columns (scroll vs spreads). With 2–3 columns, ◀ ▶ change spreads.\nSun button — cycles score colours: light, paper (sepia), dark with white notation, dark with warm notation.\nScore file — open .xml / .musicxml / .mxl from disk.\n2×2 block next to the piano button: top left — click-to-select on the score; top right — measure range dialog; bottom left — ∅ clears the measure selection (full score again); bottom right — bookmarks.\nStar — five view presets: click a number to load zoom + layout; Shift+click saves the current view.',
             'txt-infoShortcutsTitle': 'Keyboard',
             'txt-infoShortcutsBody': '← → — previous / next spread when BOOK uses 2–3 columns.\nSpace — START / STOP practice.\nNumpad + / − — zoom in or out.',
             'txt-ctrlTitle': 'Rack (below the score)',
@@ -665,12 +768,13 @@
             'txt-logClose':  'Close',
             'txt-measureRangeTitle': 'Measure range',
             'txt-measureRangeSec': 'START / DEMO scope',
+            'txt-measureRangeClickPickLabel': 'Allow clicking the score to choose measures (Shift / Ctrl+click as described in the guide)',
             'txt-measureRangeClose': 'Close',
             'txt-bookmarksTitle': 'Bookmarks',
             'txt-bookmarksClose': 'Close',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Score library',
-            'txt-scoreLibHint': 'Several named libraries; each has its own piece list (stored in the browser only).\n\n+ File / + Batch — import MusicXML/MXL into storage.\nLink folder — Chrome/Edge can attach a local folder; all .xml / .mxl inside stay listed after refresh.\nURL — only works if the server allows other sites to fetch the file (CORS). MuseScore, IMSLP, and many hosts do not; download the file and use XML instead.\nSave — store the currently open score under a name in the active library.',
+            'txt-scoreLibHint': 'Several named libraries; each has its own piece list (stored in the browser only).\n\n+ File / + Batch — import MusicXML/MXL into storage.\nLink folder — Chrome/Edge can attach a local folder; all .xml / .mxl inside stay listed after refresh.\nURL — only works if the server allows other sites to fetch the file (CORS). MuseScore, IMSLP, and many hosts do not; download the file and use the score file icon on the right instead.\nSave — store the currently open score under a name in the active library.',
             'txt-scoreLibLibsHdr': 'Libraries',
             'btnScoreLibAddLibrary': '+ New collection',
             'txt-scoreLibPiecesHdr': 'Pieces',
@@ -679,31 +783,36 @@
             'btnScoreLibFetch': 'URL'
         },
         HU:{
-            'txt-infoTitle': 'Kotta modul — útmutató',
-            'txt-infoScoresTitle': 'Kotta fájlok és források',
-            'txt-infoScoresBody': 'Olvasott formátumok: MusicXML (.xml, .musicxml) és tömörített .mxl (ZIP-ben MusicXML). Ez a szabványos csereformátum kottaszerkesztők között.\n\nBetöltés:\n• XML (jobb eszköztár) — fájl választása; azonnal megnyílik.\n• Könyvtár (katt a kotta címére) — + File / + Batch a böngésző tárhelyére másol; Link mappa (Chrome/Edge) egy helyi mappa összes .xml / .mxl fájlját kilistázza.\n• URL — közvetlen .musicxml vagy .mxl hivatkozás. Sok oldal letiltja a más domainről történő letöltést (CORS); gyakran egyszerűbb Mentés másként, majd XML gomb.\n\nHonnan szerezz kottát:\n• MuseScore (musescore.com) — a weben gyakran csak lejátszás/PDF; MusicXML-hez MuseScore asztali alkalmazás: Fájl → Exportálás → MusicXML. Darabonként eltérő licenc.\n• IMSLP — hatalmas közkincs-gyűjtemény; sok anyag PDF képként. Kell MusicXML változat, vagy más szerkesztőben begépelés és export.\n• Flat.io, Noteflight, Finale, Dorico stb. — MusicXML export, majd itt megnyitás.',
+            'txt-infoTitle': 'Repertoár modul — útmutató',
+            'txt-infoScoresTitle': 'Kottafájlok és források',
+            'txt-infoScoresBody': 'A modul csak MusicXML (.xml, .musicxml) és tömörített .mxl (ZIP-ben MusicXML) fájlt tud megnyitni. PDF-et nem: gyakorlásra, kurzorra, MIDI-re és ütemtartományra a PDF nem alkalmas; MusicXML-et viszont a legtöbb kottaszerkesztőből egyszerűen exportálhatsz.\n\nBetöltés:\n• Kottafájl ikon a jobb oldali eszköztáron (dokumentum kottavonalakkal) — kiválasztod a fájlt, és azonnal megnyílik.\n• Könyvtár — kattints a kotta címére a kijelzőn; a + File / + Batch a böngésző tárhelyére másolja a fájlokat. A Link mappa (Chrome, Edge) egy kiválasztott mappa összes .xml és .mxl fájlját kilistázza.\n• URL — közvetlen .musicxml vagy .mxl cím. Sok szerver nem engedi a másik oldalról való letöltést (CORS); ilyenkor gyakran egyszerűbb letölteni a fájlt, majd a kottafájl ikonnal megnyitni.\n\nHonnan legyen MusicXML:\n• MuseScore (asztali) — Fájl → Exportálás → MusicXML (a darab licencétől függ, mit szabad).\n• IMSLP és más gyűjtemények — ha van MusicXML kiadás, azt válaszd, vagy exportálj más programból (MuseScore, Finale, Dorico stb.).\n• Flat.io, Noteflight és hasonlók — export MusicXML, majd megnyitás itt.',
             'txt-howTitle':  'Gyakorlás menete',
-            'txt-howBody':   'START — lépésenkénti gyakorlás: a kiemelt hangok sorrendben. Szóköz indít / megáll.\nDEMO — lejátszás ütemkiemeléssel és opcionális belső zongorahanggal. Ha BOOK 1 hasábon van, demó alatt átmenetileg 2 hasábra vált a simább lapkövetéshez, demó végén visszaáll a nézeted.\n\nÜT — START és DEMO csak a megadott ütemtartományra.\nB / B1–B3 — könyvjelző: katt betölt, Shift+katt ment (görgetés, spread, tartomány).\nOLED ▲▼ — előző/következő darab az aktív könyvtárban. Címre katt: teljes könyvtárablak.',
+            'txt-howBody':   'START — lépésről lépésre gyakorlod a kotta által kiemelt hangokat, a megadott sorrendben. Szóköz: indítás vagy leállítás.\nDEMO — az alkalmazás lejátsza a darabot: az aktuális ütem kiemelve látszik, a hangot pedig opcionálisan a beépített zongora adja. Ha a könyvet egy hasábban nézed, a DEMO alatt átmenetileg két hasábra vált a gördülékenyebb lapkövetés miatt; a DEMO végén visszaáll a korábbi nézet.\n\nHa be van állítva ütemtartomány (enyhe borostyánsárga szín a kottán), a START és a DEMO csak erre a szakaszra vonatkozik, nem az egész darabra.\nA cím melletti ▲ és ▼ az aktuális könyvtárban az előző vagy a következő darabra vált; a címre kattintva megnyílik a teljes könyvtár.\n\nA következő két fejezet részletesen elmagyarázza az ütemek kijelölését és a könyvjelzőket.',
+            'txt-infoMeasureGuideTitle': 'Ütemtartomány — kijelölés és törlés',
+            'txt-infoMeasureGuideBody': 'Mire való: meghatározza, hogy a START és a DEMO a kotta mely ütemein dolgozzon. A kijelölt rész enyhén borostyánsárga háttérrel látszik.\n\nBeállítás:\n• Nyisd meg az ütemtartomány ablakot (vonalkás ikon a 2×2-es gombcsoport jobb felső mezőjében). Írd be az első és az utolsó ütem számát, majd koppints az OK gombra.\n• Egérrel a kottán: kapcsold be a ferde egérmutató ikont (bal felső mező ugyanabban a csoportban), vagy jelöld be ugyanezt az ütemtartomány ablakban. Alapból ki van kapcsolva, hogy véletlen kattintásra ne változzon a kijelölés.\n\nHa be van kapcsolva az egérrel választás:\n• Egy kattintás egy ütemre — csak az az ütem marad kijelölve (a korábbi kijelölés törlődik).\n• Shift és kattintás egy másik ütemre — minden ütem bekerül a két ütem között, az első kattintásodtól számítva (több lépésben is bővítheted a szakaszt).\n• Macen Cmd + kattintás, Windowson Ctrl + kattintás — egy-egy ütem külön be- vagy kikapcsolható a kijelölésből.\n\nKijelölés törlése (újra az egész darab):\n• A 2×2-es csoport bal alsó mezőjében a ∅ gomb (ugyanolyan színű, mint a többi ikon), vagy ugyanez az ütemtartomány ablakban az OK mellett. Ez törli a tartományt: a START és a DEMO ismét az egész kottára vonatkozik.\n• A könyvjelzőt a jobb alsó gomb nyitja. Ha kikapcsolod az egérrel választást, attól a borostyánsárga sáv még megmarad; a tartományt csak a ∅ gombbal törölheted.\n\nHa nem szeretnél többé a kottán kattintással módosítani a kijelölést, kapcsold ki az egérrel választást is.',
+            'txt-infoBookmarksGuideTitle': 'Könyvjelzők B1 · B2 · B3',
+            'txt-infoBookmarksGuideBody': 'Csak a böngészőben tárolódnak; minden kottafájlhoz külön tartoznak a B1, B2, B3 helyek.\n\n• Egyszerű kattintás a B1, B2 vagy B3 gombon — betölti a mentést az épp nyitott darabhoz: visszaáll a mentett ütemtartomány, a kotta görgetési helyzete, és ha két vagy három hasábban nézed a könyvet, az is, melyik oldalpáron voltál.\n• Shift és kattintás ugyanezen a gombon — elmenti az aktuális állapotot ebbe a helyre (csak ehhez a fájlhoz).\n\nMit ment: a kijelölt ütemeket (amit a borostyánsárga mutat), a kottaablak függőleges görgetését, több hasábnál pedig az aktuális oldalpár sorszámát.\n\nMit nem ment: a nagyítást, a hasábszámot (1 / 2 / 3), a tempót, más darabot. Üres helyre sima kattintáskor jelzi, hogy még nincs ott mentés.\n\nA könyvjelzők panelen a LOG a korábbi gyakorlások rövid listája (tempó, lépésszám, ütemtartomány, ha volt).',
             'txt-infoPanelTitle': 'Eszköztár a kotta mellett (jobb)',
-            'txt-infoPanelBody': 'Sarkok ikon — színház / teljes kotta: rack és billentyűzet eltűnik, a lap kitölti a területet; böngésző fullscreen lehet (Esc kilép).\nCsúszkák — nagyítás, lapmargó, sortáv.\nBOOK — 1 / 2 / 3 hasáb váltás (görgetés vs. spread). 2–3 hasábnál ◀ ▶ lapoz.\nFélhold — háttér: világos, papír (bézs), sötét (invertált vonalak).\nXML — .xml / .musicxml / .mxl lemezről.\nPRE — öt rekesz: katt betölti a mentett nagyítást + elrendezést; Shift+katt mentés.',
+            'txt-infoPanelBody': 'Sarkok ikon — teljes képernyős kotta nézet: eltűnik a rack és a billentyűzet, a kotta kitölti a területet; böngészőben teljes képernyő is lehetséges (Esc kilép).\nCsúszkák — nagyítás, lapmargó, kottasorok távolsága.\nNyitott könyv ikon — 1, 2 vagy 3 hasáb (folyamatos görgetés vagy oldalanként). Két vagy három hasábnál a ◀ ▶ gombok lapoznak.\nNap gomb — négy megjelenés váltása: világos, papír (bézs), sötét fehér jegyzettel, sötét meleg tónusú jegyzettel.\nKottafájl — .xml, .musicxml vagy .mxl megnyitása a gépről.\nA zongora gomb melletti 2×2-es négyes: bal felső — egérrel kijelölés a kottán; jobb felső — ütemtartomány ablak; bal alsó — ∅ törli az ütemkijelölést (vissza az egész kotta); jobb alsó — könyvjelző.\nCsillag — öt nézetmentés: számra kattintva betöltés, Shift + szám mentés (nagyítás és elrendezés).',
             'txt-infoShortcutsTitle': 'Billentyűparancsok',
-            'txt-infoShortcutsBody': '← → — előző / következő spread, ha BOOK 2–3 hasáb.\nSzóköz — START / STOP gyakorlás.\nNumerikus + / − — nagyítás léptetése.',
+            'txt-infoShortcutsBody': '← → — előző vagy következő oldalpár, ha a könyv nézet két vagy három hasábos.\nSzóköz — START vagy STOP (gyakorlás).\nNumerikus + / − — nagyítás léptetése.',
             'txt-ctrlTitle': 'Rack (a kotta alatt)',
-            'txt-ctrl0':     'Kulcs sáv — váltás: Violin+basszus / csak violin / csak basszus (segédletek és melyik sort gyakorlod).',
-            'txt-ctrl4':     'Szem — gyakorlás: billentyű LED + ▼ a billentyűzet fölötti sávban; újra katt: ki.',
+            'txt-ctrl0':     'Kulcssáv — sorrendben: két kottasor (violin- és basszuskulcs), csak violin, csak basszus. Meghatározza a segédleteket és azt, melyik sort gyakorlod.',
+            'txt-ctrl4':     'Szem ikon — gyakorláskor a billentyűkön LED és a billentyűzet fölött ▼ jelölők; újra rákattintva kikapcsolható.',
             'txt-infoHelpTitle': 'Súgó mód (? )',
-            'txt-infoHelpBody': 'Kapcsold be a ?-t, majd kattints bármely leírással rendelkező vezérlőre — a szöveg az infósávba kerül. ? újra: kilépés. Az I gomb ezt az útmutatót nyitja (EN / HU a nyelvgombokkal).',
+            'txt-infoHelpBody': 'Kapcsold be a ? gombot, majd kattints bármely olyan elemre, amelyhez leírás tartozik — a szöveg az infósávba kerül. A ? újbóli megnyomásával kilépsz. Az I gomb ezt az útmutatót nyitja meg; a nyelvet az EN / HU gombokkal válthatod.',
             'txt-gotIt':     'Értettem',
             'txt-logTitle':  'Gyakorlás napló (utolsó futások)',
             'txt-logClose':  'Bezár',
             'txt-measureRangeTitle': 'Ütemtartomány',
             'txt-measureRangeSec': 'START / DEMO hatókör',
+            'txt-measureRangeClickPickLabel': 'Engedélyezem, hogy a kottán kattintva válasszak ütemeket (Shift és Ctrl: lásd az útmutatóban)',
             'txt-measureRangeClose': 'Bezár',
             'txt-bookmarksTitle': 'Könyvjelzők',
             'txt-bookmarksClose': 'Bezár',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Kottakönyvtár',
-            'txt-scoreLibHint': 'Több elnevezett könyvtár; mindegyik saját darablistát tart (csak a böngészőben tárolva).\n\n+ File / + Batch — MusicXML/MXL import a tárhelyre.\nLink mappa — Chrome/Edge: helyi mappa csatolása; a benne lévő .xml / .mxl fájlok újratöltés után is listázva maradnak.\nURL — csak akkor működik, ha a szerver engedi a külső letöltést (CORS). A MuseScore, IMSLP és sok más oldal általában nem; töltsd le a fájlt, és használd az XML gombot.\nMentés — az épp nyitott kotta elmentése névvel az aktív könyvtárba.',
+            'txt-scoreLibHint': 'Több elnevezett könyvtár; mindegyik saját darablistát tart (csak a böngészőben tárolva).\n\n+ File / + Batch — MusicXML/MXL import a tárhelyre.\nLink mappa — Chrome/Edge: helyi mappa csatolása; a benne lévő .xml / .mxl fájlok újratöltés után is listázva maradnak.\nURL — csak akkor működik, ha a szerver engedi a külső letöltést (CORS). A MuseScore, IMSLP és sok más oldal általában nem; töltsd le a fájlt, és használd a jobb oldali kotta-fájl ikont.\nMentés — az épp nyitott kotta elmentése névvel az aktív könyvtárba.',
             'txt-scoreLibLibsHdr': 'Könyvtárak',
             'btnScoreLibAddLibrary': '+ Új gyűjtemény',
             'txt-scoreLibPiecesHdr': 'Darabok',
@@ -723,24 +832,26 @@
             btnStart:'START/STOP: step practice on the score, or stop.',
             btnLibPrev:'Previous piece in the active library.',
             btnLibNext:'Next piece in the active library.',
-            oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). XML loads from disk on the right.',
+            oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
             btnDemo:'DEMO: plays the score with highlight. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
             audioToggle:'Piano audio: built-in sampled piano on or off.',
-            btnMeasureRange:'Measure range: limits START and DEMO to the chosen measures.',
-            btnBookmarksTools:'Bookmarks: B1–B3 — click load, Shift+click save; LOG opens practice history.',
+            btnMeasureRange:'Measure range (top right of the 2×2 block): limits START and DEMO. Type numbers in the dialog, or use the pointer (top left) / checkbox to pick on the score (Shift / Ctrl+click).',
+            btnMeasureClickPick:'Click-to-select (top left of the 2×2 block): OFF by default — ON shows green tint. Same as the checkbox in the measure range dialog.',
+            btnPracticeRangeClearToolbar:'Clear selection (∅, bottom left of the 2×2 block): full score for START/DEMO again. Does not turn off click-to-select.',
+            btnBookmarksTools:'Bookmarks (bottom right): B1–B3 — click loads range, scroll, spread; Shift+click saves. LOG — practice history.',
             btnFullscreen:'Browser fullscreen for the page — press again or Esc to exit.',
             btnHelp:'Help mode: tap any control with a tooltip to read it in the info bar. Tap ? again to exit.',
             btnInfo:'Info: opens this full guide (I).',
             keyHintStrip:'Hint strip: ▼ markers line up with practice keys (same as eye hints).',
-            btnBookView:'BOOK: cycles 1 / 2 / 3 columns — scroll pages or paged spreads.',
+            btnBookView:'Book layout: cycles 1 / 2 / 3 columns — scroll pages or paged spreads.',
             btnOsmdPrevSpread:'Previous spread (2–3 column BOOK).',
             btnOsmdNextSpread:'Next spread (2–3 column BOOK).',
-            btnUploadScore:'XML: open MusicXML or MXL from your computer.',
-            btnPresetsToggle:'PRE: five view presets — click number to load, Shift+click to save layout and zoom.'
+            btnUploadScore:'Score file: open MusicXML or MXL from your computer.',
+            btnPresetsToggle:'View presets (star icon): five slots — click a number to load, Shift+click to save layout and zoom.'
         },
         HU:{
             btnHome:'Főoldal: vissza a modulválasztó menühöz.',
-            btnClef:'Kulcs: váltás Violin+basszus / csak violin / csak basszus.',
+            btnClef:'Kulcs: váltás violin- és basszuskulcs / csak violin / csak basszus.',
             btnHints:'Segédletek: billentyű LED + ▼ sáv a következő hangokhoz — katt: ki.',
             metroToggle:'Metronóm: katt indul / megáll.',
             metroBpmBox:'Tempó: katt BPM előbeállítások; ▲▼ finomhangolás.',
@@ -748,20 +859,22 @@
             btnStart:'START/STOP: lépésenkénti gyakorlás a kottán, vagy megáll.',
             btnLibPrev:'Előző darab az aktív könyvtárban.',
             btnLibNext:'Következő darab az aktív könyvtárban.',
-            oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). XML jobbról lemezről.',
+            oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
             btnDemo:'DEMO: lejátszás kiemeléssel. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
             audioToggle:'Zongora hang: belső mintahang be vagy ki.',
-            btnMeasureRange:'Ütemtartomány: START és DEMO csak a megadott ütemekre.',
-            btnBookmarksTools:'Könyvjelzők: B1–B3 — katt betölt, Shift+katt ment; LOG: gyakorlás napló.',
+            btnMeasureRange:'Ütemtartomány (2×2-es csoport jobb felső): START és DEMO határa. Számok az ablakban, vagy bal felső mutató / jelölőnégyzet + kotta (Shift / Ctrl+katt).',
+            btnMeasureClickPick:'Egérrel választás (2×2 bal felső): alapból ki; bekapcsolva zöldes háttér. Ugyanaz, mint az ütemtartomány ablak jelölőnégyzete.',
+            btnPracticeRangeClearToolbar:'Kijelölés törlése (∅, 2×2 bal alsó): újra teljes kotta START-hoz és DEMO-hoz. Nem kapcsolja ki az egérrel választást.',
+            btnBookmarksTools:'Könyvjelző (2×2 jobb alsó): B1–B3 — kattintás betölt, Shift + kattintás ment; LOG: napló.',
             btnFullscreen:'Böngésző teljes képernyő — újra katt vagy Esc kilép.',
             btnHelp:'Súgó: kattints egy leírást kapó elemre — szöveg az infósávban. ? újra: kilépés.',
             btnInfo:'Infó: részletes útmutató (I gomb).',
             keyHintStrip:'Segéd sáv: a ▼ jelölők a gyakorlandó billentyűkhöz igazodnak (szemmel együtt).',
-            btnBookView:'BOOK: 1 / 2 / 3 hasáb — görgetős lapok vagy spread lapozás.',
+            btnBookView:'Könyv nézet: 1 / 2 / 3 hasáb — görgetős lapok vagy spread lapozás.',
             btnOsmdPrevSpread:'Előző spread (2–3 hasábos BOOK).',
             btnOsmdNextSpread:'Következő spread (2–3 hasábos BOOK).',
-            btnUploadScore:'XML: MusicXML vagy MXL megnyitása a gépről.',
-            btnPresetsToggle:'PRE: öt nézet előbeállítás — szám: betöltés, Shift+szám: mentés (nagyítás + elrendezés).'
+            btnUploadScore:'Kotta-fájl: MusicXML vagy MXL megnyitása a gépről.',
+            btnPresetsToggle:'Nézet előbeállítások (csillag ikon): öt rekesz — szám: betöltés, Shift+szám: mentés (nagyítás + elrendezés).'
         }
     };
     function applyHelpTooltips(){
@@ -797,16 +910,21 @@
     }
 
     const LS_PRACTICE_RANGE='skalak_practice_range_v1';
+    const LS_PRACTICE_RANGE_CLICK_PICK='skalak_practice_range_click_pick_v1';
     const LS_PRACTICE_LOG='skalak_practice_log_v1';
+    let practiceRangeClickPickMode=false;
     const LS_BOOKMARKS='skalak_bookmarks_v1';
     const LS_SCORE_LIB_INDEX='skalak_score_lib_index_v1';
     const LS_SCORE_LIBS_V2='skalak_score_libs_v2';
     function libStorageKey(id){return'skalak_lib_xml_'+String(id||'');}
     let currentScoreHash='';
-    let practiceRangeStartMeasure=null;
-    let practiceRangeEndMeasure=null;
+    let practiceRangeMeasureSet=new Set();
+    let practiceRangeMouseAnchorMeasure=null;
     let lastLoadedScoreBpmFromXml=0;
 
+    function practiceRangeSortedMeasures(){
+        return[...practiceRangeMeasureSet].filter(n=>Number.isFinite(n)&&n>=1).sort((a,b)=>a-b);
+    }
     function hashScoreXml(xml){
         const s=String(xml||'');
         let h=2166136261>>>0;
@@ -814,18 +932,16 @@
         return(h>>>0).toString(36);
     }
     function isPracticeRangeActive(){
-        if(practiceRangeStartMeasure==null||practiceRangeEndMeasure==null)return false;
-        const a=Number(practiceRangeStartMeasure),b=Number(practiceRangeEndMeasure);
-        return Number.isFinite(a)&&Number.isFinite(b)&&a>=1&&b>=1;
+        return practiceRangeMeasureSet.size>0;
     }
     function syncPracticeRangeInputs(){
         const a=document.getElementById('practiceRangeFrom'),b=document.getElementById('practiceRangeTo');
         if(!a||!b)return;
         if(!isPracticeRangeActive()){a.value='';b.value='';return;}
-        const lo=Math.min(practiceRangeStartMeasure,practiceRangeEndMeasure);
-        const hi=Math.max(practiceRangeStartMeasure,practiceRangeEndMeasure);
-        a.value=String(lo);
-        b.value=String(hi);
+        const u=practiceRangeSortedMeasures();
+        if(!u.length){a.value='';b.value='';return;}
+        a.value=String(u[0]);
+        b.value=String(u[u.length-1]);
     }
     function readLibraryIndexLegacy(){
         try{
@@ -886,6 +1002,72 @@
         const keep=Math.max(4,Math.floor((m-1)/2));
         return t.slice(0,keep)+'…'+t.slice(t.length-keep);
     }
+    function prettifyFilenameScoreTitle(name){
+        let s=String(name||'').replace(/\.(xml|musicxml|mxl)$/i,'').trim();
+        if(!s)return'';
+        s=s.replace(/[_]+/g,' ').replace(/\s+/g,' ').trim();
+        s=s.replace(/\s*[-–—]+\s*/g,' — ');
+        s=s.replace(/([a-záéíóöőúüű])([-–])([a-záéíóöőúüű0-9])/gi,'$1 $3');
+        s=s.replace(/[-–]{2,}/g,' — ');
+        s=s.replace(/\s+/g,' ').trim();
+        return s;
+    }
+    function xmlLocalName(el){
+        if(!el||el.nodeType!==1)return'';
+        return el.localName||String(el.nodeName||'').split(':').pop()||'';
+    }
+    function xmlTextClean(el){
+        if(!el)return'';
+        return String(el.textContent||'').replace(/\s+/g,' ').trim();
+    }
+    /** movement-title / work-title / credit (MusicXML), névterek nélkül is működik */
+    function extractMusicXmlDisplayTitle(xmlStr){
+        const raw=String(xmlStr||'').trim();
+        if(!raw||(!raw.includes('<')&&!raw.includes('&lt;')))return'';
+        try{
+            const doc=new DOMParser().parseFromString(raw,'application/xml');
+            const root=doc.documentElement;
+            if(!root)return'';
+            const rn=xmlLocalName(root);
+            if(rn==='parsererror')return'';
+            if(!/score-partwise|score-timewise/i.test(rn))return'';
+            const all=root.getElementsByTagName('*');
+            const firstLocal=(ln)=>{
+                for(let i=0;i<all.length;i++){
+                    if(xmlLocalName(all[i])===ln)return all[i];
+                }
+                return null;
+            };
+            const mov=xmlTextClean(firstLocal('movement-title'));
+            const work=xmlTextClean(firstLocal('work-title'));
+            if(mov&&work&&mov!==work)return work+' — '+mov;
+            if(mov)return mov;
+            if(work)return work;
+            for(let i=0;i<all.length;i++){
+                const e=all[i];
+                if(xmlLocalName(e)!=='credit')continue;
+                let ctype='',words='';
+                for(let c=e.firstChild;c;c=c.nextSibling){
+                    if(c.nodeType!==1)continue;
+                    const ln=xmlLocalName(c);
+                    if(ln==='credit-type')ctype=String(c.textContent||'').trim().toLowerCase();
+                    else if(ln==='credit-words'&&!words)words=xmlTextClean(c);
+                }
+                if((ctype==='title'||ctype==='subtitle')&&words)return words;
+            }
+            for(let i=0;i<all.length;i++){
+                const e=all[i];
+                if(xmlLocalName(e)!=='credit')continue;
+                for(let c=e.firstChild;c;c=c.nextSibling){
+                    if(c.nodeType===1&&xmlLocalName(c)==='credit-words'){
+                        const w=xmlTextClean(c);
+                        if(w)return w;
+                    }
+                }
+            }
+        }catch(e){}
+        return'';
+    }
     function osmdTryGetWorkTitle(){
         try{
             const sh=typeof getOsmdMusicSheet==='function'?getOsmdMusicSheet():null;
@@ -938,7 +1120,7 @@
         }
         updateLibraryOledText();
     }
-    function addScoreToLibrary(displayName,xml){
+    function addScoreToLibrary(displayName,xml,opts){
         const xmlStr=String(xml||'');
         if(!xmlStr.trim())return false;
         const id=hashScoreXml(xmlStr);
@@ -949,7 +1131,15 @@
         let s=readLibrariesState();
         const lib=getActiveLibrary(s);
         if(!lib.entries)lib.entries=[];
-        const base=(displayName||'score').replace(/\.(xml|musicxml|mxl)$/i,'').trim()||'score';
+        const preferUser=opts&&opts.preferUserTitle;
+        const userStripped=String(displayName||'').replace(/\.(xml|musicxml|mxl)$/i,'').trim();
+        let base;
+        if(preferUser&&userStripped)base=userStripped;
+        else{
+            const meta=extractMusicXmlDisplayTitle(xmlStr);
+            base=meta||prettifyFilenameScoreTitle(displayName||'')||userStripped||'score';
+        }
+        if(!base)base='score';
         const ix=lib.entries.findIndex(e=>e&&e.id===id);
         if(ix>=0)lib.entries[ix].title=base;
         else lib.entries.push({id,title:base});
@@ -958,6 +1148,28 @@
         updateLibraryOledText();
         refreshScoreLibraryListUI();
         return true;
+    }
+    function maybeUpgradeLibraryTitleFromEmbeddedMetadata(xmlStr){
+        const meta=extractMusicXmlDisplayTitle(xmlStr);
+        if(!meta)return;
+        const id=hashScoreXml(xmlStr);
+        let s=readLibrariesState();
+        const lib=getActiveLibrary(s);
+        const ix=lib.entries.findIndex(e=>e&&e.id===id);
+        if(ix<0)return;
+        const cur=String(lib.entries[ix].title||'');
+        if(cur===meta)return;
+        const slugLike=t=>{
+            if(!t)return true;
+            if(/_/.test(t))return true;
+            if(!/\s/.test(t)&&/-/.test(t)&&/\d/.test(t)&&t.length>=6)return true;
+            return false;
+        };
+        if(!slugLike(cur))return;
+        lib.entries[ix].title=meta;
+        saveLibrariesState(s);
+        updateLibraryOledText();
+        refreshScoreLibraryListUI();
     }
     function removeLibraryEntryById(id){
         const sid=String(id||'');
@@ -970,6 +1182,25 @@
         saveLibrariesState(s);
         applyLibraryOledAfterLoad();
         refreshScoreLibraryListUI();
+        const empty=!lib.entries.length;
+        const wasCurrent=sid===currentScoreHash;
+        if(!empty&&!wasCurrent)return;
+        void (async()=>{
+            await clearRepertoarSessionScoreStorage();
+            if(empty){
+                const ok=await loadBundledWelcomeScoreIntoView();
+                const hu=currentLang==='HU';
+                if(!ok)setInfoBar(hu?'Nincs mintakotta — tedd a samples/ mappába (repertoar-welcome.musicxml vagy .mxl)':'No sample — add samples/repertoar-welcome.musicxml or .mxl',null);
+            }else{
+                const s2=readLibrariesState();
+                const lib2=getActiveLibrary(s2);
+                const ent2=lib2.entries||[];
+                if(ent2.length){
+                    const ix=Math.min(s2.activeEntryIndex|0,ent2.length-1);
+                    await loadLibraryEntryById(ent2[ix].id);
+                }
+            }
+        })();
     }
     async function loadLibraryEntryById(id){
         const xml=localStorage.getItem(libStorageKey(id));
@@ -988,7 +1219,8 @@
         if(!lib.entries)lib.entries=[];
         if(lib.entries.some(e=>e&&e.id===id))return;
         try{localStorage.setItem(libStorageKey(id),xmlStr);}catch(e){return;}
-        lib.entries.push({id,title:String(title||'Restored').replace(/\.(xml|musicxml|mxl)$/i,'')||'Restored'});
+        const nice=extractMusicXmlDisplayTitle(xmlStr)||prettifyFilenameScoreTitle(title||'')||String(title||'Restored').replace(/\.(xml|musicxml|mxl)$/i,'').trim()||'Restored';
+        lib.entries.push({id,title:nice});
         s.activeEntryIndex=lib.entries.length-1;
         saveLibrariesState(s);
         updateLibraryOledText();
@@ -1130,6 +1362,12 @@
         refreshScoreLibraryListUI();
         updateLibraryOledText();
         if(ent.length&&ent[s.activeEntryIndex])void loadLibraryEntryById(ent[s.activeEntryIndex].id);
+        else void (async()=>{
+            await clearRepertoarSessionScoreStorage();
+            const ok=await loadBundledWelcomeScoreIntoView();
+            const hu=currentLang==='HU';
+            if(!ok)setInfoBar(hu?'Nincs mintakotta — samples/repertoar-welcome...':'No sample — samples/repertoar-welcome...',null);
+        })();
     }
     function updateScoreLibPiecesHeader(){
         const el=document.getElementById('txt-scoreLibPiecesHdr');
@@ -1291,18 +1529,74 @@
         const inp=document.getElementById('scoreLibSaveNameInput');
         const def=hu?'Darab':'Piece';
         const t=(inp&&(inp.value||'').trim())||def;
-        addScoreToLibrary(t,xml);
+        addScoreToLibrary(t,xml,{preferUserTitle:true});
         setInfoBar(hu?'Mentve a böngésző könyvtárába':'Saved to browser library',null);
         if(inp)inp.value='';
     }
     let workshopBmSlot=0;
     function syncWorkshopBmSlotLabel(){
         const hb=document.getElementById('btnBookmarksTools');
-        if(hb)hb.textContent='B'+(workshopBmSlot+1);
+        if(!hb)return;
+        const hu=currentLang==='HU';
+        const t=hu
+            ?('Könyvjelző B'+(workshopBmSlot+1)+'–B3 + napló (Shift+katt: mentés).')
+            :('Bookmarks B'+(workshopBmSlot+1)+'–B3 + log (Shift+click: save).');
+        hb.title=t;
+        hb.setAttribute('aria-label',t);
+    }
+    function readPersistedPracticeRangeClickPick(){
+        try{return localStorage.getItem(LS_PRACTICE_RANGE_CLICK_PICK)==='1';}catch(e){return false;}
+    }
+    function persistPracticeRangeClickPick(){
+        try{localStorage.setItem(LS_PRACTICE_RANGE_CLICK_PICK,practiceRangeClickPickMode?'1':'0');}catch(e){}
+    }
+    function setPracticeRangeClickPickMode(on){
+        practiceRangeClickPickMode=!!on;
+        persistPracticeRangeClickPick();
+        syncPracticeRangeClickPickChrome();
+    }
+    function togglePracticeRangeClickPickMode(){
+        if(helpActive)return;
+        setPracticeRangeClickPickMode(!practiceRangeClickPickMode);
+    }
+    function onPracticeRangeClickPickCheckboxChange(){
+        if(helpActive)return;
+        const c=document.getElementById('chkPracticeRangeClickPick');
+        setPracticeRangeClickPickMode(!!(c&&c.checked));
+    }
+    function syncPracticeRangeClickPickCheckbox(){
+        const c=document.getElementById('chkPracticeRangeClickPick');
+        if(c)c.checked=practiceRangeClickPickMode;
+    }
+    function syncPracticeRangeClickPickChrome(){
+        const b=document.getElementById('btnMeasureClickPick');
+        const cont=document.getElementById('osmd-container');
+        const hu=currentLang==='HU';
+        if(cont)cont.classList.toggle('practice-range-click-pick-on',!!practiceRangeClickPickMode&&scoreMode);
+        if(b){
+            b.classList.toggle('active',practiceRangeClickPickMode);
+            const titleOn=hu
+                ?'Egérrel választás: be — kattints az ütemekre a kottán (Shift és Ctrl: lásd az útmutatót). Újra rákattintva kikapcsolod.'
+                :'Click-to-select: ON — click measures on the score (Shift / Ctrl — see guide). Tap again to turn OFF.';
+            const titleOff=hu
+                ?'Egérrel választás: ki — a kotta kattintása nem változtatja az ütemtartományt. Rákattintva bekapcsolod.'
+                :'Click-to-select: OFF — clicks on the score do not change the range. Tap to enable.';
+            b.title=practiceRangeClickPickMode?titleOn:titleOff;
+            b.setAttribute('aria-label',b.title);
+            if(practiceRangeClickPickMode){
+                b.style.color='#9dffc4';
+                b.style.background='rgba(40,95,65,0.42)';
+            }else{
+                b.style.color='#444';
+                b.style.background='transparent';
+            }
+        }
+        syncPracticeRangeClickPickCheckbox();
     }
     function openMeasureRangeModal(){
         if(helpActive)return;
         syncPracticeRangeInputs();
+        syncPracticeRangeClickPickCheckbox();
         const m=document.getElementById('measureRangeModal');
         if(m)m.style.display='flex';
     }
@@ -1323,21 +1617,25 @@
         const hu=currentLang==='HU';
         const mr=document.getElementById('btnMeasureRange');
         if(mr){
-            mr.textContent=hu?'ÜT':'Ms';
-            mr.title=hu?'Ütemtartomány (START / DEMO)':'Measure range (START / DEMO)';
+            const tm=hu
+                ?'Ütemtartomány (2×2 jobb felső) — számok az ablakban; a kottán csak bekapcsolt egérrel választással (bal felső). START és DEMO erre épül.'
+                :'Measure range (2×2 top right) — numbers in the dialog; on-score picks need click-to-select ON (top left). START and DEMO use this.';
+            mr.title=tm;
+            mr.setAttribute('aria-label',tm);
         }
-        const bmk=document.getElementById('btnBookmarksTools');
-        if(bmk){
-            bmk.textContent='B'+(workshopBmSlot+1);
-            bmk.title=hu?'Könyvjelző B1–B3 + napló (Shift+katt: mentés).':'Bookmarks B1–B3 + log (Shift+click: save).';
-        }
+        syncPracticeRangeClickPickChrome();
         const ap=document.getElementById('btnPracticeRangeApply'),cl=document.getElementById('btnPracticeRangeClear'),lg=document.getElementById('btnPracticeLog');
-        if(ap)ap.title=hu?'Ütemsáv alkalmazása (START/DEMO csak erre)':'Apply range (START/DEMO only here)';
-        if(cl)cl.title=hu?'Teljes kotta':'Full score';
+        if(ap)ap.title=hu?'Alkalmazás — a START és a DEMO csak a megadott ütemekre vonatkozik':'Apply — START and DEMO use only the entered measures';
+        if(cl)cl.title=hu?'Törlés (∅) — törli az ütemtartományt; a START és a DEMO újra az egész kottára vonatkozik':'Clear (∅) — remove measure range; START and DEMO use the whole score again';
+        const ctb=document.getElementById('btnPracticeRangeClearToolbar');
+        if(ctb){
+            ctb.title=hu?'Kijelölés törlése — 2×2 bal alsó ∅ (ugyanaz, mint az ütemtartomány ablak OK melletti ∅)':'Clear selection — bottom-left ∅ in 2×2 (same as ∅ next to OK in the dialog)';
+            ctb.setAttribute('aria-label',ctb.title);
+        }
         if(lg)lg.title=hu?'Gyakorlás napló':'Practice log';
         for(let i=0;i<3;i++){
             const el=document.getElementById('btnBm'+i);
-            if(el)el.title=hu?('Könyvjelző '+(i+1)+' — katt: betöltés — Shift+katt: mentés'):('Bookmark '+(i+1)+' — click: load — Shift+click: save');
+            if(el)el.title=hu?('Könyvjelző '+(i+1)+' — kattintás: betöltés; Shift + kattintás: mentés'):('Bookmark '+(i+1)+' — click: load; Shift+click: save');
         }
         const pf=document.getElementById('scoreLibFilter');
         if(pf)pf.placeholder=hu?'Gépelj a lista szűréséhez…':'Type to filter the list…';
@@ -1355,23 +1653,28 @@
             const o=map&&typeof map==='object'&&!Array.isArray(map)?map:{};
             if(!isPracticeRangeActive())delete o[currentScoreHash];
             else{
-                const lo=Math.min(practiceRangeStartMeasure,practiceRangeEndMeasure);
-                const hi=Math.max(practiceRangeStartMeasure,practiceRangeEndMeasure);
-                o[currentScoreHash]={s:lo,e:hi};
+                const m=practiceRangeSortedMeasures();
+                o[currentScoreHash]={m};
             }
             localStorage.setItem(LS_PRACTICE_RANGE,JSON.stringify(o));
         }catch(e){}
     }
     function loadPracticeRangeForScoreHash(h){
-        practiceRangeStartMeasure=null;
-        practiceRangeEndMeasure=null;
+        practiceRangeMeasureSet.clear();
+        practiceRangeMouseAnchorMeasure=null;
         if(h)try{
             const map=JSON.parse(localStorage.getItem(LS_PRACTICE_RANGE)||'{}');
             const o=map&&typeof map==='object'&&!Array.isArray(map)?map:{};
             const p=o[h];
-            if(p&&Number.isFinite(Number(p.s))&&Number.isFinite(Number(p.e))){
-                practiceRangeStartMeasure=Number(p.s);
-                practiceRangeEndMeasure=Number(p.e);
+            if(p&&Array.isArray(p.m)&&p.m.length){
+                p.m.forEach(x=>{
+                    const n=Number(x);
+                    if(Number.isFinite(n)&&n>=1)practiceRangeMeasureSet.add(Math.floor(n));
+                });
+            }else if(p&&Number.isFinite(Number(p.s))&&Number.isFinite(Number(p.e))){
+                const lo=Math.max(1,Math.min(Number(p.s),Number(p.e))|0);
+                const hi=Math.max(Number(p.s),Number(p.e))|0;
+                for(let i=lo;i<=hi;i++)practiceRangeMeasureSet.add(i);
             }
         }catch(e){}
         syncPracticeRangeInputs();
@@ -1396,9 +1699,11 @@
     }
     function saveBookmarkSlot(slot){
         const sc=elSheetContainer();
+        const ms=practiceRangeSortedMeasures();
         const payload={
-            s:isPracticeRangeActive()?Math.min(practiceRangeStartMeasure,practiceRangeEndMeasure):null,
-            e:isPracticeRangeActive()?Math.max(practiceRangeStartMeasure,practiceRangeEndMeasure):null,
+            m:ms.length?ms:null,
+            s:ms.length?ms[0]:null,
+            e:ms.length?ms[ms.length-1]:null,
             sp:Math.max(0,osmdBookSpreadIndex|0),
             st:sc?Math.round(sc.scrollTop):0
         };
@@ -1418,12 +1723,16 @@
         if(!p){setInfoBar(hu?('Nincs mentve B'+(slot+1)):('Bookmark '+(slot+1)+' empty'),null);return;}
         workshopBmSlot=slot;
         syncWorkshopBmSlotLabel();
-        if(p.s!=null&&p.e!=null&&Number.isFinite(Number(p.s))&&Number.isFinite(Number(p.e))){
-            practiceRangeStartMeasure=Math.min(Number(p.s),Number(p.e));
-            practiceRangeEndMeasure=Math.max(Number(p.s),Number(p.e));
-        }else{
-            practiceRangeStartMeasure=null;
-            practiceRangeEndMeasure=null;
+        practiceRangeMeasureSet.clear();
+        if(p.m&&Array.isArray(p.m)&&p.m.length){
+            p.m.forEach(x=>{
+                const n=Number(x);
+                if(Number.isFinite(n)&&n>=1)practiceRangeMeasureSet.add(Math.floor(n));
+            });
+        }else if(p.s!=null&&p.e!=null&&Number.isFinite(Number(p.s))&&Number.isFinite(Number(p.e))){
+            const lo=Math.max(1,Math.min(Number(p.s),Number(p.e))|0);
+            const hi=Math.max(Number(p.s),Number(p.e))|0;
+            for(let i=lo;i<=hi;i++)practiceRangeMeasureSet.add(i);
         }
         syncPracticeRangeInputs();
         persistPracticeRange();
@@ -1434,6 +1743,26 @@
             if(bookViewColumns>1)applyOsmdSpreadPaging();
         });
     }
+    function practiceLogRangeLabel(r,hu){
+        if(!r)return'';
+        let m=null;
+        if(Array.isArray(r.m)&&r.m.length){
+            m=[...r.m].map(Number).filter(x=>Number.isFinite(x)&&x>=1).sort((a,b)=>a-b);
+        }
+        if(m&&m.length){
+            const lo=m[0],hi=m[m.length-1];
+            let contiguous=true;
+            for(let i=lo;i<=hi;i++){
+                if(!m.includes(i)){contiguous=false;break;}
+            }
+            const pref=hu?' ütemek ':' m. ';
+            if(contiguous)return pref+lo+'–'+hi;
+            return pref+m.slice(0,8).join(',')+(m.length>8?'…':'');
+        }
+        if(r.s!=null&&r.e!=null&&Number.isFinite(Number(r.s))&&Number.isFinite(Number(r.e)))
+            return(hu?' ütemek ':' m. ')+Math.min(Number(r.s),Number(r.e))+'–'+Math.max(Number(r.s),Number(r.e));
+        return'';
+    }
     function appendPracticeLogEntry(avgBpm,stepCount){
         try{
             const arr=JSON.parse(localStorage.getItem(LS_PRACTICE_LOG)||'[]');
@@ -1443,7 +1772,7 @@
                 h:currentScoreHash||'',
                 bpm:avgBpm|0,
                 steps:stepCount|0,
-                r:isPracticeRangeActive()?{s:Math.min(practiceRangeStartMeasure,practiceRangeEndMeasure),e:Math.max(practiceRangeStartMeasure,practiceRangeEndMeasure)}:null
+                r:isPracticeRangeActive()?{m:practiceRangeSortedMeasures()}:null
             });
             while(arr.length>80)arr.pop();
             localStorage.setItem(LS_PRACTICE_LOG,JSON.stringify(arr));
@@ -1463,21 +1792,31 @@
                 b.textContent=arr.slice(0,40).map(x=>{
                     const d=new Date(x.t);
                     const ds=d.toLocaleString(hu?'hu-HU':'en-GB',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-                    const rg=x.r&&x.r.s&&x.r.e?((hu?' üt. ':' m.')+x.r.s+'–'+x.r.e):'';
+                    const rg=practiceLogRangeLabel(x.r,hu);
                     return ds+' · '+x.bpm+' BPM · '+x.steps+(hu?' lép':' steps')+rg;
                 }).join('\n');
             }
         }
         m.style.display=willShow?'flex':'none';
     }
+    function scoreStepsInfoBarMessage(){
+        const n=scoreSteps.length;
+        const hu=currentLang==='HU';
+        if(!n){
+            return hu
+                ?'Ebben az ütemtartományban nincs lejátszható hang — válassz más ütemeket, vagy nyiss másik darabot a könyvtárból.'
+                :'No notes in this range — choose different measures, or open another score from the library.';
+        }
+        return hu
+            ?'A START a gyakorlást indítja, a DEMO a darab meghallgatását (a kotta kiemeli az aktuális ütemet).'
+            :'START begins practice; DEMO plays the piece (the score highlights the current measure).';
+    }
     async function rebuildScoreStepsAfterRangeChange(){
         if(isRunning)stopPractice();
         if(!osmdInstance)return;
         try{if(osmdInstance.cursor&&typeof osmdInstance.cursor.hide==='function')osmdInstance.cursor.hide();}catch(e){}
         buildScoreStepsFromOsmd();
-        const n=scoreSteps.length;
-        const hu=currentLang==='HU';
-        setInfoBar(n?(hu?(n+' lépés · START / DEMO'):(n+' steps · START / DEMO')):(hu?'Ebben az ütemsávban nincs gyakorlható hang':'No notes in this measure range'),null);
+        setInfoBar(scoreStepsInfoBarMessage(),null);
         scheduleOsmdRender();
         queuePersistScoreSession();
     }
@@ -1489,18 +1828,24 @@
             setInfoBar(currentLang==='HU'?'Adj meg két ütemszámot (pl. 4 és 8)':'Enter two measure numbers (e.g. 4 and 8)',null);
             return;
         }
-        practiceRangeStartMeasure=Math.min(s,e);
-        practiceRangeEndMeasure=Math.max(s,e);
+        practiceRangeMeasureSet.clear();
+        const lo=Math.min(s,e),hi=Math.max(s,e);
+        for(let i=lo;i<=hi;i++)practiceRangeMeasureSet.add(i);
         syncPracticeRangeInputs();
         persistPracticeRange();
         await rebuildScoreStepsAfterRangeChange();
     }
     async function clearPracticeRangeAndRebuild(){
-        practiceRangeStartMeasure=null;
-        practiceRangeEndMeasure=null;
+        practiceRangeMeasureSet.clear();
+        practiceRangeMouseAnchorMeasure=null;
         syncPracticeRangeInputs();
         persistPracticeRange();
         await rebuildScoreStepsAfterRangeChange();
+    }
+    async function toolbarClearPracticeRange(){
+        await clearPracticeRangeAndRebuild();
+        const hu=currentLang==='HU';
+        setInfoBar(hu?'Ütemkijelölés törölve — újra a teljes kotta':'Measure selection cleared — full score again',null);
     }
 
     function setLang(lang){
@@ -1513,17 +1858,21 @@
         Object.keys(T).forEach(id=>{const el=document.getElementById(id);if(el)el.innerText=T[id];});
         const modEl=document.getElementById('lcdModuleText');
         const mn=MODULE_NAMES[lang]||MODULE_NAMES.EN;
-        if(modEl)modEl.textContent=mn[currentModuleIdx]||'SCORE';
+        if(modEl)modEl.textContent=mn[currentModuleIdx]||(currentLang==='HU'?'REPERTOÁR':'REPERTOIRE');
         syncPracticeToolsChrome();
         if(helpActive)setInfoBar(lang==='HU'?'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT':'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',null);
         else if(!isRunning){
             const hu=lang==='HU';
             if(scoreMode&&(!scoreSteps||!scoreSteps.length))
-                setInfoBar(hu?'Tölts fel kottát (XML)':'Load a score (XML)',null);
+                setInfoBar(hu?'Tölts be kottát (XML / MXL) — jobbra a fájl ikon vagy a címre kattintva a könyvtár.':'Open a score (XML / MXL) — file icon on the right, or tap the title for the library.',null);
+            else if(scoreMode)
+                setInfoBar(scoreStepsInfoBarMessage(),null);
             else
-                setInfoBar(hu?'KOTTA · START / DEMO':'SCORE · START / DEMO',null);
+                setInfoBar(hu?'Repertoár · START / DEMO':'Repertoire · START / DEMO',null);
         }
         updateBookViewButtonChrome();
+        syncUploadScoreChrome();
+        syncPresetAndRackIconChrome();
         updateScoreFullScoreButtonChrome();
         syncZoomSliderFromState();
         syncScoreLayoutPopupChrome();
@@ -1828,19 +2177,19 @@
         const source=audioCtx.createBufferSource();let closest=36,minDiff=999;
         for(let b in sampleBuffers){let diff=Math.abs(note-b);if(diff<minDiff){minDiff=diff;closest=b;}}
         source.buffer=sampleBuffers[closest];source.playbackRate.value=Math.pow(2,(note-closest)/12);
-        const gain=audioCtx.createGain();const v_d=parseFloat(document.getElementById('vst_d').value)||1.0;
-        gain.gain.setValueAtTime((vel/127)*v_d,audioCtx.currentTime);
+        const gain=audioCtx.createGain();
+        gain.gain.setValueAtTime(Math.min(1,(vel/127)),audioCtx.currentTime);
         source.connect(gain).connect(audioCtx.destination);source.start();
         activeNodes[note]={source,gain};
     }
 
     function releaseNoteAudio(midi){
         if(!activeNodes[midi])return;
-        const v_r=parseFloat(document.getElementById('vst_r').value)||0.8;
         const gainNode=activeNodes[midi].gain;
+        const tRel=0.09;
         gainNode.gain.cancelScheduledValues(audioCtx.currentTime);gainNode.gain.setValueAtTime(gainNode.gain.value,audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+v_r);
-        activeNodes[midi].source.stop(audioCtx.currentTime+v_r+0.1);delete activeNodes[midi];
+        gainNode.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+tRel);
+        activeNodes[midi].source.stop(audioCtx.currentTime+tRel+0.05);delete activeNodes[midi];
     }
 
     function handleMidiNoteOff(midi){
@@ -1904,6 +2253,23 @@
             }catch(e2){return null;}
         }
     }
+    /** Könyvtár törlése nem törölte eddig — a nyitott kotta IndexedDB + meta itt maradt, ezért frissítés után „visszajött”. */
+    async function clearRepertoarSessionScoreStorage(){
+        try{localStorage.removeItem(LS_SCORE_META);}catch(e){}
+        try{localStorage.removeItem(LS_SCORE_XML_FB);}catch(e){}
+        try{sessionStorage.removeItem('repertoar_welcome_fail_v1');}catch(e){}
+        lastLoadedScoreXml=null;
+        currentScoreHash='';
+        try{
+            const db=await openScoreIdb();
+            await new Promise((res,rej)=>{
+                const tx=db.transaction(IDB_SCORE_STORE,'readwrite');
+                tx.objectStore(IDB_SCORE_STORE).delete('current');
+                tx.oncomplete=()=>res();
+                tx.onerror=()=>rej(tx.error);
+            });
+        }catch(e){}
+    }
     let _persistScoreTimer=null;
     async function persistScoreSessionNow(){
         try{
@@ -1949,11 +2315,11 @@
     function persistOsmdThemePreference(){
         try{localStorage.setItem(LS_OSMD_THEME,osmdScoreTheme);}catch(e){}
     }
-    /** Világos → bézs (papír) → sötét. Régi LS_OSMD_DARK: 0=világos, egyéb/alap=sötét — nincs bézs a migrációban. */
+    /** Világos → bézs (papír) → sötét (fehér jegyzet) → sötét bézs jegyzet. Régi LS_OSMD_DARK: 0=világos, egyéb/alap=sötét. */
     function readPersistedOsmdTheme(){
         try{
             const t=localStorage.getItem(LS_OSMD_THEME);
-            if(t==='light'||t==='sepia'||t==='dark')return t;
+            if(t==='light'||t==='sepia'||t==='dark'||t==='darksepia')return t;
             const old=localStorage.getItem(LS_OSMD_DARK);
             if(old==='0')return 'light';
             return 'dark';
@@ -1962,8 +2328,8 @@
     function applyOsmdScoreThemeClass(){
         const cont=document.getElementById('osmd-container');
         if(!cont)return;
-        cont.classList.remove('osmd-dark','osmd-theme-light','osmd-theme-sepia','osmd-theme-dark');
-        const th=osmdScoreTheme==='light'||osmdScoreTheme==='sepia'||osmdScoreTheme==='dark'?osmdScoreTheme:'dark';
+        cont.classList.remove('osmd-dark','osmd-theme-light','osmd-theme-sepia','osmd-theme-dark','osmd-theme-darksepia');
+        const th=osmdScoreTheme==='light'||osmdScoreTheme==='sepia'||osmdScoreTheme==='dark'||osmdScoreTheme==='darksepia'?osmdScoreTheme:'dark';
         cont.classList.add('osmd-theme-'+th);
     }
     let zoomSliderSyncing=false;
@@ -2150,17 +2516,38 @@
             btn.title=hu?'Könyv: 2 hasáb (lapozás ◀▶)':'Book: 2 columns (◀▶ pages)';
         else
             btn.title=hu?'Könyv: 3 hasáb (lapozás ◀▶)':'Book: 3 columns (◀▶ pages)';
+        btn.setAttribute('aria-label',btn.title);
+    }
+    function syncUploadScoreChrome(){
+        const up=document.getElementById('btnUploadScore');
+        if(!up)return;
+        const hu=currentLang==='HU';
+        const hasScore=!!osmdInstance;
+        const t=hasScore
+            ?(hu?'Kotta cseréje (XML / MusicXML / MXL)':'Replace score (XML / MusicXML / MXL)')
+            :(hu?'Kotta feltöltése (XML / MusicXML / MXL)':'Upload MusicXML / MXL score');
+        up.title=t;
+        up.setAttribute('aria-label',t);
+    }
+    function syncPresetAndRackIconChrome(){
+        const hu=currentLang==='HU';
+        const pre=document.getElementById('btnPresetsToggle');
+        if(pre){
+            const t=hu?'Nézet előbeállítások (5 rekesz)':'View presets (5 slots)';
+            pre.title=t;
+            pre.setAttribute('aria-label',t);
+        }
     }
     let scoreFullViewActive=false;
     function updateScoreFullScoreButtonChrome(){
         const b=document.getElementById('btnScoreFullScore');
         if(!b)return;
         const hu=currentLang==='HU';
-        b.title=hu?'Teljes képernyős kotta: rack + billentyűzet elrejtve, opcionálisan böngésző fullscreen':'Full score view: hide rack & keyboard; browser fullscreen when allowed';
-        b.setAttribute('aria-label',hu?'Teljes képernyős kotta':'Full score view');
+        b.title=hu?'Teljes képernyős kotta nézet: rack és billentyűzet elrejtve, kérhető böngészős teljes képernyő':'Full-screen score view: hide rack and keyboard; browser fullscreen when allowed';
+        b.setAttribute('aria-label',hu?'Teljes képernyős kotta nézet':'Full-screen score view');
         b.setAttribute('data-help',hu
-            ?'TELJES KOTTA: eltünteti az alsó vezérlőt és a billentyűzetet; a kotta kitölti a területet. Ha a böngésző engedi, teljes képernyő. Esc vagy újra az ikon kilép. Nagyítás és margó: a csúszka ikonos panel (alatta a jobb oszlopban).'
-            :'FULL SCORE: hides the bottom rack and keyboard; the score fills the area. Requests fullscreen when the browser allows. Esc or tap the icon again to exit. Zoom and margins: use the sliders button below this icon on the right.');
+            ?'TELJES KÉPERNYŐS KOTTA NÉZET: eltünteti az alsó vezérlőt és a billentyűzetet; a kotta kitölti a területet. Ha a böngésző engedi, teljes képernyő. Esc vagy újra az ikon: kilépés. Nagyítás és margó: a csúszka ikonos panel (a jobb oszlopban, alatta).'
+            :'FULL-SCREEN SCORE VIEW: hides the bottom rack and keyboard; the score fills the area. Requests fullscreen when the browser allows. Esc or tap the icon again to exit. Zoom and margins: sliders button below this icon on the right.');
     }
     function syncScoreLayoutPopupChrome(){
         const hu=currentLang==='HU';
@@ -2289,7 +2676,7 @@
             initAudio();initMidi();
             if(scoreMode){
                 if(!scoreSteps.length){
-                    setInfoBar(currentLang==='HU'?'TÖLTS FEL KOTTÁT (XML)':'LOAD A SCORE (XML)',null);
+                    setInfoBar(currentLang==='HU'?'Előbb tölts be kottát (fájl ikon vagy könyvtár a címnél).':'Load a score first — file icon or library (tap the title).',null);
                     return;
                 }
                 initScorePracticeSteps();
@@ -2324,6 +2711,8 @@
         draw();
     }
     function closeModal(){document.getElementById('resultModal').style.display='none';stopPractice();}
+    function closeInfoGuideModal(){const m=document.getElementById('infoModal');if(m)m.style.display='none';}
+    function closePracticeLogModal(){const m=document.getElementById('practiceLogModal');if(m)m.style.display='none';}
     function handleNoteOn(midi,vel=100){
         midiSustainReleaseQueue.delete(midi);
         playTone(midi,vel);
@@ -2339,7 +2728,7 @@
             demoAwaitMidi=false;
             demoTimeouts.forEach(id=>clearTimeout(id));
             demoTimeouts=[];
-            setInfoBar(currentLang==='HU'?'KOTTA MÓD — START / DEMO':'SCORE MODE — START / DEMO',null);
+            setInfoBar(scoreSteps.length?scoreStepsInfoBarMessage():(currentLang==='HU'?'Repertoár · tölts kottát, majd START / DEMO':'Repertoire · load a score, then START / DEMO'),null);
             return;
         }
         const armTap=performance.now();
@@ -2368,7 +2757,7 @@
                 }
                 if(scoreMode&&!scoreSteps.length){
                     demoAwaitMidi=false;
-                    setInfoBar(currentLang==='HU'?'NINCS BETÖLTött KOTTA':'NO SCORE LOADED',null);
+                    setInfoBar(currentLang==='HU'?'Nincs betöltött kotta — nyiss meg egy XML/MXL fájlt.':'No score loaded — open an XML/MXL file.',null);
                     return;
                 }
                 if(myGen!==demoLaunchGen){demoAwaitMidi=false;return;}
@@ -2420,15 +2809,15 @@
             }else if(osmdInstance) scheduleOsmdRender();
         }
         draw();
-        setInfoBar(currentLang==='HU'?'KOTTA MÓD — START / DEMO':'SCORE MODE — START / DEMO',null);
+        setInfoBar(scoreSteps.length?scoreStepsInfoBarMessage():(currentLang==='HU'?'Repertoár · tölts kottát, majd START / DEMO':'Repertoire · load a score, then START / DEMO'),null);
         if(midiOutPort)[25,80,200].forEach(ms=>{setTimeout(()=>{try{sendMidiDemoAllSoundOffAllChannels();sendMidiDemoPianoteqHardReset();}catch(e){}},ms);});
     }
     // ── Help & Fullscreen ─────────────────────────────────────────────────────
     let helpActive=false;
     function toggleHelp(){
         helpActive=!helpActive;document.getElementById('btnHelp').classList.toggle('active',helpActive);
-        if(helpActive){document.body.classList.add('help-mode-active');setInfoBar('HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',null);}
-        else{document.body.classList.remove('help-mode-active');setInfoBar(currentLang==='HU'?'KOTTA · XML / START / DEMO':'SCORE · XML / START / DEMO',null);}
+        if(helpActive){document.body.classList.add('help-mode-active');setInfoBar(currentLang==='HU'?'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT':'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',null);}
+        else{document.body.classList.remove('help-mode-active');setInfoBar(scoreSteps.length?scoreStepsInfoBarMessage():(currentLang==='HU'?'Repertoár: XML/MXL betöltés, majd START vagy DEMO':'Repertoire: load XML/MXL, then START or DEMO'),null);}
     }
     document.addEventListener('click',(e)=>{
         if(e.target.closest('#btnHelp'))return;
@@ -2546,8 +2935,14 @@
             if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target))menu.style.display='none';
             const popup=document.getElementById('bpmPresetsPopup');const bpmBox=document.getElementById('metroBpmBox');
             if(popup&&bpmBox&&!popup.contains(e.target)&&!bpmBox.contains(e.target))popup.style.display='none';
-            const preP=document.getElementById('presetsPopup');const preB=document.getElementById('btnPresetsToggle');
-            if(preP&&preB&&!preP.contains(e.target)&&!preB.contains(e.target))preP.style.display='none';
+            const preP=document.getElementById('presetsPopup');const preW=document.getElementById('presetsToggleWrap');
+            if(preP&&preW&&preP.style.display!=='none'&&preP.style.display!==''){
+                if(!preP.contains(e.target)&&!preW.contains(e.target))preP.style.display='none';
+            }
+            const slp=document.getElementById('scoreLayoutPopup');const slWrap=document.getElementById('scoreLayoutToggleWrap');
+            if(slp&&slWrap&&slp.style.display!=='none'&&slp.style.display!==''){
+                if(!slp.contains(e.target)&&!slWrap.contains(e.target))slp.style.display='none';
+            }
         });
     });
     let _resizeOsmdTimer=null;
@@ -2587,6 +2982,12 @@
             for(let i=0;i<order.length;i++){
                 const m=document.getElementById(order[i]);
                 if(m&&m.style.display==='flex'){m.style.display='none';e.preventDefault();return;}
+            }
+            const preP=document.getElementById('presetsPopup');
+            if(preP&&preP.style.display!=='none'&&preP.style.display!==''){
+                preP.style.display='none';
+                e.preventDefault();
+                return;
             }
             const slp=document.getElementById('scoreLayoutPopup');
             if(slp&&slp.style.display!=='none'&&slp.style.display!==''){
@@ -2633,12 +3034,15 @@
     window.onload=()=>{
         osmdScoreTheme=readPersistedOsmdTheme();
         applyOsmdScoreThemeClass();
+        practiceRangeClickPickMode=readPersistedPracticeRangeClickPick();
         const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);
         updateScoreSheetLayoutShell();
         updateOsmdScoreControlsVisibility();
         updateBookViewButtonChrome();
         const bm0=document.getElementById('btnOsmdDark');
         if(bm0){bm0.style.display='flex';syncOsmdThemeToggleButtonChrome();}
+        const osmdCont=document.getElementById('osmd-container');
+        if(osmdCont)osmdCont.addEventListener('click',onOsmdContainerClickPracticeRange,true);
         create88();
         draw();
         syncZoomSliderFromState();
@@ -2646,6 +3050,7 @@
         void (async()=>{
             try{
                 await tryRestorePersistedScoreSession();
+                if(!osmdInstance)await tryLoadBundledWelcomeScoreIfNeeded();
                 if(!osmdInstance)applyWorkshopScoreShellBeforeFirstLoad();
             }catch(e){console.warn('restore score session',e);}
         })();
@@ -2830,6 +3235,140 @@
         }
         return null;
     }
+    function graphicalMeasureClientUnionRect(gm){
+        if(!gm)return null;
+        const ses=gm.staffEntries||gm.StaffEntries;
+        if(!ses)return null;
+        let minL=1e9,minT=1e9,maxR=-1e9,maxB=-1e9;
+        let any=false;
+        for(let si=0;si<ses.length;si++){
+            const se=ses[si];
+            const gves=se.graphicalVoiceEntries||se.GraphicalVoiceEntries;
+            if(!gves)continue;
+            for(let gi=0;gi<gves.length;gi++){
+                const gve=gves[gi];
+                const nlist=gve.notes||gve.Notes;
+                if(!nlist)continue;
+                for(let ni=0;ni<nlist.length;ni++){
+                    const gnn=nlist[ni];
+                    if(!gnn||typeof gnn.getSVGGElement!=='function')continue;
+                    const el=gnn.getSVGGElement();
+                    if(!el)continue;
+                    const r=el.getBoundingClientRect();
+                    if(r.width<1&&r.height<1)continue;
+                    any=true;
+                    minL=Math.min(minL,r.left);
+                    minT=Math.min(minT,r.top);
+                    maxR=Math.max(maxR,r.right);
+                    maxB=Math.max(maxB,r.bottom);
+                }
+            }
+        }
+        if(!any)return null;
+        return{left:minL,top:minT,right:maxR,bottom:maxB};
+    }
+    function osmdFindMeasureNumberAtClientPoint(cx,cy){
+        if(!osmdInstance)return null;
+        const g=osmdInstance.graphic||osmdInstance.Graphic;
+        if(!g)return null;
+        const pages=g.MusicPages||g.musicPages;
+        if(!pages||!pages.length)return null;
+        const pad=8;
+        for(let pi=0;pi<pages.length;pi++){
+            const page=pages[pi];
+            const systems=page.MusicSystems||page.musicSystems;
+            if(!systems)continue;
+            for(let si=0;si<systems.length;si++){
+                const sys=systems[si];
+                const rows=sys.graphicalMeasures||sys.GraphicalMeasures;
+                if(!rows)continue;
+                for(let ri=0;ri<rows.length;ri++){
+                    const slice=rows[ri];
+                    if(!slice)continue;
+                    for(let ci=0;ci<slice.length;ci++){
+                        const gm=slice[ci];
+                        if(!gm)continue;
+                        const psm=gm.parentSourceMeasure||gm.ParentSourceMeasure;
+                        if(!psm)continue;
+                        let u=graphicalMeasureClientUnionRect(gm);
+                        if(!u){
+                            const fb=osmdFirstSvgInGraphicalMeasure(gm);
+                            if(fb&&typeof fb.getBoundingClientRect==='function'){
+                                const r=fb.getBoundingClientRect();
+                                if(r.width>=1||r.height>=1)
+                                    u={left:r.left,top:r.top,right:r.right,bottom:r.bottom};
+                            }
+                        }
+                        if(!u)continue;
+                        if(cx>=u.left-pad&&cx<=u.right+pad&&cy>=u.top-pad&&cy<=u.bottom+pad){
+                            const mn=psm.MeasureNumber!=null?psm.MeasureNumber:(psm.measureNumber!=null?psm.measureNumber:null);
+                            if(typeof mn==='number'&&isFinite(mn)&&mn>=1)return mn;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    async function applyPracticeRangeMeasures(lo,hi){
+        if(helpActive)return;
+        const a=Number(lo),b=Number(hi);
+        if(!Number.isFinite(a)||!Number.isFinite(b)||a<1||b<1)return;
+        practiceRangeMeasureSet.clear();
+        const lo2=Math.max(1,Math.min(Math.floor(a),Math.floor(b)));
+        const hi2=Math.max(Math.floor(a),Math.floor(b));
+        for(let i=lo2;i<=hi2;i++)practiceRangeMeasureSet.add(i);
+        syncPracticeRangeInputs();
+        persistPracticeRange();
+        await rebuildScoreStepsAfterRangeChange();
+    }
+    async function togglePracticeRangeMeasure(mn){
+        if(helpActive)return;
+        const v=Math.floor(Number(mn));
+        if(!Number.isFinite(v)||v<1)return;
+        if(practiceRangeMeasureSet.has(v))practiceRangeMeasureSet.delete(v);
+        else practiceRangeMeasureSet.add(v);
+        syncPracticeRangeInputs();
+        persistPracticeRange();
+        await rebuildScoreStepsAfterRangeChange();
+    }
+    async function addPracticeRangeMeasureSpanToSet(a,b){
+        if(helpActive)return;
+        const x=Math.floor(Number(a)),y=Math.floor(Number(b));
+        if(!Number.isFinite(x)||!Number.isFinite(y)||x<1||y<1)return;
+        const lo=Math.max(1,Math.min(x,y)),hi=Math.max(x,y);
+        for(let i=lo;i<=hi;i++)practiceRangeMeasureSet.add(i);
+        syncPracticeRangeInputs();
+        persistPracticeRange();
+        await rebuildScoreStepsAfterRangeChange();
+    }
+    function onOsmdContainerClickPracticeRange(ev){
+        if(helpActive)return;
+        if(!practiceRangeClickPickMode)return;
+        if(ev.button!==0)return;
+        if(!scoreMode||!osmdInstance)return;
+        const cont=document.getElementById('osmd-container');
+        if(!cont||!ev.target||!cont.contains(ev.target))return;
+        const mn=osmdFindMeasureNumberAtClientPoint(ev.clientX,ev.clientY);
+        if(mn==null)return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        const metaOrCtrl=ev.metaKey||ev.ctrlKey;
+        if(metaOrCtrl){
+            void togglePracticeRangeMeasure(mn);
+            practiceRangeMouseAnchorMeasure=mn;
+        }else if(ev.shiftKey){
+            const a=practiceRangeMouseAnchorMeasure;
+            if(a==null||!Number.isFinite(a))
+                void applyPracticeRangeMeasures(mn,mn);
+            else
+                void addPracticeRangeMeasureSpanToSet(a,mn);
+            practiceRangeMouseAnchorMeasure=mn;
+        }else{
+            practiceRangeMouseAnchorMeasure=mn;
+            void applyPracticeRangeMeasures(mn,mn);
+        }
+    }
     /** Könyvnézet: melyik spread tartalmazza a hangokat (2 vagy 3 hasáb / oldal sor) — demó / követés lapozás. */
     function osmdBookSpreadIndexForNotes(notes){
         if(bookViewColumns<=1||!notes||!notes.length||!osmdInstance)return null;
@@ -2976,6 +3515,7 @@
                     invalidateScoreMeasureHighlightCaches();
                     scrollSheetContainerToOsmdNotes(sn);
                 }
+                requestAnimationFrame(()=>updateScorePracticeRangeShade());
             }catch(e){
                 scoreOsmdScrollNotesAfterRender=null;
             }finally{
@@ -3113,6 +3653,78 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         const r=precomputedRect||measureHighlightUnionClientRect(notes);
         if(!r){hideScoreMeasureHighlight();return;}
         positionScoreMeasureHighlightFromClientRect(r);
+    }
+    function practiceRangeClientRectForSystemColumn(sys,psm){
+        if(!sys||!psm)return null;
+        const sameMeasure=osmdSameSourceMeasureFn(psm);
+        const u=measureHighlightNoteUnionClientParts(sys,sameMeasure);
+        if(!u)return null;
+        const v=osmdSystemGrandStaffClientVerticalSpan(sys);
+        if(v&&u.maxR>u.minL+2)
+            return{left:u.minL,top:v.top,right:u.maxR,bottom:v.bottom,width:u.maxR-u.minL,height:v.bottom-v.top};
+        return{left:u.minL,top:u.minT,right:u.maxR,bottom:u.maxB,width:u.maxR-u.minL,height:u.maxB-u.minT};
+    }
+    function appendPracticeRangeShadeCell(stack,sr,rect){
+        const layer=document.getElementById('score-practice-range-shade');
+        if(!layer||!rect||rect.width<2||rect.height<2)return;
+        const padX=5,padTop=1,padBottom=4;
+        const left=rect.left-sr.left-padX;
+        const top=rect.top-sr.top-padTop;
+        const w=rect.width+2*padX;
+        const h=rect.height+padTop+padBottom;
+        const d=document.createElement('div');
+        d.className='score-practice-range-cell';
+        d.style.left=Math.max(0,Math.round(left))+'px';
+        d.style.top=Math.max(0,Math.round(top))+'px';
+        d.style.width=Math.round(w)+'px';
+        d.style.height=Math.round(h)+'px';
+        layer.appendChild(d);
+    }
+    function updateScorePracticeRangeShade(){
+        const layer=document.getElementById('score-practice-range-shade');
+        const stack=document.getElementById('score-osmd-stack');
+        if(!layer||!stack)return;
+        layer.innerHTML='';
+        if(!scoreMode||!osmdInstance||!isPracticeRangeActive()){
+            layer.style.display='none';
+            return;
+        }
+        const g=osmdInstance.graphic||osmdInstance.Graphic;
+        if(!g||!((g.MusicPages||g.musicPages)||[]).length){
+            layer.style.display='none';
+            return;
+        }
+        const pages=g.MusicPages||g.musicPages;
+        const sr=stack.getBoundingClientRect();
+        for(let pi=0;pi<pages.length;pi++){
+            const page=pages[pi];
+            const systems=page.MusicSystems||page.musicSystems;
+            if(!systems)continue;
+            for(let si=0;si<systems.length;si++){
+                const sys=systems[si];
+                const rows=sys.graphicalMeasures||sys.GraphicalMeasures;
+                if(!rows||!rows.length)continue;
+                const seenMn=new Set();
+                for(let ri=0;ri<rows.length;ri++){
+                    const slice=rows[ri];
+                    if(!slice)continue;
+                    for(let j=0;j<slice.length;j++){
+                        const gm=slice[j];
+                        if(!gm)continue;
+                        const psm=gm.parentSourceMeasure||gm.ParentSourceMeasure;
+                        if(!psm)continue;
+                        const mn=psm.MeasureNumber!=null?psm.MeasureNumber:(psm.measureNumber!=null?psm.measureNumber:null);
+                        if(typeof mn!=='number'||!isFinite(mn)||mn<1)continue;
+                        if(!practiceRangeMeasureSet.has(mn))continue;
+                        if(seenMn.has(mn))continue;
+                        seenMn.add(mn);
+                        const rect=practiceRangeClientRectForSystemColumn(sys,psm);
+                        appendPracticeRangeShadeCell(stack,sr,rect);
+                    }
+                }
+            }
+        }
+        layer.style.display=layer.childElementCount?'block':'none';
     }
     function pxToOsmdMm(px){return Math.max(30,px*25.4/96);}
     /** Álló A4 arány (magasság/szélesség, mm): fix lap — a tördelés nem függ a néző magasságától; zoom csak skáláz. */
@@ -3301,44 +3913,44 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         await osmdFitWidth();
         await applyPersistedOsmdZoomIfSaved();
     }
-    function osmdThemeIconSvg(th){
-        if(th==='light')
-            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
-        if(th==='sepia')
-            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2" ry="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="15" x2="14" y2="15"/></svg>';
-        return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3a6 6 0 1 0 0 18 9 9 0 0 1 0-18z"/></svg>';
-    }
-    /** Háromállású kotta-háttér: világos / bézs papír / sötét (invert SVG). */
+    const OSMD_THEME_BTN_ICON_SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+    /** Négyállású kotta-háttér: világos / bézs papír / sötét fehér jegyzet / sötét bézs jegyzet. Az ikon mindig a nap. */
     function syncOsmdThemeToggleButtonChrome(){
         const b=document.getElementById('btnOsmdDark');
         if(!b)return;
         b.style.removeProperty('background');
         b.style.removeProperty('color');
+        b.style.removeProperty('border-color');
         const hu=currentLang==='HU';
-        const th=osmdScoreTheme==='light'||osmdScoreTheme==='sepia'||osmdScoreTheme==='dark'?osmdScoreTheme:'dark';
+        const th=osmdScoreTheme==='light'||osmdScoreTheme==='sepia'||osmdScoreTheme==='dark'||osmdScoreTheme==='darksepia'?osmdScoreTheme:'dark';
         let title,help;
-        if(th==='dark'){
+        const cycleHelp=hu?'Kattints: világos → bézs papír → sötét (fehér jegyzet) → sötét (bézs jegyzet).':'Tap: light → paper → dark (white notation) → dark (beige notation).';
+        if(th==='darksepia'){
+            b.style.background='#1a1510';
+            b.style.color='#e8d4b8';
+            b.style.borderColor='#3d3428';
+            title=hu?'Kotta: sötét bézs (fekete háttér, meleg bézs jegyzet)':'Score: dark beige (black background, warm notation)';
+            help=hu?('KOTTA HÁTTÉR (4 állás): sötét bézs. '+cycleHelp):('SCORE THEME (4 steps): dark beige. '+cycleHelp);
+        }else if(th==='dark'){
             b.style.color='#fff';
-            b.style.removeProperty('border-color');
-            title=hu?'Kotta: sötét (fekete háttér, invertált vonalak)':'Score: dark (black background)';
-            help=hu?'KOTTA HÁTTÉR (3 állás): sötét. Kattints: világos → bézs papír → sötét.':'SCORE THEME (3 steps): dark. Tap to cycle light → paper → dark.';
+            title=hu?'Kotta: sötét (fekete háttér, fehér jegyzet)':'Score: dark (black background, white notation)';
+            help=hu?('KOTTA HÁTTÉR (4 állás): sötét fehér jegyzet. '+cycleHelp):('SCORE THEME (4 steps): dark white notation. '+cycleHelp);
         }else if(th==='sepia'){
             b.style.background='#3d3428';
             b.style.color='#e8dcc8';
             b.style.borderColor='#5c4f3d';
             title=hu?'Kotta: papír (finom bézs, fekete vonalak)':'Score: paper (soft beige, black notation)';
-            help=hu?'KOTTA HÁTTÉR (3 állás): bézs / papír. Kattints: világos → bézs → sötét.':'SCORE THEME (3 steps): beige paper. Tap to cycle light → paper → dark.';
+            help=hu?('KOTTA HÁTTÉR (4 állás): bézs / papír. '+cycleHelp):('SCORE THEME (4 steps): beige paper. '+cycleHelp);
         }else{
             b.style.background='#111';
             b.style.color='#aaa';
-            b.style.removeProperty('border-color');
             title=hu?'Kotta: világos (fehér háttér)':'Score: light (white background)';
-            help=hu?'KOTTA HÁTTÉR (3 állás): világos. Kattints: világos → bézs → sötét.':'SCORE THEME (3 steps): light. Tap to cycle light → paper → dark.';
+            help=hu?('KOTTA HÁTTÉR (4 állás): világos. '+cycleHelp):('SCORE THEME (4 steps): light. '+cycleHelp);
         }
         b.title=title;
         b.setAttribute('aria-label',title);
         b.setAttribute('data-help',help);
-        b.innerHTML=osmdThemeIconSvg(th);
+        b.innerHTML=OSMD_THEME_BTN_ICON_SVG;
     }
     function readViewPresetsMap(){
         try{
@@ -3684,6 +4296,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             await osmdInstance.render();
             if(scoreMode)relayoutOsmdPagesAfterRender();
             syncZoomSliderFromState();
+            requestAnimationFrame(()=>updateScorePracticeRangeShade());
         }catch(e){console.warn('osmdFitWidth',e);}
     }
     async function osmdFitHeight(){
@@ -3722,18 +4335,20 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             await osmdInstance.render();
             if(scoreMode)relayoutOsmdPagesAfterRender();
             syncZoomSliderFromState();
+            requestAnimationFrame(()=>updateScorePracticeRangeShade());
         }catch(e){console.warn('osmdFitHeight',e);}
     }
     function cycleOsmdScoreTheme(){
         if(!scoreMode)return;
-        const order=['light','sepia','dark'];
+        const order=['light','sepia','dark','darksepia'];
         const i=order.indexOf(osmdScoreTheme);
-        osmdScoreTheme=order[(i<0?2:i+1)%3];
+        osmdScoreTheme=order[(i<0?2:i+1)%4];
         applyOsmdScoreThemeClass();
         syncOsmdThemeToggleButtonChrome();
         persistOsmdThemePreference();
         queuePersistScoreSession();
-        requestAnimationFrame(()=>{void osmdFitWidth();});
+        /* Téma = csak CSS; osmdFitWidth() feleslegesen újranagyít és tördel. */
+        requestAnimationFrame(()=>{try{updateScorePracticeRangeShade();}catch(e){}});
     }
     function osmdCollectRawCursorRows(){
         const cur=osmdInstance.cursor;
@@ -3808,7 +4423,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         m.noteObjsLH=noteObjsLH;
         m.durQ=durQ;
     }
-    /** Ha relativeToFirstRow: az első sor ideje 0 (ütemsáv DEMO: ne várjon a darab elejétől). */
+    /** Ha relativeToFirstRow: az első sor ideje 0 (ütemtartományos DEMO: ne várjon a darab elejétől). */
     function assignPlaybackSecondsToMergedSteps(merged,relativeToFirstRow){
         if(!merged||!merged.length)return;
         let prevQ=relativeToFirstRow?(merged[0].absWhole*4):0;
@@ -3856,12 +4471,10 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
     function filterMergedByPracticeRange(merged){
         if(!merged||!merged.length)return merged;
         if(!isPracticeRangeActive())return merged;
-        const lo=Math.min(practiceRangeStartMeasure,practiceRangeEndMeasure);
-        const hi=Math.max(practiceRangeStartMeasure,practiceRangeEndMeasure);
         return merged.filter(m=>{
             const mn=measureNumberFromMergedRow(m);
             if(mn==null)return true;
-            return mn>=lo&&mn<=hi;
+            return practiceRangeMeasureSet.has(mn);
         });
     }
     function buildScoreStepsFromOsmd(){
@@ -3956,7 +4569,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             demoPlaying=false;
             const bd=document.getElementById('btnDemo');
             if(bd)bd.classList.remove('active');
-            setInfoBar(currentLang==='HU'?'Nincs hang ebben az ütemsávban':'No notes in this measure range',null);
+            setInfoBar(currentLang==='HU'?'Nincs lejátszható hang ebben az ütemtartományban':'No notes in this measure range',null);
             return;
         }
         merged.forEach(finalizeMergedStepPlayInfos);
@@ -4077,7 +4690,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         scheduleAtAudioTime(tBase+maxOff+0.5,()=>stopDemo(),pbGen);
         const isHU=currentLang==='HU';
-        setInfoBar(isHU?(isPracticeRangeActive()?'▶ MINTA — ütemsáv elejétől':'▶ MINTA — PRE-SCAN + AUDIÓ + MIDI'):(isPracticeRangeActive()?'▶ DEMO — from measure range':'▶ DEMO — PRE-SCAN + AUDIO + MIDI'),null);
+        setInfoBar(isHU?(isPracticeRangeActive()?'▶ MINTA — a kijelölt ütemektől':'▶ MINTA fut — kurzor + hang + MIDI'):(isPracticeRangeActive()?'▶ DEMO — from selected measures':'▶ DEMO running — cursor + audio + MIDI'),null);
     }
     async function refreshOsmdLayoutAfterRevisionBump(applySavedZoom){
         if(!scoreMode||!osmdInstance)return;
@@ -4136,6 +4749,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             currentScoreHash=hashScoreXml(lastLoadedScoreXml);
             loadPracticeRangeForScoreHash(currentScoreHash);
             applyLibraryOledAfterLoad();
+            maybeUpgradeLibraryTitleFromEmbeddedMetadata(lastLoadedScoreXml);
             applyTempoFromLoadedOsmdScore();
             applyTimeSignatureFromLoadedOsmdScore();
             switchToScoreMode();
@@ -4144,6 +4758,31 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }catch(e){
             setInfoBar('ERROR LOADING SCORE: '+e.message,null);
             console.error('OSMD error:',e);
+        }
+    }
+    /** Első megnyitás vagy üres könyvtár után: mintakotta betöltése (samples/ a repertoar.html mellé). */
+    async function loadBundledWelcomeScoreIntoView(){
+        try{sessionStorage.removeItem('repertoar_welcome_fail_v1');}catch(e){}
+        const xml=await tryFetchBundledWelcomeXml();
+        if(!xml)return false;
+        await loadXmlScore(xml);
+        const hu=currentLang==='HU';
+        addScoreToLibrary(hu?'Üdvözlő kotta':'Welcome sample',lastLoadedScoreXml||xml,{preferUserTitle:true});
+        return true;
+    }
+    async function tryLoadBundledWelcomeScoreIfNeeded(){
+        if(osmdInstance)return;
+        try{
+            if(sessionStorage.getItem('repertoar_welcome_fail_v1')==='1')return;
+        }catch(e){}
+        try{
+            const ok=await loadBundledWelcomeScoreIntoView();
+            if(!ok){
+                try{sessionStorage.setItem('repertoar_welcome_fail_v1','1');}catch(e){}
+            }
+        }catch(e){
+            try{sessionStorage.setItem('repertoar_welcome_fail_v1','1');}catch(_){}
+            console.warn('bundled welcome score',e);
         }
     }
     function findZipEntryByPath(zip,want){
@@ -4193,6 +4832,28 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(best)return await best.async('string');
         throw new Error('No MusicXML entry found inside MXL');
     }
+    const REPERTOAR_BUNDLED_WELCOME_CANDIDATES=[
+        'samples/repertoar-welcome.musicxml',
+        'samples/repertoar-welcome.xml',
+        'samples/repertoar-welcome.mxl',
+    ];
+    async function tryFetchBundledWelcomeXml(){
+        for(const path of REPERTOAR_BUNDLED_WELCOME_CANDIDATES){
+            try{
+                const r=await fetch(path,{cache:'force-cache'});
+                if(!r.ok)continue;
+                let xml;
+                if(/\.mxl$/i.test(path)){
+                    const buf=await r.arrayBuffer();
+                    xml=await extractMusicXmlStringFromMxlBuffer(buf);
+                }else{
+                    xml=await r.text();
+                }
+                if(xml&&typeof xml==='string'&&/<score-partwise/i.test(xml))return xml;
+            }catch(e){/* próbáljuk a következő fájlt */ void e;}
+        }
+        return null;
+    }
     async function readLocalFileAsText(file){
         if(typeof file.text==='function')return file.text();
         return new Promise((res,rej)=>{
@@ -4238,8 +4899,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         updateBookViewButtonChrome();
         const bm=document.getElementById('btnOsmdDark');
         if(bm){bm.style.display='flex';syncOsmdThemeToggleButtonChrome();}
-        const up=document.getElementById('btnUploadScore');
-        if(up)up.title=currentLang==='HU'?'Kotta feltöltése (XML / MusicXML / MXL)':'Upload MusicXML / MXL score';
+        syncUploadScoreChrome();
+        syncPracticeRangeClickPickChrome();
     }
     function switchToScoreMode(){
         scoreMode=true;
@@ -4255,8 +4916,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         updateBookViewButtonChrome();
         const bm=document.getElementById('btnOsmdDark');
         if(bm){bm.style.display='flex';syncOsmdThemeToggleButtonChrome();}
-        const up=document.getElementById('btnUploadScore');
-        if(up)up.title=currentLang==='HU'?'Kotta cseréje (XML / MusicXML / MXL)':'Replace score (XML / MusicXML / MXL)';
+        syncUploadScoreChrome();
+        syncPracticeRangeClickPickChrome();
         if(!osmdInstance)return;
         setTimeout(async()=>{
             try{
@@ -4269,11 +4930,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             applyTimeSignatureFromLoadedOsmdScore();
             try{if(osmdInstance.cursor&&typeof osmdInstance.cursor.hide==='function')osmdInstance.cursor.hide();}catch(e){}
             buildScoreStepsFromOsmd();
-            const n=scoreSteps.length;
-            const hu=currentLang==='HU';
-            let msg=n?(hu?n+' LÉPÉS · START / DEMO · LED (segédek)':n+' STEPS · START / DEMO · LED (hints)'):(hu?'ÜRES KOTTA':'EMPTY SCORE');
-            if(n&&lastLoadedScoreBpmFromXml>0)msg+=hu?' · KOTTA '+lastLoadedScoreBpmFromXml+' BPM':' · SCORE '+lastLoadedScoreBpmFromXml+' BPM';
-            setInfoBar(msg,null);
+            setInfoBar(scoreStepsInfoBarMessage(),null);
             try{
                 await osmdFitWidth();
                 await applyPersistedOsmdZoomIfSaved();
