@@ -260,7 +260,21 @@
         /* Kotta + ütemkiemelő együtt görgetődik; a kiemelő offsetje a stackhez képest (nem sheet scrollTop-mal). */
         /* Csak ha be van kapcsolva az „egérrel ütem” mód — egyébként a kotta kattintása nem változtat tartományt */
         #osmd-container.practice-range-click-pick-on { cursor: crosshair; }
-        .score-osmd-stack { position: relative; width: 100%; box-sizing: border-box; }
+        .score-osmd-stack { position: relative; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: stretch; }
+        .welcome-demo-banner {
+            flex: 0 0 auto; width: 100%; max-width: 100%; box-sizing: border-box; margin: 0 0 10px 0; padding: 12px 42px 12px 14px;
+            position: relative; background: linear-gradient(180deg, rgba(0, 72, 88, 0.42), rgba(0, 36, 44, 0.5));
+            border: 1px solid rgba(0, 170, 204, 0.5); border-radius: 8px; color: #d4f4ff;
+            font: 13px/1.55 'Inter', sans-serif; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+        .welcome-demo-banner[hidden] { display: none !important; }
+        .welcome-demo-banner-text { margin: 0; padding: 0; }
+        .welcome-demo-banner-close {
+            position: absolute; top: 6px; right: 8px; width: 30px; height: 30px; padding: 0;
+            border: 1px solid rgba(0, 170, 204, 0.4); background: rgba(0, 0, 0, 0.28); color: var(--oled-text);
+            border-radius: 6px; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .welcome-demo-banner-close:hover { background: rgba(0, 170, 204, 0.14); }
         /* Kotta modálok: alapértelmezett modal mérethez közel (nem „magasított” panel) */
         .modal-overlay .modal-content.workshop-tools-grid {
             max-width: min(96vw, 550px); width: 90%; padding: 22px 26px; box-sizing: border-box;
@@ -516,6 +530,10 @@
     </div>
     <div class="sheet-container">
         <div class="score-osmd-stack" id="score-osmd-stack">
+        <div id="welcomeDemoBanner" class="welcome-demo-banner" role="status" hidden>
+            <p class="welcome-demo-banner-text" id="welcomeDemoBannerText"></p>
+            <button type="button" class="welcome-demo-banner-close" id="welcomeDemoBannerClose" onclick="dismissWelcomeDemoBanner()" aria-label="Dismiss">×</button>
+        </div>
         <div class="sheet-viewport" id="osmd-container"
              style="display:block;width:100%;background:#fff;min-height:300px;box-sizing:border-box;"></div>
         <div id="score-practice-range-shade" class="score-practice-range-layer" aria-hidden="true"></div>
@@ -1880,6 +1898,7 @@
         updateViewPresetTitles();
         updateViewPresetChrome();
         applyHelpTooltips();
+        if(typeof updateWelcomeDemoBannerVisibility==='function')updateWelcomeDemoBannerVisibility();
     }
     function setInfoBar(text,targetEl){
         const bar=document.getElementById('infoBarText');
@@ -3061,6 +3080,33 @@
     // ── OSMD Score + teaching integration ─────────────────────────────────────────
     let osmdInstance=null;
     let lastLoadedScoreXml=null;
+    const AKIRA_BUNDLED_WELCOME_MARKER='AKIRA_BUNDLED_WELCOME_V3';
+    function isBundledWelcomeScoreXml(xml){
+        return typeof xml==='string'&&xml.includes(AKIRA_BUNDLED_WELCOME_MARKER);
+    }
+    function dismissWelcomeDemoBanner(){
+        try{sessionStorage.setItem('repertoar_welcome_banner_session_dismiss','1');}catch(e){}
+        updateWelcomeDemoBannerVisibility();
+    }
+    function updateWelcomeDemoBannerVisibility(){
+        const wrap=document.getElementById('welcomeDemoBanner');
+        const txt=document.getElementById('welcomeDemoBannerText');
+        const btn=document.getElementById('welcomeDemoBannerClose');
+        if(!wrap)return;
+        const isWel=isBundledWelcomeScoreXml(lastLoadedScoreXml);
+        let dismissed=false;
+        try{dismissed=sessionStorage.getItem('repertoar_welcome_banner_session_dismiss')==='1';}catch(e){}
+        if(isWel&&!dismissed){
+            wrap.removeAttribute('hidden');
+            const hu=currentLang==='HU';
+            if(txt)txt.textContent=hu
+                ?'Ez egy beépített mintakotta (saját, jogtiszta anyag), hogy lásd a kétkulcsos kotta kinézetét és kipróbáld a DEMO-t vagy a START gyakorlást. Saját fájlod: jobbra a dokumentum ikon, vagy kattints a címre — könyvtár.'
+                :'This built-in demo (original, license-safe) shows a two-staff score so you can try DEMO or START. Your files: use the score file icon on the right, or tap the title on the display to open the library.';
+            if(btn)btn.setAttribute('aria-label',hu?'Üzenet elrejtése (erre a munkamenetre)':'Hide for this session');
+        }else{
+            wrap.setAttribute('hidden','');
+        }
+    }
     function osmdIterator(cur){return cur&&(cur.Iterator||cur.iterator);}
     function osmdHalfToneToMidi(ht){return ht+12;}
     function isOsmdGrace(n){return !!(n&&(n.IsGraceNote||n.isGraceNote));}
@@ -4755,6 +4801,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             switchToScoreMode();
             queuePersistScoreSession();
             setTimeout(()=>{try{applyLibraryOledAfterLoad();}catch(e){}},280);
+            updateWelcomeDemoBannerVisibility();
         }catch(e){
             setInfoBar('ERROR LOADING SCORE: '+e.message,null);
             console.error('OSMD error:',e);
@@ -4762,6 +4809,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
     }
     /** Első megnyitás vagy üres könyvtár után: mintakotta betöltése (samples/ a repertoar.html mellé). */
     async function loadBundledWelcomeScoreIntoView(){
+        try{sessionStorage.removeItem('repertoar_welcome_banner_session_dismiss');}catch(e){}
         try{sessionStorage.removeItem('repertoar_welcome_fail_v1');}catch(e){}
         const xml=await tryFetchBundledWelcomeXml();
         if(!xml)return false;
