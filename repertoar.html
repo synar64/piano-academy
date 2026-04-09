@@ -11,102 +11,95 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --rack-bg:#1a1a1d; --rack-border:#2a2a2d; --btn-dark:#101012; --btn-border:#050505; --text-dim:#555; --lcd-bg-dark:#111213; --lcd-label-color:#557799; --oled-text:#b3e6ff; --info-bar-height:25px; }
+        :root { --rack-bg:#1a1a1d; --rack-border:#2a2a2d; --btn-dark:#101012; --btn-border:#050505; --text-dim:#555; --lcd-bg-dark:#111213; --lcd-label-color:#557799; --oled-text:#b3e6ff; --info-bar-height:25px; --score-paper-bg:#ebe6dc; }
         body { font-family:'Inter',sans-serif; background:#000; margin:0; padding:0; height:100vh; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-start; color:#fff; -webkit-user-select:none; user-select:none; }
         /* Teljes képernyős kotta: alsó rack + billentyűzet rejtve; böngésző fullscreen mellett a teljes monitor */
         body.score-theater-mode .lower-section { display:none !important; }
         body.score-theater-mode .sheet-container { flex:1 1 auto; min-height:0; padding-bottom:28px; }
-        /* Jobb felső: kotta vezérlők + alatta teljes képernyős kotta gomb */
+        /* Jobb felső: kotta vezérlők (fullscreen + csúszka-panel + többi) */
         .zoom-controls-dock { position:fixed; right:20px; top:20px; z-index:1000; display:flex; flex-direction:column; align-items:center; gap:10px; pointer-events:none; }
         .zoom-controls-dock > * { pointer-events:auto; }
-        /* jobb padding: fix ~38px gombok + right:20px + presets — ne lógjon a kotta a zoom oszlop alá (háttér = kotta színe, nem fekete csík) */
-        .sheet-container { flex:1 1 auto; min-height:0; display:flex; justify-content:center; align-items:flex-start; padding:30px 100px 100px 20px; width:100%; box-sizing:border-box; overflow-y:auto; position:relative; background:#fff; }
+        /* padding: jobb oszlop — zoom a felugró csúszkában */
+        .sheet-container { flex:1 1 auto; min-height:0; display:flex; justify-content:center; align-items:flex-start; padding:30px 68px 100px 20px; width:100%; box-sizing:border-box; overflow-y:auto; position:relative; background:#fff; }
         /* Kotta mód: 1 hasáb = görgethető; 2 hasáb = fix „könyvoldal”, lapozás */
         /* 1 hasáb: kevesebb alsó padding (100px helyett) + háttér = ne legyen fekete „csík” a fehér kotta alatt görgetéskor */
-        .sheet-container.score-layout-1up { flex-direction:column; align-items:stretch; overflow-y:auto; overflow-x:hidden; padding-bottom:24px; padding-top:20px; }
-        .sheet-container.score-layout-1up:has(#osmd-container.osmd-dark){background:#000;}
-        .sheet-container.score-layout-1up:has(#osmd-container:not(.osmd-dark)){background:#fff;}
-        .sheet-container.score-layout-2up:has(#osmd-container.osmd-dark),.sheet-container.score-layout-3up:has(#osmd-container.osmd-dark){background:#000;}
-        .sheet-container.score-layout-2up:has(#osmd-container:not(.osmd-dark)),.sheet-container.score-layout-3up:has(#osmd-container:not(.osmd-dark)){background:#fff;}
+        /* justify-content:flex-start: ne legyen függőlegesen középre tolva a kotta — különben üres „görgethető” sáv + elcsúszó ütemkiemelés 1 hasábnál */
+        .sheet-container.score-layout-1up { flex-direction:column; align-items:stretch; justify-content:flex-start; overflow-y:auto; overflow-x:hidden; padding-bottom:24px; padding-top:20px; }
+        .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-dark){background:#000;}
+        .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-sepia){background:var(--score-paper-bg);}
+        .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-light){background:#fff;}
+        .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-dark),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-dark){background:#000;}
+        .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-sepia),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-sepia){background:var(--score-paper-bg);}
+        .sheet-container.score-layout-2up:has(#osmd-container.osmd-theme-light),.sheet-container.score-layout-3up:has(#osmd-container.osmd-theme-light){background:#fff;}
         /* 2–3 hasáb: görgetés a .sheet-container-en; #osmd-container ne nőjön flex-grow-ral üres fehér „szegéllyé” (demó követés + kiemelés) */
         .sheet-container.score-layout-2up { flex-direction:column; align-items:stretch; overflow-y:auto; overflow-x:hidden; padding-top:16px; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
         .sheet-container.score-layout-3up { flex-direction:column; align-items:stretch; overflow-y:auto; overflow-x:hidden; padding-top:14px; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
-        /* 1 hasáb: ne nyúljon flex-grow-gal a teljes magasságra — különben üres, sötét „lyuk” marad a kotta alatt (osmd-dark háttér). */
+        /* 1 hasáb: ne nyúljon flex-grow-gal a teljes magasságra — különben üres „lyuk” marad a kotta alatt. */
         /* #osmd-container: ne legyen padding inline a HTML-ben — különben felülírja a hasáb-specifikus margókat */
-        .sheet-container.score-layout-1up #osmd-container { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; overflow-x:hidden; overflow-y:visible; padding:26px 32px 40px; box-sizing:border-box; }
-        .sheet-container.score-layout-2up #osmd-container { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; overflow-x:hidden; overflow-y:visible; padding:12px 8px 12px; box-sizing:border-box; }
-        .sheet-container.score-layout-3up #osmd-container { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; overflow-x:hidden; overflow-y:visible; padding:10px 5px 10px; box-sizing:border-box; }
+        .sheet-container.score-layout-1up .score-osmd-stack { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; }
+        .sheet-container.score-layout-1up #osmd-container { width:100%; overflow-x:hidden; overflow-y:visible; padding:26px 32px 40px; box-sizing:border-box; }
+        .sheet-container.score-layout-2up .score-osmd-stack { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; }
+        .sheet-container.score-layout-2up #osmd-container { width:100%; overflow-x:hidden; overflow-y:visible; padding:12px 8px 12px; box-sizing:border-box; }
+        .sheet-container.score-layout-3up .score-osmd-stack { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; }
+        .sheet-container.score-layout-3up #osmd-container { width:100%; overflow-x:hidden; overflow-y:visible; padding:10px 5px 10px; box-sizing:border-box; }
         .sheet-viewport { width:100%; max-width:2450px; position:relative; overflow:visible; background:transparent; }
         .lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; position:relative; z-index:9999; }
         .zoom-controls { display:flex; flex-direction:column; gap:6px; align-items:center; }
-        /* Sötét kotta: egybefüggő fekete — a gombok #111-je és a #000 háttér csíkozása; presetek ugyanabban a panelben */
-        .sheet-container:has(#osmd-container.osmd-dark) .zoom-controls {
+        /* Sötét kotta: egybefüggő fekete — a gombok és a #000 háttér csíkozásának elkerülése */
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls {
             background:#000;
             padding:8px 6px 10px;
             border-radius:12px;
             box-sizing:border-box;
             border:1px solid #161616;
         }
-        .sheet-container:has(#osmd-container.osmd-dark) .zoom-controls .zoom-btn {
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls .zoom-btn {
             background:#000;
             border-color:#383838;
             box-shadow:0 2px 8px rgba(0,0,0,0.45);
         }
-        .sheet-container:has(#osmd-container.osmd-dark) .zoom-controls .zoom-btn:hover {
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .zoom-controls .zoom-btn:hover {
             background:#121212;
             border-color:#484848;
             color:#eee;
         }
-        .sheet-container:has(#osmd-container.osmd-dark) .zoom-fullscore-btn {
-            background:#000;
-            border-color:#383838;
-            color:#ddd;
-            box-shadow:0 2px 8px rgba(0,0,0,0.45);
-        }
-        .sheet-container:has(#osmd-container.osmd-dark) .zoom-fullscore-btn:hover {
-            background:#121212;
-            border-color:#484848;
-            color:#fff;
-        }
-        .zoom-fullscore-btn {
-            width:38px; min-height:52px; padding:6px 4px; box-sizing:border-box;
-            background:#111; border:1px solid #444; border-radius:10px; color:#aaa;
-            font-family:'Share Tech Mono',monospace; font-size:8px; font-weight:700; line-height:1.2;
-            letter-spacing:0; text-align:center; cursor:pointer; user-select:none;
-            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
-            box-shadow:0 3px 10px rgba(0,0,0,0.8); transition:0.2s;
-        }
-        .zoom-fullscore-btn:hover { background:#222; color:#fff; transform:scale(1.03); }
-        .zoom-fullscore-btn.active { border-color:#557799; color:#b3e6ff; background:#151518; }
-        .zoom-fullscore-btn svg { flex-shrink:0; opacity:0.9; }
+        #btnScoreFullScore.active { border-color:#557799; color:#b3e6ff; background:#151518; }
+        #btnScoreFullScore svg { flex-shrink:0; opacity:0.92; }
         .zoom-btn { background:#111; border:1px solid #444; color:#aaa; width:38px; height:38px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,0.8); transition:0.2s; user-select:none; }
         .zoom-btn:hover { background:#222; color:#fff; transform:scale(1.1); }
         .zoom-presets { display:flex; flex-direction:column; align-items:center; gap:5px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.15); width:38px; }
         .zoom-preset-btn { font-size:12px; font-family:'Share Tech Mono',monospace; font-weight:700; letter-spacing:0; line-height:1; padding:0; border-radius:50%; }
         .zoom-preset-btn.zoom-preset-filled { border-color:#557799; color:#b3e6ff; }
-        /* Függőleges zoom-csúszka (+/− alatt), ugyanabban a 38px oszlopban */
-        .zoom-slider-wrap {
-            width:38px; height:100px; display:flex; align-items:center; justify-content:center;
-            flex-shrink:0; touch-action:none;
+        /* Felugró panel: zoom / margó / sortáv — vízszintes csúszkák (rack dizájn) */
+        .score-layout-popup {
+            display:none; position:absolute; right:46px; top:50%; transform:translateY(-50%);
+            background:#1a1a1d; border:1px solid #333; padding:12px 14px; border-radius:8px; z-index:1001;
+            box-shadow:0 12px 36px rgba(0,0,0,0.9); min-width:200px; max-width:min(280px,calc(100vw - 120px));
         }
-        .zoom-slider-wrap input[type="range"] {
-            -webkit-appearance:none; appearance:none; width:100px; height:14px; margin:0; padding:0;
-            transform:rotate(-90deg); transform-origin:center center; background:transparent; cursor:pointer;
+        .sheet-container:has(#osmd-container.osmd-theme-dark) .score-layout-popup {
+            background:#000; border-color:#161616; box-shadow:0 12px 36px rgba(0,0,0,0.95);
         }
-        .zoom-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
-            height:5px; border-radius:3px; background:#333; border:1px solid #222; box-shadow:inset 0 1px 2px rgba(0,0,0,0.5);
+        .score-layout-popup-row { margin-bottom:12px; }
+        .score-layout-popup-row:last-child { margin-bottom:0; }
+        .score-layout-popup-row label {
+            display:block; font:10px 'Share Tech Mono',monospace; color:var(--lcd-label-color);
+            text-transform:uppercase; letter-spacing:0.08em; font-weight:bold; margin-bottom:5px; cursor:pointer;
         }
-        .zoom-slider-wrap input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
-            background:#b0b0b0; border:1px solid #555; margin-top:-6px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.65);
+        .score-layout-popup-row input[type="range"] {
+            -webkit-appearance:none; appearance:none; width:100%; height:6px; margin:0; padding:0;
+            background:#111; border-radius:3px; outline:none; cursor:pointer;
+            box-shadow:inset 0 1px 3px #000; border:1px solid #222; box-sizing:border-box;
         }
-        .zoom-slider-wrap input[type="range"]::-moz-range-track {
-            height:5px; border-radius:3px; background:#333; border:1px solid #222;
+        .score-layout-popup-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance:none; width:14px; height:20px; background:#888; border:1px solid #111;
+            border-radius:2px; box-shadow:0 2px 4px #000; cursor:grab; margin-top:-8px;
         }
-        .zoom-slider-wrap input[type="range"]::-moz-range-thumb {
-            width:16px; height:16px; border-radius:50%; background:#b0b0b0; border:1px solid #555;
-            box-shadow:0 2px 8px rgba(0,0,0,0.65);
+        .score-layout-popup-row input[type="range"]::-moz-range-thumb {
+            width:14px; height:20px; background:#888; border:1px solid #111; border-radius:2px;
+            box-shadow:0 2px 4px #000; cursor:grab;
+        }
+        .score-layout-popup-row input[type="range"]::-moz-range-track {
+            height:6px; border-radius:3px; background:#111;
         }
         .workstation-chassis { display:flex; width:100%; max-width:2560px; position:relative; border-radius:6px 6px 0 0; background:var(--rack-bg); }
         .wood-cheek { width:24px; background:linear-gradient(to right,#3a1c0d,#1a0c05); box-shadow:inset 1px 0 2px rgba(255,255,255,0.1),inset -2px 0 5px rgba(0,0,0,0.8); border-radius:6px 0 0 0; z-index:10; }
@@ -186,9 +179,10 @@
         .modal-btn:active { transform:translateY(3px); box-shadow:0 0 0 #000; }
         /* OSMD score view */
         #osmd-container svg { max-width: 100%; }
-        #osmd-container.osmd-dark { background: #000 !important; }
-        #osmd-container:not(.osmd-dark){background:#fff !important;}
-        #osmd-container.osmd-dark svg { filter: invert(1) hue-rotate(180deg) brightness(1.06) contrast(1.03); }
+        #osmd-container.osmd-theme-light { background:#fff !important; }
+        #osmd-container.osmd-theme-sepia { background:var(--score-paper-bg) !important; }
+        #osmd-container.osmd-theme-dark { background:#000 !important; }
+        #osmd-container.osmd-theme-dark svg { filter: invert(1) hue-rotate(180deg) brightness(1.06) contrast(1.03); }
         .osmd-book-root { width: 100%; box-sizing: border-box; }
         .osmd-book-spread { box-sizing: border-box; }
         /* Két / három hasáb: oszlop = kotta szélessége + kis gap (flex:1 üresen kitöltötte a sort → óriási „gutter”) */
@@ -229,10 +223,12 @@
             background: rgba(100, 185, 255, 0.22);
             box-shadow: inset 0 0 0 0px rgba(130, 205, 255, 1);
         }
-        #osmd-container.osmd-dark ~ .score-measure-highlight {
+        .score-osmd-stack:has(#osmd-container.osmd-theme-dark) .score-measure-highlight {
             background: rgba(100, 185, 255, 0.12);
             box-shadow: inset 0 0 0 0px rgba(120, 200, 255, 0.35);
         }
+        /* Kotta + ütemkiemelő együtt görgetődik; a kiemelő offsetje a stackhez képest (nem sheet scrollTop-mal). */
+        .score-osmd-stack { position: relative; width: 100%; box-sizing: border-box; }
         /* Kotta modálok: alapértelmezett modal mérethez közel (nem „magasított” panel) */
         .modal-overlay .modal-content.workshop-tools-grid {
             max-width: min(96vw, 550px); width: 90%; padding: 22px 26px; box-sizing: border-box;
@@ -303,6 +299,20 @@
         #practiceLogBody { font: 18px 'Share Tech Mono',monospace; color: #bbb; max-height: 50vh; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
         .zoom-btn.zoom-btn-mono { font-size: 11px; font-weight: 700; font-family: 'Share Tech Mono',monospace; letter-spacing: 0.02em; color: #9a9a9a; }
         .zoom-btn.zoom-btn-mono:hover { color: #ddd; }
+        .info-guide-modal .info-guide-sec { margin-bottom: 20px; }
+        .info-guide-modal .info-guide-h {
+            font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--lcd-label-color);
+            text-transform: uppercase; letter-spacing: 2px; font-weight: bold; margin-bottom: 8px;
+            border-bottom: 1px solid #222; padding-bottom: 5px;
+        }
+        .info-guide-modal .info-guide-body {
+            font-size: 14px; color: #aaa; line-height: 1.65; margin: 0; font-family: 'Inter', sans-serif;
+            white-space: pre-line;
+        }
+        .info-guide-modal .info-guide-note {
+            font-size: 12px; color: #666; line-height: 1.5; margin: 10px 0 0 0; font-family: 'Inter', sans-serif;
+            white-space: pre-line;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.4/build/opensheetmusicdisplay.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -318,18 +328,34 @@
         </div>
     </div>
     <div id="infoModal" class="modal-overlay">
-        <div class="modal-content" style="max-width:560px;text-align:left;max-height:90vh;overflow-y:auto;">
-            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;color:var(--oled-text);border-bottom:1px solid #333;padding-bottom:15px;">Score</h2>
-            <div style="margin-bottom:18px;">
-                <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How it works</div>
-                <p style="font-size:15px;color:#aaa;line-height:1.6;margin:0;font-family:'Inter';" id="txt-howBody">Upload MusicXML / MXL (XML button). START = step practice; DEMO = playback. OLED: Module arrows switch modules; Ms opens tools; Bm arrows = slot; Log opens journal. Keys: ←→ spreads, +/− zoom, Space = START/STOP.</p>
+        <div class="modal-content info-guide-modal" style="max-width:min(640px,96vw);text-align:left;max-height:90vh;overflow-y:auto;padding:28px 32px;">
+            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;color:var(--oled-text);border-bottom:1px solid #333;padding-bottom:15px;margin-top:0;">Score</h2>
+            <div class="info-guide-sec">
+                <div class="info-guide-h" id="txt-infoScoresTitle">Score files</div>
+                <p class="info-guide-body" id="txt-infoScoresBody"></p>
             </div>
-            <div style="margin-bottom:22px;">
-                <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl0">Treble / bass staff visibility (for hints and practice).</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl4">Practice hints: key LEDs for the next notes — tap to cycle off.</span></div>
+            <div class="info-guide-sec">
+                <div class="info-guide-h" id="txt-howTitle">How it works</div>
+                <p class="info-guide-body" id="txt-howBody"></p>
             </div>
-            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
+            <div class="info-guide-sec">
+                <div class="info-guide-h" id="txt-infoPanelTitle">Score toolbar</div>
+                <p class="info-guide-body" id="txt-infoPanelBody"></p>
+            </div>
+            <div class="info-guide-sec">
+                <div class="info-guide-h" id="txt-infoShortcutsTitle">Keyboard</div>
+                <p class="info-guide-body" id="txt-infoShortcutsBody"></p>
+            </div>
+            <div class="info-guide-sec">
+                <div class="info-guide-h" id="txt-ctrlTitle">Rack</div>
+                <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;flex-shrink:0;">𝄞 / 𝄢</div><span class="info-guide-body" style="display:block;padding-top:2px;" id="txt-ctrl0"></span></div>
+                <div style="display:flex;gap:10px;margin-bottom:0;align-items:flex-start;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span class="info-guide-body" style="display:block;padding-top:2px;" id="txt-ctrl4"></span></div>
+            </div>
+            <div class="info-guide-sec">
+                <div class="info-guide-h" id="txt-infoHelpTitle">Help mode</div>
+                <p class="info-guide-body" id="txt-infoHelpBody"></p>
+            </div>
+            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;margin-top:8px;">Got It</button>
         </div>
     </div>
     <div id="practiceLogModal" class="modal-overlay">
@@ -401,32 +427,45 @@
         </div>
     </div>
     <div class="sheet-container">
+        <div class="score-osmd-stack" id="score-osmd-stack">
         <div class="sheet-viewport" id="osmd-container"
              style="display:block;width:100%;background:#fff;min-height:300px;box-sizing:border-box;"></div>
         <div id="score-measure-highlight" class="score-measure-highlight" aria-hidden="true"></div>
+        </div>
         <div class="zoom-controls-dock">
         <div class="zoom-controls">
-            <div class="zoom-btn" onclick="zoomSheet(1)" title="Zoom in" style="font-size:24px;line-height:1;font-weight:300;">+</div>
-            <div class="zoom-btn" onclick="zoomSheet(-1)" title="Zoom out" style="font-size:24px;line-height:1;font-weight:300;">−</div>
-            <div class="zoom-slider-wrap" id="zoomSliderWrap" title="">
-                <input type="range" id="zoomSlider" min="10" max="500" step="1" value="100" aria-label="Zoom" oninput="onZoomSliderInput()" onchange="onZoomSliderCommit()" />
+            <button type="button" class="zoom-btn" id="btnScoreFullScore" onclick="toggleScoreFullScoreView()"
+                    title="Full score view" aria-label="Full score view" data-help="">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+            <div id="scoreLayoutToggleWrap" style="display:none;position:relative;">
+                <button type="button" class="zoom-btn" id="btnScoreLayoutToggle" onclick="toggleScoreLayoutPopup()" title="" aria-label="" data-help="">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="2" y1="14" x2="6" y2="14"/><line x1="10" y1="8" x2="14" y2="8"/><line x1="18" y1="16" x2="22" y2="16"/></svg>
+                </button>
+                <div id="scoreLayoutPopup" class="score-layout-popup" role="dialog" aria-label="Score size">
+                    <div class="score-layout-popup-row">
+                        <label id="scoreLayoutLblZoom" for="zoomSlider">Zoom</label>
+                        <input type="range" id="zoomSlider" min="10" max="500" step="1" value="100" aria-labelledby="scoreLayoutLblZoom" oninput="onZoomSliderInput()" onchange="onZoomSliderCommit()" />
+                    </div>
+                    <div class="score-layout-popup-row">
+                        <label id="scoreLayoutLblMarg" for="marginSlider">Marg</label>
+                        <input type="range" id="marginSlider" min="0" max="100" step="1" value="30" aria-labelledby="scoreLayoutLblMarg" oninput="onMarginSliderInput()" onchange="flushLayoutSlidersRender()" />
+                    </div>
+                    <div class="score-layout-popup-row">
+                        <label id="scoreLayoutLblSpac" for="spacingSlider">Spac</label>
+                        <input type="range" id="spacingSlider" min="0" max="100" step="1" value="50" aria-labelledby="scoreLayoutLblSpac" oninput="onSpacingSliderInput()" onchange="flushLayoutSlidersRender()" />
+                    </div>
+                </div>
             </div>
             <button type="button" class="zoom-btn zoom-btn-mono" id="btnBookView" onclick="toggleBookView()" title="Book view">BOOK</button>
             <div class="zoom-btn" id="btnOsmdPrevSpread" onclick="osmdStepBookSpread(-1)" title="Previous spread" style="display:none;font-size:20px;font-weight:300;">←</div>
             <span id="osmdSpreadLbl" aria-hidden="true" style="display:none;font:10px 'Share Tech Mono',monospace;color:#888;text-align:center;width:38px;line-height:1.25;padding:2px 0;user-select:none;">1 / 1</span>
             <div class="zoom-btn" id="btnOsmdNextSpread" onclick="osmdStepBookSpread(1)" title="Next spread" style="display:none;font-size:20px;font-weight:300;">→</div>
-            <button type="button" class="zoom-btn zoom-btn-mono" id="btnOsmdDark" onclick="toggleOsmdDarkMode()" title="Invert score (dark)" style="display:none;" aria-label="Dark score">
+            <button type="button" class="zoom-btn zoom-btn-mono" id="btnOsmdDark" onclick="cycleOsmdScoreTheme()" title="" style="display:none;" aria-label="">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3a6 6 0 1 0 0 18 9 9 0 0 1 0-18z"/></svg>
             </button>
             <label class="zoom-btn zoom-btn-mono" for="score-file-input" id="btnUploadScore"
                    title="Upload MusicXML / MXL" style="cursor:pointer;">XML</label>
-            <!-- Henle-inspired: Margin & Spacing layout sliders -->
-            <div id="scoreLayoutPanel" style="display:none;width:38px;border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;margin-top:2px;">
-                <div style="font:8px 'Share Tech Mono',monospace;color:#666;text-align:center;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Marg</div>
-                <div class="zoom-slider-wrap"><input type="range" id="marginSlider" min="0" max="100" step="1" value="30" aria-label="Margins" oninput="onMarginSliderInput()" onchange="flushLayoutSlidersRender()" /></div>
-                <div style="font:8px 'Share Tech Mono',monospace;color:#666;text-align:center;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;margin-top:4px;">Spac</div>
-                <div class="zoom-slider-wrap"><input type="range" id="spacingSlider" min="0" max="100" step="1" value="50" aria-label="Spacing" oninput="onSpacingSliderInput()" onchange="flushLayoutSlidersRender()" /></div>
-            </div>
             <!-- Presetek: egyetlen gomb mögötti felugró -->
             <div style="position:relative;">
                 <button type="button" class="zoom-btn zoom-btn-mono" id="btnPresetsToggle" onclick="togglePresetsPopup()" title="View presets">PRE</button>
@@ -441,10 +480,6 @@
                 </div>
             </div>
         </div>
-        <button type="button" class="zoom-fullscore-btn" id="btnScoreFullScore" onclick="toggleScoreFullScoreView()" title="Full score view">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-            <span id="btnScoreFullScoreLbl">FULL</span>
-        </button>
         </div>
     </div>
     <div class="lower-section">
@@ -462,20 +497,20 @@
                 </div>
                 <div class="master-dashboard">
                     <div class="control-group">
-                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
                         </a>
-                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="">
                             <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
                             <div class="clef-divider"></div>
                             <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
                         </button>
-                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: KEY LEDS FOR NEXT NOTES (PRACTICE) — TAP TO TOGGLE OFF">
+                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
                         </button>
                         <div style="width:8px;"></div>
                         <div class="metronome-block" style="display:flex;align-items:center;gap:4px;position:relative;">
-                            <button id="metroToggle" class="sq-btn" onclick="if(!helpActive) toggleMetronome()" data-help="METRONOME: START/STOP CLICK">
+                            <button id="metroToggle" class="sq-btn" onclick="if(!helpActive) toggleMetronome()" data-help="">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L7 22h10l-5-20z"/><circle cx="12" cy="18" r="1"/></svg>
                             </button>
                             <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
@@ -501,7 +536,7 @@
                                     <button class="metro-preset" onclick="setTempoPreset(208)">208</button>
                                 </div>
                             </div>
-                            <button id="metroMenuBtn" class="sq-btn" onclick="if(!helpActive) toggleMetroMenu()" data-help="METRONOME SETTINGS: SOUND, VOLUME, ACCENT">
+                            <button id="metroMenuBtn" class="sq-btn" onclick="if(!helpActive) toggleMetroMenu()" data-help="">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
                             </button>
                             <div id="metroSettingsMenu" style="display:none;position:absolute;bottom:55px;left:0;background:#1a1a1d;border:1px solid #333;padding:15px;border-radius:4px;z-index:1000;flex-direction:column;gap:10px;box-shadow:0 10px 30px #000;width:200px;">
@@ -541,47 +576,47 @@
                     </div>
                     <div class="center-console">
                         <div style="display:flex;align-items:center;gap:16px;justify-content:center;width:100%;flex-wrap:wrap;">
-                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: SCORE STEP PRACTICE OR STOP" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;flex-shrink:0;">START</button>
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;flex-shrink:0;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row arrow-row-center">
-                                    <button type="button" class="nav-disk-btn" onclick="if(!helpActive) void cyclePieceInActiveLibrary(-1)" data-help="KOTTA: ▲ előző darab a könyvtárban.">▲</button>
+                                    <button type="button" class="nav-disk-btn" id="btnLibPrev" onclick="if(!helpActive) void cyclePieceInActiveLibrary(-1)" data-help="">▲</button>
                                 </div>
                                 <div class="oled-wrapper">
                                     <div class="oled-screen">
-                                        <div id="oledScoreTitle" class="oled-section oled-score-title-only" onclick="if(!helpActive) openScoreLibraryModal()" data-help="KOTTA CÍME: ▲▼ darab a könyvtárban; katt: könyvtár. Könyvtár váltás a listában. XML jobbra.">
+                                        <div id="oledScoreTitle" class="oled-section oled-score-title-only" onclick="if(!helpActive) openScoreLibraryModal()" data-help="">
                                             <div class="oled-main oled-lib-title" id="lcdScoreTitleOnly">—</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="arrow-row arrow-row-center">
-                                    <button type="button" class="nav-disk-btn" onclick="if(!helpActive) void cyclePieceInActiveLibrary(1)" data-help="KOTTA: ▼ következő darab.">▼</button>
+                                    <button type="button" class="nav-disk-btn" id="btnLibNext" onclick="if(!helpActive) void cyclePieceInActiveLibrary(1)" data-help="">▼</button>
                                 </div>
                             </div>
                             <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">
-                                <button type="button" id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="DEMO: MIDI mindig megy Pianoteq/IAC-ra ha nyitva a kimenet; a zongora kapcsoló csak a belső hangot adja hozzá vagy veszi el" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;flex-shrink:0;">DEMO</button>
+                                <button type="button" id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;flex-shrink:0;">DEMO</button>
                             </div>
                         </div>
                     </div>
                     <div class="control-group">
-                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH">
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="">
                             <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
                         </button>
                         <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
-                            <button type="button" id="btnMeasureRange" onclick="if(!helpActive) openMeasureRangeModal()" data-help="MEASURE RANGE: limits START / DEMO to the selected measures" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                            <button type="button" id="btnMeasureRange" onclick="if(!helpActive) openMeasureRangeModal()" data-help="" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4v16"/><path d="M18 4v16"/><path d="M6 12h12"/><path d="M9 8l-3 4 3 4"/><path d="M15 8l3 4-3 4"/></svg>
                             </button>
                             <div style="height:1px;background:#222;"></div>
-                            <button type="button" id="btnBookmarksTools" onclick="if(!helpActive) openBookmarksModal()" data-help="BOOKMARKS: B1–B3 load/save (Shift+click = save) + practice log" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                            <button type="button" id="btnBookmarksTools" onclick="if(!helpActive) openBookmarksModal()" data-help="" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                             </button>
                         </div>
-                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
+                        <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
                         <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
-                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
+                            <button id="btnHelp" onclick="toggleHelp()" data-help="" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
                             <div style="height:1px;background:#222;"></div>
-                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="7" x2="12" y2="7" stroke-width="3"/><line x1="12" y1="11" x2="12" y2="17" stroke-width="3"/></svg>
                             </button>
                         </div>
@@ -592,7 +627,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="keyHintStrip" class="info-bar-integrated info-bar-hint-strip" data-help="HINT STRIP: downward ▼ markers align with practice keys — same as the eye (LED) hints. Toggle with the eye button.">
+                <div id="keyHintStrip" class="info-bar-integrated info-bar-hint-strip" data-help="">
                     <div id="keyHintStripInner" class="key-hint-strip-inner" aria-hidden="true"></div>
                 </div>
                 <div class="piano-crop-wrapper">
@@ -611,13 +646,21 @@
     const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY','SCORE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY','KOTTA']};
     const MODAL_STRINGS={
         EN:{
-            'txt-infoTitle': 'Score',
-            'txt-howTitle':  'How it works',
-            'txt-howBody':   'Upload MusicXML / MXL (XML button on the right). START = step practice; DEMO = playback. OLED: ▲▼ = previous/next piece in the active library; tap title = library window (switch libraries there). Ms = measure range; B = bookmarks + log. Keys: ←→ spreads, +/− zoom, Space = START/STOP. BOOK cycles 1–3 columns (1 = fixed portrait pages + vertical scroll; 2–3 = spreads). The FULL button under the score controls hides the keyboard and rack, fills the window with the score, and requests browser fullscreen when allowed (Esc exits).',
-            'txt-ctrlTitle': 'Controls',
-            'txt-ctrl0':     'Treble / bass staff visibility (hints & practice).',
-            'txt-ctrl4':     'Practice hints: key LEDs plus ▼ markers in the strip above the keyboard — tap the eye to toggle off.',
-            'txt-gotIt':     'Got It',
+            'txt-infoTitle': 'Score module — guide',
+            'txt-infoScoresTitle': 'Score files & sources',
+            'txt-infoScoresBody': 'Formats: MusicXML (.xml, .musicxml) and compressed .mxl (ZIP with MusicXML). Standard interchange for notation software.\n\nLoad:\n• XML (right toolbar) — pick a file; opens at once.\n• Library (tap score title) — + File / + Batch copies into browser storage; Link folder (Chrome/Edge) lists every .xml / .mxl in a folder you choose.\n• URL — paste a direct link to .musicxml or .mxl. Many sites block cross-site downloads (CORS); saving the file and using XML is often easier.\n\nWhere to find scores:\n• MuseScore (musescore.com) — online scores are often playback/PDF only. For MusicXML use MuseScore Desktop: File → Export → MusicXML. Licensing varies by piece.\n• IMSLP — huge public-domain library; most files are PDF scans. Use a MusicXML edition if available, or typeset/export from another editor.\n• Flat.io, Noteflight, Finale, Dorico, etc. — export MusicXML, then open here.',
+            'txt-howTitle':  'Practice flow',
+            'txt-howBody':   'START — step practice: play highlighted notes in order. Space starts or stops.\nDEMO — plays the score with measure highlight and optional built-in piano. If BOOK is on 1 column, the app switches to 2 columns during DEMO for smoother page follow, then restores your layout when DEMO ends.\n\nÜT (Ms) — limits START and DEMO to a measure range.\nB / B1–B3 — bookmarks: click loads; Shift+click saves scroll, spread, and range.\nOLED ▲▼ — previous/next piece in the active library. Tap the title for the full library.',
+            'txt-infoPanelTitle': 'Toolbar (right of the sheet)',
+            'txt-infoPanelBody': 'Expand corners — theater / full score: hides rack and keyboard; score fills the area; may use browser fullscreen (Esc exits).\nSliders — zoom, page margins, staff spacing.\nBOOK — cycles 1 / 2 / 3 columns (scroll vs spreads). With 2–3 columns, ◀ ▶ flip spreads.\nHalf-moon — background: light, paper (sepia), dark (inverts notation).\nXML — open .xml / .musicxml / .mxl from disk.\nPRE — five slots: click loads saved zoom + layout; Shift+click saves the current view.',
+            'txt-infoShortcutsTitle': 'Keyboard',
+            'txt-infoShortcutsBody': '← → — previous / next spread when BOOK uses 2–3 columns.\nSpace — START / STOP practice.\nNumpad + / − — zoom in or out.',
+            'txt-ctrlTitle': 'Rack (below the score)',
+            'txt-ctrl0':     'Clef strip — cycles Treble+Bass / Treble only / Bass only (hints and which staff you practice).',
+            'txt-ctrl4':     'Eye — practice hints: key LEDs and ▼ markers in the strip above the keyboard; tap again to turn off.',
+            'txt-infoHelpTitle': 'Help mode (? )',
+            'txt-infoHelpBody': 'Turn ? on, then tap any control that has a description — text appears in the info bar. Tap ? again to exit. The I button opens this guide (EN / HU with the language buttons).',
+            'txt-gotIt':     'Got it',
             'txt-logTitle':  'Practice log (recent sessions)',
             'txt-logClose':  'Close',
             'txt-measureRangeTitle': 'Measure range',
@@ -627,24 +670,29 @@
             'txt-bookmarksClose': 'Close',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Score library',
-            'txt-scoreLibHint': 'You can keep several named libraries; each holds its own list of pieces (browser storage only). Add scores with the XML button, Save, or URL. Direct .xml / .mxl links only — many pages block fetch (CORS).',
+            'txt-scoreLibHint': 'Several named libraries; each has its own piece list (stored in the browser only).\n\n+ File / + Batch — import MusicXML/MXL into storage.\nLink folder — Chrome/Edge can attach a local folder; all .xml / .mxl inside stay listed after refresh.\nURL — only works if the server allows other sites to fetch the file (CORS). MuseScore, IMSLP, and many hosts do not; download the file and use XML instead.\nSave — store the currently open score under a name in the active library.',
             'txt-scoreLibLibsHdr': 'Libraries',
-            'btnScoreLibAddLibrary': 'Add library',
-            'lblScoreLibFilter': 'Filter list',
+            'btnScoreLibAddLibrary': '+ New collection',
             'txt-scoreLibPiecesHdr': 'Pieces',
-            'lblScoreLibUrl': 'Direct file URL',
-            'lblScoreLibSaveRow': 'Save current score',
             'txt-scoreLibClose': 'Close',
             'btnScoreLibSaveCurrent': 'Save',
             'btnScoreLibFetch': 'URL'
         },
         HU:{
-            'txt-infoTitle': 'Kotta',
-            'txt-howTitle':  'Hogyan működik',
-            'txt-howBody':   'MusicXML / MXL: a jobb oldali XML gombbal. START = lépésenkénti gyakorlás; DEMO = lejátszás. OLED: ▲▼ = előző/következő darab; katt a címre = könyvtár (könyvtár váltás a listában). ÜT = ütem; B = könyvjelző + napló. Bill.: ←→, +/− zoom, Szóköz = START/STOP. BOOK: 1–3 hasáb (1 = fix álló lapok, függőleges görgetés; 2–3 = spread). A kotta gombok alatti TELJ: billentyűzet + rack eltűnik, csak kotta tölti a képernyőt, és ha a böngésző engedi, teljes képernyő (Esc kilép).',
-            'txt-ctrlTitle': 'Vezérlők',
-            'txt-ctrl0':     'Violin / basszus kottasor láthatósága (segédletekhez).',
-            'txt-ctrl4':     'Gyakorlás: billentyű LED + ▼ jelölők a billentyűzet fölötti sávban — szem gomb: ki.',
+            'txt-infoTitle': 'Kotta modul — útmutató',
+            'txt-infoScoresTitle': 'Kotta fájlok és források',
+            'txt-infoScoresBody': 'Olvasott formátumok: MusicXML (.xml, .musicxml) és tömörített .mxl (ZIP-ben MusicXML). Ez a szabványos csereformátum kottaszerkesztők között.\n\nBetöltés:\n• XML (jobb eszköztár) — fájl választása; azonnal megnyílik.\n• Könyvtár (katt a kotta címére) — + File / + Batch a böngésző tárhelyére másol; Link mappa (Chrome/Edge) egy helyi mappa összes .xml / .mxl fájlját kilistázza.\n• URL — közvetlen .musicxml vagy .mxl hivatkozás. Sok oldal letiltja a más domainről történő letöltést (CORS); gyakran egyszerűbb Mentés másként, majd XML gomb.\n\nHonnan szerezz kottát:\n• MuseScore (musescore.com) — a weben gyakran csak lejátszás/PDF; MusicXML-hez MuseScore asztali alkalmazás: Fájl → Exportálás → MusicXML. Darabonként eltérő licenc.\n• IMSLP — hatalmas közkincs-gyűjtemény; sok anyag PDF képként. Kell MusicXML változat, vagy más szerkesztőben begépelés és export.\n• Flat.io, Noteflight, Finale, Dorico stb. — MusicXML export, majd itt megnyitás.',
+            'txt-howTitle':  'Gyakorlás menete',
+            'txt-howBody':   'START — lépésenkénti gyakorlás: a kiemelt hangok sorrendben. Szóköz indít / megáll.\nDEMO — lejátszás ütemkiemeléssel és opcionális belső zongorahanggal. Ha BOOK 1 hasábon van, demó alatt átmenetileg 2 hasábra vált a simább lapkövetéshez, demó végén visszaáll a nézeted.\n\nÜT — START és DEMO csak a megadott ütemtartományra.\nB / B1–B3 — könyvjelző: katt betölt, Shift+katt ment (görgetés, spread, tartomány).\nOLED ▲▼ — előző/következő darab az aktív könyvtárban. Címre katt: teljes könyvtárablak.',
+            'txt-infoPanelTitle': 'Eszköztár a kotta mellett (jobb)',
+            'txt-infoPanelBody': 'Sarkok ikon — színház / teljes kotta: rack és billentyűzet eltűnik, a lap kitölti a területet; böngésző fullscreen lehet (Esc kilép).\nCsúszkák — nagyítás, lapmargó, sortáv.\nBOOK — 1 / 2 / 3 hasáb váltás (görgetés vs. spread). 2–3 hasábnál ◀ ▶ lapoz.\nFélhold — háttér: világos, papír (bézs), sötét (invertált vonalak).\nXML — .xml / .musicxml / .mxl lemezről.\nPRE — öt rekesz: katt betölti a mentett nagyítást + elrendezést; Shift+katt mentés.',
+            'txt-infoShortcutsTitle': 'Billentyűparancsok',
+            'txt-infoShortcutsBody': '← → — előző / következő spread, ha BOOK 2–3 hasáb.\nSzóköz — START / STOP gyakorlás.\nNumerikus + / − — nagyítás léptetése.',
+            'txt-ctrlTitle': 'Rack (a kotta alatt)',
+            'txt-ctrl0':     'Kulcs sáv — váltás: Violin+basszus / csak violin / csak basszus (segédletek és melyik sort gyakorlod).',
+            'txt-ctrl4':     'Szem — gyakorlás: billentyű LED + ▼ a billentyűzet fölötti sávban; újra katt: ki.',
+            'txt-infoHelpTitle': 'Súgó mód (? )',
+            'txt-infoHelpBody': 'Kapcsold be a ?-t, majd kattints bármely leírással rendelkező vezérlőre — a szöveg az infósávba kerül. ? újra: kilépés. Az I gomb ezt az útmutatót nyitja (EN / HU a nyelvgombokkal).',
             'txt-gotIt':     'Értettem',
             'txt-logTitle':  'Gyakorlás napló (utolsó futások)',
             'txt-logClose':  'Bezár',
@@ -655,18 +703,82 @@
             'txt-bookmarksClose': 'Bezár',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Kottakönyvtár',
-            'txt-scoreLibHint': 'Több elnevezett könyvtárat is létrehozhatsz; mindegyik saját darablistát tart. XML gomb, Mentés vagy URL ad hozzá. Csak közvetlen .xml / .mxl link; sok oldal CORS miatt nem enged.',
+            'txt-scoreLibHint': 'Több elnevezett könyvtár; mindegyik saját darablistát tart (csak a böngészőben tárolva).\n\n+ File / + Batch — MusicXML/MXL import a tárhelyre.\nLink mappa — Chrome/Edge: helyi mappa csatolása; a benne lévő .xml / .mxl fájlok újratöltés után is listázva maradnak.\nURL — csak akkor működik, ha a szerver engedi a külső letöltést (CORS). A MuseScore, IMSLP és sok más oldal általában nem; töltsd le a fájlt, és használd az XML gombot.\nMentés — az épp nyitott kotta elmentése névvel az aktív könyvtárba.',
             'txt-scoreLibLibsHdr': 'Könyvtárak',
-            'btnScoreLibAddLibrary': 'Könyvtár hozzáadása',
-            'lblScoreLibFilter': 'Lista szűrése',
+            'btnScoreLibAddLibrary': '+ Új gyűjtemény',
             'txt-scoreLibPiecesHdr': 'Darabok',
-            'lblScoreLibUrl': 'Közvetlen fájl URL',
-            'lblScoreLibSaveRow': 'Aktuális kotta mentése',
             'txt-scoreLibClose': 'Bezár',
             'btnScoreLibSaveCurrent': 'Mentés',
             'btnScoreLibFetch': 'URL'
         }
     };
+    const HELP_TOOLTIPS={
+        EN:{
+            btnHome:'Home: return to the main module menu.',
+            btnClef:'Clef: cycles Treble+Bass / Treble only / Bass only.',
+            btnHints:'Hints: key LEDs and ▼ strip for next notes in practice — tap to turn off.',
+            metroToggle:'Metronome: start or stop the click.',
+            metroBpmBox:'Tempo: tap for preset BPM grid; ▲▼ nudge BPM.',
+            metroMenuBtn:'Metronome menu: sound, volume, accent on beat 1.',
+            btnStart:'START/STOP: step practice on the score, or stop.',
+            btnLibPrev:'Previous piece in the active library.',
+            btnLibNext:'Next piece in the active library.',
+            oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). XML loads from disk on the right.',
+            btnDemo:'DEMO: plays the score with highlight. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
+            audioToggle:'Piano audio: built-in sampled piano on or off.',
+            btnMeasureRange:'Measure range: limits START and DEMO to the chosen measures.',
+            btnBookmarksTools:'Bookmarks: B1–B3 — click load, Shift+click save; LOG opens practice history.',
+            btnFullscreen:'Browser fullscreen for the page — press again or Esc to exit.',
+            btnHelp:'Help mode: tap any control with a tooltip to read it in the info bar. Tap ? again to exit.',
+            btnInfo:'Info: opens this full guide (I).',
+            keyHintStrip:'Hint strip: ▼ markers line up with practice keys (same as eye hints).',
+            btnBookView:'BOOK: cycles 1 / 2 / 3 columns — scroll pages or paged spreads.',
+            btnOsmdPrevSpread:'Previous spread (2–3 column BOOK).',
+            btnOsmdNextSpread:'Next spread (2–3 column BOOK).',
+            btnUploadScore:'XML: open MusicXML or MXL from your computer.',
+            btnPresetsToggle:'PRE: five view presets — click number to load, Shift+click to save layout and zoom.'
+        },
+        HU:{
+            btnHome:'Főoldal: vissza a modulválasztó menühöz.',
+            btnClef:'Kulcs: váltás Violin+basszus / csak violin / csak basszus.',
+            btnHints:'Segédletek: billentyű LED + ▼ sáv a következő hangokhoz — katt: ki.',
+            metroToggle:'Metronóm: katt indul / megáll.',
+            metroBpmBox:'Tempó: katt BPM előbeállítások; ▲▼ finomhangolás.',
+            metroMenuBtn:'Metronóm menü: hang, hangerő, hangsúly az 1. ütésen.',
+            btnStart:'START/STOP: lépésenkénti gyakorlás a kottán, vagy megáll.',
+            btnLibPrev:'Előző darab az aktív könyvtárban.',
+            btnLibNext:'Következő darab az aktív könyvtárban.',
+            oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). XML jobbról lemezről.',
+            btnDemo:'DEMO: lejátszás kiemeléssel. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
+            audioToggle:'Zongora hang: belső mintahang be vagy ki.',
+            btnMeasureRange:'Ütemtartomány: START és DEMO csak a megadott ütemekre.',
+            btnBookmarksTools:'Könyvjelzők: B1–B3 — katt betölt, Shift+katt ment; LOG: gyakorlás napló.',
+            btnFullscreen:'Böngésző teljes képernyő — újra katt vagy Esc kilép.',
+            btnHelp:'Súgó: kattints egy leírást kapó elemre — szöveg az infósávban. ? újra: kilépés.',
+            btnInfo:'Infó: részletes útmutató (I gomb).',
+            keyHintStrip:'Segéd sáv: a ▼ jelölők a gyakorlandó billentyűkhöz igazodnak (szemmel együtt).',
+            btnBookView:'BOOK: 1 / 2 / 3 hasáb — görgetős lapok vagy spread lapozás.',
+            btnOsmdPrevSpread:'Előző spread (2–3 hasábos BOOK).',
+            btnOsmdNextSpread:'Következő spread (2–3 hasábos BOOK).',
+            btnUploadScore:'XML: MusicXML vagy MXL megnyitása a gépről.',
+            btnPresetsToggle:'PRE: öt nézet előbeállítás — szám: betöltés, Shift+szám: mentés (nagyítás + elrendezés).'
+        }
+    };
+    function applyHelpTooltips(){
+        const pack=HELP_TOOLTIPS[currentLang]||HELP_TOOLTIPS.EN;
+        for(const id in pack){
+            const el=document.getElementById(id);
+            if(el) el.setAttribute('data-help',pack[id]);
+        }
+        const hu=currentLang==='HU';
+        for(let i=0;i<5;i++){
+            const el=document.getElementById('btnViewPreset'+i);
+            if(!el)continue;
+            el.setAttribute('data-help',hu
+                ?('Előbeállítás '+(i+1)+' — katt: betöltés, Shift+katt: aktuális nézet mentése.')
+                :('Preset '+(i+1)+' — click: load, Shift+click: save current view.'));
+        }
+    }
     let _sheetContainerCached=null;
     function elSheetContainer(){
         if(!_sheetContainerCached)_sheetContainerCached=document.querySelector('.sheet-container');
@@ -1414,8 +1526,11 @@
         updateBookViewButtonChrome();
         updateScoreFullScoreButtonChrome();
         syncZoomSliderFromState();
+        syncScoreLayoutPopupChrome();
+        syncOsmdThemeToggleButtonChrome();
         updateViewPresetTitles();
         updateViewPresetChrome();
+        applyHelpTooltips();
     }
     function setInfoBar(text,targetEl){
         const bar=document.getElementById('infoBarText');
@@ -1739,7 +1854,7 @@
         if(audioOn&&!audioCtx)initAudio();
     }
 
-    const LS_OSMD_ZOOM='skalak_osmd_zoom',LS_OSMD_DARK='skalak_osmd_dark',LS_VIEW_PRESETS='skalak_view_presets_v1';
+    const LS_OSMD_ZOOM='skalak_osmd_zoom',LS_OSMD_DARK='skalak_osmd_dark',LS_OSMD_THEME='skalak_osmd_theme_v1',LS_VIEW_PRESETS='skalak_view_presets_v1';
     const LS_SCORE_META='skalak_score_session_meta',LS_SCORE_XML_FB='skalak_score_xml_fb';
     /** Növeld, ha változik a könyv / hasáb margó, lapozás vagy kapcsolódó elrendezés — régi mentés újraszámolódik. */
     const SCORE_LAYOUT_REVISION=7;
@@ -1831,15 +1946,25 @@
             syncZoomSliderFromState();
         }catch(e){console.warn(e);}
     }
-    function persistOsmdDarkPreference(){
-        try{localStorage.setItem(LS_OSMD_DARK,osmdDarkMode?'1':'0');}catch(e){}
+    function persistOsmdThemePreference(){
+        try{localStorage.setItem(LS_OSMD_THEME,osmdScoreTheme);}catch(e){}
     }
-    function readPersistedOsmdDark(){
+    /** Világos → bézs (papír) → sötét. Régi LS_OSMD_DARK: 0=világos, egyéb/alap=sötét — nincs bézs a migrációban. */
+    function readPersistedOsmdTheme(){
         try{
-            const v=localStorage.getItem(LS_OSMD_DARK);
-            if(v===null||v==='')return true;
-            return v!=='0';
-        }catch(e){return true;}
+            const t=localStorage.getItem(LS_OSMD_THEME);
+            if(t==='light'||t==='sepia'||t==='dark')return t;
+            const old=localStorage.getItem(LS_OSMD_DARK);
+            if(old==='0')return 'light';
+            return 'dark';
+        }catch(e){return 'dark';}
+    }
+    function applyOsmdScoreThemeClass(){
+        const cont=document.getElementById('osmd-container');
+        if(!cont)return;
+        cont.classList.remove('osmd-dark','osmd-theme-light','osmd-theme-sepia','osmd-theme-dark');
+        const th=osmdScoreTheme==='light'||osmdScoreTheme==='sepia'||osmdScoreTheme==='dark'?osmdScoreTheme:'dark';
+        cont.classList.add('osmd-theme-'+th);
     }
     let zoomSliderSyncing=false;
     /** Zoom csúszka: ne RAF-fal rendereljünk minden frame-ben (nagy kottánál másodpercekig blokkolja a UI-t). */
@@ -1850,8 +1975,7 @@
         zoomSliderSyncing=true;
         try{
             const hu=currentLang==='HU';
-            const wrap=document.getElementById('zoomSliderWrap');
-            if(wrap)wrap.title=hu?'Nagyítás (folyamatos)':'Zoom (continuous)';
+            el.title=hu?'Nagyítás (folyamatos)':'Zoom (continuous)';
             el.min='10';el.max='500';el.step='1';
             if(scoreMode&&osmdInstance){
                 const z=Math.max(0.1,Math.min(5,Number(osmdInstance.zoom)||1));
@@ -2011,6 +2135,8 @@
     // ── draw ──────────────────────────────────────────────────────────────────
     /** 1 = egy hasáb görgetés, 2 = két hasáb / spread, 3 = három hasáb / spread */
     let bookViewColumns=1;
+    /** Demó 1 hasábról 2-re vált: leálláskor visszaállítjuk; BOOK a demó alatt törli (felhasználó átvette). */
+    let bookViewColumnsBeforeDemo=null;
     function updateBookViewButtonChrome(){
         const btn=document.getElementById('btnBookView');
         if(!btn)return;
@@ -2028,14 +2154,33 @@
     let scoreFullViewActive=false;
     function updateScoreFullScoreButtonChrome(){
         const b=document.getElementById('btnScoreFullScore');
-        const lbl=document.getElementById('btnScoreFullScoreLbl');
         if(!b)return;
         const hu=currentLang==='HU';
         b.title=hu?'Teljes képernyős kotta: rack + billentyűzet elrejtve, opcionálisan böngésző fullscreen':'Full score view: hide rack & keyboard; browser fullscreen when allowed';
+        b.setAttribute('aria-label',hu?'Teljes képernyős kotta':'Full score view');
         b.setAttribute('data-help',hu
-            ?'TELJES KOTTA: eltünteti az alsó vezérlőt és a billentyűzetet; a kotta kitölti a területet. Ha a böngésző engedi, teljes képernyő. Esc vagy újra a gomb kilép. A +/- és BOOK továbbra is itt, jobb fent.'
-            :'FULL SCORE: hides the bottom rack and keyboard; the score fills the area. Requests fullscreen when the browser allows. Esc or the button again to exit. Zoom and BOOK stay on the right.');
-        if(lbl)lbl.textContent=hu?'TELJ':'FULL';
+            ?'TELJES KOTTA: eltünteti az alsó vezérlőt és a billentyűzetet; a kotta kitölti a területet. Ha a böngésző engedi, teljes képernyő. Esc vagy újra az ikon kilép. Nagyítás és margó: a csúszka ikonos panel (alatta a jobb oszlopban).'
+            :'FULL SCORE: hides the bottom rack and keyboard; the score fills the area. Requests fullscreen when the browser allows. Esc or tap the icon again to exit. Zoom and margins: use the sliders button below this icon on the right.');
+    }
+    function syncScoreLayoutPopupChrome(){
+        const hu=currentLang==='HU';
+        const btn=document.getElementById('btnScoreLayoutToggle');
+        if(btn){
+            const t=hu?'Kotta méretezés: nagyítás, margó, sortáv':'Score sizing: zoom, margins, spacing';
+            btn.title=t;
+            btn.setAttribute('aria-label',t);
+            btn.setAttribute('data-help',hu
+                ?'CSÚSZKÁK: folyamatos nagyítás, margó, sorok közötti tér. Kattints a gombra a panel nyitásához.'
+                :'SLIDERS: continuous zoom, margins, and staff spacing. Tap the button to open this panel.');
+        }
+        const lz=document.getElementById('scoreLayoutLblZoom');
+        const lm=document.getElementById('scoreLayoutLblMarg');
+        const ls=document.getElementById('scoreLayoutLblSpac');
+        const dlg=document.getElementById('scoreLayoutPopup');
+        if(lz)lz.textContent='Zoom';
+        if(lm)lm.textContent=hu?'Margó':'Marg';
+        if(ls)ls.textContent=hu?'Sortáv':'Spac';
+        if(dlg)dlg.setAttribute('aria-label',hu?'Kotta méretezés':'Score sizing');
     }
     async function toggleScoreFullScoreView(){
         if(helpActive)return;
@@ -2055,6 +2200,7 @@
         requestAnimationFrame(()=>{void osmdFitWidth();});
     }
     function toggleBookView(){
+        if(demoPlaying&&bookViewColumnsBeforeDemo!=null)bookViewColumnsBeforeDemo=null;
         bookViewColumns=bookViewColumns>=3?1:bookViewColumns+1;
         osmdBookSpreadIndex=0;
         updateBookViewButtonChrome();
@@ -2076,7 +2222,7 @@
     let demoLaunchGen=0,demoAwaitMidi=false,lastDemoArmUiMs=0;
     let demoVisualScore=true,demoVisualKeys=true;
     let scorePedalEvents=[],demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
-    let scoreMode=true,osmdDarkMode=false,scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
+    let scoreMode=true,osmdScoreTheme='dark',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
     let scoreOsmdFollowSystemKey='';
     let scoreCachedMeasureHLKey='',scoreCachedMeasureHLParts=null;
     let scoreViewFollowQ=false,scoreViewFollowPendingNotes=null;
@@ -2227,6 +2373,22 @@
                 }
                 if(myGen!==demoLaunchGen){demoAwaitMidi=false;return;}
                 demoAwaitMidi=false;
+                if(scoreMode&&bookViewColumns<=1&&osmdInstance){
+                    bookViewColumnsBeforeDemo=bookViewColumns;
+                    bookViewColumns=2;
+                    osmdBookSpreadIndex=0;
+                    updateBookViewButtonChrome();
+                    updateOsmdScoreControlsVisibility();
+                    await osmdApplyBookOrEndlessLayout();
+                    queuePersistScoreSession();
+                    if(myGen!==demoLaunchGen){
+                        const back=bookViewColumnsBeforeDemo;
+                        bookViewColumnsBeforeDemo=null;
+                        if(back!=null){bookViewColumns=back;updateBookViewButtonChrome();updateOsmdScoreControlsVisibility();void osmdApplyBookOrEndlessLayout();}
+                        demoAwaitMidi=false;
+                        return;
+                    }
+                }
                 demoPlaying=true;document.getElementById('btnDemo').classList.add('active');
                 if(scoreMode)_playScoreDemo(myGen);
             };
@@ -2244,7 +2406,19 @@
         flushDemoMidiNotes();
         demoSources.forEach(s=>{try{s.stop();}catch(e){}});demoSources=[];
         clearDemoFlashOnKeys();
-        if(scoreMode){clearScoreNoteHeadColors();scoreOsmdFollowSystemKey='';hideScoreMeasureHighlight();if(osmdInstance)scheduleOsmdRender();}
+        if(scoreMode){
+            clearScoreNoteHeadColors();scoreOsmdFollowSystemKey='';hideScoreMeasureHighlight();
+            const restoreBc=bookViewColumnsBeforeDemo;
+            bookViewColumnsBeforeDemo=null;
+            if(restoreBc!=null&&restoreBc>=1&&restoreBc<=3){
+                bookViewColumns=restoreBc;
+                osmdBookSpreadIndex=0;
+                updateBookViewButtonChrome();
+                updateOsmdScoreControlsVisibility();
+                void osmdApplyBookOrEndlessLayout();
+                queuePersistScoreSession();
+            }else if(osmdInstance) scheduleOsmdRender();
+        }
         draw();
         setInfoBar(currentLang==='HU'?'KOTTA MÓD — START / DEMO':'SCORE MODE — START / DEMO',null);
         if(midiOutPort)[25,80,200].forEach(ms=>{setTimeout(()=>{try{sendMidiDemoAllSoundOffAllChannels();sendMidiDemoPianoteqHardReset();}catch(e){}},ms);});
@@ -2321,7 +2495,21 @@
     function cycleTempo(delta){bpm=Math.max(40,Math.min(208,bpm+delta));const d=document.getElementById('metroBpmDisplay');if(d)d.innerText=bpm;setInfoBar((currentLang==='HU'?'TEMPÓ: ':'TEMPO: ')+bpm+' BPM',null);}
     function setTempoPreset(val){if(helpActive)return;bpm=val;const d=document.getElementById('metroBpmDisplay');if(d)d.innerText=bpm;document.getElementById('bpmPresetsPopup').style.display='none';}
     function toggleBpmPresets(){const p=document.getElementById('bpmPresetsPopup');p.style.display=(p.style.display==='none'||p.style.display==='')?'grid':'none';}
-    function togglePresetsPopup(){const p=document.getElementById('presetsPopup');p.style.display=(p.style.display==='none'||!p.style.display)?'flex':'none';}
+    function toggleScoreLayoutPopup(){
+        if(helpActive)return;
+        const p=document.getElementById('scoreLayoutPopup');
+        const pre=document.getElementById('presetsPopup');
+        if(!p)return;
+        const isOpen=p.style.display!=='none'&&p.style.display!=='';
+        if(pre)pre.style.display='none';
+        p.style.display=isOpen?'none':'block';
+    }
+    function togglePresetsPopup(){
+        const lay=document.getElementById('scoreLayoutPopup');
+        if(lay)lay.style.display='none';
+        const p=document.getElementById('presetsPopup');
+        p.style.display=(p.style.display==='none'||!p.style.display)?'flex':'none';
+    }
     let metroSoundType='mechanical',metroVolume=0.5,metroAccent=true,metroTimeSig=4;
     let metroIsRunning=false,metroNextNoteTime=0,metroCurrentBeat=0;
     const metroSamples={};let metroSamplesLoaded=false;
@@ -2395,10 +2583,16 @@
             if(tag==='input'||tag==='textarea'||tag==='select'||t.isContentEditable)return;
         }
         if(e.code==='Escape'){
-            const order=['practiceLogModal','scoreLibraryModal','measureRangeModal','bookmarksModal'];
+            const order=['infoModal','practiceLogModal','scoreLibraryModal','measureRangeModal','bookmarksModal'];
             for(let i=0;i<order.length;i++){
                 const m=document.getElementById(order[i]);
                 if(m&&m.style.display==='flex'){m.style.display='none';e.preventDefault();return;}
+            }
+            const slp=document.getElementById('scoreLayoutPopup');
+            if(slp&&slp.style.display!=='none'&&slp.style.display!==''){
+                slp.style.display='none';
+                e.preventDefault();
+                return;
             }
             if(document.fullscreenElement){
                 try{document.exitFullscreen();}catch(err){}
@@ -2437,15 +2631,18 @@
         }
     },true);
     window.onload=()=>{
+        osmdScoreTheme=readPersistedOsmdTheme();
+        applyOsmdScoreThemeClass();
         const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);
         updateScoreSheetLayoutShell();
         updateOsmdScoreControlsVisibility();
         updateBookViewButtonChrome();
         const bm0=document.getElementById('btnOsmdDark');
-        if(bm0){bm0.style.display='flex';syncOsmdDarkToggleButtonChrome();}
+        if(bm0){bm0.style.display='flex';syncOsmdThemeToggleButtonChrome();}
         create88();
         draw();
         syncZoomSliderFromState();
+        syncScoreLayoutPopupChrome();
         void (async()=>{
             try{
                 await tryRestorePersistedScoreSession();
@@ -2655,7 +2852,7 @@
         }
     }
     /** Demó / követés: mindig a görgethető .sheet-container; a középpont számításához a tényleges kotta-doboz (#osmd-container), ne a flex alatt üresen kinőtt lap. */
-    function scrollSheetContainerToOsmdNotes(notes,preHR){
+    function scrollSheetContainerToOsmdNotes(notes){
         if(!scoreMode||!notes||!notes.length)return;
         ensureOsmdBookSpreadShowsNotes(notes);
         const scrollEl=elSheetContainer();
@@ -2702,22 +2899,34 @@
             }
             scoreOsmdFollowSystemKey=rawSysKey;
         }
-        const mR=preHR||measureHighlightUnionClientRect(notes);
+        /* Görgetés után mindig újra mérünk: a régi preHR viewport koordinátái elavultak → ütemkiemelés „vakon” a fehér területen (főleg 1 hasáb). */
+        invalidateScoreMeasureHighlightCaches();
+        const mR=measureHighlightUnionClientRect(notes);
         const cb=mR?{minT:mR.top,maxB:mR.bottom}:chordScreenBoundsForNotes(notes);
-        if(!cb)return;
+        if(!cb){
+            const hrOnly=measureHighlightUnionClientRect(notes);
+            if(hrOnly) updateScoreMeasureHighlightForNotes(notes,hrOnly);
+            else hideScoreMeasureHighlight();
+            return;
+        }
         const orV=scrollEl.getBoundingClientRect();
         let minT=cb.minT,maxB=cb.maxB;
         let d=0;
         if(maxB>orV.bottom-pad)d=maxB-(orV.bottom-pad);
         const adjMin=minT-d;
         if(adjMin<orV.top+pad)d+=(orV.top+pad)-adjMin;
-        if(Math.abs(d)<8)return;
-        const nextTop=Math.max(0,Math.round(scrollEl.scrollTop+d));
-        try{
-            scrollEl.scrollTo({top:nextTop,behavior:demoPlaying?'auto':'smooth'});
-        }catch(e){
-            scrollEl.scrollTop=nextTop;
+        if(Math.abs(d)>=8){
+            const nextTop=Math.max(0,Math.round(scrollEl.scrollTop+d));
+            try{
+                scrollEl.scrollTo({top:nextTop,behavior:demoPlaying?'auto':'smooth'});
+            }catch(e){
+                scrollEl.scrollTop=nextTop;
+            }
         }
+        invalidateScoreMeasureHighlightCaches();
+        const hrFinal=measureHighlightUnionClientRect(notes);
+        if(hrFinal) updateScoreMeasureHighlightForNotes(notes,hrFinal);
+        else hideScoreMeasureHighlight();
     }
     function invalidateScoreMeasureHighlightCaches(){
         scoreCachedMeasureHLKey='';
@@ -2734,10 +2943,11 @@
             const sn=scoreViewFollowPendingNotes;
             scoreViewFollowPendingNotes=null;
             if(!sn||!sn.length)return;
-            const hr=measureHighlightUnionClientRect(sn);
-            if(!hr){hideScoreMeasureHighlight();return;}
-            scrollSheetContainerToOsmdNotes(sn,hr);
-            updateScoreMeasureHighlightForNotes(sn,hr);
+            /* Könyv (2–3 hasáb): előbb a megfelelő spread — különben a rejtett oldal SVG-je 0 rect, a mérés null,
+               és korai return miatt sosem fut ensureOsmdBookSpreadShowsNotes (demó „beragad” rossz oldalon). */
+            ensureOsmdBookSpreadShowsNotes(sn);
+            invalidateScoreMeasureHighlightCaches();
+            scrollSheetContainerToOsmdNotes(sn);
         });
     }
     function scheduleOsmdRender(scrollNotesAfter){
@@ -2762,14 +2972,9 @@
                 const sn=scoreOsmdScrollNotesAfterRender;
                 scoreOsmdScrollNotesAfterRender=null;
                 if(sn&&sn.length){
-                    const hr=measureHighlightUnionClientRect(sn);
-                    if(hr){
-                        scrollSheetContainerToOsmdNotes(sn,hr);
-                        updateScoreMeasureHighlightForNotes(sn,hr);
-                    }else{
-                        scrollSheetContainerToOsmdNotes(sn);
-                        updateScoreMeasureHighlightForNotes(sn);
-                    }
+                    ensureOsmdBookSpreadShowsNotes(sn);
+                    invalidateScoreMeasureHighlightCaches();
+                    scrollSheetContainerToOsmdNotes(sn);
                 }
             }catch(e){
                 scoreOsmdScrollNotesAfterRender=null;
@@ -2886,15 +3091,15 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
     }
     function positionScoreMeasureHighlightFromClientRect(rect){
         const hl=document.getElementById('score-measure-highlight');
-        const outer=elSheetContainer();
-        if(!hl||!outer||!rect||rect.width<2||rect.height<2){
+        const stack=document.getElementById('score-osmd-stack');
+        if(!hl||!stack||!rect||rect.width<2||rect.height<2){
             hideScoreMeasureHighlight();
             return;
         }
-        const o=outer.getBoundingClientRect();
+        const sr=stack.getBoundingClientRect();
         const padX=8,padTop=1,padBottom=5;
-        const left=rect.left-o.left+outer.scrollLeft-padX;
-        const top=rect.top-o.top+outer.scrollTop-padTop;
+        const left=rect.left-sr.left-padX;
+        const top=rect.top-sr.top-padTop;
         const w=rect.width+2*padX;
         const h=rect.height+padTop+padBottom;
         hl.style.display='block';
@@ -3096,12 +3301,44 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         await osmdFitWidth();
         await applyPersistedOsmdZoomIfSaved();
     }
-    /** Sötét kotta: ne írjunk #333 inline hátteret — szétüt a #000 panellel; a CSS egyesíti. */
-    function syncOsmdDarkToggleButtonChrome(){
+    function osmdThemeIconSvg(th){
+        if(th==='light')
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>';
+        if(th==='sepia')
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2" ry="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="15" x2="14" y2="15"/></svg>';
+        return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3a6 6 0 1 0 0 18 9 9 0 0 1 0-18z"/></svg>';
+    }
+    /** Háromállású kotta-háttér: világos / bézs papír / sötét (invert SVG). */
+    function syncOsmdThemeToggleButtonChrome(){
         const b=document.getElementById('btnOsmdDark');
         if(!b)return;
-        if(osmdDarkMode){b.style.removeProperty('background');b.style.color='#fff';}
-        else{b.style.background='#111';b.style.color='#aaa';}
+        b.style.removeProperty('background');
+        b.style.removeProperty('color');
+        const hu=currentLang==='HU';
+        const th=osmdScoreTheme==='light'||osmdScoreTheme==='sepia'||osmdScoreTheme==='dark'?osmdScoreTheme:'dark';
+        let title,help;
+        if(th==='dark'){
+            b.style.color='#fff';
+            b.style.removeProperty('border-color');
+            title=hu?'Kotta: sötét (fekete háttér, invertált vonalak)':'Score: dark (black background)';
+            help=hu?'KOTTA HÁTTÉR (3 állás): sötét. Kattints: világos → bézs papír → sötét.':'SCORE THEME (3 steps): dark. Tap to cycle light → paper → dark.';
+        }else if(th==='sepia'){
+            b.style.background='#3d3428';
+            b.style.color='#e8dcc8';
+            b.style.borderColor='#5c4f3d';
+            title=hu?'Kotta: papír (finom bézs, fekete vonalak)':'Score: paper (soft beige, black notation)';
+            help=hu?'KOTTA HÁTTÉR (3 állás): bézs / papír. Kattints: világos → bézs → sötét.':'SCORE THEME (3 steps): beige paper. Tap to cycle light → paper → dark.';
+        }else{
+            b.style.background='#111';
+            b.style.color='#aaa';
+            b.style.removeProperty('border-color');
+            title=hu?'Kotta: világos (fehér háttér)':'Score: light (white background)';
+            help=hu?'KOTTA HÁTTÉR (3 állás): világos. Kattints: világos → bézs → sötét.':'SCORE THEME (3 steps): light. Tap to cycle light → paper → dark.';
+        }
+        b.title=title;
+        b.setAttribute('aria-label',title);
+        b.setAttribute('data-help',help);
+        b.innerHTML=osmdThemeIconSvg(th);
     }
     function readViewPresetsMap(){
         try{
@@ -3487,13 +3724,14 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             syncZoomSliderFromState();
         }catch(e){console.warn('osmdFitHeight',e);}
     }
-    function toggleOsmdDarkMode(){
+    function cycleOsmdScoreTheme(){
         if(!scoreMode)return;
-        osmdDarkMode=!osmdDarkMode;
-        const cont=document.getElementById('osmd-container');
-        cont.classList.toggle('osmd-dark',osmdDarkMode);
-        syncOsmdDarkToggleButtonChrome();
-        persistOsmdDarkPreference();
+        const order=['light','sepia','dark'];
+        const i=order.indexOf(osmdScoreTheme);
+        osmdScoreTheme=order[(i<0?2:i+1)%3];
+        applyOsmdScoreThemeClass();
+        syncOsmdThemeToggleButtonChrome();
+        persistOsmdThemePreference();
         queuePersistScoreSession();
         requestAnimationFrame(()=>{void osmdFitWidth();});
     }
@@ -3993,13 +4231,13 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         scoreMode=true;
         const oc=document.getElementById('osmd-container');
         oc.style.display='block';
-        osmdDarkMode=readPersistedOsmdDark();
-        oc.classList.toggle('osmd-dark',osmdDarkMode);
+        osmdScoreTheme=readPersistedOsmdTheme();
+        applyOsmdScoreThemeClass();
         updateScoreSheetLayoutShell();
         updateOsmdScoreControlsVisibility();
         updateBookViewButtonChrome();
         const bm=document.getElementById('btnOsmdDark');
-        if(bm){bm.style.display='flex';syncOsmdDarkToggleButtonChrome();}
+        if(bm){bm.style.display='flex';syncOsmdThemeToggleButtonChrome();}
         const up=document.getElementById('btnUploadScore');
         if(up)up.title=currentLang==='HU'?'Kotta feltöltése (XML / MusicXML / MXL)':'Upload MusicXML / MXL score';
     }
@@ -4007,17 +4245,16 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         scoreMode=true;
         const oc=document.getElementById('osmd-container');
         oc.style.display='block';
-        osmdDarkMode=readPersistedOsmdDark();
-        oc.classList.toggle('osmd-dark',osmdDarkMode);
-        // Show layout sliders and restore values
-        const slp=document.getElementById('scoreLayoutPanel');
-        if(slp)slp.style.display='block';
+        osmdScoreTheme=readPersistedOsmdTheme();
+        applyOsmdScoreThemeClass();
+        const slw=document.getElementById('scoreLayoutToggleWrap');
+        if(slw)slw.style.display='block';
         restoreLayoutSliderValues();
         updateScoreSheetLayoutShell();
         updateOsmdScoreControlsVisibility();
         updateBookViewButtonChrome();
         const bm=document.getElementById('btnOsmdDark');
-        if(bm){bm.style.display='flex';syncOsmdDarkToggleButtonChrome();}
+        if(bm){bm.style.display='flex';syncOsmdThemeToggleButtonChrome();}
         const up=document.getElementById('btnUploadScore');
         if(up)up.title=currentLang==='HU'?'Kotta cseréje (XML / MusicXML / MXL)':'Replace score (XML / MusicXML / MXL)';
         if(!osmdInstance)return;
