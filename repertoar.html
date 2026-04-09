@@ -409,7 +409,7 @@
             <div class="zoom-btn" onclick="zoomSheet(1)" title="Zoom in" style="font-size:24px;line-height:1;font-weight:300;">+</div>
             <div class="zoom-btn" onclick="zoomSheet(-1)" title="Zoom out" style="font-size:24px;line-height:1;font-weight:300;">−</div>
             <div class="zoom-slider-wrap" id="zoomSliderWrap" title="">
-                <input type="range" id="zoomSlider" min="10" max="500" step="1" value="100" aria-label="Zoom" oninput="onZoomSliderInput()" />
+                <input type="range" id="zoomSlider" min="10" max="500" step="1" value="100" aria-label="Zoom" oninput="onZoomSliderInput()" onchange="onZoomSliderCommit()" />
             </div>
             <button type="button" class="zoom-btn zoom-btn-mono" id="btnBookView" onclick="toggleBookView()" title="Book view">BOOK</button>
             <div class="zoom-btn" id="btnOsmdPrevSpread" onclick="osmdStepBookSpread(-1)" title="Previous spread" style="display:none;font-size:20px;font-weight:300;">←</div>
@@ -420,6 +420,13 @@
             </button>
             <label class="zoom-btn zoom-btn-mono" for="score-file-input" id="btnUploadScore"
                    title="Upload MusicXML / MXL" style="cursor:pointer;">XML</label>
+            <!-- Henle-inspired: Margin & Spacing layout sliders -->
+            <div id="scoreLayoutPanel" style="display:none;width:38px;border-top:1px solid rgba(255,255,255,0.1);padding-top:6px;margin-top:2px;">
+                <div style="font:8px 'Share Tech Mono',monospace;color:#666;text-align:center;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Marg</div>
+                <div class="zoom-slider-wrap"><input type="range" id="marginSlider" min="0" max="100" step="1" value="30" aria-label="Margins" oninput="onMarginSliderInput()" onchange="flushLayoutSlidersRender()" /></div>
+                <div style="font:8px 'Share Tech Mono',monospace;color:#666;text-align:center;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;margin-top:4px;">Spac</div>
+                <div class="zoom-slider-wrap"><input type="range" id="spacingSlider" min="0" max="100" step="1" value="50" aria-label="Spacing" oninput="onSpacingSliderInput()" onchange="flushLayoutSlidersRender()" /></div>
+            </div>
             <!-- Presetek: egyetlen gomb mögötti felugró -->
             <div style="position:relative;">
                 <button type="button" class="zoom-btn zoom-btn-mono" id="btnPresetsToggle" onclick="togglePresetsPopup()" title="View presets">PRE</button>
@@ -1835,7 +1842,8 @@
         }catch(e){return true;}
     }
     let zoomSliderSyncing=false;
-    let zoomSliderOsmdRaf=null;
+    /** Zoom csúszka: ne RAF-fal rendereljünk minden frame-ben (nagy kottánál másodpercekig blokkolja a UI-t). */
+    let _zoomSliderDebounceTimer=null;
     function syncZoomSliderFromState(){
         const el=document.getElementById('zoomSlider');
         if(!el)return;
@@ -1855,6 +1863,7 @@
             zoomSliderSyncing=false;
         }
     }
+    const OSMD_ZOOM_SLIDER_DEBOUNCE_MS=140;
     function onZoomSliderInput(){
         if(helpActive)return;
         if(zoomSliderSyncing)return;
@@ -1864,22 +1873,127 @@
         const z=v/100;
         if(scoreMode&&osmdInstance){
             osmdInstance.zoom=Math.max(0.1,Math.min(5,z));
-            if(zoomSliderOsmdRaf)cancelAnimationFrame(zoomSliderOsmdRaf);
-            zoomSliderOsmdRaf=requestAnimationFrame(()=>{
-                zoomSliderOsmdRaf=null;
-                void (async()=>{
+            if(_zoomSliderDebounceTimer)clearTimeout(_zoomSliderDebounceTimer);
+            _zoomSliderDebounceTimer=setTimeout(()=>{
+                _zoomSliderDebounceTimer=null;
+                if(zoomSliderSyncing||!scoreMode||!osmdInstance)return;
+                const el2=document.getElementById('zoomSlider');if(!el2)return;
+                const v2=Number(el2.value);
+                if(!Number.isFinite(v2))return;
+                osmdInstance.zoom=Math.max(0.1,Math.min(5,v2/100));
+                enqueueOsmdSliderRender(async()=>{
                     try{
                         await osmdInstance.render();
                         relayoutOsmdPagesAfterRender();
                         persistOsmdZoomValue(osmdInstance.zoom);
                     }catch(e){console.warn(e);}
-                })();
+                });
+            },OSMD_ZOOM_SLIDER_DEBOUNCE_MS);
+        }
+    }
+    function onZoomSliderCommit(){
+        if(helpActive)return;
+        if(zoomSliderSyncing)return;
+        if(_zoomSliderDebounceTimer){clearTimeout(_zoomSliderDebounceTimer);_zoomSliderDebounceTimer=null;}
+        const el=document.getElementById('zoomSlider');if(!el)return;
+        const v=Number(el.value);
+        if(!Number.isFinite(v))return;
+        if(scoreMode&&osmdInstance){
+            osmdInstance.zoom=Math.max(0.1,Math.min(5,v/100));
+            enqueueOsmdSliderRender(async()=>{
+                try{
+                    await osmdInstance.render();
+                    relayoutOsmdPagesAfterRender();
+                    persistOsmdZoomValue(osmdInstance.zoom);
+                }catch(e){console.warn(e);}
             });
         }
     }
     function zoomSheet(dir){
         if(helpActive)return;
         if(scoreMode&&osmdInstance){void osmdZoomByStep(dir);return;}
+    }
+
+    // ── HENLE-STYLE LAYOUT SLIDERS ─────────────────────────────────────────
+    const LS_LAYOUT_MARGIN='akira_score_margin';
+    const LS_LAYOUT_SPACING='akira_score_spacing';
+    /** Margó/sortáv: debounce + soros render — RAF helyett, különben másodpercenként több teljes OSMD render fut összevissza. */
+    const OSMD_LAYOUT_SLIDER_DEBOUNCE_MS=260;
+    let _layoutSliderDebounceTimer=null;
+    let _osmdSliderRenderChain=Promise.resolve();
+    function enqueueOsmdSliderRender(asyncJob){
+        _osmdSliderRenderChain=_osmdSliderRenderChain.then(()=>asyncJob()).catch(e=>console.warn('OSMD slider render',e));
+        return _osmdSliderRenderChain;
+    }
+
+    function persistLayoutSliderPrefs(){
+        try{
+            const mEl=document.getElementById('marginSlider');
+            const sEl=document.getElementById('spacingSlider');
+            if(mEl)localStorage.setItem(LS_LAYOUT_MARGIN,String(Number(mEl.value)));
+            if(sEl)localStorage.setItem(LS_LAYOUT_SPACING,String(Number(sEl.value)));
+        }catch(e){}
+    }
+    function onMarginSliderInput(){
+        if(helpActive||!scoreMode||!osmdInstance)return;
+        if(!document.getElementById('marginSlider'))return;
+        scheduleLayoutRerenderDebounced();
+    }
+    function onSpacingSliderInput(){
+        if(helpActive||!scoreMode||!osmdInstance)return;
+        if(!document.getElementById('spacingSlider'))return;
+        scheduleLayoutRerenderDebounced();
+    }
+    function scheduleLayoutRerenderDebounced(){
+        if(_layoutSliderDebounceTimer)clearTimeout(_layoutSliderDebounceTimer);
+        _layoutSliderDebounceTimer=setTimeout(()=>{
+            _layoutSliderDebounceTimer=null;
+            enqueueOsmdSliderRender(()=>applyLayoutSlidersAndRerender());
+        },OSMD_LAYOUT_SLIDER_DEBOUNCE_MS);
+    }
+    function flushLayoutSlidersRender(){
+        if(helpActive||!scoreMode||!osmdInstance)return;
+        if(_layoutSliderDebounceTimer){clearTimeout(_layoutSliderDebounceTimer);_layoutSliderDebounceTimer=null;}
+        persistLayoutSliderPrefs();
+        enqueueOsmdSliderRender(()=>applyLayoutSlidersAndRerender());
+    }
+    async function applyLayoutSlidersAndRerender(){
+        if(!osmdInstance)return;
+        try{
+            const rules=osmdEngravingRules();
+            if(!rules)return;
+
+            // Margin slider: 0 = minimal margin, 100 = max margin (narrow content = bigger notes)
+            const mSlider=document.getElementById('marginSlider');
+            const mVal=mSlider?Number(mSlider.value):30;
+            // Map 0-100 to page margin in OSMD units (0.5 to 8.0)
+            const marginOsmd=0.5+(mVal/100)*7.5;
+            if(typeof rules.PageLeftMargin==='number') rules.PageLeftMargin=marginOsmd;
+            if(typeof rules.PageRightMargin==='number') rules.PageRightMargin=marginOsmd;
+
+            // Spacing slider: 0 = tight systems, 100 = very spread out
+            const sSlider=document.getElementById('spacingSlider');
+            const sVal=sSlider?Number(sSlider.value):50;
+            // Map 0-100 to system distance (2.0 to 14.0 OSMD units)
+            const spacingOsmd=2.0+(sVal/100)*12.0;
+            if(typeof rules.MinimumDistanceBetweenSystems==='number') rules.MinimumDistanceBetweenSystems=spacingOsmd;
+            if(typeof rules.BetweenStaffDistance==='number') rules.BetweenStaffDistance=Math.max(3,spacingOsmd*0.6);
+
+            persistLayoutSliderPrefs();
+            await osmdInstance.render();
+            relayoutOsmdPagesAfterRender();
+            syncZoomSliderFromState();
+        }catch(e){console.warn('Layout slider error:',e);}
+    }
+    function restoreLayoutSliderValues(){
+        try{
+            const m=localStorage.getItem(LS_LAYOUT_MARGIN);
+            const s=localStorage.getItem(LS_LAYOUT_SPACING);
+            const mEl=document.getElementById('marginSlider');
+            const sEl=document.getElementById('spacingSlider');
+            if(m&&mEl)mEl.value=m;
+            if(s&&sEl)sEl.value=s;
+        }catch(e){}
     }
     async function osmdZoomByStep(dir){
         if(!scoreMode||!osmdInstance)return;
@@ -2631,8 +2745,7 @@
             scoreOsmdScrollNotesAfterRender=scrollNotesAfter.filter(Boolean);
         if(!osmdInstance||scoreOsmdRenderQ)return;
         scoreOsmdRenderQ=true;
-        requestAnimationFrame(async()=>{
-            scoreOsmdRenderQ=false;
+        enqueueOsmdSliderRender(async()=>{
             try{
                 invalidateScoreMeasureHighlightCaches();
                 const outer=elSheetContainer();
@@ -2660,6 +2773,8 @@
                 }
             }catch(e){
                 scoreOsmdScrollNotesAfterRender=null;
+            }finally{
+                scoreOsmdRenderQ=false;
             }
         });
     }
@@ -3894,6 +4009,10 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         oc.style.display='block';
         osmdDarkMode=readPersistedOsmdDark();
         oc.classList.toggle('osmd-dark',osmdDarkMode);
+        // Show layout sliders and restore values
+        const slp=document.getElementById('scoreLayoutPanel');
+        if(slp)slp.style.display='block';
+        restoreLayoutSliderValues();
         updateScoreSheetLayoutShell();
         updateOsmdScoreControlsVisibility();
         updateBookViewButtonChrome();
