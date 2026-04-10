@@ -116,8 +116,9 @@
         .info-bar-hint-strip { border-top:2px solid #080808; border-bottom:2px solid #080808; }
         .info-bar-text { font-family:'Share Tech Mono',monospace; font-size:18px; font-weight:bold; color:var(--oled-text); text-transform:uppercase; letter-spacing:2px; position:absolute; white-space:nowrap; transition:left 0.15s,right 0.15s; line-height:var(--info-bar-height); }
         .key-hint-strip-inner { position:relative; width:100%; height:100%; pointer-events:none; }
-        .key-hint-marker { position:absolute; bottom:3px; left:0; transform:translateX(-50%); width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid var(--oled-text); filter:drop-shadow(0 0 4px rgba(179,230,255,0.45)); }
-        .key-hint-marker--alt { border-top-color:#7eb8dc; bottom:5px; border-left-width:4px; border-right-width:4px; border-top-width:6px; }
+        .key-hint-marker { position:absolute; bottom:3px; left:0; transform:translateX(-50%); width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid #7ecfff; filter:drop-shadow(0 0 4px rgba(120,200,255,0.5)); }
+        .key-hint-marker--lh { border-top-color:#e8a878; filter:drop-shadow(0 0 4px rgba(232,168,120,0.55)); }
+        .key-hint-marker--alt { bottom:5px; border-left-width:4px; border-right-width:4px; border-top-width:6px; }
         .master-dashboard { display:flex; justify-content:space-between; align-items:center; margin-top: 3px; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px); background-size:100% 3px; padding:2px 2px; border-top:1px solid #333; position:relative; width:100%; box-sizing:border-box; }
         .dashboard-logo { position:absolute; top:-35px; left:30px; z-index:5; pointer-events:none; }
         .control-group { display:flex; align-items:center; gap:8px; z-index:10; }
@@ -169,8 +170,21 @@
         .black-glow.pressed::after { top:6px; left:25%; width:50%; height:77%; border-radius:2px; background:rgba(255,255,255,0.36); z-index:40; }
         .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:9999; }
         .key-glow.scale-hint .key-led { opacity:0.4; }
-        .key-glow.demo-flash .key-led { opacity:1; background:rgba(179,230,255,0.95) !important; box-shadow:0 0 12px rgba(179,230,255,0.8) !important; }
-        .key-glow.chord-hint .key-led { opacity:1; background:var(--oled-text); box-shadow:0 0 10px rgba(179,230,255,0.7); }
+        /* DEMO billentyű-villanás: jobb kéz = kék, bal kéz = pasztell narancs */
+        .key-glow.demo-flash .key-led,
+        .key-glow.demo-flash-rh .key-led { opacity:1 !important; background:rgba(126,207,255,0.96) !important; box-shadow:0 0 12px rgba(120,200,255,0.85) !important; }
+        .key-glow.demo-flash-lh .key-led { opacity:1 !important; background:rgba(240,178,130,0.96) !important; box-shadow:0 0 12px rgba(235,165,115,0.85) !important; }
+        /* Gyakorlás (START): következő hangok LED — ugyanaz a RH/LH színkód */
+        .key-glow.chord-hint-rh .key-led { opacity:1; background:rgba(126,207,255,0.95); box-shadow:0 0 10px rgba(120,200,255,0.78); }
+        .key-glow.chord-hint-lh .key-led { opacity:1; background:rgba(240,178,130,0.95); box-shadow:0 0 10px rgba(235,165,115,0.78); }
+        .key-glow.chord-hint-rh.chord-hint-lh .key-led {
+            background:linear-gradient(90deg,rgba(126,207,255,0.95) 0%,rgba(126,207,255,0.95) 47%,rgba(240,178,130,0.95) 53%,rgba(240,178,130,0.95) 100%);
+            box-shadow:0 0 8px rgba(120,200,255,0.55),0 0 8px rgba(235,165,115,0.55);
+        }
+        .key-glow.demo-flash-rh.demo-flash-lh .key-led {
+            background:linear-gradient(90deg,rgba(126,207,255,0.96) 0%,rgba(126,207,255,0.96) 47%,rgba(240,178,130,0.96) 53%,rgba(240,178,130,0.96) 100%) !important;
+            box-shadow:0 0 10px rgba(120,200,255,0.55),0 0 10px rgba(235,165,115,0.55) !important;
+        }
         .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
         .metro-preset:hover { background:#333;color:#fff; }
         .metro-preset:active { transform:translateY(1px); }
@@ -760,7 +774,7 @@
             'txt-infoShortcutsBody': '← → — previous / next spread when BOOK uses 2–3 columns.\nSpace — START / STOP practice.\nNumpad + / − — zoom in or out.',
             'txt-ctrlTitle': 'Rack (below the score)',
             'txt-ctrl0':     'Clef strip — cycles Treble+Bass / Treble only / Bass only (hints and which staff you practice).',
-            'txt-ctrl4':     'Eye — practice hints: key LEDs and ▼ markers in the strip above the keyboard; tap again to turn off.',
+            'txt-ctrl4':     'Eye — practice hints: key LEDs and ▼ markers above the keyboard (cyan = right hand, pastel orange = left hand); tap again to turn off.',
             'txt-infoHelpTitle': 'Help mode (? )',
             'txt-infoHelpBody': 'Turn ? on, then tap any control that has a description — text appears in the info bar. Tap ? again to exit. The I button opens this guide (EN / HU with the language buttons).',
             'txt-gotIt':     'Got it',
@@ -798,7 +812,7 @@
             'txt-infoShortcutsBody': '← → — előző vagy következő oldalpár, ha a könyv nézet két vagy három hasábos.\nSzóköz — START vagy STOP (gyakorlás).\nNumerikus + / − — nagyítás léptetése.',
             'txt-ctrlTitle': 'Rack (a kotta alatt)',
             'txt-ctrl0':     'Kulcssáv — sorrendben: két kottasor (violin- és basszuskulcs), csak violin, csak basszus. Meghatározza a segédleteket és azt, melyik sort gyakorlod.',
-            'txt-ctrl4':     'Szem ikon — gyakorláskor a billentyűkön LED és a billentyűzet fölött ▼ jelölők; újra rákattintva kikapcsolható.',
+            'txt-ctrl4':     'Szem ikon — gyakorláskor LED a billentyűkön és ▼ a sávban (kék = jobb kéz, pasztell narancs = bal kéz); újra rákattintva kikapcsolható.',
             'txt-infoHelpTitle': 'Súgó mód (? )',
             'txt-infoHelpBody': 'Kapcsold be a ? gombot, majd kattints bármely olyan elemre, amelyhez leírás tartozik — a szöveg az infósávba kerül. A ? újbóli megnyomásával kilépsz. Az I gomb ezt az útmutatót nyitja meg; a nyelvet az EN / HU gombokkal válthatod.',
             'txt-gotIt':     'Értettem',
@@ -825,7 +839,7 @@
         EN:{
             btnHome:'Home: return to the main module menu.',
             btnClef:'Clef: cycles Treble+Bass / Treble only / Bass only.',
-            btnHints:'Hints: key LEDs and ▼ strip for next notes in practice — tap to turn off.',
+            btnHints:'Hints: key LEDs and ▼ strip (cyan = RH, orange = LH) — tap to turn off.',
             metroToggle:'Metronome: start or stop the click.',
             metroBpmBox:'Tempo: tap for preset BPM grid; ▲▼ nudge BPM.',
             metroMenuBtn:'Metronome menu: sound, volume, accent on beat 1.',
@@ -852,7 +866,7 @@
         HU:{
             btnHome:'Főoldal: vissza a modulválasztó menühöz.',
             btnClef:'Kulcs: váltás violin- és basszuskulcs / csak violin / csak basszus.',
-            btnHints:'Segédletek: billentyű LED + ▼ sáv a következő hangokhoz — katt: ki.',
+            btnHints:'Segédletek: LED + ▼ sáv (kék = JK, narancs = BK) — katt: ki.',
             metroToggle:'Metronóm: katt indul / megáll.',
             metroBpmBox:'Tempó: katt BPM előbeállítások; ▲▼ finomhangolás.',
             metroMenuBtn:'Metronóm menü: hang, hangerő, hangsúly az 1. ütésen.',
@@ -898,15 +912,19 @@
         return _sheetContainerCached;
     }
     let _keyGlowList=null;
+    const _CHORD_HINT_CLASSES=['chord-hint','chord-hint-rh','chord-hint-lh'];
+    const _DEMO_FLASH_CLASSES=['demo-flash','demo-flash-rh','demo-flash-lh'];
     function clearChordHintsOnKeys(){
         const k=_keyGlowList;
-        if(k){for(let i=0;i<k.length;i++)k[i].classList.remove('chord-hint');}
-        else document.querySelectorAll('.key-glow').forEach(el=>el.classList.remove('chord-hint'));
+        const rm=el=>{_CHORD_HINT_CLASSES.forEach(c=>el.classList.remove(c));};
+        if(k){for(let i=0;i<k.length;i++)rm(k[i]);}
+        else document.querySelectorAll('.key-glow').forEach(rm);
     }
     function clearDemoFlashOnKeys(){
         const k=_keyGlowList;
-        if(k){for(let i=0;i<k.length;i++)k[i].classList.remove('demo-flash');}
-        else document.querySelectorAll('.key-glow').forEach(el=>el.classList.remove('demo-flash'));
+        const rm=el=>{_DEMO_FLASH_CLASSES.forEach(c=>el.classList.remove(c));};
+        if(k){for(let i=0;i<k.length;i++)rm(k[i]);}
+        else document.querySelectorAll('.key-glow').forEach(rm);
     }
 
     const LS_PRACTICE_RANGE='skalak_practice_range_v1';
@@ -2633,7 +2651,7 @@
             if(!inner||!strip)return;
             inner.innerHTML='';
             if(!showLeds)return;
-            const keys=document.querySelectorAll('.key-glow.chord-hint');
+            const keys=document.querySelectorAll('.key-glow.chord-hint-rh, .key-glow.chord-hint-lh');
             if(!keys.length)return;
             const stripRect=strip.getBoundingClientRect();
             if(stripRect.width<2)return;
@@ -2643,7 +2661,8 @@
                 const pct=(cx/stripRect.width)*100;
                 if(!Number.isFinite(pct))return;
                 const d=document.createElement('div');
-                d.className='key-hint-marker'+(idx%2===1?' key-hint-marker--alt':'');
+                const isLh=k.classList.contains('chord-hint-lh');
+                d.className='key-hint-marker'+(isLh?' key-hint-marker--lh':'')+(idx%2===1?' key-hint-marker--alt':'');
                 d.style.left=Math.max(0,Math.min(100,pct))+'%';
                 inner.appendChild(d);
             });
@@ -2654,8 +2673,8 @@
         if(!showLeds){syncKeyHintStrip();return;}
         if(scoreMode&&isRunning&&scorePracticeSteps.length&&scoreStepIndex<scorePracticeSteps.length){
             const st=scorePracticeSteps[scoreStepIndex];
-            if(activeRH)st.rhMidis.forEach(m=>{const el=document.getElementById('k-'+m);if(el)el.classList.add('chord-hint');});
-            if(activeLH)st.lhMidis.forEach(m=>{const el=document.getElementById('k-'+m);if(el)el.classList.add('chord-hint');});
+            if(activeRH)st.rhMidis.forEach(m=>{const el=document.getElementById('k-'+m);if(el)el.classList.add('chord-hint-rh');});
+            if(activeLH)st.lhMidis.forEach(m=>{const el=document.getElementById('k-'+m);if(el)el.classList.add('chord-hint-lh');});
         }
         syncKeyHintStrip();
     }
@@ -4626,15 +4645,16 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     }
                 }
                 if(demoVisualKeys){
-                    uniqOn.forEach(mm=>{
+                    active.filter(p=>!p.tieCont&&!p.tieOut).forEach(p=>{
+                        const mm=p.midi&127;
                         const k=document.getElementById('k-'+mm);
-                        if(k){
-                            k.classList.add('demo-flash');
-                            demoTimeouts.push(setTimeout(()=>{
-                                if(pbGen!==demoLaunchGen)return;
-                                k.classList.remove('demo-flash');
-                            },flashMs));
-                        }
+                        if(!k)return;
+                        const cls=p.staffIndex<=0?'demo-flash-rh':'demo-flash-lh';
+                        k.classList.add(cls);
+                        demoTimeouts.push(setTimeout(()=>{
+                            if(pbGen!==demoLaunchGen)return;
+                            k.classList.remove(cls);
+                        },flashMs));
                     });
                 }
                 if(demoVisualScore){
