@@ -899,14 +899,13 @@
     let isRunning = false, showNames = false, showKeys = false, showWheel = false, helpActive = false, audioOn = true;
     let currentKey = 'C'; // Ez tárolja a tárcsán kiválasztott hangnemet
     let hintsState = 0;
-    let demoPlaying = false, demoTimeouts = [], demoSources = [];
+    let demoPlaying = false, demoTimeouts = [];
     let activeRH = true, activeLH = true;
     let currentMode = 'sheet', currentLevel = 1;
     let seq = [], currentStep = 0, activeMidiNotes = new Set();
     let waitingForRelease = false;
-    let audioInited = false;
-    let audioCtx, sampleBuffers = {}, activeNodes = {};
-    let masterReverb, reverbGain;
+    let audioCtx = null, salamanderPiano = null, _pianoInitPromise = null;
+    let _midiInited = false;
 
     // Kulcs váltó
     let clefState = 0;
@@ -1065,21 +1064,28 @@
     function toggleKeys() { cycleHints(); }
     function playChordDemo() {
         if (demoPlaying) { stopDemo(); return; }
-        if (!audioCtx) { initAudio().then(() => { setTimeout(_startChordDemo, 400); }); return; }
-        const tryPlay = () => {
-            if (Object.keys(sampleBuffers).length >= 4) {
-                demoPlaying = true;
-                document.getElementById('btnDemo').classList.add('active');
-                _startChordDemo();
-            } else setTimeout(tryPlay, 100);
-        };
-        tryPlay();
+        initAudio().then(() => {
+            setTimeout(() => {
+                let wait = 0;
+                const tryPlay = () => {
+                    if (salamanderPiano && salamanderPiano.loaded) {
+                        demoPlaying = true;
+                        document.getElementById('btnDemo').classList.add('active');
+                        _startChordDemo();
+                        return;
+                    }
+                    if (++wait > 120) return;
+                    setTimeout(tryPlay, 100);
+                };
+                tryPlay();
+            }, 400);
+        }).catch(e => { if (String(e && e.message) === 'NEED_HTTP_NOT_FILE') return; });
     }
     function stopDemo() {
         demoPlaying = false;
         document.getElementById('btnDemo').classList.remove('active');
         demoTimeouts.forEach(t => clearTimeout(t)); demoTimeouts = [];
-        demoSources.forEach(s => { try { s.stop(); } catch(e) {} }); demoSources = [];
+        if (salamanderPiano) { try { salamanderPiano.stopAll(); } catch (e) {} }
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
         currentStep = 0; updateProgress(); draw();
         updateInfoBar();
@@ -1087,7 +1093,8 @@
     function _startChordDemo() {
         if (seq.length === 0) buildSequence();
         demoTimeouts.forEach(t => clearTimeout(t)); demoTimeouts = [];
-        demoSources.forEach(s => { try { s.stop(); } catch(e) {} }); demoSources = [];
+        if (salamanderPiano) { try { salamanderPiano.stopAll(); } catch (e) {} }
+        if (!audioCtx || !salamanderPiano) return;
         const chordDur = 1.2;
         let time = audioCtx.currentTime + 0.15;
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
@@ -1099,18 +1106,19 @@
                 currentStep = i; updateProgress(); draw();
             }, delayMs));
             item.chord.notes.forEach(n => {
-                const src = audioCtx.createBufferSource();
-                let closest = 36, minDiff = 999;
-                for (let b in sampleBuffers) { let diff = Math.abs(n.m - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
-                if (!sampleBuffers[closest]) return;
-                src.buffer = sampleBuffers[closest];
-                src.playbackRate.value = Math.pow(2, (n.m - closest) / 12);
-                const g = audioCtx.createGain();
-                g.gain.setValueAtTime(0.55, time);
-                g.gain.exponentialRampToValueAtTime(0.001, time + chordDur * 2.2);
-                src.connect(g).connect(audioCtx.destination);
-                src.start(time); src.stop(time + chordDur * 2.5);
-                demoSources.push(src);
+                const m = n.m & 127;
+                const tEnd = time + chordDur;
+                const vel = 0.58;
+                const dOn = Math.max(0, (time - audioCtx.currentTime) * 1000);
+                const dOff = Math.max(0, (tEnd - audioCtx.currentTime) * 1000);
+                demoTimeouts.push(setTimeout(() => {
+                    if (!demoPlaying) return;
+                    try { salamanderPiano.keyDown({ midi: m, velocity: vel }); } catch (e) {}
+                }, dOn));
+                demoTimeouts.push(setTimeout(() => {
+                    if (!demoPlaying) return;
+                    try { salamanderPiano.keyUp({ midi: m }); } catch (e) {}
+                }, dOff));
                 demoTimeouts.push(setTimeout(() => {
                     if (!demoPlaying) return;
                     const key = document.getElementById(`k-${n.m}`);
@@ -1129,7 +1137,7 @@
     function toggleAudio() {
         audioOn = !audioOn;
         document.getElementById('audioToggle').classList.toggle('active', audioOn);
-        if (audioOn && !audioInited) initAudio();
+        if (audioOn) void initAudio().catch(() => {});
     }
     function toggleVst() {
         if (helpActive) return;
@@ -1188,74 +1196,90 @@
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
         updateInfoBar(); draw();
     }
+    function ensurePianoLoadContextOrThrow() {
+        if (location.protocol === 'file:') {
+            const hu = currentLang === 'HU';
+            setInfoBar(hu
+                ? 'Nincs hang (file://). python3 -m http.server → http://localhost:8080/akkordok.html'
+                : 'No audio on file://. Use: python3 -m http.server → http://localhost:8080/akkordok.html', document.getElementById('audioToggle'));
+            throw new Error('NEED_HTTP_NOT_FILE');
+        }
+    }
+    function showFileProtocolAudioHintIfNeeded() {
+        if (location.protocol !== 'file:') return;
+        const hu = currentLang === 'HU';
+        setInfoBar(hu
+            ? 'Akkordok zongorájához http://localhost/… (ne file://).'
+            : 'Chords piano needs http://localhost/… (not file://).', null);
+    }
+    function attachChordMidiInputs() {
+        if (_midiInited || !navigator.requestMIDIAccess) return;
+        navigator.requestMIDIAccess().then(m => {
+            _midiInited = true;
+            m.inputs.forEach(input => input.onmidimessage = (msg) => {
+                const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
+                if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
+                else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
+            });
+        }).catch(() => {});
+    }
     async function initAudio() {
-        if (audioInited) return; audioInited = true;
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
-        let len = audioCtx.sampleRate * 2.5;
-        let impulse = audioCtx.createBuffer(2, len, audioCtx.sampleRate);
-        for (let i = 0; i < len; i++) {
-            let decay = Math.pow(1 - i / len, 3);
-            impulse.getChannelData(0)[i] = (Math.random() * 2 - 1) * decay;
-            impulse.getChannelData(1)[i] = (Math.random() * 2 - 1) * decay;
+        ensurePianoLoadContextOrThrow();
+        if (salamanderPiano && salamanderPiano.loaded) {
+            if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+            attachChordMidiInputs();
+            return;
         }
-        masterReverb = audioCtx.createConvolver();
-        masterReverb.buffer = impulse;
-        reverbGain = audioCtx.createGain();
-        reverbGain.gain.value = 0;
-        masterReverb.connect(reverbGain).connect(audioCtx.destination);
-        const samples = { 36:'C2', 48:'C3', 60:'C4', 72:'C5' };
-        for (let k in samples) {
-            try {
-                const r = await fetch(`https://tonejs.github.io/audio/salamander/${samples[k]}.mp3`);
-                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
-            } catch(e) {}
+        if (!_pianoInitPromise) {
+            _pianoInitPromise = (async () => {
+                const Tone = await import('https://esm.sh/tone@14.7.77');
+                const pianoMod = await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
+                const Piano = pianoMod.Piano || pianoMod.default?.Piano || pianoMod.default;
+                await Tone.start();
+                const p = new Piano({ velocities: 5, release: true, pedal: true }).toDestination();
+                await p.load();
+                salamanderPiano = p;
+                audioCtx = Tone.getContext().rawContext;
+            })();
         }
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then(m => {
-                m.inputs.forEach(input => input.onmidimessage = (msg) => {
-                    const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
-                    if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
-                    else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
-                });
-            }).catch(() => {});
+        try {
+            await _pianoInitPromise;
+            attachChordMidiInputs();
+        } catch (e) {
+            if (String(e.message) !== 'NEED_HTTP_NOT_FILE') {
+                console.error('Piano (Tone) load:', e);
+                const hu = currentLang === 'HU';
+                setInfoBar(hu ? 'Zongora betöltés hiba — F12' : 'Piano load error — see F12', document.getElementById('audioToggle'));
+            }
+            _pianoInitPromise = null;
+            salamanderPiano = null;
+            throw e;
         }
     }
 
     function playTone(note, vel) {
-        if (!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
-        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e) {} delete activeNodes[note]; }
-        const source = audioCtx.createBufferSource();
-        let closest = 36, minDiff = 999;
-        for (let b in sampleBuffers) { let diff = Math.abs(note - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
-        source.buffer = sampleBuffers[closest];
-        source.playbackRate.value = Math.pow(2, (note - closest) / 12);
-        const gain = audioCtx.createGain();
-        const panner = audioCtx.createStereoPanner();
-        let wideAmount = parseFloat(document.getElementById('vst_wide').value) || 0;
-        panner.pan.setValueAtTime(Math.max(-1, Math.min(1, ((note - 60) / 30) * wideAmount)), audioCtx.currentTime);
-        let atk = parseFloat(document.getElementById('vst_a').value) || 0.01;
-        let dec = parseFloat(document.getElementById('vst_e').value) || 10.0;
-        let velo = parseFloat(document.getElementById('vst_d').value) || 1.0;
-        if (reverbGain) reverbGain.gain.value = parseFloat(document.getElementById('vst_rev').value) || 0;
-        gain.gain.setValueAtTime(0, audioCtx.currentTime);
-        if (atk > 0.05) gain.gain.linearRampToValueAtTime((vel/127)*velo, audioCtx.currentTime + atk);
-        else gain.gain.setValueAtTime((vel/127)*velo, audioCtx.currentTime);
-        if (dec < 9.5) gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dec);
-        source.connect(gain); gain.connect(panner); panner.connect(audioCtx.destination); gain.connect(masterReverb);
-        source.start(); activeNodes[note] = { source, gain };
+        if (!audioOn) return;
+        void (async () => {
+            try {
+                await initAudio();
+                if (!salamanderPiano) return;
+                if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+                const vEl = document.getElementById('vst_d');
+                const velo = vEl ? parseFloat(vEl.value) : 1.0;
+                const scale = Number.isFinite(velo) ? velo : 1.0;
+                const v = Math.min(1, Math.max(0.02, ((vel | 0) / 127) * scale));
+                try { salamanderPiano.keyUp({ midi: note & 127 }); } catch (e) {}
+                salamanderPiano.keyDown({ midi: note & 127, velocity: v });
+            } catch (e) {
+                if (String(e && e.message) === 'NEED_HTTP_NOT_FILE') return;
+            }
+        })();
     }
 
     function handleNoteOff(midi) {
         activeMidiNotes.delete(midi);
-        if (activeNodes[midi]) {
-            let rel = parseFloat(document.getElementById('vst_r').value) || 0.8;
-            const gainNode = activeNodes[midi].gain;
-            gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-            gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + rel);
-            activeNodes[midi].source.stop(audioCtx.currentTime + rel + 0.1);
-            delete activeNodes[midi];
+        if (salamanderPiano) {
+            try { salamanderPiano.keyUp({ midi: midi & 127 }); } catch (e) {}
         }
         if (activeMidiNotes.size === 0 && waitingForRelease) { waitingForRelease = false; draw(); }
         checkMatch();
@@ -1666,6 +1690,7 @@
         document.getElementById('clefLH').style.color = '#fff';
         const sl = localStorage.getItem('akira_lang') || 'EN';
         currentLang = sl; setLang(sl);
+        showFileProtocolAudioHintIfNeeded();
         updateLCD(); updateProgress();
         buildSequence();
         document.fonts.ready.then(() => { fitWidth(); });
