@@ -2050,9 +2050,9 @@
         else{bar.innerHTML=text+'<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';bar.style.right=Math.max(barRect.width-cx-10,20)+'px';bar.style.left='auto';bar.style.transform='none';}
     }
 
-// ── Audio engine ──────────────────────────────────────────────────────────
-    let audioInited=false;
-    let audioCtx,sampleBuffers={},activeNodes={},audioOn=true;
+// ── Audio engine (@tonejs/piano + Tone — MuseTrainer-rel azonos mintacsomag, lusta betöltés) ──
+    let audioCtx=null,salamanderPiano=null,_pianoInitPromise=null;
+    let audioOn=true;
     let sustainPedalDown=false;
     const midiSustainReleaseQueue=new Set();
     let midiAccessRef=null, midiOutPort=null, midiInitPromise=null;
@@ -2065,12 +2065,53 @@
     }
     const demoMidiRinging=new Set();
 
+    /** file:// alatt a dinamikus import + külső hangminták több böngészőben nem működik — kell http(s) vagy localhost. */
+    function ensurePianoLoadContextOrThrow(){
+        if(location.protocol==='file:'){
+            const hu=currentLang==='HU';
+            setInfoBar(hu
+                ?'Nincs hang, mert a címsorban file:// van (dupla kattintással nyitottad a fájlt). Zárd ezt a lapot. Terminál: lépj a mappába, ahol a repertoar.html van → python3 -m http.server 8080 → böngészőben pontosan: http://localhost:8080/repertoar.html'
+                :'No audio: address bar shows file:// (you opened the .html file directly). Close this tab. Terminal: cd to the folder containing repertoar.html → python3 -m http.server 8080 → in the browser open: http://localhost:8080/repertoar.html', document.getElementById('audioToggle'));
+            throw new Error('NEED_HTTP_NOT_FILE');
+        }
+    }
+    function showFileProtocolAudioHintIfNeeded(){
+        if(location.protocol!=='file:')return;
+        const hu=currentLang==='HU';
+        setInfoBar(hu
+            ?'Zongorához ne file://-ról nyisd az oldalt. Terminál a mappában: python3 -m http.server 8080 — majd http://localhost:8080/repertoar.html'
+            :'For piano sound, do not use file://. Terminal in this folder: python3 -m http.server 8080 — then http://localhost:8080/repertoar.html', null);
+    }
+
     async function initAudio(){
-        if(audioInited)return;audioInited=true;
-        if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-        if(audioCtx.state==='suspended')await audioCtx.resume();
-        const s={36:'C2',48:'C3',60:'C4',72:'C5'};
-        for(let k in s){try{const r=await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);sampleBuffers[k]=await audioCtx.decodeAudioData(await r.arrayBuffer());}catch(e){}}
+        ensurePianoLoadContextOrThrow();
+        if(salamanderPiano&&salamanderPiano.loaded)return;
+        if(!_pianoInitPromise){
+            _pianoInitPromise=(async()=>{
+                // tone ESM: nincs "Tone" nevű export — a start/getContext stb. a modul névterén (import * jellegű)
+                const Tone=await import('https://esm.sh/tone@14.7.77');
+                const pianoMod=await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
+                const Piano=pianoMod.Piano||pianoMod.default?.Piano||pianoMod.default;
+                await Tone.start();
+                const p=new Piano({velocities:5,release:true,pedal:true}).toDestination();
+                await p.load();
+                salamanderPiano=p;
+                audioCtx=Tone.getContext().rawContext;
+            })();
+        }
+        try{await _pianoInitPromise;}
+        catch(e){
+            if(String(e.message)!=='NEED_HTTP_NOT_FILE'){
+                console.error('Salamander piano (Tone) betöltés sikertelen:',e);
+                const hu=currentLang==='HU';
+                setInfoBar(hu
+                    ?'Zongora: hálózati / CDN hiba — ellenőrizd az internetet és hogy http://localhost-ról nyitod (nem file://). Részletek: böngésző konzol (F12).'
+                    :'Piano load failed — check network, use http://localhost (not file://). Details: browser console (F12).', document.getElementById('audioToggle'));
+            }
+            _pianoInitPromise=null;
+            salamanderPiano=null;
+            throw e;
+        }
     }
 
     function attachMidiInputHandler(input){
@@ -2157,7 +2198,7 @@
     }
     /** Belső minta demóban csak ha nincs kiválasztott MIDI kimenet. Ha van midiOutPort de a state még nem open, a régi !demoMidiPortOpen() miatt MIDI+minta egyszerre szólt (setTimeout vs timestamp) — stop után csak a MIDI ment tovább. */
     function demoInternalSamplesWanted(){
-        return audioOn&&Object.keys(sampleBuffers).length>=4&&!midiOutPort;
+        return audioOn&&salamanderPiano&&salamanderPiano.loaded&&!midiOutPort;
     }
 
     function sendMidiDemoNoteOff(note){
@@ -2201,16 +2242,10 @@
     }
     function releaseDemoSustainInternalOne(midi){
         const m=midi&127;
-        const h=demoSustainInternalHolds.get(m);
-        if(!h)return;
-        try{
-            const tRel=audioCtx.currentTime;
-            h.gain.cancelScheduledValues(tRel);
-            h.gain.setValueAtTime(Math.max(0.0002,h.gain.value),tRel);
-            h.gain.exponentialRampToValueAtTime(0.0001,tRel+0.42);
-            h.source.stop(tRel+0.55);
-        }catch(e){}
         demoSustainInternalHolds.delete(m);
+        if(salamanderPiano){
+            try{ salamanderPiano.keyUp({ midi:m }); }catch(e){}
+        }
     }
     function releaseAllDemoSustainInternal(){
         [...demoSustainInternalHolds.keys()].forEach(releaseDemoSustainInternalOne);
@@ -2219,6 +2254,9 @@
         const on=!!down;
         demoScoreSustainPedalDown=on;
         sendMidiDemoSustain(on);
+        if(salamanderPiano){
+            try{ if(on)salamanderPiano.pedalDown(); else salamanderPiano.pedalUp(); }catch(e){}
+        }
         if(!on)releaseAllDemoSustainInternal();
     }
     function resetDemoScoreSustain(){
@@ -2248,63 +2286,41 @@
     }
 
     function playDemoNoteInternalLive(midi,dur,tScheduled){
-        if(!audioOn || !audioCtx || Object.keys(sampleBuffers).length === 0) return;
-        const src=audioCtx.createBufferSource();
-        let closest=36,minDiff=999;
-        for(let b in sampleBuffers){const diff=Math.abs(midi-b);if(diff<minDiff){minDiff=diff;closest=b;}}
-        if(!sampleBuffers[closest])return;
+        if(!audioOn||!salamanderPiano||!audioCtx)return;
+        const m=midi&127;
         const t0=(typeof tScheduled==='number'&&Number.isFinite(tScheduled))?tScheduled:(audioCtx.currentTime+0.02);
         const rel=Math.max(0.05,dur);
-        src.buffer=sampleBuffers[closest];
-        src.playbackRate.value=Math.pow(2,(midi-closest)/12);
-        const g=audioCtx.createGain();
-        g.gain.setValueAtTime(0.6,t0);
-        g.gain.exponentialRampToValueAtTime(0.001,t0+Math.min(rel*2.2,rel+1.2));
-        src.connect(g).connect(audioCtx.destination);
-        src.start(t0);
-        src.stop(t0+Math.max(rel,0.08)+0.25);
-        demoSources.push(src);
+        const tOff=t0+rel;
+        const vel=0.62;
+        const dOn=Math.max(0,(t0-audioCtx.currentTime)*1000);
+        const dOff=Math.max(0,(tOff-audioCtx.currentTime)*1000);
+        demoTimeouts.push(setTimeout(()=>{
+            if(!demoPlaying)return;
+            try{ salamanderPiano.keyDown({ midi:m, velocity:vel }); }catch(e){}
+        },dOn));
+        demoTimeouts.push(setTimeout(()=>{
+            if(!demoPlaying)return;
+            try{ salamanderPiano.keyUp({ midi:m }); }catch(e){}
+        },dOff));
     }
     function playScoreDemoInternalNote(midi,durSec,tOn,pbGen){
-        if(!audioOn||!audioCtx||Object.keys(sampleBuffers).length===0)return;
+        if(!audioOn||!salamanderPiano||!audioCtx)return;
         const m=midi&127;
         releaseDemoSustainInternalOne(m);
-        const src=audioCtx.createBufferSource();
-        let closest=36,minDiff=999;
-        for(let b in sampleBuffers){const diff=Math.abs(m-b);if(diff<minDiff){minDiff=diff;closest=b;}}
-        if(!sampleBuffers[closest])return;
         const t0=(typeof tOn==='number'&&Number.isFinite(tOn))?tOn:audioCtx.currentTime+0.02;
         const rel=Math.max(0.05,durSec);
-        src.buffer=sampleBuffers[closest];
-        src.playbackRate.value=Math.pow(2,(m-closest)/12);
-        const g=audioCtx.createGain();
-        src.connect(g).connect(audioCtx.destination);
-        demoSources.push(src);
-        g.gain.setValueAtTime(0.001,t0);
-        g.gain.linearRampToValueAtTime(0.6,Math.min(t0+0.05,t0+rel*0.25));
         const tNat=t0+rel;
-        const finishNatural=()=>{
-            if(!demoPlaying||pbGen!==demoLaunchGen){try{src.stop();}catch(e){}return;}
-            const now=audioCtx.currentTime;
-            const tRef=Math.max(tNat,now);
-            if(demoScoreSustainPedalDown){
-                demoSustainInternalHolds.set(m,{gain:g,source:src});
-                try{
-                    g.gain.cancelScheduledValues(tRef);
-                    g.gain.setValueAtTime(Math.min(0.62,Math.max(0.06,g.gain.value)),tRef);
-                    g.gain.linearRampToValueAtTime(0.48,tRef+0.12);
-                }catch(e){}
-                try{src.stop(tRef+50);}catch(e){}
-            }else{
-                try{
-                    const tEnd=Math.min(tRef+Math.min(rel*2.2,rel+1.2),tRef+2.5);
-                    g.gain.exponentialRampToValueAtTime(0.001,tEnd);
-                    src.stop(tEnd+0.2);
-                }catch(e){}
-            }
-        };
-        demoTimeouts.push(setTimeout(finishNatural,Math.max(0,(tNat-audioCtx.currentTime)*1000)));
-        try{src.start(t0);}catch(e){}
+        const vel=0.58;
+        const dOn=Math.max(0,(t0-audioCtx.currentTime)*1000);
+        demoTimeouts.push(setTimeout(()=>{
+            if(!demoPlaying||pbGen!==demoLaunchGen)return;
+            try{ salamanderPiano.keyDown({ midi:m, velocity:vel }); }catch(e){}
+        },dOn));
+        const dOff=Math.max(0,(tNat-audioCtx.currentTime)*1000);
+        demoTimeouts.push(setTimeout(()=>{
+            if(!demoPlaying||pbGen!==demoLaunchGen)return;
+            try{ salamanderPiano.keyUp({ midi:m }); }catch(e){}
+        },dOff));
     }
 
     function scheduleDemoNote(midi,vel,tOnAudio,durSec,flashDur,pbGen){
@@ -2337,25 +2353,24 @@
     }
 
     function playTone(note,vel){
-        if(!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
-        if(audioCtx.state==='suspended')audioCtx.resume();
-        if(activeNodes[note]){try{activeNodes[note].source.stop();}catch(e){}delete activeNodes[note];}
-        const source=audioCtx.createBufferSource();let closest=36,minDiff=999;
-        for(let b in sampleBuffers){let diff=Math.abs(note-b);if(diff<minDiff){minDiff=diff;closest=b;}}
-        source.buffer=sampleBuffers[closest];source.playbackRate.value=Math.pow(2,(note-closest)/12);
-        const gain=audioCtx.createGain();
-        gain.gain.setValueAtTime(Math.min(1,(vel/127)),audioCtx.currentTime);
-        source.connect(gain).connect(audioCtx.destination);source.start();
-        activeNodes[note]={source,gain};
+        if(!audioOn)return;
+        void (async()=>{
+            try{
+                await initAudio();
+                if(!salamanderPiano)return;
+                if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
+                const v=Math.min(1,Math.max(0.02,(vel|0)/127));
+                try{ salamanderPiano.keyUp({ midi:note&127 }); }catch(e){}
+                salamanderPiano.keyDown({ midi:note&127, velocity:v });
+            }catch(e){
+                if(String(e&&e.message)==='NEED_HTTP_NOT_FILE')return;
+            }
+        })();
     }
 
     function releaseNoteAudio(midi){
-        if(!activeNodes[midi])return;
-        const gainNode=activeNodes[midi].gain;
-        const tRel=0.09;
-        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);gainNode.gain.setValueAtTime(gainNode.gain.value,audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+tRel);
-        activeNodes[midi].source.stop(audioCtx.currentTime+tRel+0.05);delete activeNodes[midi];
+        if(!salamanderPiano)return;
+        try{ salamanderPiano.keyUp({ midi:midi&127 }); }catch(e){}
     }
 
     function handleMidiNoteOff(midi){
@@ -2366,7 +2381,9 @@
     function toggleAudio(){
         audioOn=!audioOn;
         document.getElementById('audioToggle').classList.toggle('active',audioOn);
-        if(audioOn&&!audioCtx)initAudio();
+        if(audioOn){
+            void initAudio().catch(()=>{});
+        }
     }
 
     const LS_OSMD_ZOOM='skalak_osmd_zoom',LS_OSMD_DARK='skalak_osmd_dark',LS_OSMD_THEME='skalak_osmd_theme_v1',LS_VIEW_PRESETS='skalak_view_presets_v1';
@@ -2770,7 +2787,7 @@
     let isRunning=false,activeRH=true,activeLH=true;
     let showLeds=false,hintState=0;
     let lastHitTime=0,hitIntervals=[];
-    let demoPlaying=false,demoTimeouts=[],demoSources=[],scoreDemoMidiOffByNote=new Map();
+    let demoPlaying=false,demoTimeouts=[],scoreDemoMidiOffByNote=new Map();
     let demoLaunchGen=0,demoAwaitMidi=false,lastDemoArmUiMs=0;
     let demoVisualScore=true,demoVisualKeys=true;
     /** OSMD könyvnézet / render lezáruljon DEMO előtt (1→2 oszlop vagy már 2 oszlop: SVG/paint is készüljön). */
@@ -2843,7 +2860,7 @@
     function handleMainButton(){
         if(helpActive)return;
         if(!isRunning){
-            initAudio();initMidi();
+            void initAudio();initMidi();
             if(scoreMode){
                 if(!scoreSteps.length){
                     setInfoBar(currentLang==='HU'?'Előbb tölts be kottát (fájl ikon vagy könyvtár a címnél).':'Load a score first — file icon or library (tap the title).',null);
@@ -2915,7 +2932,7 @@
                 }
                 if(myGen!==demoLaunchGen){demoAwaitMidi=false;return;}
                 const midiOk=midiOutPort&&midiOutPort.state==='open';
-                const samplesOk=!!(audioCtx&&Object.keys(sampleBuffers).length>=4);
+                const samplesOk=!!(salamanderPiano&&salamanderPiano.loaded);
                 if(!midiOk&&!samplesOk){
                     if(++demoWaitTicks>120){
                         demoAwaitMidi=false;
@@ -2960,6 +2977,14 @@
                 if(scoreMode)_playScoreDemo(myGen);
             };
             await t();
+        }).catch(err=>{
+            demoAwaitMidi=false;
+            if(String(err&&err.message)==='NEED_HTTP_NOT_FILE')return;
+            console.error('DEMO audio init:',err);
+            const hu=currentLang==='HU';
+            setInfoBar(hu
+                ?'Zongora hang betöltése sikertelen (hálózat / CDN). Próbáld újra, vagy használj MIDI-t (IAC).'
+                :'Piano failed to load (network / CDN). Retry or use MIDI (IAC).',null);
         });
     }
     function stopDemo(){
@@ -2971,7 +2996,7 @@
         resetDemoScoreSustain();
         sendMidiDemoPianoteqHardReset();
         flushDemoMidiNotes();
-        demoSources.forEach(s=>{try{s.stop();}catch(e){}});demoSources=[];
+        if(salamanderPiano){try{ salamanderPiano.stopAll(); }catch(e){}}
         clearDemoFlashOnKeys();
         if(scoreMode){
             clearScoreNoteHeadColors();scoreOsmdFollowSystemKey='';hideScoreMeasureHighlight();
@@ -3214,6 +3239,7 @@
         applyOsmdScoreThemeClass();
         practiceRangeClickPickMode=readPersistedPracticeRangeClickPick();
         const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);
+        showFileProtocolAudioHintIfNeeded();
         updateScoreSheetLayoutShell();
         updateOsmdScoreControlsVisibility();
         updateBookViewButtonChrome();
@@ -4736,7 +4762,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
     function _playScoreDemo(pbGen){
         demoTimeouts.forEach(t=>clearTimeout(t));demoTimeouts=[];
         scoreDemoMidiOffByNote.forEach(id=>clearTimeout(id));scoreDemoMidiOffByNote.clear();
-        demoSources.forEach(s=>{try{s.stop();}catch(e){}});demoSources=[];
+        if(salamanderPiano){try{ salamanderPiano.stopAll(); }catch(e){}}
         sendMidiDemoAllSoundOffAllChannels();
         sendMidiDemoPedalUpAllChannels();
         demoScoreSustainPedalDown=false;
