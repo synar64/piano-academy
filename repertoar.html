@@ -2737,6 +2737,8 @@
     let demoPlaying=false,demoTimeouts=[],demoSources=[],scoreDemoMidiOffByNote=new Map();
     let demoLaunchGen=0,demoAwaitMidi=false,lastDemoArmUiMs=0;
     let demoVisualScore=true,demoVisualKeys=true;
+    /** Kotta-DEMO első MIDI/belső hangjai előtt: audio felélesztés, minták, OSMD (nézetváltás után is). */
+    const DEMO_SCORE_START_LEAD_SEC=1.35;
     let scorePedalEvents=[],demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
     let scoreMode=true,osmdScoreTheme='dark',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
     let scoreOsmdFollowSystemKey='';
@@ -2908,6 +2910,10 @@
                         return;
                     }
                 }
+                try{
+                    if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
+                }catch(e){}
+                await new Promise(r=>setTimeout(r,60));
                 demoPlaying=true;document.getElementById('btnDemo').classList.add('active');
                 if(scoreMode)_playScoreDemo(myGen);
             };
@@ -4708,8 +4714,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
            abszolút ideje (pickup / üres ütemek / belső offset) gyakran 1 ütemnyi felesleges csendet ad —
            úgy hangzik, mintha az 1. ütemet átugrotta volna a DEMO. */
         assignPlaybackSecondsToMergedSteps(merged,true);
-        const LEAD=0.15;
-        const tBase=audioCtx.currentTime+LEAD;
+        try{if(audioCtx.state==='suspended')void audioCtx.resume();}catch(e){}
+        const tBase=audioCtx.currentTime+DEMO_SCORE_START_LEAD_SEC;
         snapMetroToBeat0(tBase);
         clearDemoFlashOnKeys();
         let maxOff=0;
