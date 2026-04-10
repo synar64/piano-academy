@@ -24,7 +24,7 @@
         /* Kotta mód: 1 hasáb = görgethető; 2 hasáb = fix „könyvoldal”, lapozás */
         /* 1 hasáb: kevesebb alsó padding (100px helyett) + háttér = ne legyen fekete „csík” a fehér kotta alatt görgetéskor */
         /* justify-content:flex-start: ne legyen függőlegesen középre tolva a kotta — különben üres „görgethető” sáv + elcsúszó ütemkiemelés 1 hasábnál */
-        .sheet-container.score-layout-1up { flex-direction:column; align-items:stretch; justify-content:flex-start; overflow-y:auto; overflow-x:hidden; padding-bottom:24px; padding-top:20px; }
+        .sheet-container.score-layout-1up { flex-direction:column; align-items:stretch; justify-content:flex-start; overflow-y:hidden; overflow-x:hidden; padding-bottom:24px; padding-top:20px; }
         .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-dark),
         .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-darksepia){background:#000;}
         .sheet-container.score-layout-1up:has(#osmd-container.osmd-theme-sepia){background:var(--score-paper-bg);}
@@ -3573,16 +3573,17 @@
             void applyPracticeRangeMeasures(mn,mn);
         }
     }
-    /** Könyvnézet: melyik spread tartalmazza a hangokat (2 vagy 3 hasáb / oldal sor) — demó / követés lapozás. */
+    /** Könyvnézet és 1 hasáb: melyik spread tartalmazza a hangokat — demó / követés lapozás. */
     function osmdBookSpreadIndexForNotes(notes){
-        if(bookViewColumns<=1||!notes||!notes.length||!osmdInstance)return null;
+        if(!notes||!notes.length||!osmdInstance)return null;
         const rules=osmdEngravingRules();
         const gn=rules&&typeof rules.GNote==='function'?rules.GNote(notes[0]):null;
         if(!gn)return null;
         let page=null;
         try{page=gn.ParentMusicPage||gn.parentMusicPage;}catch(e){}
         const pi=osmdPageIndexForMusicPage(page);
-        return Math.floor(pi/bookViewColumns);
+        const cols=Math.max(1,bookViewColumns);
+        return Math.floor(pi/cols);
     }
     function ensureOsmdBookSpreadShowsNotes(notes){
         const idx=osmdBookSpreadIndexForNotes(notes);
@@ -3963,7 +3964,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         else sc.classList.add('score-layout-3up');
     }
     function updateOsmdScoreControlsVisibility(){
-        const show=scoreMode&&bookViewColumns>1;
+        const show=scoreMode;
         const prev=document.getElementById('btnOsmdPrevSpread');
         const next=document.getElementById('btnOsmdNextSpread');
         const lbl=document.getElementById('osmdSpreadLbl');
@@ -3987,7 +3988,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(next)next.style.opacity=n<=1||idx>=n-1?'0.35':'1';
     }
     function applyOsmdSpreadPaging(){
-        if(!scoreMode||bookViewColumns<=1)return;
+        if(!scoreMode)return;
         const root=document.querySelector('#osmd-container .osmd-book-root');
         if(!root)return;
         const rows=[...root.querySelectorAll(':scope > .osmd-book-spread')];
@@ -3997,7 +3998,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         updateOsmdSpreadChrome();
     }
     function osmdStepBookSpread(dir){
-        if(!scoreMode||bookViewColumns<=1)return;
+        if(!scoreMode)return;
         const root=document.querySelector('#osmd-container .osmd-book-root');
         if(!root)return;
         const n=root.querySelectorAll(':scope > .osmd-book-spread').length;
@@ -4019,13 +4020,15 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         try{osmdInstance.setOptions({autoResize:false});}catch(e){}
         const innerW=osmdContainerContentWidthPx(cont);
         const widthMm=Math.max(40,pxToOsmdMm(innerW));
-        const heightMm=widthMm*OSMD_FIXED_PAGE_H_OVER_W_MM;
-        osmdInstance.setCustomPageFormat(widthMm,heightMm);
+        // Viewport-alapú oldalmagasság (mint a book mód) — lapozással, nem görgetéssel
+        const availHPx=osmdBookViewportHeightPx(cont);
+        const pageHPx=Math.min(3000,Math.max(400,Math.round(availHPx*0.97)));
+        osmdInstance.setCustomPageFormat(widthMm,pxToOsmdMm(pageHPx));
         try{osmdInstance.updateGraphic();}catch(e){}
     }
     function relayoutOsmdPagesAfterRender(){
         layoutOsmdBookSpread();
-        if(bookViewColumns>1)applyOsmdSpreadPaging();
+        applyOsmdSpreadPaging();
     }
     function configureOsmdEndless(){
         if(!osmdInstance)return;
@@ -4080,20 +4083,28 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         const root=document.createElement('div');
         root.className='osmd-book-root';
         root.style.cssText='display:flex;flex-direction:column;gap:12px;align-items:stretch;width:100%;padding-bottom:24px;box-sizing:border-box;';
-        const cols=bookViewColumns;
+        const cols=Math.max(1,bookViewColumns);
         const gapPx=cols>=3?4:6;
-        const phW=cols>=3?22:36;
+        // Measure the width of the first actual page for placeholder sizing
+        let actualPageWidth=0;
+        if(pages.length>0){
+            const firstSvg=pages[0].querySelector('svg');
+            if(firstSvg) actualPageWidth=firstSvg.getBoundingClientRect().width||pages[0].offsetWidth||0;
+            if(!actualPageWidth) actualPageWidth=pages[0].offsetWidth||200;
+        }
         for(let i=0;i<pages.length;i+=cols){
             const row=document.createElement('div');
             row.className='osmd-book-spread';
             row.style.cssText='display:flex;flex-direction:row;flex-wrap:nowrap;gap:'+gapPx+'px;justify-content:center;align-items:flex-start;width:100%;max-width:100%;box-sizing:border-box;';
             for(let c=0;c<cols;c++){
                 if(i+c<pages.length)row.appendChild(pages[i+c]);
-                else{
+                else if(cols>1){
+                    // Placeholder same width as a real page — keeps the layout balanced
                     const ph=document.createElement('div');
                     ph.className='osmd-book-placeholder';
                     ph.setAttribute('aria-hidden','true');
-                    ph.style.cssText='flex:0 0 auto;width:'+phW+'px;min-height:1px;';
+                    const pw=actualPageWidth>10?Math.round(actualPageWidth):200;
+                    ph.style.cssText='flex:0 0 auto;width:'+pw+'px;min-height:1px;';
                     row.appendChild(ph);
                 }
             }
