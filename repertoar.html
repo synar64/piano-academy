@@ -2057,6 +2057,12 @@
     const midiSustainReleaseQueue=new Set();
     let midiAccessRef=null, midiOutPort=null, midiInitPromise=null;
     const DEMO_MIDI_CHANNEL=0;
+    /** Kimenő MIDI note-on erősség: a belső velocity (tipikusan 100) ezzel szorzódik. 1.0 = régi, hangos; 0.65–0.75 tipikusan MuseTrainer-közeli, halkabb Pianoteq-en. */
+    const MIDI_OUT_NOTE_VELOCITY_SCALE=0.55;
+    function scaleMidiOutNoteVelocity(vel){
+        const v=Math.max(0,Math.min(127,vel|0));
+        return Math.max(1,Math.min(127,Math.round(v*MIDI_OUT_NOTE_VELOCITY_SCALE)));
+    }
     const demoMidiRinging=new Set();
 
     async function initAudio(){
@@ -2128,7 +2134,7 @@
         if(!midiOutPort) return;
         try {
             if(midiOutPort.state !== 'open') midiOutPort.open();
-            midiOutPort.send([0x90|DEMO_MIDI_CHANNEL, note&127, Math.max(1, Math.min(127, vel|0))]);
+            midiOutPort.send([0x90|DEMO_MIDI_CHANNEL, note&127, scaleMidiOutNoteVelocity(vel)]);
             demoMidiRinging.add(note&127);
         } catch(e) { console.error("MIDI Send Error:", e); }
     }
