@@ -1255,9 +1255,37 @@
         }
         await loadXmlScore(xml,id);
     }
+    /** Törli a beépített „Minták” gyűjtemény(ek)et és a hozzájuk tartozó XML kulcsokat (újraseed / manifest szinkron). */
+    function stripBuiltinSamplesLibrariesFromState(){
+        let st=readLibrariesState();
+        const had=st.libraries.some(l=>l&&l.id==='lib_builtin_samples');
+        if(!had)return;
+        const prevFocusId=(st.libraries[st.activeLibIndex|0]||{}).id;
+        st.libraries.forEach(lib=>{
+            if(!lib||lib.id!=='lib_builtin_samples')return;
+            (lib.entries||[]).forEach(e=>{
+                if(e&&e.id)try{localStorage.removeItem(libStorageKey(e.id));}catch(_){}
+            });
+        });
+        st.libraries=st.libraries.filter(l=>l&&l.id!=='lib_builtin_samples');
+        if(!st.libraries.length){
+            st.libraries.push({id:'lib0',name:currentLang==='HU'?'Alapértelmezett':'Default',entries:[]});
+            st.activeLibIndex=0;
+        }else if(prevFocusId==='lib_builtin_samples'){
+            st.activeLibIndex=0;
+        }else{
+            const ix=st.libraries.findIndex(l=>l&&l.id===prevFocusId);
+            st.activeLibIndex=ix>=0?ix:Math.min(st.activeLibIndex|0,st.libraries.length-1);
+        }
+        if(st.activeLibIndex>=st.libraries.length)st.activeLibIndex=Math.max(0,st.libraries.length-1);
+        const ent=st.libraries[st.activeLibIndex].entries||[];
+        st.activeEntryIndex=ent.length?Math.min(st.activeEntryIndex|0,ent.length-1):0;
+        saveLibrariesState(st);
+    }
     /**
      * Első alkalommal (LS flag nélkül) letölti a samples/*.mxl fájlokat, létrehozza a „Minták” könyvtárat.
      * A felhasználó egyenként törölheti a darabokat; a flag miatt nem töltődnek újra.
+     * Seed újrafuttatásakor a régi Minták + IndexedDB munkamenet törlődik, különben a manifestból törölt darab „visszajönne”.
      * file:// módban a fetch gyakran elbukik — ilyenkor nincs változás (kivéve ha már be volt állítva a flag).
      */
     async function maybeSeedBuiltinSamples(){
@@ -1292,7 +1320,7 @@
             const loaded=[];
             for(const rel of relPaths){
                 try{
-                    const res=await fetch(new URL(rel,base).href,{mode:'same-origin',cache:'force-cache'});
+                    const res=await fetch(new URL(rel,base).href,{mode:'same-origin',cache:'no-cache'});
                     if(!res.ok)continue;
                     const buf=await res.arrayBuffer();
                     const xml=await extractMusicXmlStringFromMxlBuffer(buf);
@@ -1307,6 +1335,7 @@
                     :'Samples: could not load files from samples/ (check URL and filenames).',null);
                 return;
             }
+            stripBuiltinSamplesLibrariesFromState();
             let st=readLibrariesState();
             const singleEmpty=st.libraries.length===1&&st.libraries.every(L=>!(L.entries||[]).length);
             const prevActive=st.activeLibIndex|0;
@@ -1324,6 +1353,7 @@
                 saveLibrariesState(st);
             }
             try{localStorage.setItem(LS_BUILTIN_SAMPLES_SEEDED,'1');}catch(e){}
+            await clearRepertoarSessionScoreStorage();
             updateLibraryOledText();
             refreshScoreLibraryListUI();
         }catch(e){console.warn('maybeSeedBuiltinSamples',e);}
