@@ -2737,8 +2737,10 @@
     let demoPlaying=false,demoTimeouts=[],demoSources=[],scoreDemoMidiOffByNote=new Map();
     let demoLaunchGen=0,demoAwaitMidi=false,lastDemoArmUiMs=0;
     let demoVisualScore=true,demoVisualKeys=true;
-    /** Kotta-DEMO első MIDI/belső hangjai előtt: audio felélesztés, minták, OSMD (nézetváltás után is). */
-    const DEMO_SCORE_START_LEAD_SEC=1.35;
+    /** OSMD könyvnézet / render lezáruljon DEMO előtt (1→2 oszlop vagy már 2 oszlop: SVG/paint is készüljön). */
+    const DEMO_SCORE_LAYOUT_SETTLE_MS=2000;
+    /** AudioContext + első hang ütemezése a settle után (a fenti ms már ad időt a layoutnak). */
+    const DEMO_SCORE_START_LEAD_SEC=0.55;
     let scorePedalEvents=[],demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
     let scoreMode=true,osmdScoreTheme='dark',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
     let scoreOsmdFollowSystemKey='';
@@ -2909,6 +2911,10 @@
                         demoAwaitMidi=false;
                         return;
                     }
+                }
+                if(scoreMode){
+                    await new Promise(r=>setTimeout(r,DEMO_SCORE_LAYOUT_SETTLE_MS));
+                    if(myGen!==demoLaunchGen){demoAwaitMidi=false;return;}
                 }
                 try{
                     if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
@@ -4734,8 +4740,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             maxOff=Math.max(maxOff,it.t+0.05);
         });
         const tieRunSec=new Map();
-        /* Rövid lépés + tieCont: belső zongorán újra le kell ütni (pl. Beethoven V. ugyanazon G hangjai tie-vel az MXL-ben). */
-        const DEMO_SHORT_STEP_REARTIC_SEC=0.38;
+        /* tieCont: belső zongorán újraütés, kivéve ha a következő esemény nagyon messze van (hosszú kötött hang egy lépésben).
+           A ~0,38 s küszöb lassú tempónál / nagyobb lépésközön elnémította a kötött nyolcadokat (pl. Beethoven V.). */
+        const DEMO_TIE_SUPPRESS_REARTIC_IF_STEP_SEC=2.4;
         for(let ei=0;ei<merged.length;ei++){
             const st=merged[ei];
             const tb=typeof st.stepBpm==='number'&&st.stepBpm>0?st.stepBpm:bpm;
@@ -4767,15 +4774,16 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 }
                 if(demoInternalSamplesWanted()){
                     for(const p of active){
-                        if(p.tieCont&&stepWidthSec>=DEMO_SHORT_STEP_REARTIC_SEC)continue;
-                        const d=(Math.max(1/960,p.durQ)*60)/Math.max(1,tb);
-                        const playDur=Math.max(0.06,stepWidthSec>0?Math.min(d,stepWidthSec*0.99):d);
+                        if(p.tieCont&&stepWidthSec>=DEMO_TIE_SUPPRESS_REARTIC_IF_STEP_SEC)continue;
+                        const rawD=(Math.max(1/960,p.durQ)*60)/Math.max(1,tb);
+                        const cap=stepWidthSec>0.02?stepWidthSec*0.98:null;
+                        const playDur=Math.max(0.1,cap!=null?Math.min(rawD,cap):rawD);
                         playScoreDemoInternalNote(p.midi&127,playDur,tOn,pbGen);
                     }
                 }
                 if(demoVisualKeys){
                     active.forEach(p=>{
-                        if(p.tieCont&&stepWidthSec>=DEMO_SHORT_STEP_REARTIC_SEC)return;
+                        if(p.tieCont&&stepWidthSec>=DEMO_TIE_SUPPRESS_REARTIC_IF_STEP_SEC)return;
                         const mm=p.midi&127;
                         const k=document.getElementById('k-'+mm);
                         if(!k)return;
