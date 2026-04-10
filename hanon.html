@@ -361,43 +361,90 @@
         else{bar.innerHTML=text+'<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';bar.style.right=Math.max(barRect.width-cx-10,20)+'px';bar.style.left='auto';bar.style.transform='none';}
     }
     function updateStartStop(running){const btn=document.getElementById('btnStart');if(btn)btn.textContent=running?'STOP':'START';}
-    let audioInited=false,audioCtx,sampleBuffers={},activeNodes={},audioOn=true;
+    let audioCtx=null,salamanderPiano=null,_pianoInitPromise=null;
+    let _midiInited=false,audioOn=true;
+    function ensurePianoLoadContextOrThrow(){
+        if(location.protocol==='file:'){
+            const hu=currentLang==='HU';
+            setInfoBar(hu
+                ?'Nincs hang (file://). python3 -m http.server → http://localhost:8080/hanon.html'
+                :'No audio on file://. Use: python3 -m http.server → http://localhost:8080/hanon.html',document.getElementById('audioToggle'));
+            throw new Error('NEED_HTTP_NOT_FILE');
+        }
+    }
+    function showFileProtocolAudioHintIfNeeded(){
+        if(location.protocol!=='file:')return;
+        const hu=currentLang==='HU';
+        setInfoBar(hu
+            ?'Hanon zongorájához http://localhost/… (ne file://).'
+            :'Hanon piano needs http://localhost/… (not file://).',null);
+    }
+    function attachHanonMidiInputs(){
+        if(_midiInited||!navigator.requestMIDIAccess)return;
+        navigator.requestMIDIAccess().then(m=>{
+            _midiInited=true;
+            m.inputs.forEach(input=>input.onmidimessage=(msg)=>{
+                const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];
+                if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
+                else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}
+            });
+        }).catch(()=>{});
+    }
     async function initAudio(){
-        if(audioInited)return;audioInited=true;
-        if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-        if(audioCtx.state==='suspended')await audioCtx.resume();
-        const s={36:'C2',48:'C3',60:'C4',72:'C5'};
-        for(let k in s){try{const r=await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);sampleBuffers[k]=await audioCtx.decodeAudioData(await r.arrayBuffer());}catch(e){}}
-        if(navigator.requestMIDIAccess){
-            navigator.requestMIDIAccess().then(m=>{
-                m.inputs.forEach(input=>input.onmidimessage=(msg)=>{
-                    const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];
-                    if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
-                    else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}
-                });
-            }).catch(e=>{});
+        ensurePianoLoadContextOrThrow();
+        if(salamanderPiano&&salamanderPiano.loaded){
+            if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
+            attachHanonMidiInputs();
+            return;
+        }
+        if(!_pianoInitPromise){
+            _pianoInitPromise=(async()=>{
+                const Tone=await import('https://esm.sh/tone@14.7.77');
+                const pianoMod=await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
+                const Piano=pianoMod.Piano||pianoMod.default?.Piano||pianoMod.default;
+                await Tone.start();
+                const p=new Piano({velocities:5,release:true,pedal:true}).toDestination();
+                await p.load();
+                salamanderPiano=p;
+                audioCtx=Tone.getContext().rawContext;
+            })();
+        }
+        try{
+            await _pianoInitPromise;
+            attachHanonMidiInputs();
+        }catch(e){
+            if(String(e.message)!=='NEED_HTTP_NOT_FILE'){
+                console.error('Piano (Tone) load:',e);
+                const hu=currentLang==='HU';
+                setInfoBar(hu?'Zongora betöltés hiba — F12':'Piano load error — F12',document.getElementById('audioToggle'));
+            }
+            _pianoInitPromise=null;
+            salamanderPiano=null;
+            throw e;
         }
     }
     function playTone(note,vel){
-        if(!audioCtx||!audioOn||Object.keys(sampleBuffers).length===0)return;
-        if(audioCtx.state==='suspended')audioCtx.resume();
-        if(activeNodes[note]){try{activeNodes[note].source.stop();}catch(e){}delete activeNodes[note];}
-        const source=audioCtx.createBufferSource();
-        let closest=36,minDiff=999;
-        for(let b in sampleBuffers){let diff=Math.abs(note-b);if(diff<minDiff){minDiff=diff;closest=b;}}
-        source.buffer=sampleBuffers[closest];source.playbackRate.value=Math.pow(2,(note-closest)/12);
-        const gain=audioCtx.createGain();const v_d=parseFloat(document.getElementById('vst_d').value)||1.0;
-        gain.gain.setValueAtTime((vel/127)*v_d,audioCtx.currentTime);
-        source.connect(gain).connect(audioCtx.destination);source.start();
-        activeNodes[note]={source,gain};
+        if(!audioOn)return;
+        void (async()=>{
+            try{
+                await initAudio();
+                if(!salamanderPiano)return;
+                if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
+                const vEl=document.getElementById('vst_d');
+                const velo=vEl?parseFloat(vEl.value):1.0;
+                const scale=Number.isFinite(velo)?velo:1.0;
+                const v=Math.min(1,Math.max(0.02,((vel|0)/127)*scale));
+                try{ salamanderPiano.keyUp({ midi:note&127 }); }catch(e){}
+                salamanderPiano.keyDown({ midi:note&127, velocity:v });
+            }catch(e){
+                if(String(e&&e.message)==='NEED_HTTP_NOT_FILE')return;
+            }
+        })();
     }
     function handleNoteOff(midi){
-        if(!activeNodes[midi])return;
-        const v_r=parseFloat(document.getElementById('vst_r').value);
-        const gainNode=activeNodes[midi].gain;
-        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);gainNode.gain.setValueAtTime(gainNode.gain.value,audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+v_r);
-        activeNodes[midi].source.stop(audioCtx.currentTime+v_r+0.1);delete activeNodes[midi];
+        if(salamanderPiano){
+            try{ salamanderPiano.keyUp({ midi:midi&127 }); }catch(e){}
+        }
     }
     let helpActive=false;
     function toggleHelp(){
@@ -559,7 +606,7 @@
         document.getElementById('lcdExerciseText').innerText=hanonList[currentHanonIdx].name;document.getElementById('hanonSelectValue').value=val;
         closePatchBrowser();if(isRunning)stopPractice();buildSequence();draw();
     }
-    function toggleAudio(){audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn&&!audioCtx)initAudio();}
+    function toggleAudio(){audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn)void initAudio().catch(()=>{});}
     const C_MAJOR_MIDI=[0,2,4,5,7,9,11];const NOTE_NAMES=['C','D','E','F','G','A','H'];
     function getNoteInfo(diatonicStep){let octave=Math.floor(diatonicStep/7);let noteIndex=diatonicStep%7;let midi=(octave*12)+12+C_MAJOR_MIDI[noteIndex];return{midi,name:NOTE_NAMES[noteIndex]};}
     const VF = Vex.Flow;
@@ -942,20 +989,30 @@
             draw();
         }
     }
-    let demoRunning=false,demoTimeouts=[],demoSources=[];
+    let demoRunning=false,demoTimeouts=[];
     function playRhythmDemo(){
-        // Toggle: if already running, stop it
         if(demoRunning){stopDemo();return;}
-        if(!audioCtx){initAudio().then(()=>{setTimeout(()=>{const t=()=>{if(Object.keys(sampleBuffers).length>=4)_playDemo();else setTimeout(t,100);};t();},300);});return;}
-        const t=()=>{if(Object.keys(sampleBuffers).length>=4)_playDemo();else setTimeout(t,100);};t();
+        initAudio().then(()=>{
+            setTimeout(()=>{
+                let wait=0;
+                const t=()=>{
+                    if(salamanderPiano&&salamanderPiano.loaded){
+                        _playDemo();
+                        return;
+                    }
+                    if(++wait>120)return;
+                    setTimeout(t,100);
+                };
+                t();
+            },300);
+        }).catch(e=>{if(String(e&&e.message)==='NEED_HTTP_NOT_FILE')return;});
     }
     function stopDemo(){
         demoRunning=false;
         document.getElementById('btnDemo').classList.remove('active');
         demoTimeouts.forEach(t=>clearTimeout(t));
         demoTimeouts=[];
-        demoSources.forEach(s=>{try{s.stop();}catch(e){}});
-        demoSources=[];
+        if(salamanderPiano){try{ salamanderPiano.stopAll(); }catch(e){}}
         demoActiveNoteIdx=-1;
         document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
         currentNoteInBlock=0;currentBlockIndex=0;
@@ -963,23 +1020,22 @@
         setInfoBar(HANON_T[currentLang].ready,null);
     }
     function _playDemo(){
+        if(!audioCtx||!salamanderPiano)return;
         const rawSeq=buildHanonExercise(hanonList[currentHanonIdx].val);
         const R=RHYTHMS[currentRhythmIdx];const baseDur=60/bpm;
         let time=audioCtx.currentTime+0.15;
         snapMetroToBeat0(time);
         demoTimeouts.forEach(t=>clearTimeout(t));
-        demoTimeouts=[];demoSources=[];
+        demoTimeouts=[];
+        if(salamanderPiano){try{ salamanderPiano.stopAll(); }catch(e){}}
         demoActiveNoteIdx=-1;document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
         if(seqBlocks.length===0)buildSequence();
         demoRunning=true;
         document.getElementById('btnDemo').classList.add('active');
         
-        let globalIdx=0;
         rawSeq.forEach((note,i)=>{
             const ratio=R.ratios[i%R.ratios.length];const dur=baseDur*ratio;
             const delayMs=(time-audioCtx.currentTime)*1000;const flashDur=Math.min(dur*0.85*1000,400);
-            
-            // JAVÍTÁS: 16 helyett 32, mert most 32 hang van egy sorban (4 ütem)
             const blockIdx=Math.floor(i/32);const noteIdx=i%32;
             
             const tid1=setTimeout(()=>{
@@ -991,13 +1047,19 @@
             demoTimeouts.push(tid1);
             [activeRH?note.m_rh:null,activeLH?note.m_lh:null].forEach(midiNote=>{
                 if(!midiNote)return;
-                const src=audioCtx.createBufferSource();let closest=36,minDiff=999;
-                for(let b in sampleBuffers){let diff=Math.abs(midiNote-b);if(diff<minDiff){minDiff=diff;closest=b;}}
-                if(!sampleBuffers[closest])return;
-                src.buffer=sampleBuffers[closest];src.playbackRate.value=Math.pow(2,(midiNote-closest)/12);
-                const g=audioCtx.createGain();g.gain.setValueAtTime(0.6,time);g.gain.exponentialRampToValueAtTime(0.001,time+dur*2.5);
-                src.connect(g).connect(audioCtx.destination);src.start(time);src.stop(time+dur*2.8);
-                demoSources.push(src);
+                const m=midiNote&127;
+                const tOff=time+dur;
+                const vel=0.62;
+                const dOn=Math.max(0,(time-audioCtx.currentTime)*1000);
+                const dOff=Math.max(0,(tOff-audioCtx.currentTime)*1000);
+                demoTimeouts.push(setTimeout(()=>{
+                    if(!demoRunning)return;
+                    try{ salamanderPiano.keyDown({ midi:m, velocity:vel }); }catch(e){}
+                },dOn));
+                demoTimeouts.push(setTimeout(()=>{
+                    if(!demoRunning)return;
+                    try{ salamanderPiano.keyUp({ midi:m }); }catch(e){}
+                },dOff));
                 const tid3=setTimeout(()=>{
                     if(!demoRunning)return;
                     const key=document.getElementById(`k-${midiNote}`);
@@ -1203,7 +1265,7 @@
         if(d) d.innerText=bpm;
     };
     window.addEventListener('resize', () => { if(seqBlocks.length > 0) draw(); });
-    window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);create88();buildSequence();draw();window.addEventListener('pointerdown',()=>initAudio(),{once:true});};
+    window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);showFileProtocolAudioHintIfNeeded();create88();buildSequence();draw();window.addEventListener('pointerdown',()=>initAudio(),{once:true});};
 </script>
 </body>
 </html>
