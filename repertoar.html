@@ -788,7 +788,7 @@
             'txt-bookmarksClose': 'Close',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Score library',
-            'txt-scoreLibHint': 'Several named libraries; each has its own piece list (stored in the browser only).\n\nOn first visit, a \"Samples\" library is filled from samples/manifest.json (list of .mxl/.xml) plus the files in samples/; you can remove pieces with Del — they will not reappear unless you clear site data. To add scores, put the file in samples/ and add its filename to manifest.json, then clear localStorage key repertoar_builtin_samples_seeded_v1 once (or site data).\n\n+ File / + Batch — import MusicXML/MXL into storage.\nLink folder — Chrome/Edge can attach a local folder; all .xml / .mxl inside stay listed after refresh.\nURL — only works if the server allows other sites to fetch the file (CORS). MuseScore, IMSLP, and many hosts do not; download the file and use the score file icon on the right instead.\nSave — store the currently open score under a name in the active library.',
+            'txt-scoreLibHint': 'Several named libraries; each has its own piece list (stored in the browser only).\n\n+ File / + Batch — import MusicXML/MXL into storage.\nLink folder — Chrome/Edge can attach a local folder; all .xml / .mxl inside stay listed after refresh.\nURL — only works if the server allows other sites to fetch the file (CORS). MuseScore, IMSLP, and many hosts do not; download the file and use the score file icon on the right instead.\nSave — store the currently open score under a name in the active library.',
             'txt-scoreLibLibsHdr': 'Libraries',
             'btnScoreLibAddLibrary': '+ New collection',
             'txt-scoreLibPiecesHdr': 'Pieces',
@@ -826,7 +826,7 @@
             'txt-bookmarksClose': 'Bezár',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Kottakönyvtár',
-            'txt-scoreLibHint': 'Több elnevezett könyvtár; mindegyik saját darablistát tart (csak a böngészőben tárolva).\n\nElső látogatáskor a samples/manifest.json felsorolásából (és a samples/ mappában lévő fájlokból) töltődik a „Minták” gyűjtemény; egyenként törölheted (Töröl) — nem jönnek vissza, hacsak nem törlöd a böngésző adatait. Új .mxl: tedd a mappába, írd be a fájlnevet a manifest.json-ba, majd egyszer töröld a repertoar_builtin_samples_seeded_v1 kulcsot (vagy az oldal tárhelyét).\n\n+ File / + Batch — MusicXML/MXL import a tárhelyre.\nLink mappa — Chrome/Edge: helyi mappa csatolása; a benne lévő .xml / .mxl fájlok újratöltés után is listázva maradnak.\nURL — csak akkor működik, ha a szerver engedi a külső letöltést (CORS). A MuseScore, IMSLP és sok más oldal általában nem; töltsd le a fájlt, és használd a jobb oldali kotta-fájl ikont.\nMentés — az épp nyitott kotta elmentése névvel az aktív könyvtárba.',
+            'txt-scoreLibHint': 'Több elnevezett könyvtár; mindegyik saját darablistát tart (csak a böngészőben tárolva).\n\n+ File / + Batch — MusicXML/MXL import a tárhelyre.\nLink mappa — Chrome/Edge: helyi mappa csatolása; a benne lévő .xml / .mxl fájlok újratöltés után is listázva maradnak.\nURL — csak akkor működik, ha a szerver engedi a külső letöltést (CORS). A MuseScore, IMSLP és sok más oldal általában nem; töltsd le a fájlt, és használd a jobb oldali kotta-fájl ikont.\nMentés — az épp nyitott kotta elmentése névvel az aktív könyvtárba.',
             'txt-scoreLibLibsHdr': 'Könyvtárak',
             'btnScoreLibAddLibrary': '+ Új gyűjtemény',
             'txt-scoreLibPiecesHdr': 'Darabok',
@@ -934,36 +934,6 @@
     const LS_BOOKMARKS='skalak_bookmarks_v1';
     const LS_SCORE_LIB_INDEX='skalak_score_lib_index_v1';
     const LS_SCORE_LIBS_V2='skalak_score_libs_v2';
-    /** Egyszeri „Minták” könyvtár; törlés után nem töltődik újra (flag). */
-    const LS_BUILTIN_SAMPLES_SEEDED='repertoar_builtin_samples_seeded_v1';
-    const LS_BUILTIN_SAMPLES_SEEDED_LEGACY='skalak_builtin_samples_seeded_v1';
-    const SAMPLES_MANIFEST_REL='samples/manifest.json';
-    const BUILTIN_SAMPLE_FALLBACK_PATHS=[
-        'samples/Prelude_I_in_C_major_BWV_846_-_Well_Tempered_Clavier_First_Book.mxl',
-        'samples/Mozart_-_Piano_Sonata_No._16_-_Allegro.mxl',
-        'samples/Beethoven_Symphony_No._5_1st_movement_Piano_solo.mxl'
-    ];
-    async function resolveBuiltinSampleRelPaths(baseHref){
-        try{
-            const res=await fetch(new URL(SAMPLES_MANIFEST_REL,baseHref).href,{mode:'same-origin',cache:'no-cache'});
-            if(res.ok){
-                const j=await res.json();
-                const arr=j&&Array.isArray(j.files)?j.files:(j&&Array.isArray(j.scores)?j.scores:null);
-                if(arr&&arr.length){
-                    const out=[];
-                    for(const fn of arr){
-                        const raw=String(fn||'').trim();
-                        if(!raw||raw.includes('..'))continue;
-                        const n=raw.replace(/^samples\//,'');
-                        if(!/\.(mxl|xml|musicxml)$/i.test(n))continue;
-                        out.push('samples/'+n.replace(/^\/+/,''));
-                    }
-                    if(out.length)return out;
-                }
-            }
-        }catch(e){console.warn('samples manifest',e);}
-        return BUILTIN_SAMPLE_FALLBACK_PATHS.slice();
-    }
     function libStorageKey(id){return'skalak_lib_xml_'+String(id||'');}
     let currentScoreHash='';
     let practiceRangeMeasureSet=new Set();
@@ -1254,119 +1224,6 @@
             return;
         }
         await loadXmlScore(xml,id);
-    }
-    /** Törli a beépített „Minták” gyűjtemény(ek)et és a hozzájuk tartozó XML kulcsokat (újraseed / manifest szinkron). */
-    function stripBuiltinSamplesLibrariesFromState(){
-        let st=readLibrariesState();
-        const had=st.libraries.some(l=>l&&l.id==='lib_builtin_samples');
-        if(!had)return;
-        const prevFocusId=(st.libraries[st.activeLibIndex|0]||{}).id;
-        st.libraries.forEach(lib=>{
-            if(!lib||lib.id!=='lib_builtin_samples')return;
-            (lib.entries||[]).forEach(e=>{
-                if(e&&e.id)try{localStorage.removeItem(libStorageKey(e.id));}catch(_){}
-            });
-        });
-        st.libraries=st.libraries.filter(l=>l&&l.id!=='lib_builtin_samples');
-        if(!st.libraries.length){
-            st.libraries.push({id:'lib0',name:currentLang==='HU'?'Alapértelmezett':'Default',entries:[]});
-            st.activeLibIndex=0;
-        }else if(prevFocusId==='lib_builtin_samples'){
-            st.activeLibIndex=0;
-        }else{
-            const ix=st.libraries.findIndex(l=>l&&l.id===prevFocusId);
-            st.activeLibIndex=ix>=0?ix:Math.min(st.activeLibIndex|0,st.libraries.length-1);
-        }
-        if(st.activeLibIndex>=st.libraries.length)st.activeLibIndex=Math.max(0,st.libraries.length-1);
-        const ent=st.libraries[st.activeLibIndex].entries||[];
-        st.activeEntryIndex=ent.length?Math.min(st.activeEntryIndex|0,ent.length-1):0;
-        saveLibrariesState(st);
-    }
-    /**
-     * Első alkalommal (LS flag nélkül) letölti a samples/*.mxl fájlokat, létrehozza a „Minták” könyvtárat.
-     * A felhasználó egyenként törölheti a darabokat; a flag miatt nem töltődnek újra.
-     * Seed újrafuttatásakor a régi Minták + IndexedDB munkamenet törlődik, különben a manifestból törölt darab „visszajönne”.
-     * file:// módban a fetch gyakran elbukik — ilyenkor nincs változás (kivéve ha már be volt állítva a flag).
-     */
-    async function maybeSeedBuiltinSamples(){
-        try{
-            const hu=currentLang==='HU';
-            /* Böngésző biztonság: file:// alatt a mellékelt samples/*.mxl nem kérhető le — üres marad a könyvtár. */
-            if(location.protocol==='file:'){
-                setInfoBar(hu
-                    ?'Minták nem töltődnek fájlból megnyitva. Indíts helyi szervert: terminálban lépj a mappába, majd: python3 -m http.server 8765 — böngésző: http://localhost:8765/repertoar.html'
-                    :'Sample scores do not load when opening the HTML as a file. Run a local server: cd to this folder, then: python3 -m http.server 8765 — open http://localhost:8765/repertoar.html',null);
-                return;
-            }
-            try{
-                if(localStorage.getItem(LS_BUILTIN_SAMPLES_SEEDED)!=='1'&&localStorage.getItem(LS_BUILTIN_SAMPLES_SEEDED_LEGACY)==='1'){
-                    localStorage.setItem(LS_BUILTIN_SAMPLES_SEEDED,'1');
-                    localStorage.removeItem(LS_BUILTIN_SAMPLES_SEEDED_LEGACY);
-                }
-            }catch(e){}
-            let seeded=localStorage.getItem(LS_BUILTIN_SAMPLES_SEEDED)==='1';
-            if(seeded){
-                const st0=readLibrariesState();
-                const hasBuiltin=st0.libraries.some(l=>l&&l.id==='lib_builtin_samples');
-                if(hasBuiltin)return;
-                try{
-                    localStorage.removeItem(LS_BUILTIN_SAMPLES_SEEDED);
-                    localStorage.removeItem(LS_BUILTIN_SAMPLES_SEEDED_LEGACY);
-                }catch(e){}
-            }
-            const sampleLibName=hu?'Minták':'Samples';
-            const base=new URL('.',location.href).href;
-            const relPaths=await resolveBuiltinSampleRelPaths(base);
-            const loaded=[];
-            for(const rel of relPaths){
-                try{
-                    const res=await fetch(new URL(rel,base).href,{mode:'same-origin',cache:'no-cache'});
-                    if(!res.ok)continue;
-                    const buf=await res.arrayBuffer();
-                    const xml=await extractMusicXmlStringFromMxlBuffer(buf);
-                    const xt=String(xml||'').trim();
-                    if(xt&&/<score-partwise|<score-timewise/i.test(xt))
-                        loaded.push({rel,xml});
-                }catch(e){console.warn('Builtin sample',rel,e);}
-            }
-            if(!loaded.length){
-                setInfoBar(hu
-                    ?'Minták: nem találom a samples/ mappát (ellenőrizd az URL-t és a fájlneveket).'
-                    :'Samples: could not load files from samples/ (check URL and filenames).',null);
-                return;
-            }
-            stripBuiltinSamplesLibrariesFromState();
-            let st=readLibrariesState();
-            const singleEmpty=st.libraries.length===1&&st.libraries.every(L=>!(L.entries||[]).length);
-            const prevActive=st.activeLibIndex|0;
-            st.libraries.unshift({id:'lib_builtin_samples',name:sampleLibName,entries:[]});
-            st.activeLibIndex=0;
-            st.activeEntryIndex=0;
-            saveLibrariesState(st);
-            for(const {rel,xml} of loaded){
-                const fname=rel.split('/').pop()||'sample.mxl';
-                addScoreToLibrary(fname,xml);
-            }
-            st=readLibrariesState();
-            if(!singleEmpty){
-                st.activeLibIndex=Math.min(prevActive+1,st.libraries.length-1);
-                saveLibrariesState(st);
-            }
-            try{localStorage.setItem(LS_BUILTIN_SAMPLES_SEEDED,'1');}catch(e){}
-            await clearRepertoarSessionScoreStorage();
-            updateLibraryOledText();
-            refreshScoreLibraryListUI();
-        }catch(e){console.warn('maybeSeedBuiltinSamples',e);}
-    }
-    async function tryLoadFirstActiveLibraryEntryIfNoScore(){
-        if(osmdInstance)return;
-        const st=readLibrariesState();
-        const lib=getActiveLibrary(st);
-        const ent=lib.entries||[];
-        if(!ent.length)return;
-        let ix=st.activeEntryIndex|0;
-        if(ix<0||ix>=ent.length)ix=0;
-        await loadLibraryEntryById(ent[ix].id);
     }
     function ensureScoreInLibrary(title,xml){
         const xmlStr=String(xml||'');
@@ -2767,10 +2624,6 @@
     let demoPlaying=false,demoTimeouts=[],demoSources=[],scoreDemoMidiOffByNote=new Map();
     let demoLaunchGen=0,demoAwaitMidi=false,lastDemoArmUiMs=0;
     let demoVisualScore=true,demoVisualKeys=true;
-    /** OSMD könyvnézet / render lezáruljon DEMO előtt (1→2 oszlop vagy már 2 oszlop: SVG/paint is készüljön). */
-    const DEMO_SCORE_LAYOUT_SETTLE_MS=2000;
-    /** AudioContext + első hang ütemezése a settle után (a fenti ms már ad időt a layoutnak). */
-    const DEMO_SCORE_START_LEAD_SEC=0.55;
     let scorePedalEvents=[],demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
     let scoreMode=true,osmdScoreTheme='dark',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
     let scoreOsmdFollowSystemKey='';
@@ -2942,14 +2795,6 @@
                         return;
                     }
                 }
-                if(scoreMode){
-                    await new Promise(r=>setTimeout(r,DEMO_SCORE_LAYOUT_SETTLE_MS));
-                    if(myGen!==demoLaunchGen){demoAwaitMidi=false;return;}
-                }
-                try{
-                    if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
-                }catch(e){}
-                await new Promise(r=>setTimeout(r,60));
                 demoPlaying=true;document.getElementById('btnDemo').classList.add('active');
                 if(scoreMode)_playScoreDemo(myGen);
             };
@@ -3221,9 +3066,7 @@
         syncScoreLayoutPopupChrome();
         void (async()=>{
             try{
-                await maybeSeedBuiltinSamples();
                 await tryRestorePersistedScoreSession();
-                if(!osmdInstance)await tryLoadFirstActiveLibraryEntryIfNoScore();
                 if(!osmdInstance)applyWorkshopScoreShellBeforeFirstLoad();
             }catch(e){console.warn('restore score session',e);}
         })();
@@ -4746,12 +4589,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             return;
         }
         merged.forEach(finalizeMergedStepPlayInfos);
-        /* Teljes kottánál is true: az első *lejátszott* lépés legyen t=0-nál. Ha false lenne, az OSMD
-           abszolút ideje (pickup / üres ütemek / belső offset) gyakran 1 ütemnyi felesleges csendet ad —
-           úgy hangzik, mintha az 1. ütemet átugrotta volna a DEMO. */
-        assignPlaybackSecondsToMergedSteps(merged,true);
-        try{if(audioCtx.state==='suspended')void audioCtx.resume();}catch(e){}
-        const tBase=audioCtx.currentTime+DEMO_SCORE_START_LEAD_SEC;
+        assignPlaybackSecondsToMergedSteps(merged,isPracticeRangeActive());
+        const LEAD=0.15;
+        const tBase=audioCtx.currentTime+LEAD;
         snapMetroToBeat0(tBase);
         clearDemoFlashOnKeys();
         let maxOff=0;
@@ -4770,16 +4610,12 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             maxOff=Math.max(maxOff,it.t+0.05);
         });
         const tieRunSec=new Map();
-        /* tieCont: belső zongorán újraütés, kivéve ha a következő esemény nagyon messze van (hosszú kötött hang egy lépésben).
-           A ~0,38 s küszöb lassú tempónál / nagyobb lépésközön elnémította a kötött nyolcadokat (pl. Beethoven V.). */
-        const DEMO_TIE_SUPPRESS_REARTIC_IF_STEP_SEC=2.4;
         for(let ei=0;ei<merged.length;ei++){
             const st=merged[ei];
             const tb=typeof st.stepBpm==='number'&&st.stepBpm>0?st.stepBpm:bpm;
             const tOn=tBase+st.tSecStart;
             const nextStart=ei+1<merged.length?merged[ei+1].tSecStart:st.tSecStart+(st.durQ||1)*60/Math.max(1,tb);
-            const stepWidthSec=Math.max(0,nextStart-st.tSecStart);
-            const flashMs=Math.min(Math.max(50,stepWidthSec*1000*0.88),440);
+            const flashMs=Math.min(Math.max(50,(nextStart-st.tSecStart)*1000*0.88),440);
             const active=st.playInfos.filter(p=>{
                 const rh=p.staffIndex<=0;
                 if(rh&&!activeRH)return false;
@@ -4788,7 +4624,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             });
             let chordDurMaxSec=0;
             for(const p of active){
-                if(!p.tieCont)
+                if(!p.tieCont&&!p.tieOut)
                     chordDurMaxSec=Math.max(chordDurMaxSec,(Math.max(1/960,p.durQ)*60)/Math.max(1,tb));
             }
             const uniqOn=[...new Set(active.filter(p=>!p.tieCont).map(p=>p.midi&127))];
@@ -4802,18 +4638,14 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     const db=document.getElementById('metroBpmDisplay');
                     if(db)db.innerText=bpm;
                 }
-                if(demoInternalSamplesWanted()){
+                if(demoInternalSamplesWanted()&&chordDurMaxSec>0){
                     for(const p of active){
-                        if(p.tieCont&&stepWidthSec>=DEMO_TIE_SUPPRESS_REARTIC_IF_STEP_SEC)continue;
-                        const rawD=(Math.max(1/960,p.durQ)*60)/Math.max(1,tb);
-                        const cap=stepWidthSec>0.02?stepWidthSec*0.98:null;
-                        const playDur=Math.max(0.1,cap!=null?Math.min(rawD,cap):rawD);
-                        playScoreDemoInternalNote(p.midi&127,playDur,tOn,pbGen);
+                        if(!p.tieCont&&!p.tieOut)
+                            playScoreDemoInternalNote(p.midi&127,chordDurMaxSec,tOn,pbGen);
                     }
                 }
                 if(demoVisualKeys){
-                    active.forEach(p=>{
-                        if(p.tieCont&&stepWidthSec>=DEMO_TIE_SUPPRESS_REARTIC_IF_STEP_SEC)return;
+                    active.filter(p=>!p.tieCont&&!p.tieOut).forEach(p=>{
                         const mm=p.midi&127;
                         const k=document.getElementById('k-'+mm);
                         if(!k)return;
