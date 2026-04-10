@@ -756,7 +756,7 @@
 <script>
     // ── Language ──────────────────────────────────────────────────────────────
     let currentLang='EN';
-    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY','REPERTOIRE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY','REPERTOÁR']};
+    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','REPERTOIRE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','REPERTOÁR']};
     const MODAL_STRINGS={
         EN:{
             'txt-infoTitle': 'Repertoire module — guide',
@@ -3041,17 +3041,16 @@
             requestAnimationFrame(()=>{void osmdFitWidth();});
         }
     });
-    // ── Modul váltó (7. slot = ez az oldal) ────────────────────────────────────
+    // ── Modul váltó (6. slot = Repertoár / ez az oldal) ─────────────────────────
     const modules=[
         {name:'EAR TRAIN',url:'hallasfejleszto.html'},
         {name:'SIGHT READ',url:'kottaolvasas.html'},
         {name:'CHORDS',url:'akkordok.html'},
         {name:'SCALES',url:'skalak_22.html'},
         {name:'HANON',url:'hanon.html'},
-        {name:'CZERNY',url:'czerny.html'},
         {name:'SCORE',url:''}
     ];
-    let currentModuleIdx=6;
+    let currentModuleIdx=5;
     function cycleModule(dir){
         if(helpActive)return;
         currentModuleIdx=(currentModuleIdx+dir+modules.length)%modules.length;

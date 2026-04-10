@@ -425,16 +425,15 @@
 
     // ── MODULE VÁLTÓ ──
     const MODULE_NAMES = {
-        EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
-        HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
+        EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON'],
+        HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON']
     };
     const modules = [
         {url:'hallasfejleszto.html'},
         {url:'kottaolvasas.html'},
         {url:'akkordok.html'},
         {url:'skalak.html'},
-        {url:'hanon.html'},
-        {url:'czerny.html'}
+        {url:'hanon.html'}
     ];
     let currentModuleIdx = 0;
     function cycleModule(dir) {

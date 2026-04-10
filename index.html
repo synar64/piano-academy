@@ -268,14 +268,13 @@ const MODS=[
  {id:'akkordok',url:'akkordok.html',icon:'🎹',diff:'i',xp:25},
  {id:'skalak',url:'skalak.html',icon:'🎵',diff:'i',xp:20},
  {id:'hanon',url:'hanon.html',icon:'💪',diff:'a',xp:30},
- {id:'czerny',url:'czerny.html',icon:'🎼',diff:'i',xp:25},
  {id:'repertoar',url:'repertoar.html',icon:'📄',diff:'a',xp:30},
 ];
 
 const T={
  EN:{
   badge:{b:'Beginner',i:'Intermediate',a:'Advanced'},lbl:'Last visited',
-  cards:[{t:'Ear Training',d:'Identify notes and intervals purely by ear.'},{t:'Sight Reading',d:'Practice reading notes from the staff in real time.'},{t:'Chords',d:'Learn chord shapes, inversions and functional notation.'},{t:'Scales',d:'Master all scales and fingering in every key.'},{t:'Hanon',d:'Virtuoso finger exercises for technique and independence.'},{t:'Czerny',d:'Ten etudes from Op. 599 — build coordination, articulation and independence between both hands.'},{t:'Repertoire',d:'Load your own MusicXML / MXL scores — link a folder or import files. Practice step-by-step or play along with Demo.'}],
+  cards:[{t:'Ear Training',d:'Identify notes and intervals purely by ear.'},{t:'Sight Reading',d:'Practice reading notes from the staff in real time.'},{t:'Chords',d:'Learn chord shapes, inversions and functional notation.'},{t:'Scales',d:'Master all scales and fingering in every key.'},{t:'Hanon',d:'Virtuoso finger exercises for technique and independence.'},{t:'Repertoire',d:'Load your own MusicXML / MXL scores — link a folder or import files. Practice step-by-step or play along with Demo.'}],
   stl:'My Results',sts:'XP & Progress',stm:'Modules',stc:'Close',rstm:'Reset all progress and XP?',lvs:['Beginner','Student','Practitioner','Musician','Virtuoso','Master'],
   atl:'Login',atr:'Register',als:'Log In',ars:'Create Account',acl:'Cancel',
   spl:'Support',sps:'Akíra Piano Academy',spi:'Akíra Piano Academy is a free educational project. Your support helps keep it maintained.',
@@ -284,7 +283,7 @@ const T={
  },
  HU:{
   badge:{b:'Kezdő',i:'Haladó',a:'Mester'},lbl:'Legutóbb nyitott',
-  cards:[{t:'Hallásfejlesztő',d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},{t:'Kottaolvasás',d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},{t:'Akkordok',d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},{t:'Skálák',d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},{t:'Hanon',d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},{t:'Czerny',d:'Tíz etűd az Op. 599-ből — fejleszti a két kéz koordinációját, artikulációját és önállóságát.'},{t:'Repertoár',d:'Töltsd be saját MusicXML / MXL kottáidat — jelölj ki mappát vagy importálj fájlokat. Gyakorolj lépésenként vagy játssz együtt a Demóval.'}],
+  cards:[{t:'Hallásfejlesztő',d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},{t:'Kottaolvasás',d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},{t:'Akkordok',d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},{t:'Skálák',d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},{t:'Hanon',d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},{t:'Repertoár',d:'Töltsd be saját MusicXML / MXL kottáidat — jelölj ki mappát vagy importálj fájlokat. Gyakorolj lépésenként vagy játssz együtt a Demóval.'}],
   stl:'Eredményeim',sts:'XP és előrehaladás',stm:'Modulok',stc:'Bezárás',rstm:'Biztosan törlöd az összes előrehaladást?',lvs:['Kezdő','Tanuló','Gyakorló','Zenész','Virtuóz','Mester'],
   atl:'Bejelentkezés',atr:'Regisztráció',als:'Bejelentkezés',ars:'Fiók létrehozása',acl:'Mégse',
   spl:'Támogatás',sps:'Akíra Piano Academy',spi:'Az Akíra Piano Academy egy ingyenes oktatási projekt. Támogatásod segíti a fejlesztés folytatását.',
@@ -297,11 +296,11 @@ const LM_DATA = {
  HU: {
   t:'Tudj meg többet', s:'Akíra Piano Academy', cl:'Bezárás',
   h1:'Mi ez az oldal?', h2:'Hogyan jött létre?', h3:'Hogyan kezdj hozzá?', h4:'Technikai tudnivalók', h5:'A modulok részletesen',
-  about:'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak. Hét interaktív modul fedi le a zongora tanulás legfontosabb területeit: hallásfejlesztés, kottaolvasás, akkordok, skálák, technika, Czerny etűdök és repertoár (MusicXML). Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel és vizuális előrehaladási jelzéssel.',
+  about:'Az Akíra Piano Academy egy ingyenes, böngészőalapú zongora gyakorló alkalmazás — elsősorban kezdőknek és önállóan tanulóknak. Hat interaktív modul fedi le a zongora tanulás legfontosabb területeit: hallásfejlesztés, kottaolvasás, akkordok, skálák, technika (Hanon) és repertoár (MusicXML). Minden modul különböző nehézségi szintű feladványokat kínál azonnali értékeléssel és vizuális előrehaladási jelzéssel.',
   pills:['🎹 Kezdőknek', '🎵 Ingyenes', '🌐 Böngészőben fut', '🎹 MIDI támogatás', '🇭🇺 Magyar nyelvű'],
   story:'Autodidakta zongoratanuló vagyok — és hamar szembesültem azzal, hogy a megfizethető, igazán használható gyakorlóeszközök száma meglepően kevés. Ezt az alkalmazást azért hoztam létre, hogy azt nyújtsa amit én is kerestem. Claude és Gemini AI asszisztensek segítségével készült.',
   steps:[
-   {icon:'1️⃣', text:'Nyiss meg egy modult. Kattints bármelyik kártyára a főoldalon. Ha teljesen kezdő vagy, kezdd a Hallásfejlesztővel vagy a Czerny-vel.'},
+   {icon:'1️⃣', text:'Nyiss meg egy modult. Kattints bármelyik kártyára a főoldalon. Ha teljesen kezdő vagy, kezdd a Hallásfejlesztővel vagy a Kottaolvasással.'},
    {icon:'2️⃣', text:'Nyomd meg a Start gombot. A középső START gomb indítja a feladatot. A STOP befejezi a session-t és megmutatja az eredményeket.'},
    {icon:'3️⃣', text:'Használd a segítségeket. Kapcsold be a Hints-et a hangnevekhez, a Keys-t a billentyű kiemeléshez, vagy a Fingers-t az ujjszámokhoz.'},
    {icon:'4️⃣', text:'Olvasd el a ? Súgót. Nyomd meg a ? gombot, majd kattints bármely vezérlőre a leírásért. Az ⓘ gomb a modul részletes ismertetőjét nyitja meg.'}
@@ -319,18 +318,17 @@ const LM_DATA = {
    {icon:'🎹', diff:'Haladó', title:'Akkordok', diff_color:'#ffaa44', desc:'Egy akkord neve megjelenik az OLED kijelzőn — játszd le az összes hangját egyszerre a billentyűzeten.', details:['Keys: kiemeli az akkord hangjait','Wheel: megnyitja a kvintkor tárcsát','Alap szint: dúr és moll hármashangzatok','Fordítások szint: első és második fordítás','Szeptimek szint: szeptimakkordok']},
    {icon:'🎵', diff:'Haladó', title:'Skálák', diff_color:'#ffaa44', desc:'Egy skála jelenik meg a kottán — játszd le alulról felfelé és visszafelé. Hivatalos ujjrend is megjelenik.', details:['Hints: hangneveket mutat','Keys: LED vezérlés','Fingers: hivatalos ujjszámokat (1-5) mutat','Oktávok: váltás 1 és 2 oktáv között','Wheel: kvintkor tárcsa azonnali váltáshoz']},
    {icon:'💪', diff:'Mester', title:'Hanon', diff_color:'#cc88ff', desc:'Klasszikus Hanon ujjgyakorlatok kottán ábrázolva valós idejű BPM méréssel. A stabilitási sáv megmutatja mennyire egyenletesen játszol.', details:['BPM kijelző: valós idejű tempómérés','Stabilitás sáv: egyenletességet mér','Ujj tracker: megmutatja melyik ujj okozza a lassulást']},
-   {icon:'🎼', diff:'Haladó', title:'Czerny Op. 599', diff_color:'#ffaa44', desc:'Tíz etűd Czerny Op. 599-ből (No. 1–8, 24, 33). A legtöbb C-pozícióban marad, a 33. etűd bevezeti az első pozícióváltást. Mindegyik más technikát fejleszt: artikuláció, koordináció, legato, Alberti basszus és kézváltás.', details:['No. 1–3: alapvető koordináció és kézfüggetlenség','No. 4: skálafutam ujjáttevéssel','No. 5–6: staccato és bal kéz dallam','No. 7–8: kézváltás és legato','No. 24: Alberti basszus kíséret','No. 33: első pozícióváltás (C→G)','Demo: meghallgathatod az etűdöt','Hints/Segéd: hangnevek → ujjrend → LED']},
    {icon:'📄', diff:'Mester', title:'Repertoár', diff_color:'#cc88ff', desc:'Saját MusicXML vagy MXL kották, könyvtár, ütemtartomány és könyvjelzők. Lépésenkénti START gyakorlás és teljes kottás DEMO — belső hanggal vagy MIDI-vel.', details:['Kottakönyvtár és mappa-link (Chrome/Edge)','Ütemtartomány: kattintás a kottán vagy párbeszédablak','Könyvjelzők: görgetés, spread, tartomány mentése','Jobb/bal kéz külön; belső hang és MIDI kimenet']}
   ]
  },
  EN: {
   t:'Learn More', s:'Akíra Piano Academy', cl:'Close',
   h1:'What is this?', h2:'How it was made', h3:'How to get started', h4:'Technical notes', h5:'The modules',
-  about:'Akíra Piano Academy is a free, browser-based piano practice application — designed primarily for beginners and self-learners. Seven interactive modules cover every essential area of piano education: ear training, sight reading, chords, scales, technique, etudes, and repertoire (MusicXML). Each module offers tasks at multiple difficulty levels with instant scoring and a visual progress tracker.',
+  about:'Akíra Piano Academy is a free, browser-based piano practice application — designed primarily for beginners and self-learners. Six interactive modules cover every essential area of piano education: ear training, sight reading, chords, scales, technique (Hanon), and repertoire (MusicXML). Each module offers tasks at multiple difficulty levels with instant scoring and a visual progress tracker.',
   pills:['🎹 For beginners', '🎵 Free', '🌐 Browser-based', '🎹 MIDI support', '🇬🇧 English UI'],
   story:'I am a self-taught piano learner — and quickly realized that affordable, genuinely useful practice tools are surprisingly rare. I built this application to provide exactly what I was looking for myself. It was created with the help of Claude and Gemini AI assistants.',
   steps:[
-   {icon:'1️⃣', text:'Open a module. Click any card on the main page. Start with Ear Training or Czerny if you are a complete beginner.'},
+   {icon:'1️⃣', text:'Open a module. Click any card on the main page. Start with Ear Training or Sight Reading if you are a complete beginner.'},
    {icon:'2️⃣', text:'Press Start. The large START button in the center launches the exercise. STOP ends the session and shows your results.'},
    {icon:'3️⃣', text:'Use the helpers. Turn on Hints to see note names, Keys to light up the piano, or Fingers for fingering numbers. All optional.'},
    {icon:'4️⃣', text:'Read the ? Help. Press the ? button then click any control to see what it does. The ⓘ Info button opens the full module guide.'}
@@ -348,7 +346,6 @@ const LM_DATA = {
    {icon:'🎹', diff:'Intermediate', title:'Chords', diff_color:'#ffaa44', desc:'A chord symbol appears on the OLED display — play all the notes simultaneously on the keyboard. Includes a draggable Circle of Fifths for key navigation.', details:['Keys: highlights all chord tones on the keyboard','Wheel: opens the Circle of Fifths','Level Basic: major and minor triads','Level Inversions: first and second inversions','Level Sevenths: dominant, major and minor seventh chords']},
    {icon:'🎵', diff:'Intermediate', title:'Scales', diff_color:'#ffaa44', desc:'A scale is shown on the staff — play it from bottom to top and back down. Official fingering is included for both hands.', details:['Hints: shows note names on the staff','Keys: LED guide highlights the next key to press','Fingers: displays official fingering numbers (1-5)','Octaves: switch between 1 and 2 octave range','Wheel: Circle of Fifths for instant key selection']},
    {icon:'💪', diff:'Advanced', title:'Hanon', diff_color:'#cc88ff', desc:'Classic Hanon finger exercises rendered on the staff with real-time BPM tracking. A stability bar shows how evenly you play.', details:['BPM display: shows your current playing speed in real time','Stability bar: measures timing evenness across all fingers','Finger tracker: highlights the finger that causes the most slowdowns','Multiple exercises: cycle through different Hanon patterns']},
-   {icon:'🎼', diff:'Intermediate', title:'Czerny Op. 599', diff_color:'#ffaa44', desc:'Ten etudes from Czerny\'s Op. 599 (No. 1–8, 24, 33). Most stay in C position; No. 33 introduces the first position shift. Each etude targets a different technique: articulation, coordination, legato, Alberti bass and hand alternation.', details:['No. 1–3: basic coordination and hand independence','No. 4: scale runs with thumb crossing','No. 5–6: staccato and LH melody','No. 7–8: hand alternation and legato','No. 24: Alberti bass accompaniment','No. 33: first position shift (C→G)','Demo: hear the etude with keyboard LED highlights','Hints: cycles through note names → fingering → LED']},
    {icon:'📄', diff:'Advanced', title:'Repertoire', diff_color:'#cc88ff', desc:'Bring your own MusicXML or MXL files, library, measure ranges, and bookmarks. Step-by-step START practice and full-score DEMO — built-in audio or MIDI.', details:['Score library and folder link (Chrome/Edge)','Measure range: click the score or use the dialog','Bookmarks save scroll, spread, and range','RH/LH toggles; built-in sound and MIDI out']}
   ]
  }

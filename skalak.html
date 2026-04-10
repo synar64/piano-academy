@@ -377,7 +377,7 @@
 <script>
     // ── Language ──────────────────────────────────────────────────────────────
     let currentLang='EN';
-    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']};
+    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON']};
     const MODAL_STRINGS={
         EN:{
             'txt-infoTitle': 'Scales — Module Guide',
@@ -1059,7 +1059,7 @@
         selectCategory(curCat);
     }
     function closePatchBrowser(){document.getElementById('patchBrowserModal').style.display='none';}
-    const modules=[{name:'EAR TRAIN',url:'hallasfejleszto.html'},{name:'SIGHT READ',url:'kottaolvasas.html'},{name:'CHORDS',url:'akkordok.html'},{name:'SCALES',url:'skalak.html'},{name:'HANON',url:'hanon.html'},{name:'CZERNY',url:'czerny.html'}];
+    const modules=[{name:'EAR TRAIN',url:'hallasfejleszto.html'},{name:'SIGHT READ',url:'kottaolvasas.html'},{name:'CHORDS',url:'akkordok.html'},{name:'SCALES',url:'skalak.html'},{name:'HANON',url:'hanon.html'}];
     let currentModuleIdx=3;
     function cycleModule(dir){if(helpActive)return;currentModuleIdx=(currentModuleIdx+dir+modules.length)%modules.length;document.getElementById('lcdModuleText').innerText=MODULE_NAMES[currentLang][currentModuleIdx];}
     function loadModule(){if(helpActive)return;if(currentModuleIdx!==3)window.location.href=modules[currentModuleIdx].url;}

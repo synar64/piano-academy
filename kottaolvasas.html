@@ -275,10 +275,10 @@
     const SIGHT_TREBLE_MIN_MIDI=60;
     const SIGHT_BASS_MAX_MIDI=59;
     const MODULE_NAMES = {
-        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','CZERNY'],
-        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','CZERNY']
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON']
     };
-    const modules=[{url:'hallasfejleszto.html'},{url:'kottaolvasas.html'},{url:'akkordok.html'},{url:'skalak.html'},{url:'hanon.html'},{url:'czerny.html'}];
+    const modules=[{url:'hallasfejleszto.html'},{url:'kottaolvasas.html'},{url:'akkordok.html'},{url:'skalak.html'},{url:'hanon.html'}];
 
     let isRunning=false, showNames=false, showKeys=false, helpActive=false, audioOn=true;
     let activeRH=true, activeLH=true, currentMode='manual';
@@ -771,8 +771,8 @@
     }
     const C_LINES='#4a4a4a',C_BRIGHT='#c3c3c3',C_PAST='rgba(179,230,255,0.45)',C_ACTIVE='#b3e6ff',C_ERR='#ff4444';
     /** E felett 8va (egy oktávval lejjebb rajzolás + vonalas jel); e alatt 8vb */
-    const MIDI_8VA_THRESHOLD=83;  // B5 — C6-tól (84) felfelé 8va
-    const MIDI_8VB_THRESHOLD=36;  // C3-tól (36) lefelé 8vb
+    const MIDI_8VA_THRESHOLD=82;
+    const MIDI_8VB_THRESHOLD=38;
 
     function sightReadLogicalHeight(){
         return(activeRH&&activeLH)?KOTTA_BASE_H_GRAND:KOTTA_BASE_H_SINGLE;
