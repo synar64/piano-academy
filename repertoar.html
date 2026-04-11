@@ -173,7 +173,7 @@
         .key-glow { position:absolute; top:0; cursor:pointer; }
         .key-glow.pressed::after { content:''; position:absolute; pointer-events:none; z-index:150; top:0; left:0; width:100%; height:100%; border-radius:0 0 4px 4px; background:rgba(0,0,0,0.11); box-shadow:inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top:6px; left:25%; width:50%; height:77%; border-radius:2px; background:rgba(255,255,255,0.36); z-index:40; }
-        .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:9999; }
+        .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; pointer-events:none; z-index:9999; }
         .key-glow.scale-hint .key-led { opacity:0.4; }
         /* DEMO billentyű-villanás: jobb kéz = kék, bal kéz = pasztell narancs */
         .key-glow.demo-flash .key-led,
