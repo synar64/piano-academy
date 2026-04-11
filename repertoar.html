@@ -3507,33 +3507,65 @@
     function graphicalMeasureClientUnionRect(gm){
         if(!gm)return null;
         const ses=gm.staffEntries||gm.StaffEntries;
-        if(!ses)return null;
         let minL=1e9,minT=1e9,maxR=-1e9,maxB=-1e9;
         let any=false;
-        for(let si=0;si<ses.length;si++){
-            const se=ses[si];
-            const gves=se.graphicalVoiceEntries||se.GraphicalVoiceEntries;
-            if(!gves)continue;
-            for(let gi=0;gi<gves.length;gi++){
-                const gve=gves[gi];
-                const nlist=gve.notes||gve.Notes;
-                if(!nlist)continue;
-                for(let ni=0;ni<nlist.length;ni++){
-                    const gnn=nlist[ni];
-                    if(!gnn||typeof gnn.getSVGGElement!=='function')continue;
-                    const el=gnn.getSVGGElement();
-                    if(!el)continue;
-                    const r=el.getBoundingClientRect();
-                    if(r.width<1&&r.height<1)continue;
-                    any=true;
-                    minL=Math.min(minL,r.left);
-                    minT=Math.min(minT,r.top);
-                    maxR=Math.max(maxR,r.right);
-                    maxB=Math.max(maxB,r.bottom);
+        // 1) Try note SVG elements
+        if(ses){
+            for(let si=0;si<ses.length;si++){
+                const se=ses[si];
+                const gves=se.graphicalVoiceEntries||se.GraphicalVoiceEntries;
+                if(!gves)continue;
+                for(let gi=0;gi<gves.length;gi++){
+                    const gve=gves[gi];
+                    const nlist=gve.notes||gve.Notes;
+                    if(!nlist)continue;
+                    for(let ni=0;ni<nlist.length;ni++){
+                        const gnn=nlist[ni];
+                        if(!gnn||typeof gnn.getSVGGElement!=='function')continue;
+                        const el=gnn.getSVGGElement();
+                        if(!el)continue;
+                        const r=el.getBoundingClientRect();
+                        if(r.width<1&&r.height<1)continue;
+                        any=true;
+                        minL=Math.min(minL,r.left);
+                        minT=Math.min(minT,r.top);
+                        maxR=Math.max(maxR,r.right);
+                        maxB=Math.max(maxB,r.bottom);
+                    }
                 }
             }
         }
+        // 2) Fallback: use the parent StaffLine's SVG bounding box for vertical range,
+        //    and the measure's PositionAndShape for horizontal range
+        if(!any){
+            try{
+                const psl=gm.parentStaffLine||gm.ParentStaffLine;
+                if(psl){
+                    const slSvg=osmdFirstSvgInStaffLine(psl);
+                    if(slSvg){
+                        const slR=slSvg.getBoundingClientRect();
+                        if(slR.height>2){minT=slR.top;maxB=slR.bottom;any=true;}
+                    }
+                    // Use PositionAndShape for the measure's X boundaries
+                    const ps=gm.PositionAndShape||gm.positionAndShape;
+                    if(ps&&any){
+                        const pslPs=psl.PositionAndShape||psl.positionAndShape;
+                        // Try to get the stave element for coordinate mapping
+                        const stave=gm.stave||gm.Stave;
+                        if(stave&&typeof stave.getBoundingClientRect==='function'){
+                            const sr=stave.getBoundingClientRect();
+                            if(sr.width>2){minL=sr.left;maxR=sr.right;}
+                        }
+                    }
+                }
+            }catch(e){}
+        }
         if(!any)return null;
+        // Ensure minimum reasonable width
+        if(maxR-minL<10){
+            const center=(minL+maxR)/2;
+            minL=center-30;maxR=center+30;
+        }
         return{left:minL,top:minT,right:maxR,bottom:maxB};
     }
     function osmdFindMeasureNumberAtClientPoint(cx,cy){
@@ -3543,6 +3575,7 @@
         const pages=g.MusicPages||g.musicPages;
         if(!pages||!pages.length)return null;
         const pad=8;
+        let closestMn=null,closestDist=1e9;
         for(let pi=0;pi<pages.length;pi++){
             const page=pages[pi];
             const systems=page.MusicSystems||page.musicSystems;
@@ -3569,14 +3602,24 @@
                             }
                         }
                         if(!u)continue;
+                        const mn=psm.MeasureNumber!=null?psm.MeasureNumber:(psm.measureNumber!=null?psm.measureNumber:null);
+                        if(typeof mn!=='number'||!isFinite(mn)||mn<1)continue;
+                        // Exact hit
                         if(cx>=u.left-pad&&cx<=u.right+pad&&cy>=u.top-pad&&cy<=u.bottom+pad){
-                            const mn=psm.MeasureNumber!=null?psm.MeasureNumber:(psm.measureNumber!=null?psm.measureNumber:null);
-                            if(typeof mn==='number'&&isFinite(mn)&&mn>=1)return mn;
+                            return mn;
+                        }
+                        // Track closest measure on the same vertical band (within Y range)
+                        if(cy>=u.top-pad&&cy<=u.bottom+pad){
+                            const centerX=(u.left+u.right)/2;
+                            const dist=Math.abs(cx-centerX);
+                            if(dist<closestDist){closestDist=dist;closestMn=mn;}
                         }
                     }
                 }
             }
         }
+        // Fallback: if click was on the same staff line but between notes, return closest measure
+        if(closestMn!=null&&closestDist<200)return closestMn;
         return null;
     }
     async function applyPracticeRangeMeasures(lo,hi){
