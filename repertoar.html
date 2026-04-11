@@ -173,7 +173,7 @@
         .key-glow { position:absolute; top:0; cursor:pointer; }
         .key-glow.pressed::after { content:''; position:absolute; pointer-events:none; z-index:150; top:0; left:0; width:100%; height:100%; border-radius:0 0 4px 4px; background:rgba(0,0,0,0.11); box-shadow:inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top:6px; left:25%; width:50%; height:77%; border-radius:2px; background:rgba(255,255,255,0.36); z-index:40; }
-        .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; pointer-events:none; z-index:9999; }
+        .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:9999; }
         .key-glow.scale-hint .key-led { opacity:0.4; }
         /* DEMO billentyű-villanás: jobb kéz = kék, bal kéz = pasztell narancs */
         .key-glow.demo-flash .key-led,
@@ -707,8 +707,19 @@
                                     <button type="button" class="nav-disk-btn" id="btnLibNext" onclick="if(!helpActive) void cyclePieceInActiveLibrary(1)" data-help="">▼</button>
                                 </div>
                             </div>
-                            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;">
-                                <button type="button" id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;flex-shrink:0;">DEMO</button>
+                            <div style="display:flex;flex-direction:row;align-items:center;gap:4px;flex-shrink:0;">
+                                <!-- Play/Stop gomb -->
+                                <button type="button" id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playScaleRhythmDemo()" data-help="" style="width:42px;height:38px;font-size:14px;padding:0;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                                    <svg id="demoPlayIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+                                </button>
+                                <!-- Speed kijelző + nyilak -->
+                                <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) adjustDemoSpeed(0.1)" title="Speed up" style="width:22px;height:22px;">▲</button>
+                                    <div id="demoSpeedBox" onclick="if(!helpActive) resetDemoSpeedSlider()" style="width:44px;height:38px;background:#111;display:flex;align-items:center;justify-content:center;border:1px solid #050505;border-radius:3px;box-shadow:inset 0 2px 5px rgba(0,0,0,0.8);cursor:pointer;">
+                                        <span id="demoSpeedDisplay" style="font-family:'Share Tech Mono';font-size:20px;color:#b3e6ff;font-weight:bold;">1.0</span>
+                                    </div>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) adjustDemoSpeed(-0.1)" title="Slow down" style="width:22px;height:22px;">▼</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -775,7 +786,7 @@
             'txt-infoScoresTitle': 'Score files & sources',
             'txt-infoScoresBody': 'This module only reads MusicXML (.xml, .musicxml) and compressed .mxl (ZIP with MusicXML). There is no PDF import — PDF is not machine-readable for practice, cursor, MIDI, or measure range; MusicXML is easy to export from any notation app.\n\nLoad:\n• Score file icon (right toolbar, document with staff lines) — pick a file; opens at once.\n• Library (tap score title) — + File / + Batch copies into browser storage; Link folder (Chrome/Edge) lists every .xml / .mxl in a folder you choose.\n• URL — paste a direct link to .musicxml or .mxl. Many sites block cross-site downloads (CORS); saving the file and using the score file icon is often easier.\n\nWhere to get MusicXML:\n• MuseScore Desktop — File → Export → MusicXML (licensing varies by piece).\n• IMSLP and other libraries — choose a MusicXML edition when available, or export from MuseScore / Finale / Dorico / etc.\n• Flat.io, Noteflight, and similar — export MusicXML, then open here.',
             'txt-howTitle':  'Practice flow',
-            'txt-howBody':   'START — step-by-step practice: play only the notes the score highlights, in order. Spacebar starts or stops.\nDEMO — the app plays the piece with the current measure highlighted and optional built-in piano sound. If book view uses one column, DEMO temporarily switches to two columns for smoother page scrolling, then restores your layout when DEMO ends.\n\nWhen a measure range is set (soft amber band on the score), START and DEMO work only in that range — not the whole piece.\nNext to the title display, ▲ / ▼ loads the previous or next piece in the library; tap the title to open the full library.\n\nThe sections below explain measure selection and bookmarks in more detail.',
+            'txt-howBody':   'START — step-by-step practice: play only the notes the score highlights, in order. Spacebar starts or stops.\nDEMO (▶) — the app plays the piece with the current measure highlighted and optional built-in piano sound. Use the ▲▼ arrows next to the ▶ button to adjust playback speed (0.3×–1.8×); tap the speed number to reset to 1.0×. If book view uses one column, DEMO temporarily switches to two columns for smoother page scrolling, then restores your layout when DEMO ends.\n\nWhen a measure range is set (soft amber band on the score), START and DEMO work only in that range — not the whole piece.\nNext to the title display, ▲ / ▼ loads the previous or next piece in the library; tap the title to open the full library.\n\nThe sections below explain measure selection and bookmarks in more detail.',
             'txt-infoMeasureGuideTitle': 'Measure range — choosing and clearing',
             'txt-infoMeasureGuideBody': 'What it does: limits START and DEMO to certain measures. The selected area is shown as a light amber tint on the score.\n\nHow to set the range:\n• Open the measure range dialog (staff-lines icon, top right of the 2×2 control block). Enter the first and last measure number, then tap OK.\n• Click-to-select on the score: turn ON the tilted pointer (top left of that block), or use the checkbox in the measure range dialog. It is OFF by default so normal clicks on the score do not change the selection.\n\nWith click-to-select ON:\n• One click on a measure — only that measure stays selected (previous selection is replaced).\n• Shift+click another measure — every measure from the one you last clicked up to the new click is included (you can extend the range in several steps).\n• Cmd+click (Mac) or Ctrl+click (Windows) — add or remove single measures without clearing the rest.\n\nHow to clear the range (whole piece again):\n• Tap ∅ bottom left of the 2×2 block — same as ∅ next to OK in the measure range dialog.\n• Bookmarks open from bottom right. Turning click-to-select OFF only stops further clicks from changing the range; it does not remove the amber band — use ∅ to clear the range.\n\nWhen you are done, turn click-to-select OFF if you do not want accidental changes.',
             'txt-infoBookmarksGuideTitle': 'Bookmarks B1 · B2 · B3',
@@ -813,7 +824,7 @@
             'txt-infoScoresTitle': 'Kottafájlok és források',
             'txt-infoScoresBody': 'A modul csak MusicXML (.xml, .musicxml) és tömörített .mxl (ZIP-ben MusicXML) fájlt tud megnyitni. PDF-et nem: gyakorlásra, kurzorra, MIDI-re és ütemtartományra a PDF nem alkalmas; MusicXML-et viszont a legtöbb kottaszerkesztőből egyszerűen exportálhatsz.\n\nBetöltés:\n• Kottafájl ikon a jobb oldali eszköztáron (dokumentum kottavonalakkal) — kiválasztod a fájlt, és azonnal megnyílik.\n• Könyvtár — kattints a kotta címére a kijelzőn; a + File / + Batch a böngésző tárhelyére másolja a fájlokat. A Link mappa (Chrome, Edge) egy kiválasztott mappa összes .xml és .mxl fájlját kilistázza.\n• URL — közvetlen .musicxml vagy .mxl cím. Sok szerver nem engedi a másik oldalról való letöltést (CORS); ilyenkor gyakran egyszerűbb letölteni a fájlt, majd a kottafájl ikonnal megnyitni.\n\nHonnan legyen MusicXML:\n• MuseScore (asztali) — Fájl → Exportálás → MusicXML (a darab licencétől függ, mit szabad).\n• IMSLP és más gyűjtemények — ha van MusicXML kiadás, azt válaszd, vagy exportálj más programból (MuseScore, Finale, Dorico stb.).\n• Flat.io, Noteflight és hasonlók — export MusicXML, majd megnyitás itt.',
             'txt-howTitle':  'Gyakorlás menete',
-            'txt-howBody':   'START — lépésről lépésre gyakorlod a kotta által kiemelt hangokat, a megadott sorrendben. Szóköz: indítás vagy leállítás.\nDEMO — az alkalmazás lejátsza a darabot: az aktuális ütem kiemelve látszik, a hangot pedig opcionálisan a beépített zongora adja. Ha a könyvet egy hasábban nézed, a DEMO alatt átmenetileg két hasábra vált a gördülékenyebb lapkövetés miatt; a DEMO végén visszaáll a korábbi nézet.\n\nHa be van állítva ütemtartomány (enyhe borostyánsárga szín a kottán), a START és a DEMO csak erre a szakaszra vonatkozik, nem az egész darabra.\nA cím melletti ▲ és ▼ az aktuális könyvtárban az előző vagy a következő darabra vált; a címre kattintva megnyílik a teljes könyvtár.\n\nA következő két fejezet részletesen elmagyarázza az ütemek kijelölését és a könyvjelzőket.',
+            'txt-howBody':   'START — lépésről lépésre gyakorlod a kotta által kiemelt hangokat, a megadott sorrendben. Szóköz: indítás vagy leállítás.\nDEMO (▶) — az alkalmazás lejátsza a darabot: az aktuális ütem kiemelve látszik, a hangot pedig opcionálisan a beépített zongora adja. A ▶ gomb melletti ▲▼ nyilakkal állítható a lejátszási sebesség (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Ha a könyvet egy hasábban nézed, a DEMO alatt átmenetileg két hasábra vált a gördülékenyebb lapkövetés miatt; a DEMO végén visszaáll a korábbi nézet.\n\nHa be van állítva ütemtartomány (enyhe borostyánsárga szín a kottán), a START és a DEMO csak erre a szakaszra vonatkozik, nem az egész darabra.\nA cím melletti ▲ és ▼ az aktuális könyvtárban az előző vagy a következő darabra vált; a címre kattintva megnyílik a teljes könyvtár.\n\nA következő két fejezet részletesen elmagyarázza az ütemek kijelölését és a könyvjelzőket.',
             'txt-infoMeasureGuideTitle': 'Ütemtartomány — kijelölés és törlés',
             'txt-infoMeasureGuideBody': 'Mire való: meghatározza, hogy a START és a DEMO a kotta mely ütemein dolgozzon. A kijelölt rész enyhén borostyánsárga háttérrel látszik.\n\nBeállítás:\n• Nyisd meg az ütemtartomány ablakot (vonalkás ikon a 2×2-es gombcsoport jobb felső mezőjében). Írd be az első és az utolsó ütem számát, majd koppints az OK gombra.\n• Egérrel a kottán: kapcsold be a ferde egérmutató ikont (bal felső mező ugyanabban a csoportban), vagy jelöld be ugyanezt az ütemtartomány ablakban. Alapból ki van kapcsolva, hogy véletlen kattintásra ne változzon a kijelölés.\n\nHa be van kapcsolva az egérrel választás:\n• Egy kattintás egy ütemre — csak az az ütem marad kijelölve (a korábbi kijelölés törlődik).\n• Shift és kattintás egy másik ütemre — minden ütem bekerül a két ütem között, az első kattintásodtól számítva (több lépésben is bővítheted a szakaszt).\n• Macen Cmd + kattintás, Windowson Ctrl + kattintás — egy-egy ütem külön be- vagy kikapcsolható a kijelölésből.\n\nKijelölés törlése (újra az egész darab):\n• A 2×2-es csoport bal alsó mezőjében a ∅ gomb (ugyanolyan színű, mint a többi ikon), vagy ugyanez az ütemtartomány ablakban az OK mellett. Ez törli a tartományt: a START és a DEMO ismét az egész kottára vonatkozik.\n• A könyvjelzőt a jobb alsó gomb nyitja. Ha kikapcsolod az egérrel választást, attól a borostyánsárga sáv még megmarad; a tartományt csak a ∅ gombbal törölheted.\n\nHa nem szeretnél többé a kottán kattintással módosítani a kijelölést, kapcsold ki az egérrel választást is.',
             'txt-infoBookmarksGuideTitle': 'Könyvjelzők B1 · B2 · B3',
@@ -859,7 +870,7 @@
             btnLibPrev:'Previous piece in the active library.',
             btnLibNext:'Next piece in the active library.',
             oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
-            btnDemo:'DEMO: plays the score with highlight. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
+            btnDemo:'▶ DEMO: plays the score with measure highlight. ▲▼ adjusts playback speed (0.3×–1.8×); tap the speed display to reset to 1.0×. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
             audioToggle:'Piano audio: built-in sampled piano on or off.',
             btnMeasureRange:'Measure range (top right of the 2×2 block): limits START and DEMO. Type numbers in the dialog, or use the pointer (top left) / checkbox to pick on the score (Shift / Ctrl+click).',
             btnMeasureClickPick:'Click-to-select (top left of the 2×2 block): OFF by default — ON shows green tint. Same as the checkbox in the measure range dialog.',
@@ -886,7 +897,7 @@
             btnLibPrev:'Előző darab az aktív könyvtárban.',
             btnLibNext:'Következő darab az aktív könyvtárban.',
             oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
-            btnDemo:'DEMO: lejátszás kiemeléssel. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
+            btnDemo:'▶ DEMO: lejátszás ütemkiemeléssel. ▲▼ a lejátszási sebesség állítása (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
             audioToggle:'Zongora hang: belső mintahang be vagy ki.',
             btnMeasureRange:'Ütemtartomány (2×2-es csoport jobb felső): START és DEMO határa. Számok az ablakban, vagy bal felső mutató / jelölőnégyzet + kotta (Shift / Ctrl+katt).',
             btnMeasureClickPick:'Egérrel választás (2×2 bal felső): alapból ki; bekapcsolva zöldes háttér. Ugyanaz, mint az ütemtartomány ablak jelölőnégyzete.',
@@ -2802,6 +2813,27 @@
     let demoPlaying=false,demoTimeouts=[],scoreDemoMidiOffByNote=new Map();
     let demoLaunchGen=0,demoAwaitMidi=false,lastDemoArmUiMs=0;
     let demoVisualScore=true,demoVisualKeys=true;
+    let demoSpeedFactor=1.0;
+
+    function adjustDemoSpeed(delta){
+        demoSpeedFactor=Math.round(Math.max(0.3,Math.min(1.8,demoSpeedFactor+delta))*10)/10;
+        const lbl=document.getElementById('demoSpeedDisplay');
+        if(lbl)lbl.textContent=demoSpeedFactor.toFixed(1);
+    }
+    function resetDemoSpeedSlider(){
+        demoSpeedFactor=1.0;
+        const lbl=document.getElementById('demoSpeedDisplay');
+        if(lbl)lbl.textContent='1.0';
+    }
+    function syncDemoButtonIcon(playing){
+        const icon=document.getElementById('demoPlayIcon');
+        if(!icon)return;
+        if(playing){
+            icon.innerHTML='<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>';
+        }else{
+            icon.innerHTML='<polygon points="6,3 20,12 6,21" fill="currentColor"/>';
+        }
+    }
     /** OSMD könyvnézet / render lezáruljon DEMO előtt (1→2 oszlop vagy már 2 oszlop: SVG/paint is készüljön). */
     const DEMO_SCORE_LAYOUT_SETTLE_MS=2000;
     /** AudioContext + első hang ütemezése a settle után (a fenti ms már ad időt a layoutnak). */
@@ -2985,7 +3017,7 @@
                     if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
                 }catch(e){}
                 await new Promise(r=>setTimeout(r,60));
-                demoPlaying=true;document.getElementById('btnDemo').classList.add('active');
+                demoPlaying=true;document.getElementById('btnDemo').classList.add('active');syncDemoButtonIcon(true);
                 if(scoreMode)_playScoreDemo(myGen);
             };
             await t();
@@ -3002,7 +3034,7 @@
     function stopDemo(){
         demoLaunchGen++;
         demoAwaitMidi=false;
-        demoPlaying=false;document.getElementById('btnDemo').classList.remove('active');
+        demoPlaying=false;document.getElementById('btnDemo').classList.remove('active');syncDemoButtonIcon(false);
         scoreDemoMidiOffByNote.forEach(id=>clearTimeout(id));scoreDemoMidiOffByNote.clear();
         demoTimeouts.forEach(t=>clearTimeout(t));demoTimeouts=[];
         resetDemoScoreSustain();
@@ -4672,13 +4704,14 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(!merged||!merged.length)return;
         let prevQ=relativeToFirstRow?(merged[0].absWhole*4):0;
         let acc=0;
+        const speedF=Math.max(0.1,demoSpeedFactor||1.0);
         for(let i=0;i<merged.length;i++){
             const st=merged[i];
             const Q=st.absWhole*4;
             const dq=Math.max(0,Q-prevQ);
             const bpmSeg=typeof st.stepBpm==='number'&&st.stepBpm>0?st.stepBpm:bpm;
             if(bpmSeg>0)acc+=(dq*60)/bpmSeg;
-            st.tSecStart=acc;
+            st.tSecStart=acc/speedF;
             prevQ=Q;
         }
     }
@@ -4998,6 +5031,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
     }
     async function loadXmlScore(xmlContent, libEntryId){
         ensureOsmd();
+        resetDemoSpeedSlider();
         setInfoBar('LOADING SCORE…',null);
         try{
             await osmdInstance.load(xmlContent);
