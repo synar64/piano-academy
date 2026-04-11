@@ -9,6 +9,11 @@
     <title>Akíra Piano Academy | Score</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://esm.sh" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://tonejs.github.io" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.4/build/opensheetmusicdisplay.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" as="script">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --rack-bg:#1a1a1d; --rack-border:#2a2a2d; --btn-dark:#101012; --btn-border:#050505; --text-dim:#555; --lcd-bg-dark:#111213; --lcd-label-color:#557799; --oled-text:#b3e6ff; --info-bar-height:25px; --score-paper-bg:#ebe6dc; }
@@ -41,9 +46,9 @@
         .sheet-container.score-layout-1up .score-osmd-stack { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; }
         .sheet-container.score-layout-1up #osmd-container { width:100%; overflow-x:hidden; overflow-y:visible; padding:26px 32px 40px; box-sizing:border-box; }
         .sheet-container.score-layout-2up .score-osmd-stack { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; }
-        .sheet-container.score-layout-2up #osmd-container { width:100%; overflow-x:hidden; overflow-y:visible; padding:12px 8px 12px; box-sizing:border-box; }
+        .sheet-container.score-layout-2up #osmd-container { width:100%; overflow-x:clip; overflow-y:visible; padding:12px 8px 12px; box-sizing:border-box; }
         .sheet-container.score-layout-3up .score-osmd-stack { flex:0 1 auto; align-self:stretch; min-width:0; max-width:100%; width:100%; }
-        .sheet-container.score-layout-3up #osmd-container { width:100%; overflow-x:hidden; overflow-y:visible; padding:10px 5px 10px; box-sizing:border-box; }
+        .sheet-container.score-layout-3up #osmd-container { width:100%; overflow-x:clip; overflow-y:visible; padding:10px 5px 10px; box-sizing:border-box; }
         .sheet-viewport { width:100%; max-width:2450px; position:relative; overflow:visible; background:transparent; }
         .lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; position:relative; z-index:9999; }
         .zoom-controls { display:flex; flex-direction:column; gap:6px; align-items:center; }
@@ -218,6 +223,13 @@
             max-width: 100%;
         }
         #osmd-container.osmd-book-layout .osmd-book-spread > div[id^="osmdCanvasPage"] {
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        #osmd-container.osmd-book-layout .osmd-book-spread > .osmd-book-placeholder {
             flex: 0 1 auto;
             min-width: 0;
             max-width: 100%;
@@ -2535,7 +2547,7 @@
             zoomSliderSyncing=false;
         }
     }
-    const OSMD_ZOOM_SLIDER_DEBOUNCE_MS=140;
+    const OSMD_ZOOM_SLIDER_DEBOUNCE_MS=300;
     function onZoomSliderInput(){
         if(helpActive)return;
         if(zoomSliderSyncing)return;
@@ -2590,7 +2602,7 @@
     const LS_LAYOUT_MARGIN='akira_score_margin';
     const LS_LAYOUT_SPACING='akira_score_spacing';
     /** Margó/sortáv: debounce + soros render — RAF helyett, különben másodpercenként több teljes OSMD render fut összevissza. */
-    const OSMD_LAYOUT_SLIDER_DEBOUNCE_MS=260;
+    const OSMD_LAYOUT_SLIDER_DEBOUNCE_MS=400;
     let _layoutSliderDebounceTimer=null;
     let _osmdSliderRenderChain=Promise.resolve();
     function enqueueOsmdSliderRender(asyncJob){
@@ -3148,11 +3160,16 @@
         });
     });
     let _resizeOsmdTimer=null;
-    const RESIZE_OSMD_MS=200;
+    let _lastResizeWidth=0;
+    const RESIZE_OSMD_MS=400;
     window.addEventListener('resize',()=>{
         syncZoomSliderFromState();
         syncKeyHintStrip();
         if(!scoreMode||!osmdInstance)return;
+        // Skip if width didn't change significantly
+        const curW=window.innerWidth;
+        if(Math.abs(curW-_lastResizeWidth)<20)return;
+        _lastResizeWidth=curW;
         clearTimeout(_resizeOsmdTimer);
         _resizeOsmdTimer=setTimeout(()=>{
             _resizeOsmdTimer=null;
@@ -3260,6 +3277,13 @@
         })();
         if(location.protocol==='http:'||location.protocol==='https:'){
             navigator.serviceWorker.register('skalak-sw.js',{scope:'./'}).catch(()=>{});
+            // Preload Tone.js piano samples in the background after page settles
+            const preloadPiano=()=>{
+                if(location.protocol==='file:')return;
+                try{initAudio().catch(()=>{});}catch(e){}
+            };
+            if(window.requestIdleCallback) requestIdleCallback(preloadPiano,{timeout:5000});
+            else setTimeout(preloadPiano,3000);
         }
     };
     // ── OSMD Score + teaching integration ─────────────────────────────────────────
@@ -4054,8 +4078,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         const cols=bookViewColumns;
         const innerW=osmdContainerContentWidthPx(cont);
         const gapPx=cols>=3?4:6;
-        const cellPx=Math.max(cols>=3?52:100,(innerW-gapPx*(cols-1))/cols);
-        const widthMm=Math.max(cols>=3?22:34,pxToOsmdMm(cellPx));
+        const cellPx=Math.max(cols>=3?140:100,(innerW-gapPx*(cols-1))/cols);
+        const widthMm=Math.max(cols>=3?50:34,pxToOsmdMm(cellPx));
         const availHPx=osmdBookViewportHeightPx(cont);
         const pageHPx=Math.min(3000,Math.max(400,Math.round(availHPx*0.97)));
         osmdInstance.setCustomPageFormat(widthMm,pxToOsmdMm(pageHPx));
@@ -4082,18 +4106,34 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         root.style.cssText='display:flex;flex-direction:column;gap:12px;align-items:stretch;width:100%;padding-bottom:24px;box-sizing:border-box;';
         const cols=bookViewColumns;
         const gapPx=cols>=3?4:6;
-        const phW=cols>=3?22:36;
+        // Measure actual page width for placeholder sizing
+        let actualPageW=0;
+        if(pages.length>0){
+            const svg0=pages[0].querySelector('svg');
+            actualPageW=svg0?(svg0.getBoundingClientRect().width||svg0.getAttribute('width')||0):0;
+            if(!actualPageW||actualPageW<10) actualPageW=pages[0].offsetWidth||200;
+        }
         for(let i=0;i<pages.length;i+=cols){
             const row=document.createElement('div');
             row.className='osmd-book-spread';
             row.style.cssText='display:flex;flex-direction:row;flex-wrap:nowrap;gap:'+gapPx+'px;justify-content:center;align-items:flex-start;width:100%;max-width:100%;box-sizing:border-box;';
+            const pagesInRow=Math.min(cols,pages.length-i);
             for(let c=0;c<cols;c++){
-                if(i+c<pages.length)row.appendChild(pages[i+c]);
+                if(i+c<pages.length){
+                    const pg=pages[i+c];
+                    // Each page gets equal share of the row
+                    pg.style.flex='1 1 0';
+                    pg.style.minWidth='0';
+                    pg.style.maxWidth=(100/cols)+'%';
+                    pg.style.overflow='hidden';
+                    row.appendChild(pg);
+                }
                 else{
                     const ph=document.createElement('div');
                     ph.className='osmd-book-placeholder';
                     ph.setAttribute('aria-hidden','true');
-                    ph.style.cssText='flex:0 0 auto;width:'+phW+'px;min-height:1px;';
+                    // Placeholder gets the same flex share as real pages
+                    ph.style.cssText='flex:1 1 0;min-width:0;max-width:'+(100/cols)+'%;min-height:1px;';
                     row.appendChild(ph);
                 }
             }
@@ -5119,6 +5159,14 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 await osmdFitWidth();
                 await applyPersistedOsmdZoomIfSaved();
             }catch(e){console.warn(e);}
+            // Auto-apply Preset 1 if it exists
+            try{
+                const preMap=readViewPresetsMap();
+                const p1=preMap['0'];
+                if(p1&&p1.v===1){
+                    await applyViewPresetPayload(p1);
+                }
+            }catch(e){console.warn('preset 1 auto-apply:',e);}
             queuePersistScoreSession();
         },100);
     }
