@@ -2116,7 +2116,7 @@
                 const pianoMod=await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
                 const Piano=pianoMod.Piano||pianoMod.default?.Piano||pianoMod.default;
                 await Tone.start();
-                const p=new Piano({velocities:5,release:true,pedal:true}).toDestination();
+                const p=new Piano({velocities:2,release:true,pedal:false}).toDestination();
                 await p.load();
                 salamanderPiano=p;
                 audioCtx=Tone.getContext().rawContext;
