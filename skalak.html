@@ -73,6 +73,10 @@
         .key-glow.scale-hint .key-led { opacity:0.4; }
         .key-glow.demo-flash .key-led { opacity:1; background:rgba(179,230,255,0.95) !important; box-shadow:0 0 12px rgba(179,230,255,0.8) !important; }
         .key-glow.chord-hint .key-led { opacity:1; background:var(--oled-text); box-shadow:0 0 10px rgba(179,230,255,0.7); }
+        .key-finger-num { position:absolute; top:-24px; left:50%; transform:translateX(-50%); min-width:10px; text-align:center; font-family:'Inter',sans-serif; font-size:11px; font-weight:700; color:rgba(179,230,255,0.65); opacity:0; transition:opacity 0.2s,color 0.2s,text-shadow 0.2s; pointer-events:none; z-index:10000; line-height:1; display:none; }
+        .key-glow.scale-num-hint .key-finger-num { display:block; opacity:0.45; color:rgba(179,230,255,0.75); text-shadow:0 0 6px rgba(179,230,255,0.4); }
+        .key-glow.chord-num-hint .key-finger-num { display:block; opacity:1; color:#b3e6ff; text-shadow:0 0 12px rgba(179,230,255,0.85); }
+        .hitbox-layer.wrap-keynums .key-glow:not(.demo-flash) .key-led { opacity:0 !important; box-shadow:none !important; }
         .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
         .metro-preset:hover { background:#333;color:#fff; }
         .metro-preset:active { transform:translateY(1px); }
@@ -176,7 +180,7 @@
             <div style="margin-bottom:18px;">
                 <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl0">Toggle Treble and Bass clef staves.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl4">Cycles: 1× note names, 2× + fingering, 3× + keyboard LED visualization, 4× all off.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl4">Cycles: 1× note names, 2× + fingering, 3× keyboard LEDs, 4× fingering numbers above keys (same as staff), 5× all off.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Scale ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl1">Cycle through scales. Click the SCALE display to open the Encyclopedia.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl2">Sprint (1×), Marathon (3×), Training (endless loop).</span></div>
             </div>
@@ -235,7 +239,7 @@
                             <div class="clef-divider"></div>
                             <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
                         </button>
-                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEY LEDS | 4× OFF">
+                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× KEY LEDS | 4× FINGER # ON KEYS (LED OFF) | 5× OFF">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
                         </button>
                         <button id="btnOctave" class="sq-btn" onclick="if(!helpActive) toggleOctave()" data-help="OCTAVE: TOGGLE BETWEEN 1 AND 2 OCTAVE SCALE RUN">
@@ -385,7 +389,7 @@
             'txt-howBody':   'Select a scale and press Start. The notes appear on the staff — play them in order on the piano. The active note highlights in blue.',
             'txt-ctrlTitle': 'Controls',
             'txt-ctrl0':     'Toggle Treble and Bass clef staves.',
-            'txt-ctrl4':     'Cycles: 1× note names, 2× + fingering, 3× + keyboard LED visualization, 4× all off.',
+            'txt-ctrl4':     'Cycles: 1× note names, 2× + fingering, 3× keyboard LEDs, 4× fingering numbers above keys (same as staff), 5× all off.',
             'txt-ctrl1':     'Cycle through scales. Click the SCALE display to open the Encyclopedia.',
             'txt-ctrl2':     'Sprint (1×), Marathon (3×), Training (endless loop).',
             'txt-encTitle':  'Scale Encyclopedia',
@@ -402,7 +406,7 @@
             'txt-howBody':   'Válassz skálát és nyomj Startot. A hangok megjelennek a kottán — játszd le őket sorban a zongorán. Az aktív hang kékkel jelölődik.',
             'txt-ctrlTitle': 'Vezérlők',
             'txt-ctrl0':     'Violin és basszus kulcs be/ki kapcsolása.',
-            'txt-ctrl4':     'Körkörösen kapcsol: 1× hangnevek, 2× + ujjrend, 3× billentyű LED vizualizáció, 4× mind ki.',
+            'txt-ctrl4':     'Körkörösen: 1× hangnevek, 2× + ujjrend a kottán, 3× billentyű LED, 4× ujjszámok a billentyűk felett (ugyanaz mint a kottán), 5× mind ki.',
             'txt-ctrl1':     'Váltás a skálák között. Kattints a SKÁLA kijelzőre az Enciklopédia megnyitásához.',
             'txt-ctrl2':     'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',
             'txt-encTitle':  'Skála Enciklopédia',
@@ -616,19 +620,14 @@
             lh2:[5,4,3,2,1,3,2,1,4,3,2,1,3,2,1,2,3,1,2,3,4,1,2,3,1,2,3,4,5]
         },
         penta:{
-            // 5-note, 1-oct: 11 positions (5+1 up + 5 down)
             rh1:[1,2,3,1,2,3,2,1,3,2,1],
             lh1:[5,4,3,2,1,2,1,2,3,4,5],
-            // 5-note, 2-oct: 21 positions; oct1 ends on 2 → tuck 1 for oct2
             rh2:[1,2,3,1,2,1,2,3,1,2,3,2,1,3,2,1,2,1,3,2,1],
             lh2:[5,4,3,2,1,5,4,3,2,1,2,1,2,3,4,5,1,2,3,4,5]
         },
         hex:{
-            // 6-note, 1-oct: 13 positions (6+1 up + 6 down)
-            // C Eb F Gb G Bb — avoid thumb on black during tuck; tuck on F(white)→Gb or Gb→G(white)
             rh1:[1,2,3,4,1,2,3,2,1,4,3,2,1],
             lh1:[5,4,3,2,1,2,1,2,1,2,3,4,5],
-            // 6-note, 2-oct: 25 positions; oct1 ends on 2 → tuck 1 for oct2
             rh2:[1,2,3,4,1,2,1,2,3,4,1,2,3,2,1,4,3,2,1,2,1,4,3,2,1],
             lh2:[5,4,3,2,1,2,5,4,3,2,1,2,1,2,1,2,3,4,5,2,1,2,3,4,5]
         }
@@ -657,7 +656,6 @@
         }
         const descTop=seq.length-2;
         for(let i=descTop;i>=0;i--)seq.push({...seq[i]});
-        // Select fingering set based on note count per octave
         let fset=fingerings.std;
         if(nLen===5)fset=fingerings.penta;
         else if(nLen===6)fset=fingerings.hex;
@@ -783,7 +781,7 @@
 
     // ── State & Controls ──────────────────────────────────────────────────────
     let isRunning=false,activeRH=true,activeLH=true,currentNoteInBlock=0,currentBlockIndex=0;
-    let showNames=false,showFinger=false,showLeds=false,hintState=0;
+    let showNames=false,showFinger=false,showLeds=false,showKeyNums=false,hintState=0;
     let seqBlocks=[],rhHit=false,lhHit=false,lastHitTime=0,hitIntervals=[],demoActiveNoteIdx=-1;
     let demoPlaying=false,demoTimeouts=[];
     let selectedOctaves=1,clefState=0;
@@ -797,34 +795,54 @@
     let currentRhythmIdx=0;
 
     function cycleHints(){
-        hintState=(hintState+1)%4;
-        showNames=hintState>=1;showFinger=hintState>=2;showLeds=hintState>=3;
+        hintState=(hintState+1)%5;
+        showNames=hintState>=1;showFinger=hintState>=2;showLeds=(hintState===3);showKeyNums=(hintState===4);
         document.getElementById('btnHints').classList.toggle('active',hintState>0);
         const labels=currentLang==='HU'
-            ?['SEGÉDEK KI','HANGNEVEK','HANGNEVEK + UJJREND','HANGNEVEK + UJJREND + LED']
-            :['HINTS OFF','NOTE NAMES','NOTE NAMES + FINGERING','NOTE NAMES + FINGERING + LEDS'];
+            ?['SEGÉDEK KI','HANGNEVEK','HANGNEVEK + UJJREND','HANGNEVEK + UJJREND + LED','HANGNEVEK + UJJREND + SZÁMOK']
+            :['HINTS OFF','NOTE NAMES','NOTE NAMES + FINGERING','NOTE NAMES + FINGERING + LEDS','NOTE NAMES + FINGERING + KEY #'];
         setInfoBar(labels[hintState],document.getElementById('btnHints'));
         updateKeyLeds();draw();
         paintScaleKeys(document.getElementById('scaleSelectValue').value);
     }
     function updateKeyLeds(){
-        document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('chord-hint'));
-        if(!showLeds||seqBlocks.length===0)return;
+        document.querySelectorAll('.key-glow').forEach(k=>{k.classList.remove('chord-hint','chord-num-hint');});
+        if((!showLeds&&!showKeyNums)||seqBlocks.length===0)return;
         const note=seqBlocks[currentBlockIndex]?seqBlocks[currentBlockIndex][currentNoteInBlock]:null;
         if(!note)return;
-        if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-hint');}
-        if(activeLH){const el=document.getElementById('k-'+note.m_lh);if(el)el.classList.add('chord-hint');}
+        if(showLeds){
+            if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-hint');}
+            if(activeLH){const el=document.getElementById('k-'+note.m_lh);if(el)el.classList.add('chord-hint');}
+        }
+        if(showKeyNums){
+            if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-num-hint');}
+            if(activeLH){const el=document.getElementById('k-'+note.m_lh);if(el)el.classList.add('chord-num-hint');}
+        }
     }
-    // Lights the LED dot above every key that belongs to the scale (respects hints level + octave button + active clefs)
+    // Lights LED dots (hint 3) or fingering digits above keys (hint 4) for every scale tone; bright = next note to play
     function paintScaleKeys(scaleKey){
-        document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('scale-hint'));
-        if(!showLeds)return;
+        const wrap=document.getElementById('hb-wrap');
+        if(wrap)wrap.classList.toggle('wrap-keynums',showKeyNums);
+        document.querySelectorAll('.key-glow').forEach(k=>{
+            k.classList.remove('scale-hint','scale-num-hint');
+            const fn=k.querySelector('.key-finger-num');
+            if(fn){fn.textContent='';fn.style.display='none';}
+        });
+        if(!showLeds&&!showKeyNums)return;
         if(!scaleKey||!SCALES_DATABASE[scaleKey])return;
         const seq=buildScaleSequence(scaleKey,selectedOctaves);
-        seq.forEach(n=>{
-            if(activeRH){const el=document.getElementById('k-'+n.m_rh);if(el)el.classList.add('scale-hint');}
-            if(activeLH){const el=document.getElementById('k-'+n.m_lh);if(el)el.classList.add('scale-hint');}
-        });
+        if(showLeds){
+            seq.forEach(n=>{
+                if(activeRH){const el=document.getElementById('k-'+n.m_rh);if(el)el.classList.add('scale-hint');}
+                if(activeLH){const el=document.getElementById('k-'+n.m_lh);if(el)el.classList.add('scale-hint');}
+            });
+        }
+        if(showKeyNums){
+            seq.forEach(n=>{
+                if(activeLH&&n.f_lh){const el=document.getElementById('k-'+n.m_lh);const fn=el&&el.querySelector('.key-finger-num');if(fn){fn.textContent=String(n.f_lh);fn.style.display='block';el.classList.add('scale-num-hint');}}
+                if(activeRH&&n.f_rh){const el=document.getElementById('k-'+n.m_rh);const fn=el&&el.querySelector('.key-finger-num');if(fn){fn.textContent=String(n.f_rh);fn.style.display='block';el.classList.add('scale-num-hint');}}
+            });
+        }
     }
     function cycleClef(){
         if(helpActive)return;clefState=(clefState+1)%3;activeRH=clefState!==2;activeLH=clefState!==1;
@@ -1096,6 +1114,7 @@
             if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}
             else{const blackOffsets={1:-0.621,3:-0.477,6:-0.723,8:-0.559,10:-0.415};const noteInOctave=m%12;const offset=blackOffsets[noteInOctave]!==undefined?blackOffsets[noteInOctave]:-0.6;k.style.left=((wIdx*1.92307)+offset)+'%';k.style.width='1.241%';k.style.height='65%';k.style.zIndex='200';}
             const led=document.createElement('div');led.className='key-led';k.appendChild(led);
+            const kfn=document.createElement('div');kfn.className='key-finger-num';k.appendChild(kfn);
             k.onmousedown=(e)=>{e.preventDefault();k.classList.add('pressed');handleNoteOn(m,100);};
             k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};
             k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};
