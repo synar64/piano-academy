@@ -724,6 +724,9 @@
                                     </div>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) adjustDemoSpeed(-0.1)" title="Slow down" style="width:22px;height:22px;">▼</button>
                                 </div>
+                                <button type="button" id="btnDemoRepeat" class="sq-btn" onclick="if(!helpActive) toggleDemoRepeat()" data-help="" title="" aria-label="" style="align-self:center;flex-shrink:0;">
+                                    <svg id="demoRepeatIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -791,7 +794,7 @@
             'txt-infoScoresTitle': 'Score files & sources',
             'txt-infoScoresBody': 'This module only reads MusicXML (.xml, .musicxml) and compressed .mxl (ZIP with MusicXML). There is no PDF import — PDF is not machine-readable for practice, cursor, MIDI, or measure range; MusicXML is easy to export from any notation app.\n\nLoad:\n• Score file icon (right toolbar, document with staff lines) — pick a file; opens at once.\n• Library (tap score title) — + File / + Batch copies into browser storage; Link folder (Chrome/Edge) lists every .xml / .mxl in a folder you choose.\n• URL — paste a direct link to .musicxml or .mxl. Many sites block cross-site downloads (CORS); saving the file and using the score file icon is often easier.\n\nWhere to get MusicXML:\n• MuseScore Desktop — File → Export → MusicXML (licensing varies by piece).\n• IMSLP and other libraries — choose a MusicXML edition when available, or export from MuseScore / Finale / Dorico / etc.\n• Flat.io, Noteflight, and similar — export MusicXML, then open here.',
             'txt-howTitle':  'Practice flow',
-            'txt-howBody':   'START — step-by-step practice: play only the notes the score highlights, in order. Spacebar starts or stops.\nDEMO (▶) — the app plays the piece with the current measure highlighted and optional built-in piano sound. Use the ▲▼ arrows next to the ▶ button to adjust playback speed (0.3×–1.8×); tap the speed number to reset to 1.0×. If book view uses one column, DEMO temporarily switches to two columns for smoother page scrolling, then restores your layout when DEMO ends.\n\nWhen a measure range is set (soft amber band on the score), START and DEMO work only in that range — not the whole piece.\nNext to the title display, ▲ / ▼ loads the previous or next piece in the library; tap the title to open the full library.\n\nThe sections below explain measure selection and bookmarks in more detail.',
+            'txt-howBody':   'START — step-by-step practice: play only the notes the score highlights, in order. Spacebar starts or stops.\nDEMO (▶) — the app plays the piece with the current measure highlighted and optional built-in piano sound. Use the ▲▼ arrows next to the ▶ button to adjust playback speed (0.3×–1.8×); tap the speed number to reset to 1.0×. To the right of the speed box, the square loop button toggles DEMO repeat: when the piece reaches the end, DEMO starts again until you tap the button off (▶ still stops playback at any time). If book view uses one column, DEMO temporarily switches to two columns for smoother page scrolling, then restores your layout when DEMO ends.\n\nWhen a measure range is set (soft amber band on the score), START and DEMO work only in that range — not the whole piece.\nNext to the title display, ▲ / ▼ loads the previous or next piece in the library; tap the title to open the full library.\n\nThe sections below explain measure selection and bookmarks in more detail.',
             'txt-infoMeasureGuideTitle': 'Measure range — choosing and clearing',
             'txt-infoMeasureGuideBody': 'What it does: limits START and DEMO to certain measures. The selected area is shown as a light amber tint on the score.\n\nHow to set the range:\n• Open the measure range dialog (staff-lines icon, top right of the 2×2 control block). Enter the first and last measure number, then tap OK.\n• Click-to-select on the score: turn ON the tilted pointer (top left of that block), or use the checkbox in the measure range dialog. It is OFF by default so normal clicks on the score do not change the selection.\n\nWith click-to-select ON:\n• One click on a measure — only that measure stays selected (previous selection is replaced).\n• Shift+click another measure — every measure from the one you last clicked up to the new click is included (you can extend the range in several steps).\n• Cmd+click (Mac) or Ctrl+click (Windows) — add or remove single measures without clearing the rest.\n\nHow to clear the range (whole piece again):\n• Tap ∅ bottom left of the 2×2 block — same as ∅ next to OK in the measure range dialog.\n• Bookmarks open from bottom right. Turning click-to-select OFF only stops further clicks from changing the range; it does not remove the amber band — use ∅ to clear the range.\n\nWhen you are done, turn click-to-select OFF if you do not want accidental changes.',
             'txt-infoBookmarksGuideTitle': 'Bookmarks B1 · B2 · B3',
@@ -829,7 +832,7 @@
             'txt-infoScoresTitle': 'Kottafájlok és források',
             'txt-infoScoresBody': 'A modul csak MusicXML (.xml, .musicxml) és tömörített .mxl (ZIP-ben MusicXML) fájlt tud megnyitni. PDF-et nem: gyakorlásra, kurzorra, MIDI-re és ütemtartományra a PDF nem alkalmas; MusicXML-et viszont a legtöbb kottaszerkesztőből egyszerűen exportálhatsz.\n\nBetöltés:\n• Kottafájl ikon a jobb oldali eszköztáron (dokumentum kottavonalakkal) — kiválasztod a fájlt, és azonnal megnyílik.\n• Könyvtár — kattints a kotta címére a kijelzőn; a + File / + Batch a böngésző tárhelyére másolja a fájlokat. A Link mappa (Chrome, Edge) egy kiválasztott mappa összes .xml és .mxl fájlját kilistázza.\n• URL — közvetlen .musicxml vagy .mxl cím. Sok szerver nem engedi a másik oldalról való letöltést (CORS); ilyenkor gyakran egyszerűbb letölteni a fájlt, majd a kottafájl ikonnal megnyitni.\n\nHonnan legyen MusicXML:\n• MuseScore (asztali) — Fájl → Exportálás → MusicXML (a darab licencétől függ, mit szabad).\n• IMSLP és más gyűjtemények — ha van MusicXML kiadás, azt válaszd, vagy exportálj más programból (MuseScore, Finale, Dorico stb.).\n• Flat.io, Noteflight és hasonlók — export MusicXML, majd megnyitás itt.',
             'txt-howTitle':  'Gyakorlás menete',
-            'txt-howBody':   'START — lépésről lépésre gyakorlod a kotta által kiemelt hangokat, a megadott sorrendben. Szóköz: indítás vagy leállítás.\nDEMO (▶) — az alkalmazás lejátsza a darabot: az aktuális ütem kiemelve látszik, a hangot pedig opcionálisan a beépített zongora adja. A ▶ gomb melletti ▲▼ nyilakkal állítható a lejátszási sebesség (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Ha a könyvet egy hasábban nézed, a DEMO alatt átmenetileg két hasábra vált a gördülékenyebb lapkövetés miatt; a DEMO végén visszaáll a korábbi nézet.\n\nHa be van állítva ütemtartomány (enyhe borostyánsárga szín a kottán), a START és a DEMO csak erre a szakaszra vonatkozik, nem az egész darabra.\nA cím melletti ▲ és ▼ az aktuális könyvtárban az előző vagy a következő darabra vált; a címre kattintva megnyílik a teljes könyvtár.\n\nA következő két fejezet részletesen elmagyarázza az ütemek kijelölését és a könyvjelzőket.',
+            'txt-howBody':   'START — lépésről lépésre gyakorlod a kotta által kiemelt hangokat, a megadott sorrendben. Szóköz: indítás vagy leállítás.\nDEMO (▶) — az alkalmazás lejátsza a darabot: az aktuális ütem kiemelve látszik, a hangot pedig opcionálisan a beépített zongora adja. A ▶ gomb melletti ▲▼ nyilakkal állítható a lejátszási sebesség (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. A sebességkijelző jobb oldalán a négyzetes ismétlés ikon kapcsolja a DEMO ismétlést: a darab végén újraindul, amíg ki nem kapcsolod (a ▶ továbbra is bármikor megállítja a lejátszást). Ha a könyvet egy hasábban nézed, a DEMO alatt átmenetileg két hasábra vált a gördülékenyebb lapkövetés miatt; a DEMO végén visszaáll a korábbi nézet.\n\nHa be van állítva ütemtartomány (enyhe borostyánsárga szín a kottán), a START és a DEMO csak erre a szakaszra vonatkozik, nem az egész darabra.\nA cím melletti ▲ és ▼ az aktuális könyvtárban az előző vagy a következő darabra vált; a címre kattintva megnyílik a teljes könyvtár.\n\nA következő két fejezet részletesen elmagyarázza az ütemek kijelölését és a könyvjelzőket.',
             'txt-infoMeasureGuideTitle': 'Ütemtartomány — kijelölés és törlés',
             'txt-infoMeasureGuideBody': 'Mire való: meghatározza, hogy a START és a DEMO a kotta mely ütemein dolgozzon. A kijelölt rész enyhén borostyánsárga háttérrel látszik.\n\nBeállítás:\n• Nyisd meg az ütemtartomány ablakot (vonalkás ikon a 2×2-es gombcsoport jobb felső mezőjében). Írd be az első és az utolsó ütem számát, majd koppints az OK gombra.\n• Egérrel a kottán: kapcsold be a ferde egérmutató ikont (bal felső mező ugyanabban a csoportban), vagy jelöld be ugyanezt az ütemtartomány ablakban. Alapból ki van kapcsolva, hogy véletlen kattintásra ne változzon a kijelölés.\n\nHa be van kapcsolva az egérrel választás:\n• Egy kattintás egy ütemre — csak az az ütem marad kijelölve (a korábbi kijelölés törlődik).\n• Shift és kattintás egy másik ütemre — minden ütem bekerül a két ütem között, az első kattintásodtól számítva (több lépésben is bővítheted a szakaszt).\n• Macen Cmd + kattintás, Windowson Ctrl + kattintás — egy-egy ütem külön be- vagy kikapcsolható a kijelölésből.\n\nKijelölés törlése (újra az egész darab):\n• A 2×2-es csoport bal alsó mezőjében a ∅ gomb (ugyanolyan színű, mint a többi ikon), vagy ugyanez az ütemtartomány ablakban az OK mellett. Ez törli a tartományt: a START és a DEMO ismét az egész kottára vonatkozik.\n• A könyvjelzőt a jobb alsó gomb nyitja. Ha kikapcsolod az egérrel választást, attól a borostyánsárga sáv még megmarad; a tartományt csak a ∅ gombbal törölheted.\n\nHa nem szeretnél többé a kottán kattintással módosítani a kijelölést, kapcsold ki az egérrel választást is.',
             'txt-infoBookmarksGuideTitle': 'Könyvjelzők B1 · B2 · B3',
@@ -876,6 +879,7 @@
             btnLibNext:'Next piece in the active library.',
             oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
             btnDemo:'▶ DEMO: plays the score with measure highlight. ▲▼ adjusts playback speed (0.3×–1.8×); tap the speed display to reset to 1.0×. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
+            btnDemoRepeat:'DEMO repeat: when on, the score DEMO restarts from the beginning each time it reaches the end, until you tap this button off. ▶ still stops playback immediately.',
             audioToggle:'Piano audio: built-in sampled piano on or off.',
             btnMeasureRange:'Measure range (top right of the 2×2 block): limits START and DEMO. Type numbers in the dialog, or use the pointer (top left) / checkbox to pick on the score (Shift / Ctrl+click).',
             btnMeasureClickPick:'Click-to-select (top left of the 2×2 block): OFF by default — ON shows green tint. Same as the checkbox in the measure range dialog.',
@@ -903,6 +907,7 @@
             btnLibNext:'Következő darab az aktív könyvtárban.',
             oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
             btnDemo:'▶ DEMO: lejátszás ütemkiemeléssel. ▲▼ a lejátszási sebesség állítása (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
+            btnDemoRepeat:'DEMO ismétlés: bekapcsolva a kotta-DEMO minden lefutás végén elölről indul, amíg ki nem kapcsolod. A ▶ gomb továbbra is azonnal megállítja a lejátszást.',
             audioToggle:'Zongora hang: belső mintahang be vagy ki.',
             btnMeasureRange:'Ütemtartomány (2×2-es csoport jobb felső): START és DEMO határa. Számok az ablakban, vagy bal felső mutató / jelölőnégyzet + kotta (Shift / Ctrl+katt).',
             btnMeasureClickPick:'Egérrel választás (2×2 bal felső): alapból ki; bekapcsolva zöldes háttér. Ugyanaz, mint az ütemtartomány ablak jelölőnégyzete.',
@@ -1836,7 +1841,7 @@
             if(!isPracticeRangeActive())delete o[currentScoreHash];
             else{
                 const m=practiceRangeSortedMeasures();
-                o[currentScoreHash]={m};
+                o[currentScoreHash]={v:PRACTICE_RANGE_PERSIST_V,m};
             }
             localStorage.setItem(LS_PRACTICE_RANGE,JSON.stringify(o));
         }catch(e){}
@@ -1848,15 +1853,19 @@
             const map=JSON.parse(localStorage.getItem(LS_PRACTICE_RANGE)||'{}');
             const o=map&&typeof map==='object'&&!Array.isArray(map)?map:{};
             const p=o[h];
-            if(p&&Array.isArray(p.m)&&p.m.length){
+            if(p&&p.v===PRACTICE_RANGE_PERSIST_V&&Array.isArray(p.m)&&p.m.length){
                 p.m.forEach(x=>{
                     const n=Number(x);
                     if(Number.isFinite(n)&&n>=1)practiceRangeMeasureSet.add(Math.floor(n));
                 });
+            }else if(p&&Array.isArray(p.m)&&p.m.length){
+                osmdLegacyStoredMeasureNumsToCanonical(p.m).forEach(n=>practiceRangeMeasureSet.add(n));
             }else if(p&&Number.isFinite(Number(p.s))&&Number.isFinite(Number(p.e))){
                 const lo=Math.max(1,Math.min(Number(p.s),Number(p.e))|0);
                 const hi=Math.max(Number(p.s),Number(p.e))|0;
-                for(let i=lo;i<=hi;i++)practiceRangeMeasureSet.add(i);
+                const leg=[];
+                for(let i=lo;i<=hi;i++)leg.push(i);
+                osmdLegacyStoredMeasureNumsToCanonical(leg).forEach(n=>practiceRangeMeasureSet.add(n));
             }
         }catch(e){}
         syncPracticeRangeInputs();
@@ -1887,7 +1896,8 @@
             s:ms.length?ms[0]:null,
             e:ms.length?ms[ms.length-1]:null,
             sp:Math.max(0,osmdBookSpreadIndex|0),
-            st:sc?Math.round(sc.scrollTop):0
+            st:sc?Math.round(sc.scrollTop):0,
+            cv:PRACTICE_RANGE_PERSIST_V
         };
         const map=readBookmarksMap();
         if(!map[currentScoreHash])map[currentScoreHash]={};
@@ -1906,15 +1916,19 @@
         workshopBmSlot=slot;
         syncWorkshopBmSlotLabel();
         practiceRangeMeasureSet.clear();
-        if(p.m&&Array.isArray(p.m)&&p.m.length){
+        if(p.cv===PRACTICE_RANGE_PERSIST_V&&p.m&&Array.isArray(p.m)&&p.m.length){
             p.m.forEach(x=>{
                 const n=Number(x);
                 if(Number.isFinite(n)&&n>=1)practiceRangeMeasureSet.add(Math.floor(n));
             });
+        }else if(p.m&&Array.isArray(p.m)&&p.m.length){
+            osmdLegacyStoredMeasureNumsToCanonical(p.m).forEach(n=>practiceRangeMeasureSet.add(n));
         }else if(p.s!=null&&p.e!=null&&Number.isFinite(Number(p.s))&&Number.isFinite(Number(p.e))){
             const lo=Math.max(1,Math.min(Number(p.s),Number(p.e))|0);
             const hi=Math.max(Number(p.s),Number(p.e))|0;
-            for(let i=lo;i<=hi;i++)practiceRangeMeasureSet.add(i);
+            const leg=[];
+            for(let i=lo;i<=hi;i++)leg.push(i);
+            osmdLegacyStoredMeasureNumsToCanonical(leg).forEach(n=>practiceRangeMeasureSet.add(n));
         }
         syncPracticeRangeInputs();
         persistPracticeRange();
@@ -2062,6 +2076,15 @@
         updateViewPresetTitles();
         updateViewPresetChrome();
         applyHelpTooltips();
+        syncDemoRepeatButtonChrome();
+    }
+    function syncDemoRepeatButtonChrome(){
+        const b=document.getElementById('btnDemoRepeat');
+        if(!b)return;
+        const hu=currentLang==='HU';
+        const t=hu?'DEMO ismétlés be / ki — a végén újraindul, amíg ki nem kapcsolod':'DEMO repeat on/off — restarts at end until turned off';
+        b.title=t;
+        b.setAttribute('aria-label',t);
     }
     function setEmptyScorePlaceholderInfoBar(){
         const hu=currentLang==='HU';
@@ -2877,9 +2900,22 @@
     let lastHitTime=0,hitIntervals=[];
     let demoPlaying=false,demoTimeouts=[],scoreDemoMidiOffByNote=new Map();
     let demoLaunchGen=0,demoAwaitMidi=false,lastDemoArmUiMs=0;
+    /** Ha igaz, a kotta-DEMO a darab (vagy ütemtartomány) természetes végén újraindul, amíg a felhasználó ki nem kapcsolja. A ▶ megállítás nem kapcsolja ki. */
+    let demoRepeatEnabled=false;
     let demoVisualScore=true,demoVisualKeys=true;
     let demoSpeedFactor=1.0;
 
+    function toggleDemoRepeat(){
+        if(helpActive)return;
+        demoRepeatEnabled=!demoRepeatEnabled;
+        const b=document.getElementById('btnDemoRepeat');
+        if(b)b.classList.toggle('active',demoRepeatEnabled);
+        const hu=currentLang==='HU';
+        setInfoBar(demoRepeatEnabled
+            ?(hu?'DEMO ismétlés: be — a darab végén újraindul, amíg ki nem kapcsolod.':'DEMO repeat: on — restarts when the piece ends until you turn it off.')
+            :(hu?'DEMO ismétlés: ki.':'DEMO repeat: off.')
+        ,b||null);
+    }
     function adjustDemoSpeed(delta){
         demoSpeedFactor=Math.round(Math.max(0.3,Math.min(1.8,demoSpeedFactor+delta))*10)/10;
         const lbl=document.getElementById('demoSpeedDisplay');
@@ -3676,10 +3712,25 @@
             }catch(e){}
         }
         if(!any)return null;
-        // Ensure minimum reasonable width
-        if(maxR-minL<10){
+        // Keskeny ütem (1–2 hang): a kattintás gyakran a hangok melletti üres résre esik — bővítünk + kotta vonal szélességéhez igazítunk
+        const wNote=maxR-minL;
+        if(wNote>0&&wNote<56){
+            const cx=(minL+maxR)/2,half=Math.max(30,56-wNote/2);
+            minL=cx-half;maxR=cx+half;
+        }
+        try{
+            const stave=gm.stave||gm.Stave;
+            if(stave&&typeof stave.getBoundingClientRect==='function'){
+                const sr=stave.getBoundingClientRect();
+                if(sr.width>24){
+                    minL=Math.max(minL,sr.left-1);
+                    maxR=Math.min(maxR,sr.right+1);
+                }
+            }
+        }catch(e){}
+        if(maxR-minL<36){
             const center=(minL+maxR)/2;
-            minL=center-30;maxR=center+30;
+            minL=center-28;maxR=center+28;
         }
         return{left:minL,top:minT,right:maxR,bottom:maxB};
     }
@@ -3690,7 +3741,7 @@
         const pages=g.MusicPages||g.musicPages;
         if(!pages||!pages.length)return null;
         const pad=8;
-        let closestMn=null,closestDist=1e9;
+        let closestCanon=null,closestDist=1e9;
         for(let pi=0;pi<pages.length;pi++){
             const page=pages[pi];
             const systems=page.MusicSystems||page.musicSystems;
@@ -3717,24 +3768,24 @@
                             }
                         }
                         if(!u)continue;
-                        const mn=psm.MeasureNumber!=null?psm.MeasureNumber:(psm.measureNumber!=null?psm.measureNumber:null);
-                        if(typeof mn!=='number'||!isFinite(mn)||mn<1)continue;
+                        const canon=osmdPracticeCanonicalFromSourceMeasure(psm);
+                        if(canon==null||canon<1)continue;
                         // Exact hit
                         if(cx>=u.left-pad&&cx<=u.right+pad&&cy>=u.top-pad&&cy<=u.bottom+pad){
-                            return mn;
+                            return canon;
                         }
                         // Track closest measure on the same vertical band (within Y range)
                         if(cy>=u.top-pad&&cy<=u.bottom+pad){
                             const centerX=(u.left+u.right)/2;
                             const dist=Math.abs(cx-centerX);
-                            if(dist<closestDist){closestDist=dist;closestMn=mn;}
+                            if(dist<closestDist){closestDist=dist;closestCanon=canon;}
                         }
                     }
                 }
             }
         }
         // Fallback: if click was on the same staff line but between notes, return closest measure
-        if(closestMn!=null&&closestDist<200)return closestMn;
+        if(closestCanon!=null&&closestDist<200)return closestCanon;
         return null;
     }
     async function applyPracticeRangeMeasures(lo,hi){
@@ -4140,11 +4191,11 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                         if(!gm)continue;
                         const psm=gm.parentSourceMeasure||gm.ParentSourceMeasure;
                         if(!psm)continue;
-                        const mn=psm.MeasureNumber!=null?psm.MeasureNumber:(psm.measureNumber!=null?psm.measureNumber:null);
-                        if(typeof mn!=='number'||!isFinite(mn)||mn<1)continue;
-                        if(!practiceRangeMeasureSet.has(mn))continue;
-                        if(seenMn.has(mn))continue;
-                        seenMn.add(mn);
+                        const canon=osmdPracticeCanonicalFromSourceMeasure(psm);
+                        if(canon==null||canon<1)continue;
+                        if(!practiceRangeMeasureSet.has(canon))continue;
+                        if(seenMn.has(canon))continue;
+                        seenMn.add(canon);
                         const rect=practiceRangeClientRectForSystemColumn(sys,psm);
                         appendPracticeRangeShadeCell(stack,sr,rect);
                     }
@@ -4512,6 +4563,50 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(a&&a.length)return a;
         const b=sh.MeasureList||sh.measureList;
         return b&&b.length?b:[];
+    }
+    const PRACTICE_RANGE_PERSIST_V=2;
+    let _practiceCanonRefToIdx=null;
+    function osmdPracticeCanonicalCacheInvalidate(){
+        _practiceCanonRefToIdx=null;
+    }
+    function osmdRawMeasureNumberFromSourceMeasure(sm){
+        if(!sm)return null;
+        const n=sm.MeasureNumber!=null?sm.MeasureNumber:(sm.measureNumber!=null?sm.measureNumber:null);
+        return typeof n==='number'&&isFinite(n)?n:null;
+    }
+    /** 1…N: a SourceMeasures tömbbeli sorrend — a kotta első fizikai üteme mindig 1 (MusicXML pickup / 0-s szám nem tolja el a START–DEMO tartományt). */
+    function osmdPracticeCanonicalFromSourceMeasure(psm){
+        if(!psm)return null;
+        const sh=getOsmdMusicSheet();
+        if(!sh)return null;
+        if(!_practiceCanonRefToIdx){
+            const measures=getAllSourceMeasures(sh);
+            const m=new Map();
+            for(let i=0;i<measures.length;i++)m.set(measures[i],i+1);
+            _practiceCanonRefToIdx=m;
+        }
+        const c=_practiceCanonRefToIdx.get(psm);
+        return typeof c==='number'&&c>=1?c:null;
+    }
+    /** Régi mentés: OSMD MeasureNumber tengely — átalakítás kanonikus indexre (egyezés nélkül: ha 1…N befér, megtartjuk). */
+    function osmdLegacyStoredMeasureNumsToCanonical(storedNums){
+        const sh=getOsmdMusicSheet();
+        const arr=Array.isArray(storedNums)?storedNums:[];
+        if(!sh||!arr.length)return arr.map(x=>Math.floor(Number(x))).filter(n=>Number.isFinite(n)&&n>=1);
+        const measures=getAllSourceMeasures(sh);
+        if(!measures.length)return arr.map(x=>Math.floor(Number(x))).filter(n=>Number.isFinite(n)&&n>=1);
+        const out=new Set();
+        for(const x of arr){
+            const n=Math.floor(Number(x));
+            if(!Number.isFinite(n)||n<1)continue;
+            let found=false;
+            for(let i=0;i<measures.length;i++){
+                const mn=osmdRawMeasureNumberFromSourceMeasure(measures[i]);
+                if(mn===n){out.add(i+1);found=true;}
+            }
+            if(!found&&n>=1&&n<=measures.length)out.add(n);
+        }
+        return[...out].sort((a,b)=>a-b);
     }
     function measureAbsoluteTimestampWhole(m){
         const fr=m.AbsoluteTimestamp!=null?m.AbsoluteTimestamp:m.absoluteTimestamp;
@@ -5455,20 +5550,18 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             fn();
         },Math.max(0,ms)));
     }
-    function measureNumberFromMergedRow(m){
+    function practiceCanonicalFromMergedRow(m){
         if(!m||!m.playInfos||!m.playInfos.length)return null;
         const pm=osmdNoteToSourceMeasure(m.playInfos[0].note);
-        if(!pm)return null;
-        const n=pm.MeasureNumber!=null?pm.MeasureNumber:(pm.measureNumber!=null?pm.measureNumber:null);
-        return typeof n==='number'&&isFinite(n)?n:null;
+        return osmdPracticeCanonicalFromSourceMeasure(pm);
     }
     function filterMergedByPracticeRange(merged){
         if(!merged||!merged.length)return merged;
         if(!isPracticeRangeActive())return merged;
         return merged.filter(m=>{
-            const mn=measureNumberFromMergedRow(m);
-            if(mn==null)return true;
-            return practiceRangeMeasureSet.has(mn);
+            const c=practiceCanonicalFromMergedRow(m);
+            if(c==null)return true;
+            return practiceRangeMeasureSet.has(c);
         });
     }
     function buildScoreStepsFromOsmd(){
@@ -5746,7 +5839,15 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 scheduleOsmdRender(firstNotes.length?firstNotes:null);
             });
         }
-        scheduleAtAudioTime(tBase+maxOff+0.5,()=>stopDemo(),pbGen);
+        scheduleAtAudioTime(tBase+maxOff+0.5,()=>{
+            const wantRepeat=demoRepeatEnabled;
+            stopDemo();
+            if(!wantRepeat||helpActive)return;
+            setTimeout(()=>{
+                if(!demoRepeatEnabled||demoPlaying||helpActive)return;
+                playScaleRhythmDemo();
+            },280);
+        },pbGen);
         const isHU=currentLang==='HU';
         setInfoBar(isHU?(isPracticeRangeActive()?'▶ MINTA — a kijelölt ütemektől':'▶ MINTA fut — kurzor + hang + MIDI'):(isPracticeRangeActive()?'▶ DEMO — from selected measures':'▶ DEMO running — cursor + audio + MIDI'),null);
     }
@@ -5806,6 +5907,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         setInfoBar('LOADING SCORE…',null);
         try{
             await osmdInstance.load(xmlContent);
+            osmdPracticeCanonicalCacheInvalidate();
             lastLoadedScoreXml=String(xmlContent);
             currentScoreHash=hashScoreXml(lastLoadedScoreXml);
             loadPracticeRangeForScoreHash(currentScoreHash);
@@ -5903,6 +6005,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
     }
     function resetScoreViewToEmptyShell(){
+        osmdPracticeCanonicalCacheInvalidate();
         osmdInstance=null;
         try{
             const oc=document.getElementById('osmd-container');
