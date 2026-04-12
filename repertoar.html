@@ -4432,150 +4432,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             return vc&&(vc.ParentMeasure||vc.parentMeasure)||null;
         }catch(e){return null;}
     }
-
-    // ── REPEAT EXPANDER ──────────────────────────────────────────────────────
-    /** Build a playback-order array of measure indices from SourceMeasures repeat barlines.
-     *  Handles: forward/backward repeat barlines, repeat times, and simple volta (1st/2nd endings).
-     *  Does NOT handle: D.C., D.S., Coda (future). */
-    function buildRepeatExpandedMeasureOrder(){
-        const sh=getOsmdMusicSheet();
-        if(!sh)return null;
-        const measures=getAllSourceMeasures(sh);
-        if(!measures||!measures.length)return null;
-
-        // Extract repeat info per measure
-        const info=[];
-        for(let i=0;i<measures.length;i++){
-            const m=measures[i];
-            let hasForward=false,hasBackward=false,repeatTimes=2,endingNumber=0;
-            try{
-                const fri=m.FirstRepetitionInstructions||m.firstRepetitionInstructions;
-                if(fri&&fri.length){
-                    for(const ri of fri){
-                        const t=ri.type!=null?ri.type:(ri.Type!=null?ri.Type:-1);
-                        if(t===0||t===2)hasForward=true;
-                        const en=ri.endingIndices||ri.EndingIndices;
-                        if(en&&en.length)endingNumber=en[0]+1;
-                    }
-                }
-                const lri=m.LastRepetitionInstructions||m.lastRepetitionInstructions;
-                if(lri&&lri.length){
-                    for(const ri of lri){
-                        const t=ri.type!=null?ri.type:(ri.Type!=null?ri.Type:-1);
-                        if(t===1||t===3)hasBackward=true;
-                        const rt=ri.repeatTimes||ri.RepeatTimes;
-                        if(typeof rt==='number'&&rt>1)repeatTimes=rt;
-                    }
-                }
-                if(!hasForward&&(m.beginsWithLineRepetition||m.BeginsWithLineRepetition))hasForward=true;
-                if(!hasBackward&&(m.endsWithLineRepetition||m.EndsWithLineRepetition))hasBackward=true;
-            }catch(e){}
-            info.push({hasForward,hasBackward,repeatTimes,endingNumber});
-        }
-
-        if(!info.some(r=>r.hasBackward))return null;
-
-        // Build playback order
-        const order=[];
-        let i=0;
-        while(i<measures.length){
-            // Find if there's a backward repeat ahead — collect the section
-            let backwardIdx=-1;
-            for(let j=i;j<measures.length;j++){
-                if(info[j].hasBackward){backwardIdx=j;break;}
-                // Stop at next forward repeat (new section)
-                if(j>i&&info[j].hasForward)break;
-            }
-
-            if(backwardIdx<0){
-                // No more repeats — add remaining measures linearly
-                for(;i<measures.length;i++) order.push(i);
-                break;
-            }
-
-            // Find the start of this repeat section (nearest forward barline at or before i)
-            let repeatStart=i;
-            for(let j=i;j<=backwardIdx;j++){
-                if(info[j].hasForward){repeatStart=j;break;}
-            }
-
-            // Add measures before the repeat section (if any between i and repeatStart)
-            for(;i<repeatStart;i++) order.push(i);
-
-            // First pass: add the full repeat section
-            for(let j=repeatStart;j<=backwardIdx;j++){
-                order.push(j);
-            }
-
-            // Additional passes
-            const times=info[backwardIdx].repeatTimes||2;
-            for(let pass=1;pass<times;pass++){
-                for(let j=repeatStart;j<=backwardIdx;j++){
-                    // Volta: skip 1st ending on repeat passes, skip 2nd ending on first pass
-                    const ei=info[j].endingNumber;
-                    if(ei===1&&pass>0)continue;
-                    if(ei>=2&&pass===0)continue;
-                    order.push(j);
-                }
-            }
-
-            i=backwardIdx+1;
-        }
-        return order;
-    }
-
-    function expandRepeatsInMergedSteps(merged){
-        const order=buildRepeatExpandedMeasureOrder();
-        if(!order||!order.length)return merged;
-
-        const sh=getOsmdMusicSheet();
-        if(!sh)return merged;
-        const srcMeasures=getAllSourceMeasures(sh);
-        if(!srcMeasures)return merged;
-
-        // Map measure number → merged steps
-        const stepsByMN=new Map();
-        merged.forEach(m=>{
-            const mn=measureNumberFromMergedRow(m);
-            if(mn==null)return;
-            if(!stepsByMN.has(mn))stepsByMN.set(mn,[]);
-            stepsByMN.get(mn).push(m);
-        });
-
-        // Build expanded list following the order
-        const expanded=[];
-        for(const mi of order){
-            if(mi>=srcMeasures.length)continue;
-            const sm=srcMeasures[mi];
-            const mn=sm.MeasureNumber!=null?sm.MeasureNumber:(sm.measureNumber!=null?sm.measureNumber:null);
-            if(mn==null)continue;
-            const steps=stepsByMN.get(mn);
-            if(!steps||!steps.length)continue;
-            for(const step of steps){
-                expanded.push({...step,
-                    playInfos:step.playInfos.map(p=>({...p}))
-                });
-            }
-        }
-        if(expanded.length<=merged.length)return merged; // No expansion happened
-
-        // Rebuild absWhole monotonically from step durations
-        let acc=0;
-        for(let i=0;i<expanded.length;i++){
-            const origAW=expanded[i].absWhole;
-            expanded[i].absWhole=acc;
-            // Find duration: look at original next step distance
-            if(i<expanded.length-1){
-                // Temporarily peek at what the next step's original timing gap was
-                // Use durQ as fallback
-                const bpm0=expanded[i].stepBpm||80;
-                const durSec=(expanded[i].durQ||1)*60/bpm0/4;
-                acc+=(expanded[i].durQ||1)/4; // quarter notes as whole-note fractions
-            }
-        }
-
-        return expanded;
-    }
     function getOsmdMusicSheet(){
         return (osmdInstance&&(osmdInstance.sheet||osmdInstance.Sheet))||null;
     }
@@ -5026,8 +4882,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         resetScoreOsmdFollowSnap();
         extractScorePedalEventsFromSheet();
         if(!osmdInstance||!osmdInstance.cursor)return;
-        let mergedAll=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
-        mergedAll=expandRepeatsInMergedSteps(mergedAll);
+        const mergedAll=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
         const merged=filterMergedByPracticeRange(mergedAll);
         merged.forEach(m=>{
             finalizeMergedStepPlayInfos(m);
@@ -5122,7 +4977,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         releaseAllDemoSustainInternal();
         if(!osmdInstance||!osmdInstance.cursor||!audioCtx)return;
         let merged=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
-        merged=expandRepeatsInMergedSteps(merged);
         merged=filterMergedByPracticeRange(merged);
         if(!merged.length){
             demoPlaying=false;
