@@ -771,7 +771,7 @@
                 <div id="keyHintStrip" class="info-bar-integrated info-bar-hint-strip" data-help="">
                     <div id="keyHintStripInner" class="key-hint-strip-inner" aria-hidden="true"></div>
                 </div>
-                <div id="pedalStrip" style="width:100%;height:1px;background:transparent;transition:background 0.15s;pointer-events:none;z-index:50;flex-shrink:0;" aria-hidden="true"></div>
+                <div id="pedalStrip" style="width:100%;height:2px;background:transparent;transition:background 0.15s;pointer-events:none;z-index:50;flex-shrink:0;" aria-hidden="true"></div>
                 <div class="piano-crop-wrapper">
                     <div class="piano-inner">
                         <img src="grandpiano-keys.png" class="piano-img">
@@ -4432,6 +4432,165 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             return vc&&(vc.ParentMeasure||vc.parentMeasure)||null;
         }catch(e){return null;}
     }
+
+    // ── REPEAT EXPANDER ──────────────────────────────────────────────────────
+    /** Build a playback-order array of measure indices from SourceMeasures repeat barlines.
+     *  Handles: forward/backward repeat barlines, repeat times, and simple volta (1st/2nd endings).
+     *  Does NOT handle: D.C., D.S., Coda (future). */
+    function buildRepeatExpandedMeasureOrder(){
+        const sh=getOsmdMusicSheet();
+        if(!sh)return null;
+        const measures=getAllSourceMeasures(sh);
+        if(!measures||!measures.length)return null;
+
+        // Extract repeat structure
+        const repeatInfo=[];
+        for(let i=0;i<measures.length;i++){
+            const m=measures[i];
+            let hasForward=false,hasBackward=false,repeatTimes=2,endingNumber=0;
+            try{
+                // Check FirstRepetitionInstructions (forward repeat, endings start)
+                const fri=m.FirstRepetitionInstructions||m.firstRepetitionInstructions;
+                if(fri&&fri.length){
+                    for(const ri of fri){
+                        const t=ri.type!=null?ri.type:(ri.Type!=null?ri.Type:-1);
+                        // type 0 = StartLine (forward repeat)
+                        if(t===0||t===2)hasForward=true;
+                        // Ending/volta
+                        const en=ri.endingIndices||ri.EndingIndices;
+                        if(en&&en.length)endingNumber=en[0]+1; // 0-based to 1-based
+                    }
+                }
+                // Check LastRepetitionInstructions (backward repeat, endings end)
+                const lri=m.LastRepetitionInstructions||m.lastRepetitionInstructions;
+                if(lri&&lri.length){
+                    for(const ri of lri){
+                        const t=ri.type!=null?ri.type:(ri.Type!=null?ri.Type:-1);
+                        // type 1 = EndLine (backward repeat)
+                        if(t===1||t===3)hasBackward=true;
+                        // Check for repeat times
+                        const rt=ri.repeatTimes||ri.RepeatTimes;
+                        if(typeof rt==='number'&&rt>1)repeatTimes=rt;
+                    }
+                }
+                // Fallback: check endsWithLineRepetition / beginsWithLineRepetition
+                if(!hasForward&&(m.beginsWithLineRepetition||m.BeginsWithLineRepetition))hasForward=true;
+                if(!hasBackward&&(m.endsWithLineRepetition||m.EndsWithLineRepetition))hasBackward=true;
+            }catch(e){}
+            repeatInfo.push({idx:i,hasForward,hasBackward,repeatTimes,endingNumber});
+        }
+
+        // Check if there are any repeats at all
+        const hasAnyRepeat=repeatInfo.some(r=>r.hasBackward);
+        if(!hasAnyRepeat)return null; // No repeats — use linear order
+
+        // Build playback order
+        const order=[];
+        let i=0;
+        while(i<measures.length){
+            // Find the end of the current repeat section
+            let repeatStart=0;
+            // Look backward for the nearest forward repeat barline
+            for(let j=i;j>=0;j--){
+                if(repeatInfo[j].hasForward){repeatStart=j;break;}
+            }
+
+            // Check if this measure has a backward repeat
+            if(repeatInfo[i].hasBackward){
+                const times=repeatInfo[i].repeatTimes||2;
+                // First pass is already in order, add remaining passes
+                order.push(i); // add this measure (end of repeat section)
+                for(let pass=1;pass<times;pass++){
+                    for(let j=repeatStart;j<=i;j++){
+                        // Skip volta 1 endings on pass 2+, skip volta 2 on pass 1
+                        const ei=repeatInfo[j].endingNumber;
+                        if(ei===1&&pass>0)continue; // skip 1st ending on repeats
+                        if(ei===2&&pass===0)continue; // skip 2nd ending on first pass
+                        order.push(j);
+                    }
+                }
+                i++;
+            }else{
+                order.push(i);
+                i++;
+            }
+        }
+        return order;
+    }
+
+    /** Expand merged steps according to repeat barline structure.
+     *  Returns new merged array with repeated sections duplicated. */
+    function expandRepeatsInMergedSteps(merged){
+        const order=buildRepeatExpandedMeasureOrder();
+        if(!order||!order.length)return merged; // No repeats found
+
+        // Group merged steps by their source measure number
+        const stepsByMeasure=new Map();
+        merged.forEach(m=>{
+            if(!m.playInfos||!m.playInfos.length)return;
+            const mn=measureNumberFromMergedRow(m);
+            if(mn==null)return;
+            if(!stepsByMeasure.has(mn))stepsByMeasure.set(mn,[]);
+            stepsByMeasure.get(mn).push(m);
+        });
+
+        // Get measure numbers for each index
+        const sh=getOsmdMusicSheet();
+        if(!sh)return merged;
+        const srcMeasures=getAllSourceMeasures(sh);
+        if(!srcMeasures)return merged;
+
+        // Build expanded merged list
+        const expanded=[];
+        let timeOffset=0;
+        let prevLastTime=0;
+
+        for(const mi of order){
+            if(mi>=srcMeasures.length)continue;
+            const sm=srcMeasures[mi];
+            const mn=sm.MeasureNumber!=null?sm.MeasureNumber:(sm.measureNumber!=null?sm.measureNumber:null);
+            if(mn==null)continue;
+            const stepsForMeasure=stepsByMeasure.get(mn);
+            if(!stepsForMeasure||!stepsForMeasure.length)continue;
+
+            for(const step of stepsForMeasure){
+                const clone={...step,
+                    playInfos:step.playInfos.map(p=>({...p})),
+                    absWhole:step.absWhole+timeOffset
+                };
+                expanded.push(clone);
+            }
+        }
+
+        // Recalculate absWhole to be monotonically increasing
+        if(expanded.length>1){
+            // Find the original duration per step from the linear version
+            const origDurations=[];
+            for(let i=0;i<merged.length-1;i++){
+                origDurations.push(merged[i+1].absWhole-merged[i].absWhole);
+            }
+            const avgDur=origDurations.length?origDurations.reduce((a,b)=>a+b,0)/origDurations.length:0.25;
+
+            // Rebuild absWhole monotonically
+            let acc=0;
+            for(let i=0;i<expanded.length;i++){
+                expanded[i].absWhole=acc;
+                // Use original step duration where available, otherwise average
+                const origIdx=merged.findIndex(m=>
+                    m.playInfos&&m.playInfos.length&&expanded[i].playInfos&&expanded[i].playInfos.length&&
+                    m.playInfos[0].midi===expanded[i].playInfos[0].midi&&
+                    m.playInfos[0].staffIndex===expanded[i].playInfos[0].staffIndex
+                );
+                if(origIdx>=0&&origIdx<merged.length-1){
+                    acc+=merged[origIdx+1].absWhole-merged[origIdx].absWhole;
+                }else{
+                    acc+=expanded[i].durQ?expanded[i].durQ*0.25:avgDur;
+                }
+            }
+        }
+
+        return expanded.length>0?expanded:merged;
+    }
     function getOsmdMusicSheet(){
         return (osmdInstance&&(osmdInstance.sheet||osmdInstance.Sheet))||null;
     }
@@ -4882,7 +5041,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         resetScoreOsmdFollowSnap();
         extractScorePedalEventsFromSheet();
         if(!osmdInstance||!osmdInstance.cursor)return;
-        const mergedAll=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        let mergedAll=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        mergedAll=expandRepeatsInMergedSteps(mergedAll);
         const merged=filterMergedByPracticeRange(mergedAll);
         merged.forEach(m=>{
             finalizeMergedStepPlayInfos(m);
@@ -4967,7 +5127,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             updateKeyLeds();
         },220);
     }
-    function _playScoreDemo(pbGen){
+    async function _playScoreDemo(pbGen){
         demoTimeouts.forEach(t=>clearTimeout(t));demoTimeouts=[];
         scoreDemoMidiOffByNote.forEach(id=>clearTimeout(id));scoreDemoMidiOffByNote.clear();
         if(salamanderPiano){try{ salamanderPiano.stopAll(); }catch(e){}}
@@ -4977,6 +5137,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         releaseAllDemoSustainInternal();
         if(!osmdInstance||!osmdInstance.cursor||!audioCtx)return;
         let merged=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        merged=expandRepeatsInMergedSteps(merged);
         merged=filterMergedByPracticeRange(merged);
         if(!merged.length){
             demoPlaying=false;
@@ -4990,7 +5151,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
            abszolút ideje (pickup / üres ütemek / belső offset) gyakran 1 ütemnyi felesleges csendet ad —
            úgy hangzik, mintha az 1. ütemet átugrotta volna a DEMO. */
         assignPlaybackSecondsToMergedSteps(merged,true);
-        try{if(audioCtx.state==='suspended')void audioCtx.resume();}catch(e){}
+        try{if(audioCtx.state==='suspended') await audioCtx.resume();}catch(e){}
+        // Extra safety: wait a frame for audioCtx.currentTime to stabilize after resume
+        await new Promise(r=>setTimeout(r,50));
         const tBase=audioCtx.currentTime+DEMO_SCORE_START_LEAD_SEC;
         snapMetroToBeat0(tBase);
         clearDemoFlashOnKeys();
