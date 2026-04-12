@@ -9,10 +9,9 @@
     <title>Akíra Piano Academy | Repertoire</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://esm.sh" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://tonejs.github.io" crossorigin>
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.4/build/opensheetmusicdisplay.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.7/build/opensheetmusicdisplay.min.js?v=osmd197" as="script">
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" as="script">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
@@ -417,10 +416,10 @@
             white-space: pre-line;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.4/build/opensheetmusicdisplay.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.7/build/opensheetmusicdisplay.min.js?v=osmd197"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
-<body onclick="initAudio()">
+<body onclick="void userUnlockAudioAndMidi().catch(()=>{})">
     <input type="file" id="score-file-input" accept=".xml,.musicxml,.mxl" style="display:none">
     <input type="file" id="score-file-input-multi" accept=".xml,.musicxml,.mxl" multiple style="display:none">
     <div id="resultModal" class="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -967,18 +966,16 @@
     const LS_BUILTIN_SAMPLES_SEEDED='repertoar_builtin_samples_seeded_v1';
     const LS_BUILTIN_SAMPLES_SEEDED_LEGACY='skalak_builtin_samples_seeded_v1';
     const SAMPLES_MANIFEST_REL='samples/manifest.json';
-    const BUILTIN_SAMPLE_FALLBACK_PATHS=[
-        'samples/Prelude_I_in_C_major_BWV_846_-_Well_Tempered_Clavier_First_Book.mxl',
-        'samples/Mozart_-_Piano_Sonata_No._16_-_Allegro.mxl',
-        'samples/Beethoven_Symphony_No._5_1st_movement_Piano_solo.mxl'
-    ];
+    /** Ha üres, nem futnak felesleges fetch-ek (nincs a repóban .mxl — tölts a samples/ mappába és írd a manifestbe). */
+    const BUILTIN_SAMPLE_FALLBACK_PATHS=[];
     async function resolveBuiltinSampleRelPaths(baseHref){
         try{
             const res=await fetch(new URL(SAMPLES_MANIFEST_REL,baseHref).href,{mode:'same-origin',cache:'no-cache'});
             if(res.ok){
                 const j=await res.json();
                 const arr=j&&Array.isArray(j.files)?j.files:(j&&Array.isArray(j.scores)?j.scores:null);
-                if(arr&&arr.length){
+                if(Array.isArray(arr)){
+                    if(!arr.length)return[];
                     const out=[];
                     for(const fn of arr){
                         const raw=String(fn||'').trim();
@@ -987,7 +984,7 @@
                         if(!/\.(mxl|xml|musicxml)$/i.test(n))continue;
                         out.push('samples/'+n.replace(/^\/+/,''));
                     }
-                    if(out.length)return out;
+                    return out.length?out:[];
                 }
             }
         }catch(e){console.warn('samples manifest',e);}
@@ -2079,8 +2076,11 @@
         else{bar.innerHTML=text+'<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';bar.style.right=Math.max(barRect.width-cx-10,20)+'px';bar.style.left='auto';bar.style.transform='none';}
     }
 
-// ── Audio engine (@tonejs/piano + Tone — MuseTrainer-rel azonos mintacsomag, lusta betöltés) ──
-    let audioCtx=null,salamanderPiano=null,_pianoInitPromise=null;
+// ── Audio: @tonejs/piano (Salamander) + Tone — CSAK jsDelivr +esm, egy Tone példány (esm.sh + külön Tone = dupla töltés, 1–2 GB RAM). ──
+    /** velocitiesMap 1 = egy réteg / billentyű; több réteg = arányosan több AudioBuffer. */
+    const PIANO_SAMPLE_VELOCITIES=1;
+    const PIANO_SAMPLE_RELEASE=false;
+    let audioCtx=null,salamanderPiano=null,_pianoInitPromise=null,_toneOnlyPromise=null;
     let audioOn=true;
     let sustainPedalDown=false;
     const midiSustainReleaseQueue=new Set();
@@ -2112,20 +2112,35 @@
             :'For piano sound, do not use file://. Terminal in this folder: python3 -m http.server 8080 — then http://localhost:8080/repertoar.html', null);
     }
 
+    /** Csak Tone AudioContext (metronome, DEMO időzítés) — nem tölti a Salamander MB-okat. */
+    async function initToneContextOnly(){
+        ensurePianoLoadContextOrThrow();
+        if(audioCtx)return;
+        if(!_toneOnlyPromise){
+            _toneOnlyPromise=(async()=>{
+                const Tone=await import('https://cdn.jsdelivr.net/npm/tone@14.6.10/+esm');
+                await Tone.start();
+                audioCtx=Tone.getContext().rawContext;
+            })();
+        }
+        try{await _toneOnlyPromise;}
+        catch(e){
+            _toneOnlyPromise=null;
+            throw e;
+        }
+    }
+    /** Belső zongoraminták — hívd csak ha kell hang (nincs MIDI kimenet, vagy billentyű DEMO). IAC-only: marad ki → sokszáz MB RAM megmarad. */
     async function initAudio(){
         ensurePianoLoadContextOrThrow();
+        await initToneContextOnly();
         if(salamanderPiano&&salamanderPiano.loaded)return;
         if(!_pianoInitPromise){
             _pianoInitPromise=(async()=>{
-                // tone ESM: nincs "Tone" nevű export — a start/getContext stb. a modul névterén (import * jellegű)
-                const Tone=await import('https://esm.sh/tone@14.7.77');
-                const pianoMod=await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
+                const pianoMod=await import('https://cdn.jsdelivr.net/npm/@tonejs/piano@0.2.1/+esm');
                 const Piano=pianoMod.Piano||pianoMod.default?.Piano||pianoMod.default;
-                await Tone.start();
-                const p=new Piano({velocities:5,release:true,pedal:true}).toDestination();
+                const p=new Piano({velocities:PIANO_SAMPLE_VELOCITIES,release:PIANO_SAMPLE_RELEASE,pedal:true}).toDestination();
                 await p.load();
                 salamanderPiano=p;
-                audioCtx=Tone.getContext().rawContext;
             })();
         }
         try{await _pianoInitPromise;}
@@ -2181,23 +2196,53 @@
     }
 
     function initMidi(){
-        if(!navigator.requestMIDIAccess) return Promise.resolve();
-        if(midiInitPromise) return midiInitPromise;
-        // JAVÍTÁS: Sysex és szoftveres portok engedélyezése
-        midiInitPromise = navigator.requestMIDIAccess({sysex: true, software: true}).then(access => {
-            midiAccessRef = access;
+        if(!navigator.requestMIDIAccess)return Promise.resolve();
+        if(midiAccessRef)return Promise.resolve(midiAccessRef);
+        if(midiInitPromise)return midiInitPromise;
+        /* sysex:false: több böngészőben megjelenik az engedélyablak; sysex:true néha elutasítás nélkül „csendben” elbukik. */
+        const tryAccess=(opt)=>navigator.requestMIDIAccess(opt).then(access=>{
+            midiAccessRef=access;
             hookAllMidiInputs(access);
             pickIacMidiOutPort(access);
-            access.onstatechange = () => {
+            access.onstatechange=()=>{
                 hookAllMidiInputs(access);
                 pickIacMidiOutPort(access);
             };
             return access;
-        }).catch(err => {
-            console.error("MIDI hiba:", err);
+        });
+        midiInitPromise=tryAccess({sysex:false,software:true}).catch(err=>{
+            console.warn('requestMIDIAccess (sysex:false):',err&&err.name,err&&err.message);
+            return tryAccess({sysex:true,software:true});
+        }).catch(err=>{
+            console.error('MIDI hiba:',err&&err.name,err&&err.message);
+            midiInitPromise=null;
             return Promise.resolve();
         });
         return midiInitPromise;
+    }
+    /** Első felhasználói gesztus: AudioContext + zongora (CDN) + Web MIDI engedély. A body onclick + pointerdown egyszer hívja. */
+    let _userUnlockInFlight=null;
+    async function userUnlockAudioAndMidi(){
+        if(_userUnlockInFlight)return _userUnlockInFlight;
+        _userUnlockInFlight=(async()=>{
+            try{
+                await ensureAudioContextBase();
+                await initMidi();
+                if(audioOn&&!midiOutPort){
+                    try{
+                        await initAudio();
+                    }catch(e){
+                        if(String(e&&e.message)==='NEED_HTTP_NOT_FILE')throw e;
+                    }
+                }
+                try{
+                    if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
+                }catch(e){}
+            }finally{
+                _userUnlockInFlight=null;
+            }
+        })();
+        return _userUnlockInFlight;
     }
 
     function sendMidiDemoNoteOn(note,vel){
@@ -2391,7 +2436,10 @@
         if(!audioOn)return;
         void (async()=>{
             try{
-                await initAudio();
+                await userUnlockAudioAndMidi();
+                if(!salamanderPiano&&audioOn){
+                    try{await initAudio();}catch(e2){if(String(e2&&e2.message)==='NEED_HTTP_NOT_FILE')return;}
+                }
                 if(!salamanderPiano)return;
                 if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
                 const v=Math.min(1,Math.max(0.02,(vel|0)/127));
@@ -2417,7 +2465,12 @@
         audioOn=!audioOn;
         document.getElementById('audioToggle').classList.toggle('active',audioOn);
         if(audioOn){
-            void initAudio().catch(()=>{});
+            void (async()=>{
+                try{
+                    await userUnlockAudioAndMidi();
+                    await initAudio();
+                }catch(e){}
+            })();
         }
     }
 
@@ -2859,7 +2912,7 @@
     const DEMO_SCORE_LAYOUT_SETTLE_MS=2000;
     /** AudioContext + első hang ütemezése a settle után (a fenti ms már ad időt a layoutnak). */
     const DEMO_SCORE_START_LEAD_SEC=0.55;
-    let scorePedalEvents=[],demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
+    let scorePedalEvents=[],scorePedalEventsExpanded=null,demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
     let scoreMode=true,osmdScoreTheme='dark',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
     let scoreOsmdFollowSystemKey='';
     let scoreCachedMeasureHLKey='',scoreCachedMeasureHLParts=null;
@@ -2955,7 +3008,7 @@
     function handleMainButton(){
         if(helpActive)return;
         if(!isRunning){
-            void initAudio();initMidi();
+            void userUnlockAudioAndMidi();
             if(scoreMode){
                 if(!scoreSteps.length){
                     setInfoBar(currentLang==='HU'?'Előbb tölts be kottát (fájl ikon vagy könyvtár a címnél).':'Load a score first — file icon or library (tap the title).',null);
@@ -3018,7 +3071,7 @@
         lastDemoArmUiMs=armTap;
         const myGen=++demoLaunchGen;
         demoAwaitMidi=true;
-        Promise.all([initAudio(),initMidi()]).then(async()=>{
+        userUnlockAudioAndMidi().then(async()=>{
             let demoWaitTicks=0;
             const t=async()=>{
                 if(myGen!==demoLaunchGen){demoAwaitMidi=false;return;}
@@ -3027,6 +3080,9 @@
                 }
                 if(myGen!==demoLaunchGen){demoAwaitMidi=false;return;}
                 const midiOk=midiOutPort&&midiOutPort.state==='open';
+                if(audioOn&&!midiOk&&!salamanderPiano){
+                    try{await initAudio();}catch(e){}
+                }
                 const samplesOk=!!(salamanderPiano&&salamanderPiano.loaded);
                 if(!midiOk&&!samplesOk){
                     if(++demoWaitTicks>120){
@@ -3206,8 +3262,27 @@
     function playMetroClick(time,beat){const isAccent=(beat===0&&metroAccent);const sampleKey=isAccent?metroSoundType+'_accent':metroSoundType;const buf=metroSamples[sampleKey]||metroSamples[metroSoundType];if(!buf)return;const src=audioCtx.createBufferSource();src.buffer=buf;const g=audioCtx.createGain();g.gain.setValueAtTime(metroVolume,time);src.connect(g).connect(audioCtx.destination);src.start(time);}
     function syncMetroTimeSig(){metroTimeSig=4;metroCurrentBeat=0;const sel=document.getElementById('metroTimeSigSelect');if(sel)sel.value='4/4';}
     function snapMetroToBeat0(t){if(!metroIsRunning)return;metroNextNoteTime=t;metroCurrentBeat=0;}
+    async function ensureAudioContextBase(){
+        if(audioCtx){
+            if(audioCtx.state==='suspended')try{await audioCtx.resume();}catch(e){}
+            return;
+        }
+        try{
+            await initToneContextOnly();
+        }catch(e){
+            if(String(e&&e.message)==='NEED_HTTP_NOT_FILE')throw e;
+        }
+        if(!audioCtx){
+            try{
+                const Ctx=window.AudioContext||window.webkitAudioContext;
+                if(Ctx)audioCtx=new Ctx();
+            }catch(e){}
+        }
+        if(audioCtx&&audioCtx.state==='suspended')try{await audioCtx.resume();}catch(e){}
+    }
     async function toggleMetronome(){
-        if(!audioCtx)await initAudio();else if(audioCtx.state==='suspended')await audioCtx.resume();
+        await ensureAudioContextBase();
+        if(!audioCtx)return;
         metroIsRunning=!metroIsRunning;document.getElementById('metroToggle').classList.toggle('active',metroIsRunning);
         if(metroIsRunning){document.getElementById('metroBpmDisplay').innerText=bpm;if(!metroSamplesLoaded)await loadMetroSamples();metroNextNoteTime=audioCtx.currentTime+0.05;metroCurrentBeat=0;metroScheduler();}
     }
@@ -3215,6 +3290,7 @@
 
     // ── DOMContentLoaded & init ───────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded',()=>{
+        window.addEventListener('pointerdown',()=>{void userUnlockAudioAndMidi().catch(()=>{});},{once:true,passive:true,capture:true});
         const sel=document.getElementById('metroSoundSelect');if(sel)sel.addEventListener('change',function(){metroSoundType=this.value;});
         const vol=document.getElementById('metroVolumeSlider');if(vol)vol.addEventListener('input',function(){metroVolume=parseFloat(this.value);});
         const acc=document.getElementById('metroAccentCheck');if(acc)acc.addEventListener('change',function(){metroAccent=this.checked;});
@@ -3361,13 +3437,9 @@
         })();
         if(location.protocol==='http:'||location.protocol==='https:'){
             navigator.serviceWorker.register('skalak-sw.js',{scope:'./'}).catch(()=>{});
-            // Preload Tone.js piano samples in the background after page settles
-            const preloadPiano=()=>{
-                if(location.protocol==='file:')return;
-                try{initAudio().catch(()=>{});}catch(e){}
-            };
-            if(window.requestIdleCallback) requestIdleCallback(preloadPiano,{timeout:5000});
-            else setTimeout(preloadPiano,3000);
+            /* Ne hívjunk initAudio()-t háttérben (requestIdleCallback): Chrome blokkolja az AudioContext-et
+               felhasználói gesztus nélkül → nincs hang, amíg nincs kattintás. A zongora a userUnlockAudioAndMidi()
+               során töltődik (body / első pointerdown / START / DEMO). */
         }
     };
     // ── OSMD Score + teaching integration ─────────────────────────────────────────
@@ -4778,6 +4850,528 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         try{if(typeof cur.hide==='function')cur.hide();}catch(e){}
         return raw;
     }
+    /** OSMD RepetitionInstructionEnum */
+    const OSMD_REP_INST_START_LINE=0;
+    const OSMD_REP_INST_BACK_JUMP_LINE=2;
+    const OSMD_REP_INST_ENDING=3;
+    function osmdRepetitionNumberOfEndings(rep){
+        if(!rep)return 1;
+        try{
+            const n=rep.NumberOfEndings!=null?rep.NumberOfEndings:rep.numberOfEndings;
+            if(typeof n==='number'&&n>=1)return Math.min(8,Math.floor(n));
+        }catch(e){}
+        return 1;
+    }
+    function osmdMeasureEndingLabelSet(sm){
+        const s=new Set();
+        if(!sm)return s;
+        try{
+            function scan(list){
+                if(!list||!list.length)return;
+                for(let k=0;k<list.length;k++){
+                    const ins=list[k];
+                    const t=ins.type!=null?ins.type:ins.Type;
+                    if(t!==OSMD_REP_INST_ENDING)continue;
+                    const arr=ins.endingIndices||ins.EndingIndices;
+                    if(arr&&arr.length)for(let j=0;j<arr.length;j++){const n=Number(arr[j]);if(n>=1)s.add(n);}
+                }
+            }
+            scan(sm.FirstRepetitionInstructions||sm.firstRepetitionInstructions);
+            scan(sm.LastRepetitionInstructions||sm.lastRepetitionInstructions);
+        }catch(e){}
+        return s;
+    }
+    /** measureListIndex → melyik ház(ak) kizárólagos üteme (üres = közös minden menetben). */
+    function osmdBuildMeasureVoltaExclusiveMap(sh, measures, M){
+        const map=new Map();
+        if(sh){
+            try{
+                const reps=sh.Repetitions||sh.repetitions||[];
+                for(let ri=0;ri<reps.length;ri++){
+                    const rep=reps[ri];
+                    if(!rep||rep.FromWords||rep.fromWords)continue;
+                    const dict=rep.EndingIndexDict||rep.endingIndexDict;
+                    if(!dict||typeof dict!=='object')continue;
+                    for(const key of Object.keys(dict)){
+                        const num=parseInt(key,10);
+                        if(!Number.isFinite(num)||num<1)continue;
+                        const ed=dict[key];
+                        const part=ed&&(ed.part!==undefined?ed.part:ed.Part);
+                        if(!part)continue;
+                        const s0=part.StartIndex!==undefined?part.StartIndex:part.startIndex;
+                        const e0=part.EndIndex!==undefined?part.EndIndex:part.endIndex;
+                        const s=Number(s0),e=Number(e0);
+                        if(!Number.isFinite(s)||!Number.isFinite(e))continue;
+                        const lo=Math.max(0,Math.min(s,e)),hi=Math.min(M-1,Math.max(s,e));
+                        for(let mi=lo;mi<=hi;mi++){
+                            if(!map.has(mi))map.set(mi,new Set());
+                            map.get(mi).add(num);
+                        }
+                    }
+                }
+            }catch(e){console.warn('volta EndingIndexDict',e);}
+        }
+        for(let mi=0;mi<M;mi++){
+            const lab=osmdMeasureEndingLabelSet(measures[mi]);
+            if(!lab.size)continue;
+            if(!map.has(mi))map.set(mi,new Set());
+            lab.forEach(n=>map.get(mi).add(n));
+        }
+        return map;
+    }
+    function osmdMeasureAllowedOnVoltaPass(mi, voltaPass, voltMap){
+        const L=voltMap.get(mi);
+        if(!L||L.size===0)return true;
+        if(L.size>1)return true;
+        const only=[...L][0];
+        return voltaPass===only;
+    }
+    function osmdMeasureHasLineRepeatForwardStart(sm){
+        if(!sm)return false;
+        try{
+            if(typeof sm.beginsWithLineRepetition==='function')return!!sm.beginsWithLineRepetition();
+        }catch(e){}
+        return false;
+    }
+    function osmdMeasureHasLineRepeatBackwardEnd(sm){
+        if(!sm)return false;
+        try{
+            if(typeof sm.endsWithLineRepetition==='function')return!!sm.endsWithLineRepetition();
+        }catch(e){}
+        return false;
+    }
+    /** OSMD 1.8.x: néha nincs begins/endsWithLineRepetition(), csak First/LastRepetitionInstructions (pl. egyes MXL-ek). */
+    function osmdMeasureHasRepeatForwardFromInstructions(sm){
+        if(!sm)return false;
+        try{
+            const first=sm.FirstRepetitionInstructions||sm.firstRepetitionInstructions;
+            if(!first||!first.length)return false;
+            for(let i=0;i<first.length;i++){
+                const instruction=first[i];
+                const type=instruction.type!=null?instruction.type:instruction.Type;
+                if(type===OSMD_REP_INST_START_LINE)return true;
+            }
+        }catch(e){}
+        return false;
+    }
+    function osmdMeasureHasRepeatBackwardFromInstructions(sm){
+        if(!sm)return false;
+        try{
+            const last=sm.LastRepetitionInstructions||sm.lastRepetitionInstructions;
+            if(!last||!last.length)return false;
+            for(let i=0;i<last.length;i++){
+                const instruction=last[i];
+                const type=instruction.type!=null?instruction.type:instruction.Type;
+                if(type===OSMD_REP_INST_BACK_JUMP_LINE)return true;
+                const rep=instruction.parentRepetition||instruction.ParentRepetition;
+                if(!rep||rep.FromWords||rep.fromWords)continue;
+                const bjList=rep.BackwardJumpInstructions||rep.backwardJumpInstructions;
+                if(bjList&&bjList.length){
+                    for(let j=0;j<bjList.length;j++){
+                        if(bjList[j]===instruction)return true;
+                    }
+                }
+            }
+        }catch(e){}
+        return false;
+    }
+    function osmdMeasureHasRepeatForwardSignals(sm){
+        return osmdMeasureHasLineRepeatForwardStart(sm)||osmdMeasureHasRepeatForwardFromInstructions(sm);
+    }
+    function osmdMeasureHasRepeatBackwardSignals(sm){
+        return osmdMeasureHasLineRepeatBackwardEnd(sm)||osmdMeasureHasRepeatBackwardFromInstructions(sm);
+    }
+    function osmdRepetitionTotalPasses(rep){
+        if(!rep)return 2;
+        try{
+            const u=rep.UserNumberOfRepetitions!==undefined&&rep.UserNumberOfRepetitions!==null
+                ?rep.UserNumberOfRepetitions
+                :(rep.userNumberOfRepetitions!==undefined?rep.userNumberOfRepetitions:0);
+            if(typeof u==='number'&&u>=1)return Math.min(99,Math.floor(u));
+            let d;
+            try{d=rep.DefaultNumberOfRepetitions;}catch(e2){d=undefined;}
+            if(typeof d!=='number')d=rep.defaultNumberOfRepetitions;
+            if(typeof d==='number'&&d>=1)return Math.min(99,Math.floor(d));
+        }catch(e){}
+        return 2;
+    }
+    /** OSMD néha a páros |: ütem *listaindexét* adja vissza, ami nagyobb lehet, mint a :| ütem (pl. Für Elise MXL: :| m8, |: m10). */
+    function osmdClampRepeatJumpStart(measures, backwardIdx,rawStart){
+        const M=measures&&measures.length;
+        if(!M||backwardIdx==null||backwardIdx<0)return 0;
+        let s=Math.floor(Number(rawStart));
+        if(!Number.isFinite(s)||s<0)s=0;
+        if(s<backwardIdx)return s;
+        for(let j=Math.min(backwardIdx-1,M-1);j>=0;j--){
+            if(osmdMeasureHasRepeatForwardSignals(measures[j]))return j;
+        }
+        return 0;
+    }
+    function osmdMaxEndingLabelNearMeasure(measures, idx){
+        let mx=1;
+        const M=measures.length;
+        const lo=Math.max(0,idx-2),hi=Math.min(M-1,idx+3);
+        for(let mi=lo;mi<=hi;mi++){
+            osmdMeasureEndingLabelSet(measures[mi]).forEach(n=>{
+                if(n>mx)mx=n;
+            });
+        }
+        return Math.min(8,Math.max(2,mx));
+    }
+    function osmdParseRepeatFrameFromForwardMeasure(sm,measureIndex){
+        try{
+            const first=sm.FirstRepetitionInstructions||sm.firstRepetitionInstructions;
+            if(!first||!first.length)return null;
+            for(let i=0;i<first.length;i++){
+                const instruction=first[i];
+                const type=instruction.type!=null?instruction.type:instruction.Type;
+                if(type!==OSMD_REP_INST_START_LINE)continue;
+                const rep=instruction.parentRepetition||instruction.ParentRepetition;
+                if(!rep||rep.FromWords||rep.fromWords)continue;
+                const endings=osmdRepetitionNumberOfEndings(rep);
+                if(endings>1){
+                    return{hasVolta:true,start:measureIndex,voltaPass:1,maxVoltaPass:endings};
+                }
+                const passes=osmdRepetitionTotalPasses(rep);
+                let bj=Math.max(0,passes-1);
+                if(bj<=0)bj=1;
+                return{hasVolta:false,start:measureIndex,backJumpsRemaining:bj};
+            }
+        }catch(e){}
+        return null;
+    }
+    function osmdParseRepeatFrameFromBackwardMeasure(sm,backwardIdx,measures){
+        try{
+            const last=sm.LastRepetitionInstructions||sm.lastRepetitionInstructions;
+            if(!last||!last.length)return null;
+            for(let i=0;i<last.length;i++){
+                const instruction=last[i];
+                const type=instruction.type!=null?instruction.type:instruction.Type;
+                const rep=instruction.parentRepetition||instruction.ParentRepetition;
+                if(!rep||rep.FromWords||rep.fromWords)continue;
+                let match=false;
+                if(type===OSMD_REP_INST_BACK_JUMP_LINE)match=true;
+                else{
+                    const bjList=rep.BackwardJumpInstructions||rep.backwardJumpInstructions;
+                    if(bjList&&bjList.length){
+                        for(let j=0;j<bjList.length;j++){
+                            if(bjList[j]===instruction){match=true;break;}
+                        }
+                    }
+                }
+                if(!match)continue;
+                const smStart=rep.startMarker||rep.StartMarker;
+                let start=0;
+                if(smStart&&(smStart.measureIndex!=null||smStart.measureIndex===0))
+                    start=Number(smStart.measureIndex);
+                else if(typeof rep.getBackwardJumpTarget==='function')
+                    start=Number(rep.getBackwardJumpTarget());
+                if(!Number.isFinite(start)||start<0)start=0;
+                if(measures&&backwardIdx!=null&&backwardIdx>=0)
+                    start=osmdClampRepeatJumpStart(measures,backwardIdx,start);
+                const endings=osmdRepetitionNumberOfEndings(rep);
+                const lab=osmdMeasureEndingLabelSet(sm);
+                let useVolta=endings>1;
+                if(!useVolta&&lab.size>0)useVolta=true;
+                if(useVolta){
+                    const maxVp=Math.max(endings>1?endings:0,osmdMaxEndingLabelNearMeasure(measures,backwardIdx));
+                    return{hasVolta:true,start,voltaPass:1,maxVoltaPass:Math.min(8,Math.max(2,maxVp))};
+                }
+                const passes=osmdRepetitionTotalPasses(rep);
+                let bj=Math.max(0,passes-1);
+                if(bj<=0)bj=1;
+                return{hasVolta:false,start,backJumpsRemaining:bj};
+            }
+        }catch(e){}
+        return null;
+    }
+    function osmdActiveVoltaPassForMeasure(stack,i){
+        for(let s=stack.length-1;s>=0;s--){
+            const fr=stack[s];
+            if(fr&&fr.hasVolta&&i>=fr.start)return fr.voltaPass;
+        }
+        return null;
+    }
+    /** Ütemlista-indexek ismétlésekkel (:||) és volta (1./2. ház) OSMD SourceMeasure alapján. */
+    function osmdExpandMeasurePlaybackOrder(measures){
+        const M=measures.length;
+        if(!M)return[];
+        const sh=getOsmdMusicSheet();
+        const voltMap=osmdBuildMeasureVoltaExclusiveMap(sh,measures,M);
+        const stack=[];
+        const out=[];
+        let i=0;
+        let skipForwardRepeatPush=false;
+        const maxSteps=Math.max(M*64,256);
+        let guard=0;
+        while(i<M){
+            if(++guard>maxSteps){
+                console.warn('osmdExpandMeasurePlaybackOrder: guard hit, linear measures');
+                return Array.from({length:M},(_,k)=>k);
+            }
+            const sm=measures[i];
+            if(!skipForwardRepeatPush&&sm&&osmdMeasureHasRepeatForwardSignals(sm)){
+                const fr=osmdParseRepeatFrameFromForwardMeasure(sm,i);
+                if(fr&&(fr.hasVolta||(fr.backJumpsRemaining||0)>0))stack.push(fr);
+            }
+            skipForwardRepeatPush=false;
+            const vp=osmdActiveVoltaPassForMeasure(stack,i);
+            const voltSkip=vp!=null&&!osmdMeasureAllowedOnVoltaPass(i,vp,voltMap);
+            if(!voltSkip)out.push(i);
+            if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)){
+                let jumped=false;
+                for(;;){
+                    if(!stack.length){
+                        const parsed=osmdParseRepeatFrameFromBackwardMeasure(sm,i,measures);
+                        if(parsed&&(parsed.hasVolta||(parsed.backJumpsRemaining||0)>0))stack.push(parsed);
+                    }
+                    const fr=stack.length?stack[stack.length-1]:null;
+                    if(!fr)break;
+                    if(fr.hasVolta){
+                        if(fr.voltaPass<fr.maxVoltaPass){
+                            fr.voltaPass++;
+                            i=fr.start;
+                            skipForwardRepeatPush=true;
+                            jumped=true;
+                            break;
+                        }
+                        stack.pop();
+                        if(!stack.length)break;
+                        continue;
+                    }
+                    if(fr.backJumpsRemaining>0){
+                        fr.backJumpsRemaining--;
+                        i=fr.start;
+                        skipForwardRepeatPush=true;
+                        jumped=true;
+                        break;
+                    }
+                    if(stack.length){
+                        stack.pop();
+                        if(!stack.length)break;
+                        continue;
+                    }
+                    break;
+                }
+                if(jumped)continue;
+            }
+            if(voltSkip){
+                i++;
+                continue;
+            }
+            i++;
+        }
+        return out;
+    }
+    function osmdRawRowMeasureListIndex(row){
+        if(!row||!row.playInfos||!row.playInfos[0])return -1;
+        const sm=osmdNoteToSourceMeasure(row.playInfos[0].note);
+        if(!sm)return -1;
+        const sh=getOsmdMusicSheet();
+        if(sh){
+            const arr=getAllSourceMeasures(sh);
+            for(let k=0;k<arr.length;k++)if(arr[k]===sm)return k;
+        }
+        const ix=sm.measureListIndex!=null?sm.measureListIndex:sm.MeasureListIndex;
+        return typeof ix==='number'&&ix>=0?ix:-1;
+    }
+    function osmdBuildRowsByMeasureListIndex(rawRows,measureCount){
+        const rowsBy=[];
+        for(let i=0;i<measureCount;i++)rowsBy[i]=[];
+        rawRows.forEach(row=>{
+            const mi=osmdRawRowMeasureListIndex(row);
+            if(mi>=0&&mi<measureCount)rowsBy[mi].push(row);
+        });
+        rowsBy.forEach(list=>list.sort((a,b)=>a.absWhole-b.absWhole||a.stepIdx-b.stepIdx));
+        return rowsBy;
+    }
+    function osmdMeasureMinAbsWholeInRows(rows){
+        if(!rows||!rows.length)return null;
+        let minV=Infinity;
+        rows.forEach(r=>{
+            if(typeof r.absWhole==='number'&&isFinite(r.absWhole))minV=Math.min(minV,r.absWhole);
+        });
+        return minV===Infinity?null:minV;
+    }
+    function osmdSourceMeasureDurationWhole(sm){
+        if(!sm)return 1;
+        try{
+            const fr=sm.Duration||sm.duration;
+            const w=osmdFractionToWhole(fr);
+            if(w>1e-9)return w;
+        }catch(e){}
+        return 1;
+    }
+    function osmdMeasurePlaybackSpanWhole(measures,mi){
+        const sm=measures[mi];
+        if(!sm)return 1;
+        if(mi+1<measures.length){
+            const w=measureAbsoluteTimestampWhole(sm);
+            const w2=measureAbsoluteTimestampWhole(measures[mi+1]);
+            if(Number.isFinite(w)&&Number.isFinite(w2)&&w2>w)return w2-w;
+        }
+        return Math.max(1e-4,osmdSourceMeasureDurationWhole(sm));
+    }
+    /**
+     * Konzol + window.__lastRepeatExpandDebug: hol szakad meg az ismétlés-láncolat.
+     * Részletes alert: böngésző konzolban localStorage.setItem('osmd_repeat_debug','1') vagy ?repeatDebug=1 az URL-ben, vagy window.OSMD_REPEAT_DEBUG=true
+     */
+    function repeatChainLog(summary){
+        try{window.__lastRepeatExpandDebug=summary;}catch(e){}
+        const line=summary.oneLine!=null?summary.oneLine:JSON.stringify(summary);
+        console.warn('[REPEAT-CHAIN]',line);
+        const shout=(typeof window!=='undefined'&&(window.OSMD_REPEAT_DEBUG===true
+            ||(typeof localStorage!=='undefined'&&localStorage.getItem('osmd_repeat_debug')==='1')
+            ||(typeof location!=='undefined'&&/[?&]repeatDebug=1(?:&|$)/.test(location.search||''))));
+        if(shout&&typeof alert==='function'&&summary.alertHu)alert(summary.alertHu);
+    }
+    /**
+     * Ismétlőjelek: a kurzor lineáris sora helyett kibővített nyers sorok (új absWhole időtengely).
+     * Nem fut render ciklusban — csak START/DEMO előtti összeállításkor.
+     * Volta (1./2. ház): osmdExpandMeasurePlaybackOrder kezeli.
+     */
+    function expandRawRowsWithRepeats(rawRows){
+        scorePedalEventsExpanded=null;
+        const rawLen=rawRows&&rawRows.length;
+        if(!rawLen||!osmdInstance){
+            repeatChainLog({ok:false,skip:'no_raw_or_osmd',rawCursorRows:rawLen||0,oneLine:`nyers_sor=${rawLen||0} osmd=${!!osmdInstance} → nincs bővítés (nincs bemenet)`,alertHu:`Nincs bővítés: nyers sor=${rawLen||0}, OSMD=${!!osmdInstance}`});
+            return rawRows;
+        }
+        try{
+            const sh=getOsmdMusicSheet();
+            if(!sh){
+                repeatChainLog({ok:false,skip:'no_sheet',rawCursorRows:rawLen,oneLine:`nyers_sor=${rawLen} sheet=null`,alertHu:'Nincs MusicSheet — nincs mit bővíteni.'});
+                return rawRows;
+            }
+            const measures=getAllSourceMeasures(sh);
+            if(!measures.length){
+                repeatChainLog({ok:false,skip:'no_measures',rawCursorRows:rawLen,oneLine:`nyers_sor=${rawLen} ütemek=0`,alertHu:'Üres ütemlista (getAllSourceMeasures).'});
+                return rawRows;
+            }
+            const M=measures.length;
+            let cFwdLine=0,cBackLine=0,cFwdIns=0,cBackIns=0,ixFwd=-1,ixBack=-1;
+            for(let mi=0;mi<M;mi++){
+                const sm=measures[mi];
+                if(!sm)continue;
+                const fl=osmdMeasureHasLineRepeatForwardStart(sm);
+                const bl=osmdMeasureHasLineRepeatBackwardEnd(sm);
+                const fi=osmdMeasureHasRepeatForwardFromInstructions(sm);
+                const bi=osmdMeasureHasRepeatBackwardFromInstructions(sm);
+                if(fl)cFwdLine++;
+                if(bl)cBackLine++;
+                if(fi)cFwdIns++;
+                if(bi)cBackIns++;
+                if(ixFwd<0&&(fl||fi))ixFwd=mi;
+                if(ixBack<0&&(bl||bi))ixBack=mi;
+            }
+            let repListLen=-1;
+            try{
+                const r=sh.Repetitions||sh.repetitions;
+                repListLen=r&&r.length?r.length:0;
+            }catch(e2){repListLen=-1;}
+            const order=osmdExpandMeasurePlaybackOrder(measures);
+            if(!order||!order.length){
+                repeatChainLog({ok:false,skip:'no_order',rawCursorRows:rawLen,M,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`nyers_sor=${rawLen} M=${M} |:_vonals=${cFwdLine} :|_vonals=${cBackLine} |:_ins=${cFwdIns} :|_ins=${cBackIns} → order üres`,alertHu:`Ismétlés-sorrend üres. M=${M}, |: vonal=${cFwdLine}, :| vonal=${cBackLine}, |: ins=${cFwdIns}, :| ins=${cBackIns}`});
+                return rawRows;
+            }
+            let identity=order.length===measures.length;
+            if(identity){
+                for(let j=0;j<order.length;j++){
+                    if(order[j]!==j){identity=false;break;}
+                }
+            }
+            if(identity){
+                repeatChainLog({ok:true,expanded:false,rawCursorRows:rawLen,M,orderLen:order.length,identity:true,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`nyers_sor=${rawLen} M=${M} |:_vonals=${cFwdLine} :|_vonals=${cBackLine} |:_ins=${cFwdIns} :|_ins=${cBackIns} ix(|:)=${ixFwd} ix(:|)=${ixBack} Repetitions=${repListLen} → order LINEÁRIS (${order.length}) = nincs kiterjesztés`,alertHu:`Kiterjesztés NEM történt (lineáris sorrend).\nNyers sorok: ${rawLen}\n|: vonal=${cFwdLine}, :| vonal=${cBackLine}\n|: utasítás=${cFwdIns}, :| utasítás=${cBackIns}\nElső |: ütem index: ${ixFwd}, első :| index: ${ixBack}\nHa minden 0/-1: az OSMD nem ad jelzést ehhez az MXL-hez.`});
+                return rawRows;
+            }
+            const rowsBy=osmdBuildRowsByMeasureListIndex(rawRows,measures.length);
+            const out=[];
+            const visitSynthStarts=new Array(order.length);
+            let cursorTimeline=0;
+            let stepCounter=0;
+            for(let oi=0;oi<order.length;oi++){
+                const mi=order[oi];
+                visitSynthStarts[oi]=cursorTimeline;
+                const span=osmdMeasurePlaybackSpanWhole(measures,mi);
+                const rows=rowsBy[mi];
+                const base=osmdMeasureMinAbsWholeInRows(rows);
+                if(base==null){
+                    cursorTimeline+=span;
+                    continue;
+                }
+                for(let ri=0;ri<rows.length;ri++){
+                    const row=rows[ri];
+                    const playInfos=row.playInfos.map(p=>({...p,note:p.note}));
+                    out.push({
+                        stepIdx:stepCounter++,
+                        absWhole:cursorTimeline+(row.absWhole-base),
+                        stepBpm:row.stepBpm,
+                        playInfos
+                    });
+                }
+                cursorTimeline+=span;
+            }
+            if(!out.length){
+                repeatChainLog({ok:false,skip:'out_empty',rawCursorRows:rawLen,M,orderLen:order.length,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`nyers_sor=${rawLen} orderLen=${order.length} de kimenet_sor=0 (ütemekhez nem volt kurzor-sor)`,alertHu:'Bővített ütem-sorrend van, de egyetlen lejátszható sort sem sikerült képezni (kurzor-sor / ütem párosítás?).'});
+                return rawRows;
+            }
+            repeatChainLog({ok:true,expanded:true,rawCursorRows:rawLen,kimenetSor:out.length,orderLen:order.length,M,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`Kiterjesztés OK: nyers_sor ${rawLen} → kimenet_sor ${out.length} (ütem-index lista ${order.length} / alap ${M} ütem)`,alertHu:`Kiterjesztés sikeres.\nNyers sorok: ${rawLen}\nKimenet sorok: ${out.length}\nÜtem-lejátszási lista hossza: ${order.length} (eredeti ütemek: ${M})`});
+            scorePedalEventsExpanded=osmdRemapPedalEventsToSyntheticTimeline(measures,order,visitSynthStarts);
+            return out;
+        }catch(e){
+            console.warn('expandRawRowsWithRepeats:',e);
+            const msg=e&&e.message?String(e.message):String(e);
+            repeatChainLog({ok:false,error:msg,rawCursorRows:rawLen,oneLine:'expandRawRowsWithRepeats kivétel: '+msg,alertHu:'Hiba a bővítésben: '+msg});
+            scorePedalEventsExpanded=null;
+            return rawRows;
+        }
+    }
+    /** Globális (kotta) absWhole → DEMO merge absWhole, ha ismétlés miatt új idővonal készült. */
+    function osmdRemapPedalEventsToSyntheticTimeline(measures,order,visitSynthStarts){
+        const baseEvents=scorePedalEvents;
+        if(!baseEvents||!baseEvents.length||!order||!visitSynthStarts||order.length!==visitSynthStarts.length)return[];
+        const M=measures.length;
+        const EPS=1e-7;
+        const measureStartAw=[];
+        for(let mi=0;mi<M;mi++)measureStartAw.push(measureAbsoluteTimestampWhole(measures[mi]));
+        function measureIndexAtAw(aw){
+            for(let mi=M-1;mi>=0;mi--){
+                if(measureStartAw[mi]<=aw+EPS)return mi;
+            }
+            return 0;
+        }
+        const out=[];
+        for(let ei=0;ei<baseEvents.length;ei++){
+            const ev=baseEvents[ei];
+            if(!Number.isFinite(ev.absWhole))continue;
+            const mi=measureIndexAtAw(ev.absWhole);
+            const ms=measureStartAw[mi];
+            const span=osmdMeasurePlaybackSpanWhole(measures,mi);
+            let rel=ev.absWhole-ms;
+            if(rel<-EPS)rel=0;
+            if(rel>span+EPS)rel=Math.max(0,span);
+            for(let vi=0;vi<order.length;vi++){
+                if(order[vi]!==mi)continue;
+                const base=visitSynthStarts[vi];
+                if(!Number.isFinite(base))continue;
+                out.push({absWhole:base+rel,down:!!ev.down});
+            }
+        }
+        out.sort((a,b)=>{
+            const d=a.absWhole-b.absWhole;
+            if(Math.abs(d)>EPS)return d;
+            return(a.down?1:0)-(b.down?1:0);
+        });
+        const dedup=[];
+        for(let i=0;i<out.length;i++){
+            const e=out[i];
+            const p=dedup[dedup.length-1];
+            if(p&&Math.abs(e.absWhole-p.absWhole)<=EPS&&e.down===p.down)continue;
+            dedup.push(e);
+        }
+        return dedup;
+    }
+    function getExpandedSequence(rawRows){return expandRawRowsWithRepeats(rawRows);}
     function osmdMergeRawRowsToMergedSteps(raw){
         raw.sort((a,b)=>a.absWhole-b.absWhole||a.stepIdx-b.stepIdx);
         const merged=[];
@@ -4882,8 +5476,23 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         resetScoreOsmdFollowSnap();
         extractScorePedalEventsFromSheet();
         if(!osmdInstance||!osmdInstance.cursor)return;
-        const mergedAll=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        let mergedAll;
+        try{
+            mergedAll=osmdMergeRawRowsToMergedSteps(expandRawRowsWithRepeats(osmdCollectRawCursorRows()));
+        }catch(e){
+            console.warn('buildScoreStepsFromOsmd merge:',e);
+            mergedAll=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        }
         const merged=filterMergedByPracticeRange(mergedAll);
+        try{
+            const d=window.__lastRepeatExpandDebug;
+            if(d&&typeof d==='object'){
+                d.mergedSteps=mergedAll.length;
+                d.filteredMergedSteps=merged.length;
+                d.practiceFilterActive=!!isPracticeRangeActive();
+            }
+            console.warn('[REPEAT-CHAIN] merge → mergedSteps='+mergedAll.length+' (szűrés után '+merged.length+') → scoreSteps feltöltve');
+        }catch(e3){}
         merged.forEach(m=>{
             finalizeMergedStepPlayInfos(m);
             scoreSteps.push({
@@ -4975,9 +5584,30 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         sendMidiDemoPedalUpAllChannels();
         demoScoreSustainPedalDown=false;
         releaseAllDemoSustainInternal();
-        if(!osmdInstance||!osmdInstance.cursor||!audioCtx)return;
-        let merged=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        if(!osmdInstance||!osmdInstance.cursor||!audioCtx){
+            demoPlaying=false;
+            const bd=document.getElementById('btnDemo');
+            if(bd)bd.classList.remove('active');
+            syncDemoButtonIcon(false);
+            setInfoBar(currentLang==='HU'?'Nincs hangkimenet (AudioContext). Kattints a képernyőre, vagy ellenőrizd a hálózatot / CDN-t.':'No audio output (AudioContext). Click the page, or check network/CDN.',null);
+            return;
+        }
+        let merged;
+        try{
+            merged=osmdMergeRawRowsToMergedSteps(expandRawRowsWithRepeats(osmdCollectRawCursorRows()));
+        }catch(e){
+            console.warn('_playScoreDemo merge:',e);
+            merged=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        }
         merged=filterMergedByPracticeRange(merged);
+        try{
+            const d=window.__lastRepeatExpandDebug;
+            if(d&&typeof d==='object'){
+                d.demoMergedSteps=merged.length;
+                d.demoAfterPracticeFilter=!!isPracticeRangeActive();
+            }
+            console.warn('[REPEAT-CHAIN] DEMO merge → lépések='+merged.length);
+        }catch(e4){}
         if(!merged.length){
             demoPlaying=false;
             const bd=document.getElementById('btnDemo');
@@ -5001,7 +5631,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         const minAw=merged[0].absWhole;
         const maxAw=merged[merged.length-1].absWhole;
         const EPSped=1e-5;
-        const pedalItems=scorePedalEvents.filter(ev=>ev.absWhole>=minAw-EPSped&&ev.absWhole<=maxAw+EPSped).map(ev=>{
+        const pedEvSrc=scorePedalEventsExpanded!=null?scorePedalEventsExpanded:scorePedalEvents;
+        const pedalItems=pedEvSrc.filter(ev=>ev.absWhole>=minAw-EPSped&&ev.absWhole<=maxAw+EPSped).map(ev=>{
             const t=secondsAtAbsWholeFromMergedSteps(ev.absWhole,merged);
             return{t,down:ev.down};
         }).filter(x=>Number.isFinite(x.t));
@@ -5164,6 +5795,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(osmdInstance)return;
         osmdInstance=new opensheetmusicdisplay.OpenSheetMusicDisplay(document.getElementById('osmd-container'),{
             autoResize:true,backend:'svg',drawTitle:true,drawSubtitle:true,drawComposer:true,drawLyricist:true,
+            /* WebGL skyline batch = több kontextus + több RAM; Plain elég repertoárhoz, kevesebb „Too many WebGL contexts” */
+            preferredSkyBottomLineBatchCalculatorBackend:0,
             cursorsOptions:[{type:0,color:'#000000',alpha:0,follow:false}],
         });
     }
