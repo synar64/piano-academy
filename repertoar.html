@@ -174,6 +174,11 @@
         .key-glow.pressed::after { content:''; position:absolute; pointer-events:none; z-index:150; top:0; left:0; width:100%; height:100%; border-radius:0 0 4px 4px; background:rgba(0,0,0,0.11); box-shadow:inset 6px 0 10px -2px rgba(0,0,0,0.6); }
         .black-glow.pressed::after { top:6px; left:25%; width:50%; height:77%; border-radius:2px; background:rgba(255,255,255,0.36); z-index:40; }
         .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; pointer-events:none; z-index:9999; }
+        .key-finger-num { position:absolute; top:-24px; left:50%; transform:translateX(-50%); min-width:10px; text-align:center; font-family:'Inter',sans-serif; font-size:11px; font-weight:700; color:rgba(179,230,255,0.75); opacity:0; pointer-events:none; z-index:10000; line-height:1; display:none; }
+        .key-glow.finger-hint-rh .key-finger-num { display:block; opacity:1; color:#b3e6ff; text-shadow:0 0 8px rgba(179,230,255,0.6); }
+        .key-glow.finger-hint-lh .key-finger-num { display:block; opacity:1; color:#e8a878; text-shadow:0 0 8px rgba(232,168,120,0.5); }
+        .key-glow.finger-hint-rh .key-led { opacity:0; }
+        .key-glow.finger-hint-lh .key-led { opacity:0; }
         .key-glow.scale-hint .key-led { opacity:0.4; }
         /* DEMO billentyű-villanás: jobb kéz = kék, bal kéz = pasztell narancs */
         .key-glow.demo-flash .key-led,
@@ -2116,7 +2121,7 @@
                 const pianoMod=await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
                 const Piano=pianoMod.Piano||pianoMod.default?.Piano||pianoMod.default;
                 await Tone.start();
-                const p=new Piano({velocities:2,release:true,pedal:false}).toDestination();
+                const p=new Piano({velocities:5,release:true,pedal:true}).toDestination();
                 await p.load();
                 salamanderPiano=p;
                 audioCtx=Tone.getContext().rawContext;
@@ -2856,12 +2861,12 @@
     let clefState=0;
 
     function cycleHints(){
-        hintState=(hintState+1)%2;
-        showLeds=hintState===1;
+        hintState=(hintState+1)%3;
+        showLeds=hintState>=1;
         document.getElementById('btnHints').classList.toggle('active',showLeds);
         const labels=currentLang==='HU'
-            ?['SEGÉDEK KI','BILLENTYŰ LED + SÁV (GYAKORLÁS)']
-            :['HINTS OFF','KEY LEDS + STRIP (PRACTICE)'];
+            ?['SEGÉDEK KI','BILLENTYŰ LED + SÁV (GYAKORLÁS)','UJJREND + LED (GYAKORLÁS)']
+            :['HINTS OFF','KEY LEDS + STRIP (PRACTICE)','FINGERING + LEDS (PRACTICE)'];
         setInfoBar(labels[hintState],document.getElementById('btnHints'));
         updateKeyLeds();draw();
     }
@@ -2891,13 +2896,43 @@
             });
         });
     }
+    function clearFingerHintsOnKeys(){
+        document.querySelectorAll('.key-glow.finger-hint-rh,.key-glow.finger-hint-lh').forEach(k=>{
+            k.classList.remove('finger-hint-rh','finger-hint-lh');
+            const fn=k.querySelector('.key-finger-num');
+            if(fn){fn.textContent='';fn.style.display='none';}
+        });
+    }
     function updateKeyLeds(){
         clearChordHintsOnKeys();
+        clearFingerHintsOnKeys();
         if(!showLeds){syncKeyHintStrip();return;}
         if(scoreMode&&isRunning&&scorePracticeSteps.length&&scoreStepIndex<scorePracticeSteps.length){
             const st=scorePracticeSteps[scoreStepIndex];
-            if(activeRH)st.rhMidis.forEach(m=>{const el=document.getElementById('k-'+m);if(el)el.classList.add('chord-hint-rh');});
-            if(activeLH)st.lhMidis.forEach(m=>{const el=document.getElementById('k-'+m);if(el)el.classList.add('chord-hint-lh');});
+            const fm=st.fingerMap||{};
+            const showFingers=(hintState===2);
+            if(activeRH)st.rhMidis.forEach(m=>{
+                const el=document.getElementById('k-'+m);if(!el)return;
+                const fi=fm[m]&&fm[m].rh;
+                if(showFingers&&fi){
+                    const fn=el.querySelector('.key-finger-num');
+                    if(fn){fn.textContent=fi;fn.style.display='block';}
+                    el.classList.add('finger-hint-rh');
+                }else{
+                    el.classList.add('chord-hint-rh');
+                }
+            });
+            if(activeLH)st.lhMidis.forEach(m=>{
+                const el=document.getElementById('k-'+m);if(!el)return;
+                const fi=fm[m]&&fm[m].lh;
+                if(showFingers&&fi){
+                    const fn=el.querySelector('.key-finger-num');
+                    if(fn){fn.textContent=fi;fn.style.display='block';}
+                    el.classList.add('finger-hint-lh');
+                }else{
+                    el.classList.add('chord-hint-lh');
+                }
+            });
         }
         syncKeyHintStrip();
     }
@@ -3126,6 +3161,7 @@
             if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}
             else{const blackOffsets={1:-0.621,3:-0.477,6:-0.723,8:-0.559,10:-0.415};const noteInOctave=m%12;const offset=blackOffsets[noteInOctave]!==undefined?blackOffsets[noteInOctave]:-0.6;k.style.left=((wIdx*1.92307)+offset)+'%';k.style.width='1.241%';k.style.height='65%';k.style.zIndex='200';}
             const led=document.createElement('div');led.className='key-led';k.appendChild(led);
+            const kfn=document.createElement('div');kfn.className='key-finger-num';k.appendChild(kfn);
             k.onmousedown=(e)=>{e.preventDefault();k.classList.add('pressed');handleNoteOn(m,100);};
             k.onmouseup=()=>{k.classList.remove('pressed');releaseNoteAudio(m);};
             k.onmouseleave=()=>{k.classList.remove('pressed');releaseNoteAudio(m);};
@@ -4700,8 +4736,29 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     const midi=osmdHalfToneToMidi(n.Pitch.halfTone);
                     const staffIndex=osmdStaffIndexOfNote(n);
                     const durQ=osmdNoteLengthInQuarters(n);
+                    // Extract fingering from MusicXML <fingering> if available
+                    let finger=null;
+                    try{
+                        // OSMD stores fingering in TechnicalInstructions on the parent VoiceEntry
+                        const pve=n.ParentVoiceEntry||n.parentVoiceEntry;
+                        if(pve){
+                            const ti=pve.TechnicalInstructions||pve.technicalInstructions;
+                            if(ti&&ti.length){
+                                for(let t=0;t<ti.length;t++){
+                                    const inst=ti[t];
+                                    if(inst&&(inst.type===0||inst.Type===0)&&inst.value!=null){
+                                        finger=String(inst.value);break;
+                                    }
+                                    if(inst&&inst.value!=null&&/^[1-5]$/.test(String(inst.value))){
+                                        finger=String(inst.value);break;
+                                    }
+                                }
+                            }
+                        }
+                        if(!finger&&n.Fingering!=null) finger=String(n.Fingering);
+                    }catch(e){}
                     return{
-                        note:n,midi,staffIndex,durQ,
+                        note:n,midi,staffIndex,durQ,finger,
                         tieCont:osmdNoteIsTieContinuation(n),
                         tieOut:osmdNoteTieHasOutgoing(n)
                     };
@@ -4739,16 +4796,23 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             return true;
         });
         const rhMidis=[],lhMidis=[],noteObjsRH=[],noteObjsLH=[];
+        const fingerMap={};  // midi → {rh:finger, lh:finger}
         let durQ=0;
         m.playInfos.forEach(p=>{
             durQ=Math.max(durQ,p.durQ);
             if(p.staffIndex<=0){rhMidis.push(p.midi);noteObjsRH.push(p.note);}
             else{lhMidis.push(p.midi);noteObjsLH.push(p.note);}
+            if(p.finger){
+                if(!fingerMap[p.midi])fingerMap[p.midi]={};
+                if(p.staffIndex<=0)fingerMap[p.midi].rh=p.finger;
+                else fingerMap[p.midi].lh=p.finger;
+            }
         });
         m.rhMidis=rhMidis;
         m.lhMidis=lhMidis;
         m.noteObjsRH=noteObjsRH;
         m.noteObjsLH=noteObjsLH;
+        m.fingerMap=fingerMap;
         m.durQ=durQ;
     }
     /** Ha relativeToFirstRow: az első sor ideje 0 (ütemtartományos DEMO: ne várjon a darab elejétől). */
@@ -4817,7 +4881,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             finalizeMergedStepPlayInfos(m);
             scoreSteps.push({
                 rhMidis:m.rhMidis,lhMidis:m.lhMidis,noteObjsRH:m.noteObjsRH,noteObjsLH:m.noteObjsLH,
-                absWhole:m.absWhole,durQ:m.durQ,stepBpm:m.stepBpm,playInfos:m.playInfos,cursorStep:m.cursorStep
+                absWhole:m.absWhole,durQ:m.durQ,stepBpm:m.stepBpm,playInfos:m.playInfos,cursorStep:m.cursorStep,
+                fingerMap:m.fingerMap||{}
             });
         });
     }
@@ -4836,6 +4901,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     durQ:s.durQ,
                     stepBpm:s.stepBpm,
                     cursorStep:s.cursorStep,
+                    fingerMap:s.fingerMap||{},
                     playInfos:s.playInfos?s.playInfos.map(p=>({...p,note:p.note})):undefined
                 });
             });
