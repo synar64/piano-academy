@@ -3320,7 +3320,7 @@
         await ensureAudioContextBase();
         if(!audioCtx)return;
         metroIsRunning=!metroIsRunning;document.getElementById('metroToggle').classList.toggle('active',metroIsRunning);
-        if(metroIsRunning){document.getElementById('metroBpmDisplay').innerText=bpm;if(!metroSamplesLoaded)await loadMetroSamples();metroNextNoteTime=audioCtx.currentTime+0.05;metroCurrentBeat=0;metroScheduler();}
+        if(metroIsRunning){if(!metroSamplesLoaded)await loadMetroSamples();metroNextNoteTime=audioCtx.currentTime+0.05;metroCurrentBeat=0;metroScheduler();}
     }
     function toggleMetroMenu(){const menu=document.getElementById('metroSettingsMenu');menu.style.display=(menu.style.display==='none'||menu.style.display==='')?'flex':'none';}
 
@@ -4751,15 +4751,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }catch(e){}
         return null;
     }
-    function applyTimeSignatureFromLoadedOsmdScore(){
-        const sh=getOsmdMusicSheet();
-        if(!sh)return;
-        const measures=getAllSourceMeasures(sh);
-        let pair=null;
-        for(let i=0;i<measures.length;i++){
-            pair=readTimeSignatureFromSourceMeasure(measures[i]);
-            if(pair)break;
-        }
+    /** Apply a numerator/denominator pair to the metronome Time Signature control (English UI). */
+    function applyTimeSignaturePairToMetroSelect(pair){
         if(!pair)return;
         const num=pair.numerator|0;
         const den=pair.denominator|0;
@@ -4780,15 +4773,50 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         metroTimeSig=Math.max(1,parseInt(chosen.split('/')[0],10)||4);
         metroCurrentBeat=0;
     }
+    /** Current OSMD measure: update Time Signature dropdown + metronome beat count from ActiveTimeSignature. */
+    function syncMetroTimeSigFromSourceMeasure(pm){
+        if(!pm)return;
+        const pair=readTimeSignatureFromSourceMeasure(pm);
+        if(pair)applyTimeSignaturePairToMetroSelect(pair);
+    }
+    /** Compound 6/8, 9/8, 12/8 (and 3/8): OSMD TempoInBPM is quarter-note BPM; marking is usually dotted-quarter = 1.5 Q. */
+    function displayTempoBpmForScoreUi(pm, quarterBpm){
+        if(!(typeof quarterBpm==='number'&&quarterBpm>0))return Math.round(bpm);
+        const ts=pm?readTimeSignatureFromSourceMeasure(pm):null;
+        if(!ts)return Math.round(quarterBpm);
+        const num=ts.numerator, den=ts.denominator;
+        if(den===8&&(num===3||num===6||num===9||num===12)){
+            const w=Math.round(quarterBpm/1.5);
+            if(w>=20&&w<=400)return w;
+        }
+        return Math.round(quarterBpm);
+    }
+    function setMetroBpmDisplayFromScore(pm, quarterBpm){
+        const d=document.getElementById('metroBpmDisplay');
+        if(!d)return;
+        const q=typeof quarterBpm==='number'&&quarterBpm>0?quarterBpm:bpm;
+        d.innerText=String(pm?displayTempoBpmForScoreUi(pm,q):Math.round(q));
+    }
+    function applyTimeSignatureFromLoadedOsmdScore(){
+        const sh=getOsmdMusicSheet();
+        if(!sh)return;
+        const measures=getAllSourceMeasures(sh);
+        let pair=null;
+        for(let i=0;i<measures.length;i++){
+            pair=readTimeSignatureFromSourceMeasure(measures[i]);
+            if(pair)break;
+        }
+        applyTimeSignaturePairToMetroSelect(pair);
+    }
     function applyTempoFromLoadedOsmdScore(){
         lastLoadedScoreBpmFromXml=0;
         const sh=getOsmdMusicSheet();
         if(!sh)return;
-        let raw=0;
+        let raw=0, srcPm=null;
         const arr=getAllSourceMeasures(sh);
         for(let i=0;i<arr.length;i++){
             const t=readTempoFromSourceMeasure(arr[i]);
-            if(t>0){raw=t;break;}
+            if(t>0){raw=t;srcPm=arr[i];break;}
         }
         if(!raw){
             const d0=sh.DefaultStartTempoInBpm||sh.userStartTempoInBPM||0;
@@ -4797,8 +4825,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(typeof raw!=='number'||raw<=0||raw>400)return;
         bpm=Math.max(40,Math.min(208,Math.round(raw)));
         lastLoadedScoreBpmFromXml=bpm;
-        const d=document.getElementById('metroBpmDisplay');
-        if(d)d.innerText=bpm;
+        setMetroBpmDisplayFromScore(srcPm,bpm);
     }
     async function osmdFitWidth(){
         if(!osmdInstance)return;
@@ -5647,6 +5674,16 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         const scrollNotes=[...(activeRH?st.noteObjsRH:[]),...(activeLH?st.noteObjsLH:[])];
         scheduleOsmdRender(scrollNotes.length?scrollNotes:null);
+        try{
+            const pi=st.playInfos&&st.playInfos.length?st.playInfos[0]:null;
+            const pm=pi&&pi.note?osmdNoteToSourceMeasure(pi.note):null;
+            if(pm){
+                syncMetroTimeSigFromSourceMeasure(pm);
+                const qb=readTempoFromSourceMeasure(pm);
+                const seg=(typeof st.stepBpm==='number'&&st.stepBpm>0)?st.stepBpm:bpm;
+                setMetroBpmDisplayFromScore(pm,qb>0?qb:seg);
+            }
+        }catch(e){}
     }
     function handleScorePracticeNoteOn(midi){
         let ok=false;
@@ -5763,10 +5800,20 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     queueDemoMidiAtAudioTime([0x90|DEMO_MIDI_CHANNEL,m&127,100],tOn,pbGen);
             }
             scheduleAtAudioTime(tOn,()=>{
-                if(typeof st.stepBpm==='number'&&st.stepBpm>0){
-                    bpm=st.stepBpm;
+                let pm=null;
+                try{
+                    const n0=st.playInfos&&st.playInfos[0]&&st.playInfos[0].note;
+                    pm=n0?osmdNoteToSourceMeasure(n0):null;
+                    if(pm)syncMetroTimeSigFromSourceMeasure(pm);
+                }catch(e0){}
+                if(typeof st.stepBpm==='number'&&st.stepBpm>0)bpm=st.stepBpm;
+                const tb=(typeof st.stepBpm==='number'&&st.stepBpm>0)?st.stepBpm:bpm;
+                try{
+                    if(pm)setMetroBpmDisplayFromScore(pm,tb);
+                    else{const db=document.getElementById('metroBpmDisplay');if(db)db.innerText=String(tb);}
+                }catch(e2){
                     const db=document.getElementById('metroBpmDisplay');
-                    if(db)db.innerText=bpm;
+                    if(db)db.innerText=String(tb);
                 }
                 if(demoInternalSamplesWanted()){
                     for(const p of active){
