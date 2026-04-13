@@ -5193,7 +5193,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(!rep||rep.FromWords||rep.fromWords)continue;
                 const endings=osmdRepetitionNumberOfEndings(rep);
                 if(endings>1){
-                    return{hasVolta:true,start:measureIndex,voltaPass:1,maxVoltaPass:endings};
+                    return{hasVolta:true,start:measureIndex,voltaPass:1,maxVoltaPass:endings,pass1Emitted:new Set(),hasPlayedFirstEnding:false};
                 }
                 const passes=osmdRepetitionTotalPasses(rep);
                 let bj=Math.max(0,passes-1);
@@ -5238,7 +5238,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(!useVolta&&lab.size>0)useVolta=true;
                 if(useVolta){
                     const maxVp=Math.max(endings>1?endings:0,osmdMaxEndingLabelNearMeasure(measures,backwardIdx));
-                    return{hasVolta:true,start,voltaPass:1,maxVoltaPass:Math.min(8,Math.max(2,maxVp))};
+                    return{hasVolta:true,start,voltaPass:1,maxVoltaPass:Math.min(8,Math.max(2,maxVp)),pass1Emitted:new Set(),hasPlayedFirstEnding:false};
                 }
                 const passes=osmdRepetitionTotalPasses(rep);
                 let bj=Math.max(0,passes-1);
@@ -5279,9 +5279,44 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(fr&&(fr.hasVolta||(fr.backJumpsRemaining||0)>0))stack.push(fr);
             }
             skipForwardRepeatPush=false;
+            if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)&&!stack.length){
+                const parsedEarly=osmdParseRepeatFrameFromBackwardMeasure(sm,i,measures);
+                if(parsedEarly&&(parsedEarly.hasVolta||(parsedEarly.backJumpsRemaining||0)>0))stack.push(parsedEarly);
+            }
+            if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)){
+                const frFlush=stack.length?stack[stack.length-1]:null;
+                if(frFlush&&frFlush.hasVolta&&frFlush.voltaPass===1&&rowMeasures&&rowMeasures.size&&i>frFlush.start){
+                    const inserted=[];
+                    for(let k=frFlush.start;k<i;k++){
+                        if(!rowMeasures.has(k))continue;
+                        if(frFlush.pass1Emitted&&frFlush.pass1Emitted.has(k))continue;
+                        if(!osmdMeasureAllowedOnVoltaPass(k,1,voltMap,measures,rowMeasures))continue;
+                        out.push(k);
+                        if(!frFlush.pass1Emitted)frFlush.pass1Emitted=new Set();
+                        frFlush.pass1Emitted.add(k);
+                        frFlush.hasPlayedFirstEnding=true;
+                        inserted.push(k);
+                    }
+                    if(inserted.length&&osmdRepeatDebugVerbose())
+                        console.warn('[REPEAT-CHAIN] volta pass1 flush before :| at list index',i,'inserted indices',inserted.join(','));
+                }
+            }
             const vp=osmdActiveVoltaPassForMeasure(stack,i);
             const voltSkip=vp!=null&&!osmdMeasureAllowedOnVoltaPass(i,vp,voltMap,measures,rowMeasures);
-            if(!voltSkip)out.push(i);
+            if(!voltSkip){
+                out.push(i);
+                if(vp===1&&stack.length){
+                    for(let s=stack.length-1;s>=0;s--){
+                        const fr=stack[s];
+                        if(fr&&fr.hasVolta&&fr.voltaPass===1&&i>=fr.start){
+                            if(!fr.pass1Emitted)fr.pass1Emitted=new Set();
+                            fr.pass1Emitted.add(i);
+                            fr.hasPlayedFirstEnding=true;
+                            break;
+                        }
+                    }
+                }
+            }
             if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)){
                 let jumped=false;
                 for(;;){
@@ -5392,6 +5427,14 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         return Math.max(1e-4,osmdSourceMeasureDurationWhole(sm));
     }
+    /** ?repeatDebug=1 / localStorage osmd_repeat_debug / window.OSMD_REPEAT_DEBUG — részletes ismétlés- és DEMO-ütemlog */
+    function osmdRepeatDebugVerbose(){
+        try{
+            return typeof window!=='undefined'&&(window.OSMD_REPEAT_DEBUG===true
+                ||(typeof localStorage!=='undefined'&&localStorage.getItem('osmd_repeat_debug')==='1')
+                ||(typeof location!=='undefined'&&/[?&]repeatDebug=1(?:&|$)/.test(location.search||'')));
+        }catch(e){return false;}
+    }
     /**
      * Konzol + window.__lastRepeatExpandDebug: hol szakad meg az ismétlés-láncolat.
      * Részletes alert: böngésző konzolban localStorage.setItem('osmd_repeat_debug','1') vagy ?repeatDebug=1 az URL-ben, vagy window.OSMD_REPEAT_DEBUG=true
@@ -5400,9 +5443,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         try{window.__lastRepeatExpandDebug=summary;}catch(e){}
         const line=summary.oneLine!=null?summary.oneLine:JSON.stringify(summary);
         console.warn('[REPEAT-CHAIN]',line);
-        const shout=(typeof window!=='undefined'&&(window.OSMD_REPEAT_DEBUG===true
-            ||(typeof localStorage!=='undefined'&&localStorage.getItem('osmd_repeat_debug')==='1')
-            ||(typeof location!=='undefined'&&/[?&]repeatDebug=1(?:&|$)/.test(location.search||''))));
+        const shout=osmdRepeatDebugVerbose();
         if(shout&&typeof alert==='function'&&summary.alertHu)alert(summary.alertHu);
     }
     /**
@@ -5884,6 +5925,11 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     const n0=st.playInfos&&st.playInfos[0]&&st.playInfos[0].note;
                     pm=n0?osmdNoteToSourceMeasure(n0):null;
                     if(pm)syncMetroTimeSigFromSourceMeasure(pm);
+                    if(osmdRepeatDebugVerbose()&&pm){
+                        const currentMeasureIndex=osmdPracticeCanonicalFromSourceMeasure(pm);
+                        const disp=currentMeasureIndex!=null?currentMeasureIndex:(osmdRawMeasureNumberFromSourceMeasure(pm)??'?');
+                        console.log('Playing Measure:', disp);
+                    }
                 }catch(e0){}
                 if(typeof st.stepBpm==='number'&&st.stepBpm>0)bpm=st.stepBpm;
                 const tb=(typeof st.stepBpm==='number'&&st.stepBpm>0)?st.stepBpm:bpm;
