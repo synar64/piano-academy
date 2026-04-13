@@ -5052,12 +5052,42 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         return map;
     }
-    function osmdMeasureAllowedOnVoltaPass(mi, voltaPass, voltMap){
+    function osmdNextBackwardMeasureIndex(measures, fromMi){
+        const M=measures?measures.length:0;
+        if(!M)return -1;
+        for(let j=fromMi+1;j<M;j++)
+            if(measures[j]&&osmdMeasureHasRepeatBackwardSignals(measures[j]))return j;
+        return -1;
+    }
+    /**
+     * Volta-pass: OSMD EndingIndexDict néha az 1. ház ütemét is kizárólagos 2. házként jelöli.
+     * Ilyenkor az 1. körben (voltaPass===1) kihagyjuk a hangot, holott a kotta szerint le kell játszani.
+     * Javítás: ha a kottában explicit szerepel a jelenlegi pass száma az ending labelben → engedély.
+     * Ha közvetlenül egy volta-s :| előtti ütemben van lejátszandó sor, és a :| volta → első körben engedély.
+     */
+    function osmdMeasureAllowedOnVoltaPass(mi, voltaPass, voltMap, measures, rowMeasures){
+        if(typeof voltaPass!=='number'||!Number.isFinite(voltaPass))return true;
+        if(measures&&measures[mi]){
+            try{
+                const lab=osmdMeasureEndingLabelSet(measures[mi]);
+                if(lab.size&&lab.has(voltaPass))return true;
+            }catch(e){}
+        }
         const L=voltMap.get(mi);
         if(!L||L.size===0)return true;
         if(L.size>1)return true;
         const only=[...L][0];
-        return voltaPass===only;
+        if(voltaPass===only)return true;
+        if(voltaPass===1&&only!==1&&rowMeasures&&rowMeasures.size&&rowMeasures.has(mi)&&measures){
+            const nb=osmdNextBackwardMeasureIndex(measures,mi);
+            if(nb===mi+1&&measures[nb]&&osmdMeasureHasRepeatBackwardSignals(measures[nb])){
+                try{
+                    const parsed=osmdParseRepeatFrameFromBackwardMeasure(measures[nb],nb,measures);
+                    if(parsed&&parsed.hasVolta)return true;
+                }catch(e){}
+            }
+        }
+        return false;
     }
     function osmdMeasureHasLineRepeatForwardStart(sm){
         if(!sm)return false;
@@ -5226,9 +5256,10 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         return null;
     }
     /** Ütemlista-indexek ismétlésekkel (:||) és volta (1./2. ház) OSMD SourceMeasure alapján. */
-    function osmdExpandMeasurePlaybackOrder(measures){
+    function osmdExpandMeasurePlaybackOrder(measures, rowMeasures){
         const M=measures.length;
         if(!M)return[];
+        if(!rowMeasures)rowMeasures=new Set();
         const sh=getOsmdMusicSheet();
         const voltMap=osmdBuildMeasureVoltaExclusiveMap(sh,measures,M);
         const stack=[];
@@ -5249,7 +5280,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             }
             skipForwardRepeatPush=false;
             const vp=osmdActiveVoltaPassForMeasure(stack,i);
-            const voltSkip=vp!=null&&!osmdMeasureAllowedOnVoltaPass(i,vp,voltMap);
+            const voltSkip=vp!=null&&!osmdMeasureAllowedOnVoltaPass(i,vp,voltMap,measures,rowMeasures);
             if(!voltSkip)out.push(i);
             if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)){
                 let jumped=false;
@@ -5418,7 +5449,12 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 const r=sh.Repetitions||sh.repetitions;
                 repListLen=r&&r.length?r.length:0;
             }catch(e2){repListLen=-1;}
-            const order=osmdExpandMeasurePlaybackOrder(measures);
+            const rowMeasures=new Set();
+            rawRows.forEach(r=>{
+                const mi=osmdRawRowMeasureListIndex(r);
+                if(mi>=0&&mi<M)rowMeasures.add(mi);
+            });
+            const order=osmdExpandMeasurePlaybackOrder(measures, rowMeasures);
             if(!order||!order.length){
                 repeatChainLog({ok:false,skip:'no_order',rawCursorRows:rawLen,M,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`nyers_sor=${rawLen} M=${M} |:_vonals=${cFwdLine} :|_vonals=${cBackLine} |:_ins=${cFwdIns} :|_ins=${cBackIns} → order üres`,alertHu:`Ismétlés-sorrend üres. M=${M}, |: vonal=${cFwdLine}, :| vonal=${cBackLine}, |: ins=${cFwdIns}, :| ins=${cBackIns}`});
                 return rawRows;
