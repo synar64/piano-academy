@@ -5296,17 +5296,33 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         return out;
     }
+    /** Nyers kurzor-sor → SourceMeasures tömb index. Volta / ismétlés mellett a measureListIndex néha rossz — ilyenkor a hang abszolút ideje alapján keresünk. */
     function osmdRawRowMeasureListIndex(row){
         if(!row||!row.playInfos||!row.playInfos[0])return -1;
-        const sm=osmdNoteToSourceMeasure(row.playInfos[0].note);
+        const note=row.playInfos[0].note;
+        const sm=osmdNoteToSourceMeasure(note);
         if(!sm)return -1;
         const sh=getOsmdMusicSheet();
-        if(sh){
-            const arr=getAllSourceMeasures(sh);
-            for(let k=0;k<arr.length;k++)if(arr[k]===sm)return k;
-        }
-        const ix=sm.measureListIndex!=null?sm.measureListIndex:sm.MeasureListIndex;
-        return typeof ix==='number'&&ix>=0?ix:-1;
+        if(!sh)return -1;
+        const arr=getAllSourceMeasures(sh);
+        const M=arr.length;
+        if(!M)return -1;
+        for(let k=0;k<M;k++)if(arr[k]===sm)return k;
+        const ix=sm.measureListIndex!=null?sm.measureListIndex:(sm.MeasureListIndex!=null?sm.MeasureListIndex:-1);
+        if(typeof ix==='number'&&ix>=0&&ix<M&&arr[ix]===sm)return ix;
+        try{
+            const aw=osmdGraphicalAbsWhole(note);
+            if(typeof aw==='number'&&isFinite(aw)){
+                for(let k=0;k<M;k++){
+                    const w0=measureAbsoluteTimestampWhole(arr[k]);
+                    const w1=k+1<M?measureAbsoluteTimestampWhole(arr[k+1]):1e300;
+                    if(aw+1e-9>=w0&&aw<w1-1e-9)return k;
+                }
+                const wLast=measureAbsoluteTimestampWhole(arr[M-1]);
+                if(aw+1e-9>=wLast)return M-1;
+            }
+        }catch(e){}
+        return -1;
     }
     function osmdBuildRowsByMeasureListIndex(rawRows,measureCount){
         const rowsBy=[];
