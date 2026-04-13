@@ -5424,25 +5424,41 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             let stepCounter=0;
             for(let oi=0;oi<order.length;oi++){
                 const mi=order[oi];
-                visitSynthStarts[oi]=cursorTimeline;
+                const tBlock=cursorTimeline;
+                visitSynthStarts[oi]=tBlock;
                 const span=osmdMeasurePlaybackSpanWhole(measures,mi);
                 const rows=rowsBy[mi];
-                const base=osmdMeasureMinAbsWholeInRows(rows);
-                if(base==null){
-                    cursorTimeline+=span;
+                const rowMin=osmdMeasureMinAbsWholeInRows(rows);
+                if(rowMin==null){
+                    cursorTimeline=tBlock+span;
                     continue;
                 }
+                const mStart=measureAbsoluteTimestampWhole(measures[mi]);
+                const ref=(typeof mStart==='number'&&isFinite(mStart))?mStart:rowMin;
+                let maxRel=0;
                 for(let ri=0;ri<rows.length;ri++){
                     const row=rows[ri];
+                    const rel=Math.max(0,(typeof row.absWhole==='number'?row.absWhole:0)-ref);
+                    if(rel>maxRel)maxRel=rel;
                     const playInfos=row.playInfos.map(p=>({...p,note:p.note}));
                     out.push({
                         stepIdx:stepCounter++,
-                        absWhole:cursorTimeline+(row.absWhole-base),
+                        absWhole:tBlock+rel,
                         stepBpm:row.stepBpm,
                         playInfos
                     });
                 }
-                cursorTimeline+=span;
+                const endByMeter=tBlock+span;
+                const endByContent=tBlock+maxRel;
+                const next=Math.max(endByMeter,endByContent)+1e-7;
+                if(endByContent>endByMeter+1e-6){
+                    try{
+                        if(typeof window!=='undefined'&&(window.OSMD_REPEAT_DEBUG===true
+                            ||(typeof localStorage!=='undefined'&&localStorage.getItem('osmd_repeat_debug')==='1')))
+                            console.warn('[REPEAT-CHAIN] measure',mi,'meterSpan',span,'contentRel',maxRel,'— synthetic block extended (repeat / volta / TS).');
+                    }catch(eDbg){}
+                }
+                cursorTimeline=next;
             }
             if(!out.length){
                 repeatChainLog({ok:false,skip:'out_empty',rawCursorRows:rawLen,M,orderLen:order.length,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`nyers_sor=${rawLen} orderLen=${order.length} de kimenet_sor=0 (ütemekhez nem volt kurzor-sor)`,alertHu:'Bővített ütem-sorrend van, de egyetlen lejátszható sort sem sikerült képezni (kurzor-sor / ütem párosítás?).'});
