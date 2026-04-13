@@ -2608,15 +2608,16 @@
     function persistOsmdThemePreference(){
         try{localStorage.setItem(LS_OSMD_THEME,osmdScoreTheme);}catch(e){}
     }
-    /** Világos → bézs (papír) → sötét (fehér jegyzet) → sötét bézs jegyzet. Régi LS_OSMD_DARK: 0=világos, egyéb/alap=sötét. */
+    /** Világos → bézs (papír) → sötét (fehér jegyzet) → sötét bézs jegyzet. Régi LS_OSMD_DARK: 0=világos, egyéb=sötét. Első látogatás (nincs téma kulcs): világos. */
     function readPersistedOsmdTheme(){
         try{
             const t=localStorage.getItem(LS_OSMD_THEME);
             if(t==='light'||t==='sepia'||t==='dark'||t==='darksepia')return t;
             const old=localStorage.getItem(LS_OSMD_DARK);
             if(old==='0')return 'light';
-            return 'dark';
-        }catch(e){return 'dark';}
+            if(old!=null&&old!=='')return 'dark';
+            return 'light';
+        }catch(e){return 'light';}
     }
     function applyOsmdScoreThemeClass(){
         const cont=document.getElementById('osmd-container');
@@ -2793,7 +2794,7 @@
     }
     // ── draw ──────────────────────────────────────────────────────────────────
     /** 1 = egy hasáb görgetés, 2 = két hasáb / spread, 3 = három hasáb / spread */
-    let bookViewColumns=1;
+    let bookViewColumns=2;
     /** Demó 1 hasábról 2-re vált: leálláskor visszaállítjuk; BOOK a demó alatt törli (felhasználó átvette). */
     let bookViewColumnsBeforeDemo=null;
     function updateBookViewButtonChrome(){
@@ -2949,7 +2950,7 @@
     /** AudioContext + első hang ütemezése a settle után (a fenti ms már ad időt a layoutnak). */
     const DEMO_SCORE_START_LEAD_SEC=0.55;
     let scorePedalEvents=[],scorePedalEventsExpanded=null,demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
-    let scoreMode=true,osmdScoreTheme='dark',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
+    let scoreMode=true,osmdScoreTheme='light',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
     let scoreOsmdFollowSystemKey='';
     let scoreCachedMeasureHLKey='',scoreCachedMeasureHLParts=null;
     let scoreViewFollowQ=false,scoreViewFollowPendingNotes=null;
