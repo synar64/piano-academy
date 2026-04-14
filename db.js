@@ -13,10 +13,14 @@
  *   last_seen_at timestamptz,
  *   is_anonymous boolean not null default true,
  *   auth_user_id uuid unique,
- *   locale text
+ *   locale text,
+ *   xp_total integer not null default 0
  * );
  * comment on column public.users.auth_user_id is
  *   'auth.users.id after email login; use to merge anonymous stats later.';
+ *
+ * -- Ha a tábla már létezett xp_total nélkül:
+ * alter table public.users add column if not exists xp_total integer not null default 0;
  *
  * create table if not exists public.events (
  *   id uuid primary key default gen_random_uuid(),
@@ -40,12 +44,24 @@
  *
  * Optional: Authentication → Sign In / Providers → Anonymous — then you can
  * call auth.signInAnonymously() and map auth.users.id → users.auth_user_id.
+ *
+ * Dev: localStorage.setItem('akira_is_admin','true') — skip insertEvent + syncXpTotal (no Supabase noise).
  */
 (function () {
   'use strict';
 
   var LS_ANON_ID = 'akira_anon_user_id';
   var LS_LEGACY_VISITOR = 'akira_visitor_id';
+  var LS_ADMIN = 'akira_is_admin';
+
+  /** Admin / QA: ne küldjön events és xp_total frissítést a Supabase-nek. */
+  function isAdminSupabaseBypass() {
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem(LS_ADMIN) === 'true';
+    } catch (e) {
+      return false;
+    }
+  }
 
   var TABLES = { USERS: 'users', EVENTS: 'events' };
 
@@ -130,7 +146,8 @@
             is_anonymous: true,
             last_seen_at: now,
             locale: lang,
-            auth_user_id: null
+            auth_user_id: null,
+            xp_total: 0
           })
           .then(function (ins) {
             if (ins.error) {
@@ -156,6 +173,7 @@
   }
 
   function insertEvent(eventType, fields) {
+    if (isAdminSupabaseBypass()) return Promise.resolve();
     var sb = getSupabase();
     if (!sb) return Promise.resolve();
     var userId = getOrCreateAnonymousId();
@@ -190,6 +208,80 @@
     });
   }
 
+  /**
+   * Persists total XP for the current browser user row (users.id = anon id).
+   * @param {number} xpValue non-negative integer
+   */
+  function syncXpTotal(xpValue) {
+    if (isAdminSupabaseBypass()) return Promise.resolve();
+    var sb = getSupabase();
+    if (!sb) return Promise.resolve();
+    var v = Math.max(0, Math.floor(Number(xpValue) || 0));
+    return ensureAnonymousUserRow().then(function () {
+      var uid = getOrCreateAnonymousId();
+      return sb
+        .from(TABLES.USERS)
+        .update({ xp_total: v })
+        .eq('id', uid)
+        .then(function (res) {
+          if (res.error) console.warn('[AkiraDb] syncXpTotal', res.error.message);
+        });
+    });
+  }
+
+  /**
+   * @returns {Promise<number|null>} xp_total from DB, or null if off / no row / error
+   */
+  function fetchXpTotal() {
+    var sb = getSupabase();
+    if (!sb) return Promise.resolve(null);
+    var uid = getOrCreateAnonymousId();
+    return sb
+      .from(TABLES.USERS)
+      .select('xp_total')
+      .eq('id', uid)
+      .maybeSingle()
+      .then(function (res) {
+        if (res.error) {
+          console.warn('[AkiraDb] fetchXpTotal', res.error.message);
+          return null;
+        }
+        if (res.data && res.data.xp_total != null) return Math.max(0, Math.floor(Number(res.data.xp_total)));
+        return null;
+      })
+      .catch(function (e) {
+        console.warn('[AkiraDb] fetchXpTotal', e);
+        return null;
+      });
+  }
+
+  /**
+   * Regisztráció / profil létrehozás: névtelen sor xp_total := max(meglévő, helyi XP).
+   * @param {number} localXp XP a böngészőben (pl. localStorage) összegyűjtve
+   */
+  function mergeLocalXpOnRegister(localXp) {
+    var sb = getSupabase();
+    if (!sb) return Promise.resolve();
+    var v = Math.max(0, Math.floor(Number(localXp) || 0));
+    return ensureAnonymousUserRow().then(function () {
+      var anonId = getOrCreateAnonymousId();
+      return sb
+        .from(TABLES.USERS)
+        .select('xp_total')
+        .eq('id', anonId)
+        .maybeSingle()
+        .then(function (sel) {
+          var cur = 0;
+          if (!sel.error && sel.data && sel.data.xp_total != null) cur = Math.max(0, Math.floor(Number(sel.data.xp_total)));
+          var merged = Math.max(cur, v);
+          return sb.from(TABLES.USERS).update({ xp_total: merged }).eq('id', anonId);
+        })
+        .then(function (up) {
+          if (up.error) console.warn('[AkiraDb] mergeLocalXpOnRegister', up.error.message);
+        });
+    });
+  }
+
   function init() {
     return ensureAnonymousUserRow();
   }
@@ -212,19 +304,32 @@
   }
 
   /**
-   * Later: after email login, set users.auth_user_id and is_anonymous = false.
+   * After Supabase Auth sign-up / link: same users row (anon id), auth_user_id set.
    * @param {string} authUserId from Supabase Auth
+   * @param {number} [localXp] optional client XP to merge with DB (max)
    */
-  function linkRegisteredProfile(authUserId) {
+  function linkRegisteredProfile(authUserId, localXp) {
     var sb = getSupabase();
     if (!sb || !authUserId) return Promise.resolve();
     var anonId = getOrCreateAnonymousId();
+    var loc = typeof localXp === 'number' && localXp >= 0 ? Math.floor(localXp) : null;
     return sb
       .from(TABLES.USERS)
-      .update({ auth_user_id: authUserId, is_anonymous: false })
+      .select('xp_total')
       .eq('id', anonId)
+      .maybeSingle()
+      .then(function (sel) {
+        var cur = 0;
+        if (!sel.error && sel.data && sel.data.xp_total != null) cur = Math.max(0, Math.floor(Number(sel.data.xp_total)));
+        var mergedXp = loc != null ? Math.max(cur, loc) : cur;
+        var payload = { auth_user_id: authUserId, is_anonymous: false, xp_total: mergedXp };
+        return sb.from(TABLES.USERS).update(payload).eq('id', anonId);
+      })
       .then(function (res) {
         if (res.error) console.warn('[AkiraDb] linkRegisteredProfile', res.error.message);
+      })
+      .catch(function (e) {
+        console.warn('[AkiraDb] linkRegisteredProfile', e);
       });
   }
 
@@ -241,7 +346,10 @@
     trackModuleCardClick: trackModuleCardClick,
     signOut: signOut,
     getCurrentAuthUserId: getCurrentAuthUserId,
-    linkRegisteredProfile: linkRegisteredProfile
+    linkRegisteredProfile: linkRegisteredProfile,
+    syncXpTotal: syncXpTotal,
+    fetchXpTotal: fetchXpTotal,
+    mergeLocalXpOnRegister: mergeLocalXpOnRegister
   };
 
   window.AkiraAuth = window.AkiraDb;
