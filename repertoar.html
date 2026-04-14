@@ -927,7 +927,7 @@
             oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
             btnDemo:'▶ DEMO: plays the score with measure highlight. ▲▼ adjusts playback speed (0.3×–1.8×); tap the speed display to reset to 1.0×. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
             btnDemoRepeat:'DEMO repeat: when on, the score DEMO restarts from the beginning each time it reaches the end, until you tap this button off. ▶ still stops playback immediately.',
-            btnMidiRec:'MIDI recording: start / stop. Timeline begins on the first captured MIDI event (not when you press REC).',
+            btnMidiRec:'MIDI recording: start / stop. Timeline starts on the first note (USB MIDI or on-screen keyboard). DEMO alone is not written into this MIDI capture unless it is routed back as MIDI input.',
             btnMidiPlayer:'MIDI player panel: open / close.',
             btnMidiRecRepeat:'Loop at end of playback.',
             audioToggle:'Piano audio: built-in sampled piano on or off.',
@@ -958,7 +958,7 @@
             oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
             btnDemo:'▶ DEMO: lejátszás ütemkiemeléssel. ▲▼ a lejátszási sebesség állítása (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
             btnDemoRepeat:'DEMO ismétlés: bekapcsolva a kotta-DEMO minden lefutás végén elölről indul, amíg ki nem kapcsolod. A ▶ gomb továbbra is azonnal megállítja a lejátszást.',
-            btnMidiRec:'MIDI felvétel: indítás / leállítás. Az idővonal az első rögzített MIDI eseménynél indul (nem a REC gombnál).',
+            btnMidiRec:'MIDI felvétel: indítás / leállítás. Az idővonal az első hangnál indul (USB MIDI vagy képernyős zongora). A DEMO önmagában nem kerül ebbe a MIDI felvételbe, hacsak nincs visszacsatolva MIDI bemenetként.',
             btnMidiPlayer:'Lejátszó ablak: megnyitás / bezárás.',
             btnMidiRecRepeat:'Ismétlés a lejátszás végén.',
             audioToggle:'Zongora hang: belső mintahang be vagy ki.',
@@ -2242,22 +2242,27 @@
 
     function attachMidiInputHandler(input){
         input.onmidimessage=(msg)=>{
-            midiRecorderOnMidiMessage(msg);
-            const d=msg.data;if(d.length<3)return;
-            const cmd=d[0]>>4,n=d[1],v=d[2];
-            if(cmd===11){ // Sustain Pedal
-                if(n===64){
-                    const on=v>=64;
-                    if(sustainPedalDown&&!on){
-                        midiSustainReleaseQueue.forEach(noteNum=>releaseNoteAudio(noteNum));
-                        midiSustainReleaseQueue.clear();
+            _midiRecorderFromHardwareInput=true;
+            try{
+                midiRecorderOnMidiMessage(msg);
+                const d=msg.data;if(d.length<3)return;
+                const cmd=d[0]>>4,n=d[1],v=d[2];
+                if(cmd===11){ // Sustain Pedal
+                    if(n===64){
+                        const on=v>=64;
+                        if(sustainPedalDown&&!on){
+                            midiSustainReleaseQueue.forEach(noteNum=>releaseNoteAudio(noteNum));
+                            midiSustainReleaseQueue.clear();
+                        }
+                        sustainPedalDown=on;
                     }
-                    sustainPedalDown=on;
+                    return;
                 }
-                return;
+                if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
+                else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleMidiNoteOff(n);}
+            }finally{
+                _midiRecorderFromHardwareInput=false;
             }
-            if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
-            else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleMidiNoteOff(n);}
         };
     }
 
@@ -2535,6 +2540,7 @@
     }
 
     function releaseNoteAudio(midi){
+        midiRecorderCaptureAppNoteIfNeeded(midi,0,false);
         if(!salamanderPiano)return;
         try{ salamanderPiano.keyUp({ midi:midi&127 }); }catch(e){}
     }
@@ -3145,6 +3151,7 @@
     function closeInfoGuideModal(){const m=document.getElementById('infoModal');if(m)m.style.display='none';}
     function closePracticeLogModal(){const m=document.getElementById('practiceLogModal');if(m)m.style.display='none';}
     function handleNoteOn(midi,vel=100){
+        midiRecorderCaptureAppNoteIfNeeded(midi,vel,true);
         midiSustainReleaseQueue.delete(midi);
         playTone(midi,vel);
         if(scoreMode&&isRunning&&scorePracticeSteps.length){
@@ -3395,6 +3402,8 @@
     const MIDI_REC_SPEEDS=[0.5,1,1.5,2];
     let midiRecSeekDragging=false,midiRecPlayBaseAudioTime=0,midiRecPlayContentAnchorSec=0;
     let midiRecRepeatEnabled=false;
+    /** Web MIDI callback közben true — ne duplázzuk a virtuális billentyű rögzítésével. */
+    let _midiRecorderFromHardwareInput=false;
     function loadMidiSessionsFromStorage(){
         try{
             const j=JSON.parse(localStorage.getItem(LS_MIDI_REC)||'null');
@@ -3479,6 +3488,18 @@
             midiRecSilenceTimer=null;
             if(midiRecorderIsRecording)endMidiRecordingCapture(true);
         },15000);
+    }
+    /** Virtuális billentyű / egér: nincs Web MIDI üzenet, ezért közvetlenül ide kerülnek a hangok. */
+    function midiRecorderCaptureAppNoteIfNeeded(midi,vel,isOn){
+        if(!midiRecorderIsRecording||midiRecPlayback||_midiRecorderFromHardwareInput)return;
+        if(midiRecorderStartMs==null){
+            midiRecorderStartMs=performance.now();
+            touchMidiRecSilenceWatch();
+        }
+        const t=performance.now()-midiRecorderStartMs;
+        const n=midi&127;
+        midiRecorderEvents.push({t,on:!!isOn,note:n,vel:isOn?Math.max(1,Math.min(127,vel|0)):0,seq:++midiRecEventSeq});
+        touchMidiRecSilenceWatch();
     }
     function midiRecorderOnMidiMessage(msg){
         if(!midiRecorderIsRecording||midiRecPlayback)return;
