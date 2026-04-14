@@ -426,7 +426,39 @@ function setHeroVideoSrc(rel){
  vid.play().catch(function(){});
 }
 
-function save(){localStorage.setItem('akira_visited',JSON.stringify(visited));localStorage.setItem('akira_xp',xp);if(lastV)localStorage.setItem('akira_last',lastV);}
+var _xpSyncT=null;
+function isProfileIdentified(){
+ try{return localStorage.getItem('akira_profile_active')==='1';}catch(e){return false;}
+}
+function queueXpSync(){
+ if(!window.AkiraDb||typeof AkiraDb.syncXpTotal!=='function')return;
+ clearTimeout(_xpSyncT);
+ _xpSyncT=setTimeout(function(){void AkiraDb.syncXpTotal(xp);},450);
+}
+/** Supabase xp_total → globális xp; azonosított: kizárólag szerver; névtelen: max(helyi, szerver). */
+function applyRemoteXp(remote){
+ if(remote==null)return;
+ var r=Math.max(0,Math.floor(Number(remote))||0);
+ if(isProfileIdentified()){
+  xp=r;
+ }else{
+  var loc=parseInt(localStorage.getItem('akira_xp')||'0',10)||0;
+  xp=Math.max(loc,r);
+ }
+ localStorage.setItem('akira_xp',String(xp));
+ updXp();buildStats();
+}
+async function pullIdentifiedXpFromServer(){
+ if(!window.AkiraDb||typeof AkiraDb.fetchXpTotal!=='function')return;
+ var authId=null;
+ if(AkiraDb.getCurrentAuthUserId){
+  try{authId=await AkiraDb.getCurrentAuthUserId();}catch(e){}
+ }
+ if(!isProfileIdentified()&&!authId)return;
+ var remote=await AkiraDb.fetchXpTotal();
+ applyRemoteXp(remote);
+}
+function save(){localStorage.setItem('akira_visited',JSON.stringify(visited));localStorage.setItem('akira_xp',String(xp));if(lastV)localStorage.setItem('akira_last',lastV);queueXpSync();}
 function getLv(x){return Math.min(5,Math.floor(x/100));}
 
 function updXp(){
@@ -557,18 +589,26 @@ function aTab(t){
 function clearAuthFormInputs(){
  ['au-em-l','au-pw-l','au-nn-r','au-em-r','au-pw-r'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
-function doLogin(){
+async function doLogin(){
  const em=document.getElementById('au-em-l');const v=em&&em.value?em.value.trim():'';
  if(v)try{localStorage.setItem('akira_profile_email',v);}catch(e){}
  try{localStorage.setItem('akira_profile_active','1');}catch(e){}
+ try{await pullIdentifiedXpFromServer();}catch(e){console.warn(e);}
  toast('✓ ' + (lang==='HU'?'Sikeres bejelentkezés!':'Login successful!'));closeM('authM');
 }
-function doReg(){
+async function doReg(){
  const nn=document.getElementById('au-nn-r'),em=document.getElementById('au-em-r');
  const nick=nn&&nn.value?nn.value.trim():'',mail=em&&em.value?em.value.trim():'';
  if(nick)try{localStorage.setItem('akira_profile_nick',nick);}catch(e){}
  if(mail)try{localStorage.setItem('akira_profile_email',mail);}catch(e){}
  try{localStorage.setItem('akira_profile_active','1');}catch(e){}
+ try{
+  if(window.AkiraDb&&typeof AkiraDb.mergeLocalXpOnRegister==='function')await AkiraDb.mergeLocalXpOnRegister(xp);
+  var authId=null;
+  if(AkiraDb&&typeof AkiraDb.getCurrentAuthUserId==='function'){try{authId=await AkiraDb.getCurrentAuthUserId();}catch(e){}}
+  if(authId&&typeof AkiraDb.linkRegisteredProfile==='function')await AkiraDb.linkRegisteredProfile(authId,xp);
+  await pullIdentifiedXpFromServer();
+ }catch(e){console.warn(e);}
  toast('✓ ' + (lang==='HU'?'Fiók létrehozva!':'Account created!'));closeM('authM');
 }
 async function doLogout(){
@@ -638,7 +678,12 @@ function initParticles(){
 window.onload=function(){
  initParticles(); updXp(); initRevStars();
  var p=(window.AkiraDb&&typeof AkiraDb.init==='function')?AkiraDb.init():Promise.resolve();
- p.then(function(){if(window.AkiraDb)console.log('Akira Academy online & tracking.');}).catch(function(e){console.warn('Supabase init error',e);});
+ p.then(function(){
+  if(window.AkiraDb)console.log('Akira Academy online & tracking.');
+  return(window.AkiraDb&&typeof AkiraDb.fetchXpTotal==='function')?AkiraDb.fetchXpTotal():Promise.resolve(null);
+ }).then(function(remote){
+  if(remote!=null)applyRemoteXp(remote);
+ }).catch(function(e){console.warn('Supabase init error',e);});
  var savedLang=localStorage.getItem('akira_lang');
  if(savedLang)resumeApp(savedLang);
  else{var gate=document.getElementById('langGate');if(gate)gate.style.display='flex';}
