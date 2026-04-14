@@ -418,6 +418,12 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.7/build/opensheetmusicdisplay.min.js?v=osmd197"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+    window.AKIRA_SUPABASE_URL = window.AKIRA_SUPABASE_URL || 'https://ktnnrwabzbdkcgsvflls.supabase.co';
+    window.AKIRA_SUPABASE_ANON_KEY = window.AKIRA_SUPABASE_ANON_KEY || 'sb_publishable_T3265Yuf-k-RNrGzriwu8g_trfy4f-r';
+    </script>
+    <script src="db.js"></script>
 </head>
 <body onclick="void userUnlockAudioAndMidi().catch(()=>{})">
     <input type="file" id="score-file-input" accept=".xml,.musicxml,.mxl" style="display:none">
@@ -785,6 +791,7 @@
         </div>
     </div>
 <script>
+    if(window.AkiraDb&&typeof AkiraDb.init==='function')void AkiraDb.init().catch(function(e){console.warn('AkiraDb init',e);});
     // ── Language ──────────────────────────────────────────────────────────────
     let currentLang='EN';
     const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','REPERTOIRE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','REPERTOÁR']};
@@ -2608,16 +2615,15 @@
     function persistOsmdThemePreference(){
         try{localStorage.setItem(LS_OSMD_THEME,osmdScoreTheme);}catch(e){}
     }
-    /** Világos → bézs (papír) → sötét (fehér jegyzet) → sötét bézs jegyzet. Régi LS_OSMD_DARK: 0=világos, egyéb=sötét. Első látogatás (nincs téma kulcs): világos. */
+    /** Világos → bézs (papír) → sötét (fehér jegyzet) → sötét bézs jegyzet. Régi LS_OSMD_DARK: 0=világos, egyéb/alap=sötét. */
     function readPersistedOsmdTheme(){
         try{
             const t=localStorage.getItem(LS_OSMD_THEME);
             if(t==='light'||t==='sepia'||t==='dark'||t==='darksepia')return t;
             const old=localStorage.getItem(LS_OSMD_DARK);
             if(old==='0')return 'light';
-            if(old!=null&&old!=='')return 'dark';
-            return 'light';
-        }catch(e){return 'light';}
+            return 'dark';
+        }catch(e){return 'dark';}
     }
     function applyOsmdScoreThemeClass(){
         const cont=document.getElementById('osmd-container');
@@ -2794,7 +2800,7 @@
     }
     // ── draw ──────────────────────────────────────────────────────────────────
     /** 1 = egy hasáb görgetés, 2 = két hasáb / spread, 3 = három hasáb / spread */
-    let bookViewColumns=2;
+    let bookViewColumns=1;
     /** Demó 1 hasábról 2-re vált: leálláskor visszaállítjuk; BOOK a demó alatt törli (felhasználó átvette). */
     let bookViewColumnsBeforeDemo=null;
     function updateBookViewButtonChrome(){
@@ -2950,7 +2956,7 @@
     /** AudioContext + első hang ütemezése a settle után (a fenti ms már ad időt a layoutnak). */
     const DEMO_SCORE_START_LEAD_SEC=0.55;
     let scorePedalEvents=[],scorePedalEventsExpanded=null,demoScoreSustainPedalDown=false,demoSustainInternalHolds=new Map();
-    let scoreMode=true,osmdScoreTheme='light',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
+    let scoreMode=true,osmdScoreTheme='dark',scoreSteps=[],scorePracticeSteps=[],scoreStepIndex=0,scorePendingRh=new Set(),scorePendingLh=new Set(),scoreOsmdRenderQ=false,scoreOsmdScrollNotesAfterRender=null;
     let scoreOsmdFollowSystemKey='';
     let scoreCachedMeasureHLKey='',scoreCachedMeasureHLParts=null;
     let scoreViewFollowQ=false,scoreViewFollowPendingNotes=null;
@@ -3291,8 +3297,6 @@
         p.style.display=(p.style.display==='none'||!p.style.display)?'flex':'none';
     }
     let metroSoundType='mechanical',metroVolume=0.5,metroAccent=true,metroTimeSig=4;
-    /** Avoid resetting metronome beat on every chord when the time signature string did not change. */
-    let _lastMetroAppliedTimeSigStr='';
     let metroIsRunning=false,metroNextNoteTime=0,metroCurrentBeat=0;
     const metroSamples={};let metroSamplesLoaded=false;
     const METRO_B64={'woodblock':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAGhACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrKysrKysrKysrKysrKysrKysrKysrKysrK6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAZiQQAB4AAABoSA0XNPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAAECRnUnT3gCrhoSf/O1AAAAtt3pR48VisiUeM64G4BcAIADgG4Xg3wcgOQXAuCGKxkiU///pAeP1eh5pnWo47Ycg9ZCzrV8ffAMPf//4f/+AAAAHh4eXSAAAAAAeHh4eGAAAACA8PDw9IAAAAIDw8PH4AAAAAAeHh4eGAAAACA8PDw9IAAAAIDw8PD8AAAAPTllgAgAArldAAATAYCgQBgGAYJBwJmDANmDYeUXmEwymFZXTIEFfwgOji1ATj4JTHj4TI4YzQo4TTELQMODUDDQTE7BQQCbADiqBjYdgEgoDA4GBQihsohonTAFBABALAwQJQOTkFIV4GgtA2MPo+wIBAImkDDpcAweCAbFJJAPEYkp/AxoFAoCyQyFHKEFhZVf/45JNE8TSJiQH//SSMkUTFJIy///RRRUkZCUFj3/lhcJA0JQkDQlWwlEAAA7AHAAAhOP/6ey5kVmbIzIZGBQYYXDxidHHBYoapLBjULBACTlQCpgvzLef9rHH///3zGluO0w5dwqSHMmxjokYAAoowKIj1OBWW4G2BxAA57w6u5YpcFpSeseFaG6iXjQ5Y+kBxjIm0E2/3ZGtR0jB3gMsTJXDEIwD6qqmoqgBqDjfgACE1KTCvG7fIMc5uo6BZGZjpRIgLfxivAEDUdTDnzfeof+Mwg71h0TwfI8XdwgwAzPAMDI7RkBkfAmHiYAFgKH5AAH2d6vDMZ4+z9P85SjhEqkL3LjTFkGbxwiesyq1jjXstbMma1HECJrAnMes99a+yYutLnoVr2rXYRwNiaFYnAvDo3TYVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7MMT6AEmMYTn9zYAgzAxnfKxIrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7MMT9gAg4ZTHsgfIpM5DlPYAyRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMTWA8AAAf4AAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV','woodblock_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAGNgCfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5/MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM6enp6enp6enp6enp6enp6enp6enp6enp6f////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAU6QQAB4AAABjZHN40VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAAEDSbSVWMgCp7FCl/OdIA0AAAAAT/jDDWGGFJKH8ctrbD1h1TrHedLQ0MOOE4XTXPBRbfIYAAABAIKK7Z2zt34ft9wwp6fPv//////4VIxDjls7Xeqdd7v0boJiFpy8am793IYfyHIxD8bl9PmP/+AAB//////gAADv+OHh62AAACA8PDx/4AAAIDw8PfgAAAA34XaAqAADuXgAgAQIAAAAjiYVI0YgK95g0KK0hUBGSQd4wKTB4MNd3pVUWKowFDCAdOFC2PlwMMBGUMzwYMRTcMDQCMMBRMJxGMMQcMFA/WjAhieFP+YTgUzqfUpMCQHSpcyC///aUgmAIEBYAUkP/7jM//6qjhpeIZjiTBhCBiea5nGMQhDMEADk3f8wTDoWAqe5/yKsFTx38soSnSyuAP/EAAACggABK1//lJSWEP0W1AQj+FuL8W5ChngtHA3zAXCJxLBBjZF1////U6taKLBG4BURBYgzxbAAAHEGADhiQ//iqyloOWQgSTggcDTQvUP///+panugmXB3gcsiKjLigTBMDqkAAIggAwOIAAA5/8M6SNsVbtAMhj4UuqEBifW5d0mm3///9LqWPwC/B2iyWj7DNttvQp/3IAARrLbLaImzJFwCwWU8FETurKxD9comY990zGeSzvLRL2pndPrO6avikOLfGrxkYBiYEIR24kO0ScsjCB5BHIWRz2LI5MQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoAACRl5JVJtDMlBIFVG3AyBSP/+ZCRF1VMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE0oBHUIVH/PmACLMQ5rzdzY1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sgxPwABdiHL+ViSSksEaT0bL2NVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMTiA8LkMxqAASEAAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV','mechanical':'data:audio/mpeg;base64,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','mechanical_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAH1wCGhoaGhoaGhoaGhoaGhoaGhoaGsLCwsLCwsLCwsLCwsLCwsLCwsLDR0dHR0dHR0dHR0dHR0dHR0dHR0e/v7+/v7+/v7+/v7+/v7+/v7+/v//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJASTQQAB4AAAB9fIRHnDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAABtABafQQACPxsy2/NaAQiVQSMzQACAgBwQGic+XPlAQghBA4UDEH3g//nBO9HwQ5R31h8uf/6gQcCDv4IOLg/icH4P8u+ZZlVEGZQnE3EsOBkAgkRykJA8eJRdKRA2XBAhAaSkguBOOuAIFg4NCltgIxA7xhIwEFDCRIAjhw6UqZoTwADFogBBhUGX7AI9Fu3NUJacZFkR1ERTIKHR5CsN2rTsxa1F38IBSaqoWQvIY9AXZac7Mpiz2O3MUUocprU5K4ddJ5nooLc7E4vt2IdjmHKGk1Rurdl7cWk2muxC3T2/r2/tXbk3Uw3diV29DUpa7P1pfe3KbMTi8sw5T1bl6xTdlWeGWOdLqmgzrY5Xeyu0tBWo45GnYik9Y+ksfhzPnv1uta3ytruX91/tKlNHcmYzDvzTw1ZVHZie////893PhVcSAAAAAABUuIDwawto3QvR6QjQVwZpPQ8Ftaw/gH2kRMRhgQoTJJIxHqUSoKIBlByxtCKiSiaEuMkyTDkl00ZaJIpl08gMl0SURIgWoTIkg3h7JEsuyT1oonUkuvOpGyVZiipLUbGSy4g1Ziykn/qSSSpJJf/6P///omJqjpf//rRapJFFEkTXMks4UsFSM3rUIgYgD7LKCMtWxQQiWGfceGYAujJVsMXrKYFgM+h2mEeNoV7q2Ccg/ySIc7AeYa+sYVx5LlYMpy8s/jPE9bosZylSInwpaYOM9lW9teLv2b+QAi36DCEhcPlgJCOWnCcEWNN/5z48SXR5ym84qIxNn///5vN////5vN6C7t+MQSEgAAR4Ackx1EzqGnfMkAKpjyoZDQS6KH0DRBoS3maY1Xdsdu9mfzh5Stnb2R9eDz0WH60wdf8787R/oIg+hL5FhJ3ut7+9/nf5xn+25s8WRbPmAdvOjUU2MAAAOAJgEaF3LjjrRCwEeEzda0dWKpa/K7W9aflMQDP/jhSUv5v8wavIGA6jh7DMiI1v+/0/yWCBFEgCxoTCrZ7bt9f9Tv6vWkqUC+YwMgaTq+2+VzhQBAz4AjArMVHmLYzRIus5YXPBQFwGsoDbhFLQlKsTVfdzm0XGjIaTQkVLP/fKBqLFCJB8snZ/T/MP/7YMT9gJIdl0389oAB+LKofYedvKt+pevHR8MGOIA993J2VSEEUD2gBD84wjeIVxOWyQVriOE6i8ji78yupgELpywkLDn4c7LB9a1isbXmbsmA9BHec/n4OQXChxxhQ//S357//8oy//0b6VCCX6GCNZiYh0NTBIL0ABmIAGx1YZMZB6B2swAw14C70WeFUsMM6l1WxDUPJHBW+tanbTSOvLEtmZ//7zOGoLBUAZJ/MtQpmb/jMzND//iqpeGAlUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7UMTuAAsAz0HtMVaBVxon/YSqnFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+0DE9IAJKNFB7LDs4UWZ532WIeRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMT3g8moxSnsGHFAAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV','drumstick':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAHvQCIiIiIiIiIiIiIiIiIiIiIiIiIu7u7u7u7u7u7u7u7u7u7u7u7u7vV1dXV1dXV1dXV1dXV1dXV1dXV1e7u7u7u7u7u7u7u7u7u7u7u7u7u//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAWgQQAB4AAAB739+mZYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAAE30ZWbQXgCPFI6o/NcBAsdZAAAAAAA4AAAAACjkAAAAX/owJxDFBE3SjxOIYhiGIYaZ1qN/vFGBOGmaaHs8icQw0DQJ2abPaA8eMCGE7LmdaHoer1ec5BwkAhhLHCGr1eh5OxNB6C4Kir9+/jxMsafOc61Gz2Y1er1er39mA0B6x6x6y5qOMwKxkZ37+Pe93794rE4hiGIYySoePQQg6FZELg+CAIAg7/lw/+cqUAAAOAAAEAAAAAIB+AkqZSDVdrvpUiMJsvL4wLLzExwGkRbqna3q0DAYMaUXbflK8xGQQg7AkBGJpOHA5o4MAMzNphmAQkgsW+UBCoATMLpwBee1piCYwiIDCoRMjjhoA8EH0LTmFjCAhy+r6sxXxfMBg5xFrIJTFw/QCpeCgElJggPgUNDQqlMqiTdX2X6AgSDAeCgKm4Fgy4hapdRgUACoDBwFTEh9TB88I8xt5qstVKspAMFAGYdCUpyuwzLr77GAAyYSDJQAf/eO4NeOKd//dJL8FA0RAFXMt/9/+aNqlr7WzmKiXlRE8FREeDSqw39kDIAAAAN//wVCLMWIP5ChZWEnotAQ2CrcvxiP5QYnUFUoAWPt9ldjVNWaVROzbdWzCarVWbRGTN402GZQr1pKOSwyWq97P5U3flUGO/ZcqCn/W1ThwgcImiqx0FL1yR/LHHkugGzhVazDEagJ2WmRaGuf////+OM11GgHd8SwAOAH+tS2J8ZhMiANeDaIb2aYzhIfyPlCvrif51+3YundYr22J6v95zPKJ4ICLQ3Z//9bQPD7lKdJ0sNUo3pWut9w3DBhwxwmx1R/mBtXAAA53hAAAA4Af/oG9IJsViK1sN7RqLwwYyim+2cmxdWp6iDdJKTTQqEyC4C3E5/SWtV76TqMCkJGg0amk8npN+R6qWPHgLDTKujKlBjKFAAf/YbKUBNLoE9rmQO+kIohGxVf/qPUNj0F00Tei2tr9IaR7N//64iOmqD0UqnXK1Hx0e/hq4hiAHaWzKqAAANuoPsE0AB//7cIcDiD1/WxRb0xlhFpSid/R6kA/YfVJpQdudo8hNEUNv30OzyFxqMSEhZ2+b8sJIhQFZmcytmjHoP/7cMTQAI+M3UPc/AABSBupPReJ+AKgD7m5rmnM7FEMgySImziqWZxaa2gpJDqPt6c4keI/WjdWlBK0ztR8Box/6mjxUSUBcLjSg2PNb/o84bEvrppMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv//rb26xUW/iwrVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+zDE+oIJSL9H5rz8IQOYKLwXrUlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+zDE+AAHyL9B4L1LARkYJzyXnaVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xDE24PBRAEMAAAAAAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==','drumstick_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAHBwCHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4fKysrKysrKysrKysrKysrKysrKysrKysrK7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7P////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAOIQQAB4AAABwdwX253AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAAB7C5f/QRACOoLWv/NaBA3v6qd1Qm6mBHwAAAAJwABAAEyEIQhCZCZCEIx30IQn0IRvIQn/5CEIRv/QgGBg/BAEwf/ygIf/8CBj/lwf2durIDpdMMMEAoDAALHC3MEdNYiuCGVwVVGgLodxJADkCLAMDiAcPIQKYKJC8yYikiZ0pBQFLscEhRi4YcBWGMZPVA7YPKgkiSjyoDC4oxZgDAV0koQwyNycnGMSEU2nmdKHg4U6r8Rt5zAF2su4pmMlUaG+YC7UMy13mG2JM1lxmetyfKPS2BbkoZzQ8HDBkjACnM7Ym9zoAEQY8wDQkZl//G1yt5bdqXN0bEy2lmojZjtIoFBicVHNP13X1ZV3/////x/boyCU0uv//xdp6XdiVH///////y3/1Mwim3j//////8w1eXfqX8dvgAUAAAAGAelQGiVWYEAhByX5TgljwggsMuyIKh2Zmy7TXn+y/KJNeBEUfFxWv3h95vplUrXzFEi6zDKmlL30VNMwlvUwS/o61FJY4aNpd6VNVpJ/K/HnWavNOFLca0bTpT6XM87qOE41LS8/cRXbFUkU+QQwKHHWkoFp3WJOVGbPP//1p6UOSCMkQPT5lQVz4bfAaAM8oBZlHSolPHt6jVgFl/1D1A25m19qDhXv8m8dQdJ1V//hRMLsIaegCqideydr/WOol0HAA6i0i4Qd9PWjfOtxPj/MGAT1K0hQt///tR1DmUjeON4h0WPr/x0MgJAFCiqs6t70X2DEKggDv7qVxwYlW5nnLIH/NHVXMI+H3IlVL6IMg+Oarrk2HtqRIoDSX8f3B1IdREHoPJpea9/5jx+ikIMS1Nf6KecAOE8ocb/+hqEw9mqwKZ9YGVAiAH2TAoI/mmzs4IJExFD8n9tfpdSFPFL1n//DXJmZPK5vg/++v4sFyvFSYub2Jqyivb/879R6W/8oUFUSQfC7Gpo9Lf/QuRINnq7s3/+4DEzwDSOOVF/YwAIZWcqDmHnjj/veZqho6AFcwsTXS68tmKXElRAWxPhqRAS+oxAmUhpzZxlqUUjNnHKU0RApDf+UsAKJDzZFaWaskVr/2cVS6v+e14DkFoqKmqvM9/88CxxJrVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7QMT/AApI40fsLVGBRBynfSepuFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxP2DyoTlQeeVFKgAAD/AAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=','electronic':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAADAAAFtACzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Pm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ub///////////////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAVGQQAB4AAABbR9xADeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABwQhYVRgACMZJin3OYBQIAAAAetXi+2Pd7BMLJkyadjgfPiAEAyJwfB8P4Pg+DgIcvxIcE4Pv/4Pg+D/Lg+//5d5cHwfPwwAAgcAwSAAqG6qjxIKAYLFAEHJCDjPLyMLDcxt7TCY0TdMNhEymHjQwLDiuDQAYBBxg8smHQKYEIQ8FyFRdoQ8ih0KCTMlk6E0vS+wCMZwQcOrEZC8KhrXJsus07qQS04dLrp6vbSxKNtfUzgRQaFLtfd2J/kYfWdmKW/zctrbdnuu/WWlOS2tKqWgjSZWr+vrU1Nl///1ZTJKGipu46pn1EAZhnUua6/sO/+v/+/9WlginlE/Xs6//4+9NErWPP//+U2W5YSqpAZFAAAvAQCVZaqAwJE2EBNhGAWUXtWQnS7MMt44LWbDomAJBOEWLItjEEEQJhpGFyDaFCAJBdC5HoqjEelDwuCYeEp49OkI9GpU4Wjv//4xFk3////////84fCtgLmgGAuEcQhy7AIsGsDBjwUxhkKTpa0ADU1gJuoBaO6IIkqC6pUD8WDw5XWqHIek1sRmjs9MWRJc+iU7hYKE5yWFkZFHJUxBTUUzLjEwMFWyyOWJGAAAJAqJxXEQZFlp6JVQ0hSbJSKBMISBMaSNMjZxnyjXILRK7UxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE44BLkQ81vYUAKRiOZTWGGa1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxOqDxRhRG4YkxwgAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=','electronic_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAADAAAFtACzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Pm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ub///////////////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAVEQQAB4AAABbTklhU+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABhQBZ1QAACL7qGr3N4CRACAEA/eTgEAwXB8HDgnB+sHz8Rh/LggCAY1AgCGJwfD/wf/wf1eQB8P8uD4f//Lg+AABgAAgAAwbdvXBUcBWEZigGOkICUEMx8iqEFkT1ygyYxNtBDDRISYDEygUAyIzHAdRZcqsybZIdVVMJK5i18FdRSSJbZjdO2O06LemhaYqhqJMHoSX6p0em/bra2/rgR13esoZfCYddqSOTKs4lLluxCL2JqHoc/v/8vpoLgyJS668OZdQAqd3C7+n+lXP+tTW8spqU5UGOVLVs6iUvX1//////Ga26tnW5mg3RVu6//+CW1+Xf////uz/O1plwALRAAAI4ACZqU8cSqMbEgkRy1SA6WuSmu7My/Dpw7K+HBSwLQ9YXQQjyhg0VNYVBcFhYQB7UeKyDw9WdaNVTTYn///////lQ5D1VRYCiKqkRCnAxgEURPABKAKgDjK3IE32LxSOC2Cz0QbaIAy0WB88jPBZtdQZdFV29aSbJFNmpvQhViW51sOwCYV/+yKSCGTkU8gYLIo5CypMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqcjabcFwAAAoeEZAKxIPCkRHLi2ejSirxzj0AqXzZOHP6JJVE4aIktUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE6wBJfLE3vYQAITwPpj2Eje1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxOoDxPRBF4SkwOgAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU='};
@@ -3323,7 +3327,7 @@
         await ensureAudioContextBase();
         if(!audioCtx)return;
         metroIsRunning=!metroIsRunning;document.getElementById('metroToggle').classList.toggle('active',metroIsRunning);
-        if(metroIsRunning){if(!metroSamplesLoaded)await loadMetroSamples();metroNextNoteTime=audioCtx.currentTime+0.05;metroCurrentBeat=0;metroScheduler();}
+        if(metroIsRunning){document.getElementById('metroBpmDisplay').innerText=bpm;if(!metroSamplesLoaded)await loadMetroSamples();metroNextNoteTime=audioCtx.currentTime+0.05;metroCurrentBeat=0;metroScheduler();}
     }
     function toggleMetroMenu(){const menu=document.getElementById('metroSettingsMenu');menu.style.display=(menu.style.display==='none'||menu.style.display==='')?'flex':'none';}
 
@@ -3333,7 +3337,7 @@
         const sel=document.getElementById('metroSoundSelect');if(sel)sel.addEventListener('change',function(){metroSoundType=this.value;});
         const vol=document.getElementById('metroVolumeSlider');if(vol)vol.addEventListener('input',function(){metroVolume=parseFloat(this.value);});
         const acc=document.getElementById('metroAccentCheck');if(acc)acc.addEventListener('change',function(){metroAccent=this.checked;});
-        const tsig=document.getElementById('metroTimeSigSelect');if(tsig)tsig.addEventListener('change',function(){_lastMetroAppliedTimeSigStr=this.value||'';const p=this.value.split('/')[0];metroTimeSig=Math.max(1,parseInt(p,10)||4);metroCurrentBeat=0;});
+        const tsig=document.getElementById('metroTimeSigSelect');if(tsig)tsig.addEventListener('change',function(){const p=this.value.split('/')[0];metroTimeSig=Math.max(1,parseInt(p,10)||4);metroCurrentBeat=0;});
         document.querySelectorAll('.metro-tempo-btn').forEach(btn=>{
             let holdTimer=null,repeatTimer=null,repeatCount=0;const dir=parseInt(btn.dataset.dir);
             function getStep(){if(repeatCount<3)return 1;if(repeatCount<5)return 2;if(repeatCount<8)return 5;return 10;}
@@ -4706,19 +4710,17 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }catch(e){}
         return null;
     }
-    /**
-     * Effective time signature for this SourceMeasure (OSMD).
-     * Prefer explicit instructions in score order (first staff headers, then left-to-right containers);
-     * use the *last* explicit TS in the measure (handles mid-bar / end-of-bar courtesy vs start-of-next).
-     * If none, fall back to ActiveTimeSignature (carried signature).
-     */
     function readTimeSignatureFromSourceMeasure(m){
         if(!m)return null;
-        const collected=[];
-        const pushInstr=function(ins){
-            const hit=readTimeSignatureFromInstruction(ins);
-            if(hit)collected.push(hit);
-        };
+        try{
+            const ats=m.ActiveTimeSignature||m.activeTimeSignature;
+            if(ats){
+                const num=ats.Numerator!=null?ats.Numerator:ats.numerator;
+                const den=ats.Denominator!=null?ats.Denominator:ats.denominator;
+                if(typeof num==='number'&&num>0&&typeof den==='number'&&den>0)
+                    return{numerator:num,denominator:den};
+            }
+        }catch(e){}
         try{
             const arr=m.FirstInstructionsStaffEntries||m.firstInstructionsStaffEntries;
             if(arr&&arr.length){
@@ -4727,7 +4729,10 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     if(!ent)continue;
                     const instrs=ent.Instructions||ent.instructions;
                     if(!instrs||!instrs.length)continue;
-                    for(let ii=0;ii<instrs.length;ii++)pushInstr(instrs[ii]);
+                    for(let ii=0;ii<instrs.length;ii++){
+                        const hit=readTimeSignatureFromInstruction(instrs[ii]);
+                        if(hit)return hit;
+                    }
                 }
             }
         }catch(e){}
@@ -4743,32 +4748,30 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                         if(!ent)continue;
                         const instrs=ent.Instructions||ent.instructions;
                         if(!instrs)continue;
-                        for(let ii=0;ii<instrs.length;ii++)pushInstr(instrs[ii]);
+                        for(let ii=0;ii<instrs.length;ii++){
+                            const hit=readTimeSignatureFromInstruction(instrs[ii]);
+                            if(hit)return hit;
+                        }
                     }
                 }
             }
         }catch(e){}
-        if(collected.length)
-            return collected[collected.length-1];
-        try{
-            const ats=m.ActiveTimeSignature||m.activeTimeSignature;
-            if(ats){
-                const num=ats.Numerator!=null?ats.Numerator:ats.numerator;
-                const den=ats.Denominator!=null?ats.Denominator:ats.denominator;
-                if(typeof num==='number'&&num>0&&typeof den==='number'&&den>0)
-                    return{numerator:num,denominator:den};
-            }
-        }catch(e){}
         return null;
     }
-    /** Apply a numerator/denominator pair to the metronome Time Signature control (English UI). */
-    function applyTimeSignaturePairToMetroSelect(pair){
+    function applyTimeSignatureFromLoadedOsmdScore(){
+        const sh=getOsmdMusicSheet();
+        if(!sh)return;
+        const measures=getAllSourceMeasures(sh);
+        let pair=null;
+        for(let i=0;i<measures.length;i++){
+            pair=readTimeSignatureFromSourceMeasure(measures[i]);
+            if(pair)break;
+        }
         if(!pair)return;
         const num=pair.numerator|0;
         const den=pair.denominator|0;
         if(num<=0||den<=0)return;
         const v=num+'/'+den;
-        if(_lastMetroAppliedTimeSigStr===v)return;
         const sel=document.getElementById('metroTimeSigSelect');
         if(!sel)return;
         const opts=[...sel.options];
@@ -4780,55 +4783,19 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             if(hit)chosen=hit.value;
         }
         if(!chosen)return;
-        _lastMetroAppliedTimeSigStr=v;
         sel.value=chosen;
         metroTimeSig=Math.max(1,parseInt(chosen.split('/')[0],10)||4);
         metroCurrentBeat=0;
-    }
-    /** Current OSMD measure: update Time Signature dropdown + metronome beat count from ActiveTimeSignature. */
-    function syncMetroTimeSigFromSourceMeasure(pm){
-        if(!pm)return;
-        const pair=readTimeSignatureFromSourceMeasure(pm);
-        if(pair)applyTimeSignaturePairToMetroSelect(pair);
-    }
-    /** Compound 6/8, 9/8, 12/8 (and 3/8): OSMD TempoInBPM is quarter-note BPM; marking is usually dotted-quarter = 1.5 Q. */
-    function displayTempoBpmForScoreUi(pm, quarterBpm){
-        if(!(typeof quarterBpm==='number'&&quarterBpm>0))return Math.round(bpm);
-        const ts=pm?readTimeSignatureFromSourceMeasure(pm):null;
-        if(!ts)return Math.round(quarterBpm);
-        const num=ts.numerator, den=ts.denominator;
-        if(den===8&&(num===3||num===6||num===9||num===12)){
-            const w=Math.round(quarterBpm/1.5);
-            if(w>=20&&w<=400)return w;
-        }
-        return Math.round(quarterBpm);
-    }
-    function setMetroBpmDisplayFromScore(pm, quarterBpm){
-        const d=document.getElementById('metroBpmDisplay');
-        if(!d)return;
-        const q=typeof quarterBpm==='number'&&quarterBpm>0?quarterBpm:bpm;
-        d.innerText=String(pm?displayTempoBpmForScoreUi(pm,q):Math.round(q));
-    }
-    function applyTimeSignatureFromLoadedOsmdScore(){
-        const sh=getOsmdMusicSheet();
-        if(!sh)return;
-        const measures=getAllSourceMeasures(sh);
-        let pair=null;
-        for(let i=0;i<measures.length;i++){
-            pair=readTimeSignatureFromSourceMeasure(measures[i]);
-            if(pair)break;
-        }
-        applyTimeSignaturePairToMetroSelect(pair);
     }
     function applyTempoFromLoadedOsmdScore(){
         lastLoadedScoreBpmFromXml=0;
         const sh=getOsmdMusicSheet();
         if(!sh)return;
-        let raw=0, srcPm=null;
+        let raw=0;
         const arr=getAllSourceMeasures(sh);
         for(let i=0;i<arr.length;i++){
             const t=readTempoFromSourceMeasure(arr[i]);
-            if(t>0){raw=t;srcPm=arr[i];break;}
+            if(t>0){raw=t;break;}
         }
         if(!raw){
             const d0=sh.DefaultStartTempoInBpm||sh.userStartTempoInBPM||0;
@@ -4837,7 +4804,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(typeof raw!=='number'||raw<=0||raw>400)return;
         bpm=Math.max(40,Math.min(208,Math.round(raw)));
         lastLoadedScoreBpmFromXml=bpm;
-        setMetroBpmDisplayFromScore(srcPm,bpm);
+        const d=document.getElementById('metroBpmDisplay');
+        if(d)d.innerText=bpm;
     }
     async function osmdFitWidth(){
         if(!osmdInstance)return;
@@ -5053,42 +5021,12 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         return map;
     }
-    function osmdNextBackwardMeasureIndex(measures, fromMi){
-        const M=measures?measures.length:0;
-        if(!M)return -1;
-        for(let j=fromMi+1;j<M;j++)
-            if(measures[j]&&osmdMeasureHasRepeatBackwardSignals(measures[j]))return j;
-        return -1;
-    }
-    /**
-     * Volta-pass: OSMD EndingIndexDict néha az 1. ház ütemét is kizárólagos 2. házként jelöli.
-     * Ilyenkor az 1. körben (voltaPass===1) kihagyjuk a hangot, holott a kotta szerint le kell játszani.
-     * Javítás: ha a kottában explicit szerepel a jelenlegi pass száma az ending labelben → engedély.
-     * Ha közvetlenül egy volta-s :| előtti ütemben van lejátszandó sor, és a :| volta → első körben engedély.
-     */
-    function osmdMeasureAllowedOnVoltaPass(mi, voltaPass, voltMap, measures, rowMeasures){
-        if(typeof voltaPass!=='number'||!Number.isFinite(voltaPass))return true;
-        if(measures&&measures[mi]){
-            try{
-                const lab=osmdMeasureEndingLabelSet(measures[mi]);
-                if(lab.size&&lab.has(voltaPass))return true;
-            }catch(e){}
-        }
+    function osmdMeasureAllowedOnVoltaPass(mi, voltaPass, voltMap){
         const L=voltMap.get(mi);
         if(!L||L.size===0)return true;
         if(L.size>1)return true;
         const only=[...L][0];
-        if(voltaPass===only)return true;
-        if(voltaPass===1&&only!==1&&rowMeasures&&rowMeasures.size&&rowMeasures.has(mi)&&measures){
-            const nb=osmdNextBackwardMeasureIndex(measures,mi);
-            if(nb===mi+1&&measures[nb]&&osmdMeasureHasRepeatBackwardSignals(measures[nb])){
-                try{
-                    const parsed=osmdParseRepeatFrameFromBackwardMeasure(measures[nb],nb,measures);
-                    if(parsed&&parsed.hasVolta)return true;
-                }catch(e){}
-            }
-        }
-        return false;
+        return voltaPass===only;
     }
     function osmdMeasureHasLineRepeatForwardStart(sm){
         if(!sm)return false;
@@ -5194,7 +5132,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(!rep||rep.FromWords||rep.fromWords)continue;
                 const endings=osmdRepetitionNumberOfEndings(rep);
                 if(endings>1){
-                    return{hasVolta:true,start:measureIndex,voltaPass:1,maxVoltaPass:endings,pass1Emitted:new Set(),hasPlayedFirstEnding:false};
+                    return{hasVolta:true,start:measureIndex,voltaPass:1,maxVoltaPass:endings};
                 }
                 const passes=osmdRepetitionTotalPasses(rep);
                 let bj=Math.max(0,passes-1);
@@ -5239,7 +5177,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(!useVolta&&lab.size>0)useVolta=true;
                 if(useVolta){
                     const maxVp=Math.max(endings>1?endings:0,osmdMaxEndingLabelNearMeasure(measures,backwardIdx));
-                    return{hasVolta:true,start,voltaPass:1,maxVoltaPass:Math.min(8,Math.max(2,maxVp)),pass1Emitted:new Set(),hasPlayedFirstEnding:false};
+                    return{hasVolta:true,start,voltaPass:1,maxVoltaPass:Math.min(8,Math.max(2,maxVp))};
                 }
                 const passes=osmdRepetitionTotalPasses(rep);
                 let bj=Math.max(0,passes-1);
@@ -5257,10 +5195,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         return null;
     }
     /** Ütemlista-indexek ismétlésekkel (:||) és volta (1./2. ház) OSMD SourceMeasure alapján. */
-    function osmdExpandMeasurePlaybackOrder(measures, rowMeasures){
+    function osmdExpandMeasurePlaybackOrder(measures){
         const M=measures.length;
         if(!M)return[];
-        if(!rowMeasures)rowMeasures=new Set();
         const sh=getOsmdMusicSheet();
         const voltMap=osmdBuildMeasureVoltaExclusiveMap(sh,measures,M);
         const stack=[];
@@ -5280,44 +5217,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(fr&&(fr.hasVolta||(fr.backJumpsRemaining||0)>0))stack.push(fr);
             }
             skipForwardRepeatPush=false;
-            if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)&&!stack.length){
-                const parsedEarly=osmdParseRepeatFrameFromBackwardMeasure(sm,i,measures);
-                if(parsedEarly&&(parsedEarly.hasVolta||(parsedEarly.backJumpsRemaining||0)>0))stack.push(parsedEarly);
-            }
-            if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)){
-                const frFlush=stack.length?stack[stack.length-1]:null;
-                if(frFlush&&frFlush.hasVolta&&frFlush.voltaPass===1&&rowMeasures&&rowMeasures.size&&i>frFlush.start){
-                    const inserted=[];
-                    for(let k=frFlush.start;k<i;k++){
-                        if(!rowMeasures.has(k))continue;
-                        if(frFlush.pass1Emitted&&frFlush.pass1Emitted.has(k))continue;
-                        if(!osmdMeasureAllowedOnVoltaPass(k,1,voltMap,measures,rowMeasures))continue;
-                        out.push(k);
-                        if(!frFlush.pass1Emitted)frFlush.pass1Emitted=new Set();
-                        frFlush.pass1Emitted.add(k);
-                        frFlush.hasPlayedFirstEnding=true;
-                        inserted.push(k);
-                    }
-                    if(inserted.length&&osmdRepeatDebugVerbose())
-                        console.warn('[REPEAT-CHAIN] volta pass1 flush before :| at list index',i,'inserted indices',inserted.join(','));
-                }
-            }
             const vp=osmdActiveVoltaPassForMeasure(stack,i);
-            const voltSkip=vp!=null&&!osmdMeasureAllowedOnVoltaPass(i,vp,voltMap,measures,rowMeasures);
-            if(!voltSkip){
-                out.push(i);
-                if(vp===1&&stack.length){
-                    for(let s=stack.length-1;s>=0;s--){
-                        const fr=stack[s];
-                        if(fr&&fr.hasVolta&&fr.voltaPass===1&&i>=fr.start){
-                            if(!fr.pass1Emitted)fr.pass1Emitted=new Set();
-                            fr.pass1Emitted.add(i);
-                            fr.hasPlayedFirstEnding=true;
-                            break;
-                        }
-                    }
-                }
-            }
+            const voltSkip=vp!=null&&!osmdMeasureAllowedOnVoltaPass(i,vp,voltMap);
+            if(!voltSkip)out.push(i);
             if(sm&&osmdMeasureHasRepeatBackwardSignals(sm)){
                 let jumped=false;
                 for(;;){
@@ -5363,33 +5265,17 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         return out;
     }
-    /** Nyers kurzor-sor → SourceMeasures tömb index. Volta / ismétlés mellett a measureListIndex néha rossz — ilyenkor a hang abszolút ideje alapján keresünk. */
     function osmdRawRowMeasureListIndex(row){
         if(!row||!row.playInfos||!row.playInfos[0])return -1;
-        const note=row.playInfos[0].note;
-        const sm=osmdNoteToSourceMeasure(note);
+        const sm=osmdNoteToSourceMeasure(row.playInfos[0].note);
         if(!sm)return -1;
         const sh=getOsmdMusicSheet();
-        if(!sh)return -1;
-        const arr=getAllSourceMeasures(sh);
-        const M=arr.length;
-        if(!M)return -1;
-        for(let k=0;k<M;k++)if(arr[k]===sm)return k;
-        const ix=sm.measureListIndex!=null?sm.measureListIndex:(sm.MeasureListIndex!=null?sm.MeasureListIndex:-1);
-        if(typeof ix==='number'&&ix>=0&&ix<M&&arr[ix]===sm)return ix;
-        try{
-            const aw=osmdGraphicalAbsWhole(note);
-            if(typeof aw==='number'&&isFinite(aw)){
-                for(let k=0;k<M;k++){
-                    const w0=measureAbsoluteTimestampWhole(arr[k]);
-                    const w1=k+1<M?measureAbsoluteTimestampWhole(arr[k+1]):1e300;
-                    if(aw+1e-9>=w0&&aw<w1-1e-9)return k;
-                }
-                const wLast=measureAbsoluteTimestampWhole(arr[M-1]);
-                if(aw+1e-9>=wLast)return M-1;
-            }
-        }catch(e){}
-        return -1;
+        if(sh){
+            const arr=getAllSourceMeasures(sh);
+            for(let k=0;k<arr.length;k++)if(arr[k]===sm)return k;
+        }
+        const ix=sm.measureListIndex!=null?sm.measureListIndex:sm.MeasureListIndex;
+        return typeof ix==='number'&&ix>=0?ix:-1;
     }
     function osmdBuildRowsByMeasureListIndex(rawRows,measureCount){
         const rowsBy=[];
@@ -5428,14 +5314,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         return Math.max(1e-4,osmdSourceMeasureDurationWhole(sm));
     }
-    /** ?repeatDebug=1 / localStorage osmd_repeat_debug / window.OSMD_REPEAT_DEBUG — részletes ismétlés- és DEMO-ütemlog */
-    function osmdRepeatDebugVerbose(){
-        try{
-            return typeof window!=='undefined'&&(window.OSMD_REPEAT_DEBUG===true
-                ||(typeof localStorage!=='undefined'&&localStorage.getItem('osmd_repeat_debug')==='1')
-                ||(typeof location!=='undefined'&&/[?&]repeatDebug=1(?:&|$)/.test(location.search||'')));
-        }catch(e){return false;}
-    }
     /**
      * Konzol + window.__lastRepeatExpandDebug: hol szakad meg az ismétlés-láncolat.
      * Részletes alert: böngésző konzolban localStorage.setItem('osmd_repeat_debug','1') vagy ?repeatDebug=1 az URL-ben, vagy window.OSMD_REPEAT_DEBUG=true
@@ -5444,7 +5322,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         try{window.__lastRepeatExpandDebug=summary;}catch(e){}
         const line=summary.oneLine!=null?summary.oneLine:JSON.stringify(summary);
         console.warn('[REPEAT-CHAIN]',line);
-        const shout=osmdRepeatDebugVerbose();
+        const shout=(typeof window!=='undefined'&&(window.OSMD_REPEAT_DEBUG===true
+            ||(typeof localStorage!=='undefined'&&localStorage.getItem('osmd_repeat_debug')==='1')
+            ||(typeof location!=='undefined'&&/[?&]repeatDebug=1(?:&|$)/.test(location.search||''))));
         if(shout&&typeof alert==='function'&&summary.alertHu)alert(summary.alertHu);
     }
     /**
@@ -5491,12 +5371,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 const r=sh.Repetitions||sh.repetitions;
                 repListLen=r&&r.length?r.length:0;
             }catch(e2){repListLen=-1;}
-            const rowMeasures=new Set();
-            rawRows.forEach(r=>{
-                const mi=osmdRawRowMeasureListIndex(r);
-                if(mi>=0&&mi<M)rowMeasures.add(mi);
-            });
-            const order=osmdExpandMeasurePlaybackOrder(measures, rowMeasures);
+            const order=osmdExpandMeasurePlaybackOrder(measures);
             if(!order||!order.length){
                 repeatChainLog({ok:false,skip:'no_order',rawCursorRows:rawLen,M,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`nyers_sor=${rawLen} M=${M} |:_vonals=${cFwdLine} :|_vonals=${cBackLine} |:_ins=${cFwdIns} :|_ins=${cBackIns} → order üres`,alertHu:`Ismétlés-sorrend üres. M=${M}, |: vonal=${cFwdLine}, :| vonal=${cBackLine}, |: ins=${cFwdIns}, :| ins=${cBackIns}`});
                 return rawRows;
@@ -5518,41 +5393,25 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             let stepCounter=0;
             for(let oi=0;oi<order.length;oi++){
                 const mi=order[oi];
-                const tBlock=cursorTimeline;
-                visitSynthStarts[oi]=tBlock;
+                visitSynthStarts[oi]=cursorTimeline;
                 const span=osmdMeasurePlaybackSpanWhole(measures,mi);
                 const rows=rowsBy[mi];
-                const rowMin=osmdMeasureMinAbsWholeInRows(rows);
-                if(rowMin==null){
-                    cursorTimeline=tBlock+span;
+                const base=osmdMeasureMinAbsWholeInRows(rows);
+                if(base==null){
+                    cursorTimeline+=span;
                     continue;
                 }
-                const mStart=measureAbsoluteTimestampWhole(measures[mi]);
-                const ref=(typeof mStart==='number'&&isFinite(mStart))?mStart:rowMin;
-                let maxRel=0;
                 for(let ri=0;ri<rows.length;ri++){
                     const row=rows[ri];
-                    const rel=Math.max(0,(typeof row.absWhole==='number'?row.absWhole:0)-ref);
-                    if(rel>maxRel)maxRel=rel;
                     const playInfos=row.playInfos.map(p=>({...p,note:p.note}));
                     out.push({
                         stepIdx:stepCounter++,
-                        absWhole:tBlock+rel,
+                        absWhole:cursorTimeline+(row.absWhole-base),
                         stepBpm:row.stepBpm,
                         playInfos
                     });
                 }
-                const endByMeter=tBlock+span;
-                const endByContent=tBlock+maxRel;
-                const next=Math.max(endByMeter,endByContent)+1e-7;
-                if(endByContent>endByMeter+1e-6){
-                    try{
-                        if(typeof window!=='undefined'&&(window.OSMD_REPEAT_DEBUG===true
-                            ||(typeof localStorage!=='undefined'&&localStorage.getItem('osmd_repeat_debug')==='1')))
-                            console.warn('[REPEAT-CHAIN] measure',mi,'meterSpan',span,'contentRel',maxRel,'— synthetic block extended (repeat / volta / TS).');
-                    }catch(eDbg){}
-                }
-                cursorTimeline=next;
+                cursorTimeline+=span;
             }
             if(!out.length){
                 repeatChainLog({ok:false,skip:'out_empty',rawCursorRows:rawLen,M,orderLen:order.length,scan:{cFwdLine,cBackLine,cFwdIns,cBackIns,ixFwd,ixBack,repListLen},oneLine:`nyers_sor=${rawLen} orderLen=${order.length} de kimenet_sor=0 (ütemekhez nem volt kurzor-sor)`,alertHu:'Bővített ütem-sorrend van, de egyetlen lejátszható sort sem sikerült képezni (kurzor-sor / ütem párosítás?).'});
@@ -5795,16 +5654,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         }
         const scrollNotes=[...(activeRH?st.noteObjsRH:[]),...(activeLH?st.noteObjsLH:[])];
         scheduleOsmdRender(scrollNotes.length?scrollNotes:null);
-        try{
-            const pi=st.playInfos&&st.playInfos.length?st.playInfos[0]:null;
-            const pm=pi&&pi.note?osmdNoteToSourceMeasure(pi.note):null;
-            if(pm){
-                syncMetroTimeSigFromSourceMeasure(pm);
-                const qb=readTempoFromSourceMeasure(pm);
-                const seg=(typeof st.stepBpm==='number'&&st.stepBpm>0)?st.stepBpm:bpm;
-                setMetroBpmDisplayFromScore(pm,qb>0?qb:seg);
-            }
-        }catch(e){}
     }
     function handleScorePracticeNoteOn(midi){
         let ok=false;
@@ -5921,25 +5770,10 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     queueDemoMidiAtAudioTime([0x90|DEMO_MIDI_CHANNEL,m&127,100],tOn,pbGen);
             }
             scheduleAtAudioTime(tOn,()=>{
-                let pm=null;
-                try{
-                    const n0=st.playInfos&&st.playInfos[0]&&st.playInfos[0].note;
-                    pm=n0?osmdNoteToSourceMeasure(n0):null;
-                    if(pm)syncMetroTimeSigFromSourceMeasure(pm);
-                    if(osmdRepeatDebugVerbose()&&pm){
-                        const currentMeasureIndex=osmdPracticeCanonicalFromSourceMeasure(pm);
-                        const disp=currentMeasureIndex!=null?currentMeasureIndex:(osmdRawMeasureNumberFromSourceMeasure(pm)??'?');
-                        console.log('Playing Measure:', disp);
-                    }
-                }catch(e0){}
-                if(typeof st.stepBpm==='number'&&st.stepBpm>0)bpm=st.stepBpm;
-                const tb=(typeof st.stepBpm==='number'&&st.stepBpm>0)?st.stepBpm:bpm;
-                try{
-                    if(pm)setMetroBpmDisplayFromScore(pm,tb);
-                    else{const db=document.getElementById('metroBpmDisplay');if(db)db.innerText=String(tb);}
-                }catch(e2){
+                if(typeof st.stepBpm==='number'&&st.stepBpm>0){
+                    bpm=st.stepBpm;
                     const db=document.getElementById('metroBpmDisplay');
-                    if(db)db.innerText=String(tb);
+                    if(db)db.innerText=bpm;
                 }
                 if(demoInternalSamplesWanted()){
                     for(const p of active){
@@ -6087,7 +5921,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             applyLibraryOledAfterLoad();
             maybeUpgradeLibraryTitleFromEmbeddedMetadata(lastLoadedScoreXml);
             applyTempoFromLoadedOsmdScore();
-            _lastMetroAppliedTimeSigStr='';
             applyTimeSignatureFromLoadedOsmdScore();
             switchToScoreMode();
             queuePersistScoreSession();
@@ -6144,6 +5977,23 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(best)return await best.async('string');
         throw new Error('No MusicXML entry found inside MXL');
     }
+    function emitRepertoireFileLoadAnalytics(file){
+        if(!file||typeof file.name!=='string')return;
+        if(!window.AkiraDb||typeof AkiraDb.insertEvent!=='function')return;
+        var payload={
+            metadata:{
+                fileName:file.name,
+                fileSize:file.size,
+                fileType:file.name.split('.').pop()
+            }
+        };
+        var send=function(){return AkiraDb.insertEvent('repertoire_file_load',payload);};
+        if(typeof AkiraDb.ensureAnonymousUserRow==='function'){
+            void AkiraDb.ensureAnonymousUserRow().then(send).catch(function(e){console.warn('repertoire_file_load',e);});
+        }else{
+            void send();
+        }
+    }
     async function readLocalFileAsText(file){
         if(typeof file.text==='function')return file.text();
         return new Promise((res,rej)=>{
@@ -6172,6 +6022,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             if(!xml||typeof xml!=='string'||!xml.trim())
                 throw new Error(isHU?'Üres vagy hibás fájl':'Empty or invalid file');
             await loadXmlScore(xml);
+            emitRepertoireFileLoadAnalytics(file);
             addScoreToLibrary(file.name,lastLoadedScoreXml);
         }catch(e){
             setInfoBar((isHU?'HIBA: ':'ERROR: ')+(e&&e.message?e.message:String(e)),null);
@@ -6278,6 +6129,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     xml=await file.text();
                 }
                 if(xml&&xml.length>50){
+                    emitRepertoireFileLoadAnalytics(file);
                     addScoreToLibrary(name,xml);
                     count++;
                 }
