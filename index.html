@@ -389,13 +389,27 @@ let visited=JSON.parse(localStorage.getItem('akira_visited')||'{}');
 let xp=parseInt(localStorage.getItem('akira_xp')||'0');
 let lastV=localStorage.getItem('akira_last')||null;
 var _heroVidGen=0;
-/** Hero welcome clip: metadata preload, skeleton until can play (reduces startup jank). */
+var LS_WELCOME_DONE='akira_welcome_video_seen';
+function welcomeVideoAlreadySeen(){
+ try{return localStorage.getItem(LS_WELCOME_DONE)==='1';}catch(e){return false;}
+}
+function markWelcomeVideoSeen(){
+ try{localStorage.setItem(LS_WELCOME_DONE,'1');}catch(e){}
+}
+/** Hero welcome clip: metadata preload, skeleton until can play. Csak az első (sikeres) lejátszásig — utána poster, nincs újratöltés. */
 function setHeroVideoSrc(rel){
  if(!rel)return;
  var vid=document.getElementById('akiraVid');
  var wrap=document.getElementById('heroVidWrap');
  if(!vid)return;
  var gen=++_heroVidGen;
+ if(welcomeVideoAlreadySeen()){
+  if(wrap)wrap.classList.add('vid-ready');
+  try{vid.removeAttribute('src');}catch(e){vid.src='';}
+  try{vid.preload='none';vid.setAttribute('preload','none');}catch(e){}
+  try{vid.load();}catch(e){}
+  return;
+ }
  if(wrap)wrap.classList.remove('vid-ready');
  try{vid.preload='metadata';}catch(e){}
  vid.setAttribute('preload','metadata');
@@ -406,6 +420,7 @@ function setHeroVideoSrc(rel){
  vid.addEventListener('canplay',markReady,{once:true});
  vid.addEventListener('loadeddata',markReady,{once:true});
  vid.addEventListener('error',markReady,{once:true});
+ vid.addEventListener('playing',markWelcomeVideoSeen,{once:true});
  vid.src=rel;
  if(vid.readyState>=2)markReady();
  vid.play().catch(function(){});
