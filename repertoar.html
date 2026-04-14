@@ -927,7 +927,7 @@
             oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
             btnDemo:'▶ DEMO: plays the score with measure highlight. ▲▼ adjusts playback speed (0.3×–1.8×); tap the speed display to reset to 1.0×. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
             btnDemoRepeat:'DEMO repeat: when on, the score DEMO restarts from the beginning each time it reaches the end, until you tap this button off. ▶ still stops playback immediately.',
-            btnMidiRec:'MIDI recording: start / stop.',
+            btnMidiRec:'MIDI recording: start / stop. Timeline begins on the first captured MIDI event (not when you press REC).',
             btnMidiPlayer:'MIDI player panel: open / close.',
             btnMidiRecRepeat:'Loop at end of playback.',
             audioToggle:'Piano audio: built-in sampled piano on or off.',
@@ -958,7 +958,7 @@
             oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
             btnDemo:'▶ DEMO: lejátszás ütemkiemeléssel. ▲▼ a lejátszási sebesség állítása (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
             btnDemoRepeat:'DEMO ismétlés: bekapcsolva a kotta-DEMO minden lefutás végén elölről indul, amíg ki nem kapcsolod. A ▶ gomb továbbra is azonnal megállítja a lejátszást.',
-            btnMidiRec:'MIDI felvétel: indítás / leállítás.',
+            btnMidiRec:'MIDI felvétel: indítás / leállítás. Az idővonal az első rögzített MIDI eseménynél indul (nem a REC gombnál).',
             btnMidiPlayer:'Lejátszó ablak: megnyitás / bezárás.',
             btnMidiRecRepeat:'Ismétlés a lejátszás végén.',
             audioToggle:'Zongora hang: belső mintahang be vagy ki.',
@@ -3387,7 +3387,7 @@
 
     // ── MIDI recorder / player (Repertoire rack) ─────────────────────────────
     const LS_MIDI_REC='repertoar_midi_rec_sessions_v1';
-    let midiRecorderIsRecording=false,midiRecorderEvents=[],midiRecorderStartMs=0,midiRecSilenceTimer=null;
+    let midiRecorderIsRecording=false,midiRecorderEvents=[],midiRecorderStartMs=null,midiRecSilenceTimer=null;
     let midiRecEventSeq=0;
     let midiRecSessions=[];
     let midiRecPlayback=false,midiRecPlayTimers=[],midiRecRafId=0;
@@ -3395,70 +3395,6 @@
     const MIDI_REC_SPEEDS=[0.5,1,1.5,2];
     let midiRecSeekDragging=false,midiRecPlayBaseAudioTime=0,midiRecPlayContentAnchorSec=0;
     let midiRecRepeatEnabled=false;
-    let _midiRecSyncMerged=null,_midiRecSyncKey='';
-    function invalidateMidiRecorderTimeline(){_midiRecSyncMerged=null;_midiRecSyncKey='';}
-    function midiRecorderSyncCacheKey(){
-        try{
-            const pr=isPracticeRangeActive()?'1':'0';
-            return String(currentScoreHash||'')+'|'+pr;
-        }catch(e){return'';}
-    }
-    function getMidiRecMergedForSync(){
-        if(!osmdInstance||!osmdInstance.cursor)return null;
-        const k=midiRecorderSyncCacheKey();
-        if(_midiRecSyncMerged&&_midiRecSyncKey===k)return _midiRecSyncMerged;
-        let merged;
-        try{
-            merged=osmdMergeRawRowsToMergedSteps(expandRawRowsWithRepeats(osmdCollectRawCursorRows()));
-        }catch(e){
-            merged=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
-        }
-        merged=filterMergedByPracticeRange(merged);
-        if(!merged||!merged.length)return null;
-        merged.forEach(finalizeMergedStepPlayInfos);
-        const saved=demoSpeedFactor;
-        demoSpeedFactor=1;
-        assignPlaybackSecondsToMergedSteps(merged,true);
-        demoSpeedFactor=saved;
-        try{if(osmdInstance.cursor&&typeof osmdInstance.cursor.hide==='function')osmdInstance.cursor.hide();}catch(e){}
-        _midiRecSyncMerged=merged;
-        _midiRecSyncKey=k;
-        return merged;
-    }
-    function recorderTimeToCursorStep(tSec){
-        const merged=getMidiRecMergedForSync();
-        if(!merged||!merged.length)return null;
-        let best=merged[0];
-        for(let i=1;i<merged.length;i++){
-            const st=merged[i].tSecStart;
-            if(typeof st==='number'&&st<=tSec+1e-4)best=merged[i];
-            else break;
-        }
-        return best&&typeof best.cursorStep==='number'?best.cursorStep:null;
-    }
-    function osmdCursorJumpToCursorStep(stepIdx){
-        try{
-            const cur=osmdInstance&&osmdInstance.cursor;
-            if(!cur||typeof cur.reset!=='function'||stepIdx==null||stepIdx<0)return;
-            cur.reset();
-            for(let i=0;i<stepIdx;i++){
-                const It=osmdIterator(cur);
-                if(!It||It.EndReached)break;
-                cur.next();
-            }
-            try{if(typeof cur.hide==='function')cur.hide();}catch(e2){}
-            const merged=getMidiRecMergedForSync();
-            let row=null;
-            if(merged)for(let j=0;j<merged.length;j++)if(merged[j].cursorStep===stepIdx){row=merged[j];break;}
-            const notes=[];
-            if(row){
-                if(activeRH)notes.push(...(row.noteObjsRH||[]));
-                if(activeLH)notes.push(...(row.noteObjsLH||[]));
-            }
-            if(notes.length)scheduleScoreViewportFollow(notes);
-            else if(osmdInstance)scheduleOsmdRender();
-        }catch(e){console.warn('osmdCursorJumpToCursorStep',e);}
-    }
     function loadMidiSessionsFromStorage(){
         try{
             const j=JSON.parse(localStorage.getItem(LS_MIDI_REC)||'null');
@@ -3535,8 +3471,6 @@
     function midiRecScrubToTime(tSec){
         midiRecPlayheadSec=Math.max(0,Math.min(midiRecDurationSec||1,tSec));
         updateMidiRecSeekUi();
-        const step=recorderTimeToCursorStep(midiRecPlayheadSec);
-        if(step!=null)osmdCursorJumpToCursorStep(step);
     }
     function touchMidiRecSilenceWatch(){
         if(!midiRecorderIsRecording)return;
@@ -3551,16 +3485,21 @@
         const d=msg.data;
         if(!d||d.length<3)return;
         const cmd=d[0]>>4,n=d[1],v=d[2];
+        let cap=false;
+        if(cmd===11&&n===64)cap=true;
+        else if(cmd===9&&v>0)cap=true;
+        else if(cmd===8||(cmd===9&&v===0))cap=true;
+        if(!cap)return;
+        if(midiRecorderStartMs==null){
+            midiRecorderStartMs=performance.now();
+            touchMidiRecSilenceWatch();
+        }
         const t=performance.now()-midiRecorderStartMs;
         if(cmd===11&&n===64){
             midiRecorderEvents.push({t,cc:true,ctrl:64,val:v&127,seq:++midiRecEventSeq});
             touchMidiRecSilenceWatch();
             return;
         }
-        let cap=false;
-        if(cmd===9&&v>0)cap=true;
-        else if(cmd===8||(cmd===9&&v===0))cap=true;
-        if(!cap)return;
         const on=cmd===9&&v>0;
         midiRecorderEvents.push({t,on,note:n&127,vel:on?Math.max(1,v&127):0,seq:++midiRecEventSeq});
         touchMidiRecSilenceWatch();
@@ -3587,22 +3526,21 @@
             setInfoBar(currentLang==='HU'?'Nem volt MIDI esemény':'No MIDI events captured',document.getElementById('btnMidiRec'));
         }
         midiRecorderEvents=[];
+        midiRecorderStartMs=null;
     }
     async function toggleMidiRecorder(){
         if(helpActive)return;
         if(midiRecorderIsRecording){endMidiRecordingCapture(false);return;}
         await userUnlockAudioAndMidi();
         stopMidiRecPlayback({rewind:true});
-        if(demoPlaying)stopDemo();
         midiRecorderIsRecording=true;
         midiRecorderEvents=[];
         midiRecEventSeq=0;
-        midiRecorderStartMs=performance.now();
+        midiRecorderStartMs=null;
         const br=document.getElementById('btnMidiRec');
         if(br)br.classList.add('recording');
-        touchMidiRecSilenceWatch();
         const hu=currentLang==='HU';
-        setInfoBar(hu?'MIDI REC… (újra REC / 15 mp csend = STOP)':'MIDI REC… (tap REC again or 15 s silence to stop)',br);
+        setInfoBar(hu?'MIDI REC… (az óra az első MIDI eseménynél indul; újra REC / 15 mp csend = STOP)':'MIDI REC… (clock starts on first MIDI; tap REC again or 15 s silence to stop)',br);
     }
     function stopMidiRecPlayback(opts){
         const o=opts&&typeof opts==='object'?opts:{};
@@ -6113,7 +6051,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         resetScoreOsmdFollowSnap();
         extractScorePedalEventsFromSheet();
         if(!osmdInstance||!osmdInstance.cursor){
-            invalidateMidiRecorderTimeline();
             return;
         }
         let mergedAll;
@@ -6141,7 +6078,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 fingerMap:m.fingerMap||{}
             });
         });
-        invalidateMidiRecorderTimeline();
     }
     function initScorePracticeSteps(){
         const loops=1;
