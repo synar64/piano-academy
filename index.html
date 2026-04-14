@@ -6,6 +6,7 @@
 <title>Akíra Piano Academy</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23050508'/><rect x='3' y='8' width='26' height='18' rx='2' fill='%2300AACC' opacity='0.9'/><rect x='5' y='8' width='4' height='11' rx='0.5' fill='%23050508'/><rect x='13' y='8' width='4' height='11' rx='0.5' fill='%23050508'/><rect x='21' y='8' width='4' height='11' rx='0.5' fill='%23050508'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="zongora-hatter-dark.jpg">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>if(localStorage.getItem('akira_lang')) document.documentElement.classList.add('skip-gate');</script>
@@ -19,9 +20,11 @@ body,html{width:100%;height:100%;background:var(--bg);color:#fff;font-family:'In
 html.skip-gate #langGate { display: none !important; }
 html:not(.skip-gate) #heroSec { display: none; }
 
-/* HÁTTÉR ÉS RÉSZECSKÉK */
-.ambient-bg{position:fixed;inset:0;z-index:0;background:url('zongora-hatter-dark.jpg') center/cover no-repeat;}
-.ambient-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,8,.85) 0%,rgba(5,5,8,.98) 100%);}
+/* HÁTTÉR: azonnal var(--bg), kép fade-in betöltés után (nem blokkolja az első festést) */
+.ambient-bg{position:fixed;inset:0;z-index:0;background:var(--bg);}
+.ambient-bg-img{position:absolute;inset:0;background:url('zongora-hatter-dark.jpg') center/cover no-repeat;opacity:0;transition:opacity .65s ease-out;}
+.ambient-bg-img.is-ready{opacity:1;}
+.ambient-bg-scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(5,5,8,.85) 0%,rgba(5,5,8,.98) 100%);z-index:1;}
 #pc{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;}
 
 /* ÜDVÖZLŐ KAPU */
@@ -57,8 +60,11 @@ html:not(.skip-gate) #heroSec { display: none; }
 .content-inner {width:100%;max-width:1100px;display:flex;flex-direction:column;gap:30px;}
 @keyframes fadeIn {from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 .hero-section {background:var(--glass);border:1px solid var(--glass-b);border-radius:16px;padding:30px;backdrop-filter:blur(12px);gap:30px;animation:fadeIn 0.8s ease forwards; display:flex;}
-.hero-vid-wrapper {width:220px;flex-shrink:0;border-radius:12px;overflow:hidden;border:1px solid rgba(0,170,204,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.6);background:#000;aspect-ratio:9/16;}
-.hero-vid {width:100%;height:100%;object-fit:cover;display:block;}
+.hero-vid-wrapper {width:220px;flex-shrink:0;border-radius:12px;overflow:hidden;border:1px solid rgba(0,170,204,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.6);background:#0a0c10;aspect-ratio:9/16;position:relative;}
+.hero-vid-wrapper::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(105deg,rgba(255,255,255,.03) 0%,rgba(0,170,204,.08) 45%,rgba(255,255,255,.03) 90%);background-size:180% 100%;animation:akiraVidShim 1.1s ease-in-out infinite;opacity:1;transition:opacity .4s ease;}
+.hero-vid-wrapper.vid-ready::before{opacity:0;animation:none;}
+@keyframes akiraVidShim{0%{background-position:100% 0}100%{background-position:-80% 0}}
+.hero-vid {width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:2;background:#000;}
 .hero-text {flex:1;display:flex;flex-direction:column;justify-content:center;}
 .hero-title {font-size:28px;font-weight:800;letter-spacing:3px;color:var(--cyan);margin-bottom:12px;text-transform:uppercase;}
 .hero-sub {font-size:14px;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:24px;}
@@ -135,7 +141,21 @@ html:not(.skip-gate) #heroSec { display: none; }
 </head>
 <body>
 
-<div class="ambient-bg"></div>
+<div class="ambient-bg" id="ambientBg">
+ <div class="ambient-bg-img" id="ambientBgImg" aria-hidden="true"></div>
+ <div class="ambient-bg-scrim" aria-hidden="true"></div>
+</div>
+<script>
+(function(){
+ var el=document.getElementById('ambientBgImg');
+ if(!el)return;
+ var img=new Image();
+ function done(){el.classList.add('is-ready');}
+ img.onload=done;
+ img.onerror=done;
+ img.src='zongora-hatter-dark.jpg';
+})();
+</script>
 <canvas id="pc"></canvas>
 
 <div id="langGate">
@@ -196,7 +216,7 @@ html:not(.skip-gate) #heroSec { display: none; }
     <main class="main-content">
         <div class="content-inner">
             <section class="hero-section" id="heroSec">
-                <div class="hero-vid-wrapper"><video id="akiraVid" class="hero-vid" playsinline ></video></div>
+                <div class="hero-vid-wrapper" id="heroVidWrap"><video id="akiraVid" class="hero-vid" playsinline preload="metadata" poster="Akíra.jpg"></video></div>
                 <div class="hero-text">
                     <h1 class="hero-title" id="h-tit">Üdvözöllek az Akadémián</h1>
                     <p class="hero-sub" id="h-sub"></p>
@@ -368,6 +388,28 @@ let lang = 'HU';
 let visited=JSON.parse(localStorage.getItem('akira_visited')||'{}');
 let xp=parseInt(localStorage.getItem('akira_xp')||'0');
 let lastV=localStorage.getItem('akira_last')||null;
+var _heroVidGen=0;
+/** Hero welcome clip: metadata preload, skeleton until can play (reduces startup jank). */
+function setHeroVideoSrc(rel){
+ if(!rel)return;
+ var vid=document.getElementById('akiraVid');
+ var wrap=document.getElementById('heroVidWrap');
+ if(!vid)return;
+ var gen=++_heroVidGen;
+ if(wrap)wrap.classList.remove('vid-ready');
+ try{vid.preload='metadata';}catch(e){}
+ vid.setAttribute('preload','metadata');
+ function markReady(){
+  if(gen!==_heroVidGen)return;
+  if(wrap)wrap.classList.add('vid-ready');
+ }
+ vid.addEventListener('canplay',markReady,{once:true});
+ vid.addEventListener('loadeddata',markReady,{once:true});
+ vid.addEventListener('error',markReady,{once:true});
+ vid.src=rel;
+ if(vid.readyState>=2)markReady();
+ vid.play().catch(function(){});
+}
 
 function save(){localStorage.setItem('akira_visited',JSON.stringify(visited));localStorage.setItem('akira_xp',xp);if(lastV)localStorage.setItem('akira_last',lastV);}
 function getLv(x){return Math.min(5,Math.floor(x/100));}
@@ -411,19 +453,14 @@ function enterApp(selectedLang) {
     const hero = document.getElementById('heroSec');
     if(hero) hero.style.display = 'flex';
     setLang(selectedLang);
-    const vid = document.getElementById('akiraVid');
-    if(vid) {
-        vid.src = selectedLang === 'HU' ? 'akira_welc_hu.mp4' : 'akira_welc_en.mp4';
-        vid.play().catch(e => console.log("Auto-play prevented"));
-    }
+    setHeroVideoSrc(selectedLang === 'HU' ? 'akira_welc_hu.mp4' : 'akira_welc_en.mp4');
 }
 
 function resumeApp(savedLang) {
     const hero = document.getElementById('heroSec');
     if(hero) hero.style.display = 'flex';
     setLang(savedLang);
-    const vid = document.getElementById('akiraVid');
-    if(vid) vid.src = savedLang === 'HU' ? 'akira_welc_hu.mp4' : 'akira_welc_en.mp4';
+    setHeroVideoSrc(savedLang === 'HU' ? 'akira_welc_hu.mp4' : 'akira_welc_en.mp4');
 }
 
 function buildLearnModal() {
@@ -489,11 +526,8 @@ function setLang(l){
  if(ctN)ctN.placeholder=L.ctNamePh||''; if(ctM)ctM.placeholder=L.ctMsgPh||'';
  setTxt('rv-t', L.rvl); setTxt('rv-s', L.rvs); setTxt('rv-wh', L.rvw); setTxt('rv-cl', L.rvc); setTxt('rv-sb', L.rvb);
 
- const vid = document.getElementById('akiraVid');
- if (vid && vid.src && !vid.paused) { 
-     vid.src = l === 'HU' ? 'akira_welc_hu.mp4' : 'akira_welc_en.mp4'; 
-     vid.play().catch(e=>console.log(e)); 
- }
+ const vid=document.getElementById('akiraVid');
+ if(vid&&vid.src&&!vid.paused)setHeroVideoSrc(l==='HU'?'akira_welc_hu.mp4':'akira_welc_en.mp4');
  buildGrid();updXp();buildStats();buildLearnModal();
 }
 
