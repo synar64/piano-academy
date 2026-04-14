@@ -197,6 +197,20 @@
         .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
         .metro-preset:hover { background:#333;color:#fff; }
         .metro-preset:active { transform:translateY(1px); }
+        #btnMidiRec { color:#666; border-color:#333; transition:color 0.15s,border-color 0.15s,box-shadow 0.15s; }
+        #btnMidiRec.recording { color:#ff2a2a !important; border-color:#cc2222 !important; box-shadow:0 0 10px rgba(255,40,40,0.35); }
+        #midiPlayerPanel { box-shadow:0 12px 32px rgba(0,0,0,0.75); }
+        #midiPlayerPanel input[type="range"] { -webkit-appearance:none; width:100%; height:6px; background:#111; border-radius:3px; outline:none; cursor:pointer; }
+        #midiPlayerPanel input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#b3e6ff; border:1px solid #557799; cursor:grab; }
+        .midi-rec-clock-box {
+            font-family:'Share Tech Mono',monospace;font-size:22px;line-height:1.15;color:#b3e6ff;font-weight:bold;
+            padding:6px 10px;border-radius:3px;background:#111;border:1px solid #050505;
+            box-shadow:inset 0 2px 5px rgba(0,0,0,0.5);min-width:0;flex:1;text-align:center;
+        }
+        #midiRecTimeDisplay { user-select:none;cursor:default; }
+        #midiRecSpeedBox { user-select:none;cursor:pointer;flex:0 0 auto;min-width:4.2em; }
+        #midiRecSpeedBox:hover { border-color:#557799;color:#d8f4ff; }
+        #btnMidiRecRepeat.active { color:#b3e6ff;border-color:#557799; }
         .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; }
         .modal-content { background:var(--rack-bg); padding:30px; border:2px solid var(--rack-border); border-radius:6px; text-align:center; max-width:550px; width:90%; box-shadow:0 20px 50px rgba(0,0,0,1); }
         .modal-title { color:#aaa; text-transform:uppercase; letter-spacing:2px; font-weight:800; font-size:16px; margin-top:0; margin-bottom:25px; border-bottom:2px solid #111; padding-bottom:15px; }
@@ -733,6 +747,32 @@
                                 <button type="button" id="btnDemoRepeat" class="sq-btn" onclick="if(!helpActive) toggleDemoRepeat()" data-help="" title="" aria-label="" style="align-self:center;flex-shrink:0;">
                                     <svg id="demoRepeatIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                                 </button>
+                                <button type="button" id="btnMidiRec" class="sq-btn" onclick="if(!helpActive) void toggleMidiRecorder()" data-help="" title="" aria-label="MIDI REC" style="align-self:center;flex-shrink:0;margin-left:14px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/></svg>
+                                </button>
+                                <div class="midi-player-wrap" style="position:relative;align-self:center;flex-shrink:0;margin-left:2px;">
+                                    <button type="button" id="btnMidiPlayer" class="sq-btn" onclick="if(!helpActive) toggleMidiPlayerPanel()" data-help="" title="" aria-label="MIDI Player" style="display:flex;align-items:center;justify-content:center;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7,5 19,12 7,19"/></svg>
+                                    </button>
+                                    <div id="midiPlayerPanel" style="display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;width:min(92vw,300px);background:#1a1a1d;border:1px solid #333;border-radius:4px;padding:10px 12px;z-index:1200;flex-direction:column;gap:8px;">
+                                        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#557799;text-transform:uppercase;">Sessions</div>
+                                        <select id="midiRecSessionSelect" style="background:#111;color:#eee;border:1px solid #333;padding:6px;font-family:'Share Tech Mono';border-radius:3px;width:100%;font-size:11px;"></select>
+                                        <div style="display:flex;align-items:center;gap:8px;">
+                                            <button type="button" id="midiRecPlayBtn" class="sq-btn" onclick="if(!helpActive) void toggleMidiRecPlayback()" style="width:36px;height:38px;flex-shrink:0;padding:0;align-self:center;" title="Play / Stop">▶</button>
+                                            <div style="flex:1;min-width:0;display:flex;align-items:center;">
+                                                <input type="range" id="midiRecSeek" min="0" max="1000" value="0" step="0.1">
+                                            </div>
+                                            <button type="button" id="btnMidiRecRepeat" class="sq-btn" onclick="if(!helpActive) toggleMidiRecRepeat()" data-help="" title="" aria-label="" style="width:36px;height:38px;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center;align-self:center;">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                                            </button>
+                                        </div>
+                                        <div style="display:flex;align-items:stretch;gap:10px;justify-content:space-between;">
+                                            <div id="midiRecTimeDisplay" class="midi-rec-clock-box" title="">00:00.0</div>
+                                            <div id="midiRecSpeedBox" class="midi-rec-clock-box" onclick="if(!helpActive) cycleMidiRecPlaySpeed()" title="">×1.0</div>
+                                        </div>
+                                        <button type="button" class="hardware-btn" id="midiRecExportBtn" onclick="if(!helpActive) void exportMidiRecorderSession()" style="width:100%;font-size:11px;padding:8px;letter-spacing:1px;">Export .mid</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -887,6 +927,9 @@
             oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
             btnDemo:'▶ DEMO: plays the score with measure highlight. ▲▼ adjusts playback speed (0.3×–1.8×); tap the speed display to reset to 1.0×. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
             btnDemoRepeat:'DEMO repeat: when on, the score DEMO restarts from the beginning each time it reaches the end, until you tap this button off. ▶ still stops playback immediately.',
+            btnMidiRec:'MIDI recording: start / stop.',
+            btnMidiPlayer:'MIDI player panel: open / close.',
+            btnMidiRecRepeat:'Loop at end of playback.',
             audioToggle:'Piano audio: built-in sampled piano on or off.',
             btnMeasureRange:'Measure range (top right of the 2×2 block): limits START and DEMO. Type numbers in the dialog, or use the pointer (top left) / checkbox to pick on the score (Shift / Ctrl+click).',
             btnMeasureClickPick:'Click-to-select (top left of the 2×2 block): OFF by default — ON shows green tint. Same as the checkbox in the measure range dialog.',
@@ -915,6 +958,9 @@
             oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
             btnDemo:'▶ DEMO: lejátszás ütemkiemeléssel. ▲▼ a lejátszási sebesség állítása (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
             btnDemoRepeat:'DEMO ismétlés: bekapcsolva a kotta-DEMO minden lefutás végén elölről indul, amíg ki nem kapcsolod. A ▶ gomb továbbra is azonnal megállítja a lejátszást.',
+            btnMidiRec:'MIDI felvétel: indítás / leállítás.',
+            btnMidiPlayer:'Lejátszó ablak: megnyitás / bezárás.',
+            btnMidiRecRepeat:'Ismétlés a lejátszás végén.',
             audioToggle:'Zongora hang: belső mintahang be vagy ki.',
             btnMeasureRange:'Ütemtartomány (2×2-es csoport jobb felső): START és DEMO határa. Számok az ablakban, vagy bal felső mutató / jelölőnégyzet + kotta (Shift / Ctrl+katt).',
             btnMeasureClickPick:'Egérrel választás (2×2 bal felső): alapból ki; bekapcsolva zöldes háttér. Ugyanaz, mint az ütemtartomány ablak jelölőnégyzete.',
@@ -945,6 +991,11 @@
                 ?('Előbeállítás '+(i+1)+' — katt: betöltés, Shift+katt: aktuális nézet mentése.')
                 :('Preset '+(i+1)+' — click: load, Shift+click: save current view.'));
         }
+        ['btnMidiRec','btnMidiPlayer'].forEach(id=>{
+            const el=document.getElementById(id);
+            const t=pack[id];
+            if(el&&t)el.setAttribute('title',t);
+        });
     }
     let _sheetContainerCached=null;
     function elSheetContainer(){
@@ -2084,6 +2135,7 @@
         updateViewPresetChrome();
         applyHelpTooltips();
         syncDemoRepeatButtonChrome();
+        syncMidiRecRepeatButtonChrome();
     }
     function syncDemoRepeatButtonChrome(){
         const b=document.getElementById('btnDemoRepeat');
@@ -2190,6 +2242,7 @@
 
     function attachMidiInputHandler(input){
         input.onmidimessage=(msg)=>{
+            midiRecorderOnMidiMessage(msg);
             const d=msg.data;if(d.length<3)return;
             const cmd=d[0]>>4,n=d[1],v=d[2];
             if(cmd===11){ // Sustain Pedal
@@ -3100,7 +3153,8 @@
         }
     }
     function playScaleRhythmDemo(){
-        if(demoPlaying){stopDemo();return;}
+        if(demoPlaying){stopDemo();stopMidiRecPlayback({rewind:true});return;}
+        stopMidiRecPlayback({rewind:true});
         if(demoAwaitMidi){
             demoLaunchGen++;
             demoAwaitMidi=false;
@@ -3331,6 +3385,475 @@
     }
     function toggleMetroMenu(){const menu=document.getElementById('metroSettingsMenu');menu.style.display=(menu.style.display==='none'||menu.style.display==='')?'flex':'none';}
 
+    // ── MIDI recorder / player (Repertoire rack) ─────────────────────────────
+    const LS_MIDI_REC='repertoar_midi_rec_sessions_v1';
+    let midiRecorderIsRecording=false,midiRecorderEvents=[],midiRecorderStartMs=0,midiRecSilenceTimer=null;
+    let midiRecEventSeq=0;
+    let midiRecSessions=[];
+    let midiRecPlayback=false,midiRecPlayTimers=[],midiRecRafId=0;
+    let midiRecPlayheadSec=0,midiRecDurationSec=1,midiRecPlaySpeed=1,midiRecSpeedIdx=1;
+    const MIDI_REC_SPEEDS=[0.5,1,1.5,2];
+    let midiRecSeekDragging=false,midiRecPlayBaseAudioTime=0,midiRecPlayContentAnchorSec=0;
+    let midiRecRepeatEnabled=false;
+    let _midiRecSyncMerged=null,_midiRecSyncKey='';
+    function invalidateMidiRecorderTimeline(){_midiRecSyncMerged=null;_midiRecSyncKey='';}
+    function midiRecorderSyncCacheKey(){
+        try{
+            const pr=isPracticeRangeActive()?'1':'0';
+            return String(currentScoreHash||'')+'|'+pr;
+        }catch(e){return'';}
+    }
+    function getMidiRecMergedForSync(){
+        if(!osmdInstance||!osmdInstance.cursor)return null;
+        const k=midiRecorderSyncCacheKey();
+        if(_midiRecSyncMerged&&_midiRecSyncKey===k)return _midiRecSyncMerged;
+        let merged;
+        try{
+            merged=osmdMergeRawRowsToMergedSteps(expandRawRowsWithRepeats(osmdCollectRawCursorRows()));
+        }catch(e){
+            merged=osmdMergeRawRowsToMergedSteps(osmdCollectRawCursorRows());
+        }
+        merged=filterMergedByPracticeRange(merged);
+        if(!merged||!merged.length)return null;
+        merged.forEach(finalizeMergedStepPlayInfos);
+        const saved=demoSpeedFactor;
+        demoSpeedFactor=1;
+        assignPlaybackSecondsToMergedSteps(merged,true);
+        demoSpeedFactor=saved;
+        try{if(osmdInstance.cursor&&typeof osmdInstance.cursor.hide==='function')osmdInstance.cursor.hide();}catch(e){}
+        _midiRecSyncMerged=merged;
+        _midiRecSyncKey=k;
+        return merged;
+    }
+    function recorderTimeToCursorStep(tSec){
+        const merged=getMidiRecMergedForSync();
+        if(!merged||!merged.length)return null;
+        let best=merged[0];
+        for(let i=1;i<merged.length;i++){
+            const st=merged[i].tSecStart;
+            if(typeof st==='number'&&st<=tSec+1e-4)best=merged[i];
+            else break;
+        }
+        return best&&typeof best.cursorStep==='number'?best.cursorStep:null;
+    }
+    function osmdCursorJumpToCursorStep(stepIdx){
+        try{
+            const cur=osmdInstance&&osmdInstance.cursor;
+            if(!cur||typeof cur.reset!=='function'||stepIdx==null||stepIdx<0)return;
+            cur.reset();
+            for(let i=0;i<stepIdx;i++){
+                const It=osmdIterator(cur);
+                if(!It||It.EndReached)break;
+                cur.next();
+            }
+            try{if(typeof cur.hide==='function')cur.hide();}catch(e2){}
+            const merged=getMidiRecMergedForSync();
+            let row=null;
+            if(merged)for(let j=0;j<merged.length;j++)if(merged[j].cursorStep===stepIdx){row=merged[j];break;}
+            const notes=[];
+            if(row){
+                if(activeRH)notes.push(...(row.noteObjsRH||[]));
+                if(activeLH)notes.push(...(row.noteObjsLH||[]));
+            }
+            if(notes.length)scheduleScoreViewportFollow(notes);
+            else if(osmdInstance)scheduleOsmdRender();
+        }catch(e){console.warn('osmdCursorJumpToCursorStep',e);}
+    }
+    function loadMidiSessionsFromStorage(){
+        try{
+            const j=JSON.parse(localStorage.getItem(LS_MIDI_REC)||'null');
+            midiRecSessions=Array.isArray(j)?j.filter(x=>x&&Array.isArray(x.events)):[];
+        }catch(e){midiRecSessions=[];}
+    }
+    function persistMidiSessions(){
+        try{localStorage.setItem(LS_MIDI_REC,JSON.stringify(midiRecSessions));}catch(e){console.warn('midi sessions persist',e);}
+    }
+    function getMidiRecSelectedSession(){
+        const sel=document.getElementById('midiRecSessionSelect');
+        if(!sel||sel.value===''||sel.selectedIndex<0)return null;
+        const i=parseInt(sel.value,10);
+        return Number.isFinite(i)?midiRecSessions[i]||null:null;
+    }
+    function refreshMidiRecSessionSelect(){
+        const sel=document.getElementById('midiRecSessionSelect');
+        if(!sel)return;
+        sel.innerHTML='';
+        if(!midiRecSessions.length){
+            const opt=document.createElement('option');
+            opt.value='';
+            opt.textContent=currentLang==='HU'?'(nincs felvétel)':'(no sessions)';
+            sel.appendChild(opt);
+            return;
+        }
+        midiRecSessions.forEach((s,i)=>{
+            const opt=document.createElement('option');
+            opt.value=String(i);
+            const sec=Math.max(1,Math.round((s.durationMs||0)/1000));
+            opt.textContent=(s.title||'Session').slice(0,28)+' · '+sec+'s · '+(s.events?s.events.length:0);
+            sel.appendChild(opt);
+        });
+        sel.selectedIndex=midiRecSessions.length-1;
+    }
+    function updateMidiRecSeekBounds(){
+        const sess=getMidiRecSelectedSession();
+        const sk=document.getElementById('midiRecSeek');
+        if(!sk)return;
+        midiRecDurationSec=sess?Math.max(0.5,(sess.durationMs||1000)/1000):1;
+        sk.max=Math.max(100,midiRecDurationSec*1000);
+        if(midiRecPlayheadSec>midiRecDurationSec)midiRecPlayheadSec=midiRecDurationSec;
+        if(!midiRecSeekDragging)sk.value=midiRecPlayheadSec*1000;
+    }
+    function formatMidiRecTime(s){
+        if(!Number.isFinite(s)||s<0)s=0;
+        const m=Math.floor(s/60);
+        const r=s-m*60;
+        const t=Math.floor(r*10)%10;
+        const ss=Math.floor(r);
+        return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0')+'.'+t;
+    }
+    function updateMidiRecSeekUi(){
+        const sk=document.getElementById('midiRecSeek');
+        const el=document.getElementById('midiRecTimeDisplay');
+        if(el)el.textContent=formatMidiRecTime(midiRecPlayheadSec);
+        if(sk&&!midiRecSeekDragging)sk.value=midiRecPlayheadSec*1000;
+    }
+    function syncMidiRecRepeatButtonChrome(){
+        const b=document.getElementById('btnMidiRecRepeat');
+        if(!b)return;
+        b.classList.toggle('active',midiRecRepeatEnabled);
+        const pack=HELP_TOOLTIPS[currentLang]||HELP_TOOLTIPS.EN;
+        const th=pack.btnMidiRecRepeat||'';
+        b.title=th;
+        b.setAttribute('aria-label',th);
+        if(th)b.setAttribute('data-help',th);
+    }
+    function toggleMidiRecRepeat(){
+        if(helpActive)return;
+        midiRecRepeatEnabled=!midiRecRepeatEnabled;
+        syncMidiRecRepeatButtonChrome();
+    }
+    function midiRecScrubToTime(tSec){
+        midiRecPlayheadSec=Math.max(0,Math.min(midiRecDurationSec||1,tSec));
+        updateMidiRecSeekUi();
+        const step=recorderTimeToCursorStep(midiRecPlayheadSec);
+        if(step!=null)osmdCursorJumpToCursorStep(step);
+    }
+    function touchMidiRecSilenceWatch(){
+        if(!midiRecorderIsRecording)return;
+        if(midiRecSilenceTimer)clearTimeout(midiRecSilenceTimer);
+        midiRecSilenceTimer=setTimeout(()=>{
+            midiRecSilenceTimer=null;
+            if(midiRecorderIsRecording)endMidiRecordingCapture(true);
+        },15000);
+    }
+    function midiRecorderOnMidiMessage(msg){
+        if(!midiRecorderIsRecording||midiRecPlayback)return;
+        const d=msg.data;
+        if(!d||d.length<3)return;
+        const cmd=d[0]>>4,n=d[1],v=d[2];
+        const t=performance.now()-midiRecorderStartMs;
+        if(cmd===11&&n===64){
+            midiRecorderEvents.push({t,cc:true,ctrl:64,val:v&127,seq:++midiRecEventSeq});
+            touchMidiRecSilenceWatch();
+            return;
+        }
+        let cap=false;
+        if(cmd===9&&v>0)cap=true;
+        else if(cmd===8||(cmd===9&&v===0))cap=true;
+        if(!cap)return;
+        const on=cmd===9&&v>0;
+        midiRecorderEvents.push({t,on,note:n&127,vel:on?Math.max(1,v&127):0,seq:++midiRecEventSeq});
+        touchMidiRecSilenceWatch();
+    }
+    function endMidiRecordingCapture(fromIdle){
+        if(!midiRecorderIsRecording)return;
+        midiRecorderIsRecording=false;
+        if(midiRecSilenceTimer){clearTimeout(midiRecSilenceTimer);midiRecSilenceTimer=null;}
+        const b=document.getElementById('btnMidiRec');
+        if(b)b.classList.remove('recording');
+        if(midiRecorderEvents.length>0){
+            const dur=Math.max(...midiRecorderEvents.map(e=>e.t),80)+120;
+            const title=(document.getElementById('lcdScoreTitleOnly')&&document.getElementById('lcdScoreTitleOnly').textContent||'Recording').replace(/\s+/g,' ').trim().slice(0,48);
+            const sess={id:Date.now(),createdAt:new Date().toISOString(),title:title||'Recording',events:midiRecorderEvents.slice(),durationMs:dur};
+            midiRecSessions.push(sess);
+            if(midiRecSessions.length>5)midiRecSessions=midiRecSessions.slice(-5);
+            persistMidiSessions();
+            refreshMidiRecSessionSelect();
+            if(!fromIdle){
+                const hu=currentLang==='HU';
+                setInfoBar(hu?('MIDI felvétel mentve ('+midiRecorderEvents.length+' esemény)'):('MIDI recording saved ('+midiRecorderEvents.length+' events)'),document.getElementById('btnMidiRec'));
+            }
+        }else if(!fromIdle){
+            setInfoBar(currentLang==='HU'?'Nem volt MIDI esemény':'No MIDI events captured',document.getElementById('btnMidiRec'));
+        }
+        midiRecorderEvents=[];
+    }
+    async function toggleMidiRecorder(){
+        if(helpActive)return;
+        if(midiRecorderIsRecording){endMidiRecordingCapture(false);return;}
+        await userUnlockAudioAndMidi();
+        stopMidiRecPlayback({rewind:true});
+        if(demoPlaying)stopDemo();
+        midiRecorderIsRecording=true;
+        midiRecorderEvents=[];
+        midiRecEventSeq=0;
+        midiRecorderStartMs=performance.now();
+        const br=document.getElementById('btnMidiRec');
+        if(br)br.classList.add('recording');
+        touchMidiRecSilenceWatch();
+        const hu=currentLang==='HU';
+        setInfoBar(hu?'MIDI REC… (újra REC / 15 mp csend = STOP)':'MIDI REC… (tap REC again or 15 s silence to stop)',br);
+    }
+    function stopMidiRecPlayback(opts){
+        const o=opts&&typeof opts==='object'?opts:{};
+        const rewind=o.rewind===true;
+        if(midiRecRafId){cancelAnimationFrame(midiRecRafId);midiRecRafId=0;}
+        midiRecPlayTimers.forEach(id=>clearTimeout(id));
+        midiRecPlayTimers=[];
+        midiRecPlayback=false;
+        const pb=document.getElementById('midiRecPlayBtn');
+        if(pb)pb.textContent='▶';
+        try{
+            if(midiOutPort){
+                if(midiOutPort.state!=='open')midiOutPort.open();
+                for(let ch=0;ch<16;ch++)try{midiOutPort.send([0xB0|ch,123,0]);}catch(e){}
+                try{midiOutPort.send([0xB0|DEMO_MIDI_CHANNEL,64,0]);}catch(e){}
+            }
+        }catch(e){}
+        if(salamanderPiano){try{salamanderPiano.stopAll();}catch(e){}}
+        document.querySelectorAll('.key-glow.pressed').forEach(k=>k.classList.remove('pressed'));
+        try{updatePedalStripVisual(false);}catch(e){}
+        if(rewind){
+            midiRecPlayheadSec=0;
+            midiRecScrubToTime(0);
+        }else{
+            updateMidiRecSeekUi();
+        }
+    }
+    function midiRecOnNaturalEnd(sess){
+        if(!sess)return;
+        stopMidiRecPlayback({rewind:false});
+        midiRecPlayheadSec=0;
+        midiRecScrubToTime(0);
+        if(midiRecRepeatEnabled)void startMidiRecPlayback();
+    }
+    function midiRecPlaybackTick(){
+        if(!midiRecPlayback)return;
+        if(!audioCtx){midiRecRafId=0;return;}
+        const sess=getMidiRecSelectedSession();
+        if(!sess){midiRecRafId=0;return;}
+        const speed=Math.max(0.25,midiRecPlaySpeed||1);
+        const elapsed=(audioCtx.currentTime-midiRecPlayBaseAudioTime)*speed;
+        const endT=sess.durationMs/1000;
+        midiRecPlayheadSec=Math.min(endT,midiRecPlayContentAnchorSec+elapsed);
+        updateMidiRecSeekUi();
+        if(midiRecPlayheadSec>=endT-0.01){midiRecRafId=0;return;}
+        midiRecRafId=requestAnimationFrame(midiRecPlaybackTick);
+    }
+    async function startMidiRecPlayback(){
+        const sess=getMidiRecSelectedSession();
+        if(!sess||!sess.events||!sess.events.length)return;
+        await ensureAudioContextBase();
+        await userUnlockAudioAndMidi();
+        if(!audioCtx)return;
+        if(demoPlaying)stopDemo();
+        stopMidiRecPlayback({rewind:false});
+        if(audioCtx.state==='suspended')try{await audioCtx.resume();}catch(e){}
+        if(audioOn&&!midiOutPort&&!salamanderPiano){try{await initAudio();}catch(e){}}
+        const speed=Math.max(0.25,midiRecPlaySpeed||1);
+        const evs=sess.events.slice().sort((a,b)=>{
+            if(a.t!==b.t)return a.t-b.t;
+            const sa=typeof a.seq==='number'?a.seq:0,sb=typeof b.seq==='number'?b.seq:0;
+            return sa-sb;
+        });
+        const endT0=sess.durationMs/1000;
+        if(midiRecPlayheadSec>=endT0-0.04)midiRecPlayheadSec=0;
+        const playhead=midiRecPlayheadSec;
+        const tBase=audioCtx.currentTime+0.03;
+        midiRecPlayback=true;
+        midiRecPlayBaseAudioTime=tBase;
+        midiRecPlayContentAnchorSec=playhead;
+        const pb=document.getElementById('midiRecPlayBtn');
+        if(pb)pb.textContent='■';
+        evs.forEach(evt=>{
+            const te=evt.t/1000;
+            if(te+1e-6<playhead)return;
+            const tAudio=tBase+(te-playhead)/speed;
+            const delay=Math.max(0,(tAudio-audioCtx.currentTime)*1000);
+            const id=setTimeout(()=>{
+                if(!midiRecPlayback)return;
+                if(evt.cc&&evt.ctrl===64){
+                    const vv=Math.max(0,Math.min(127,evt.val|0));
+                    try{updatePedalStripVisual(vv>=64);}catch(e){}
+                    if(midiOutPort){
+                        try{
+                            if(midiOutPort.state!=='open')midiOutPort.open();
+                            midiOutPort.send([0xB0|DEMO_MIDI_CHANNEL,64,vv]);
+                        }catch(e){}
+                    }
+                    if(audioOn&&salamanderPiano){
+                        try{if(vv>=64)salamanderPiano.pedalDown();else salamanderPiano.pedalUp();}catch(e){}
+                    }
+                    return;
+                }
+                const n=evt.note&127;
+                if(evt.on){
+                    document.getElementById('k-'+n)?.classList.add('pressed');
+                    if(midiOutPort){
+                        try{
+                            if(midiOutPort.state!=='open')midiOutPort.open();
+                            midiOutPort.send([0x90|DEMO_MIDI_CHANNEL,n,scaleMidiOutNoteVelocity(evt.vel||90)]);
+                        }catch(e){}
+                    }
+                    if(audioOn&&salamanderPiano){
+                        try{
+                            const v=Math.min(1,Math.max(0.02,(evt.vel||90)/127));
+                            try{salamanderPiano.keyUp({midi:n});}catch(e2){}
+                            salamanderPiano.keyDown({midi:n,velocity:v});
+                        }catch(e){}
+                    }
+                }else{
+                    document.getElementById('k-'+n)?.classList.remove('pressed');
+                    if(midiOutPort){
+                        try{
+                            if(midiOutPort.state!=='open')midiOutPort.open();
+                            midiOutPort.send([0x80|DEMO_MIDI_CHANNEL,n,0]);
+                        }catch(e){}
+                    }
+                    if(salamanderPiano){try{salamanderPiano.keyUp({midi:n});}catch(e){}}
+                }
+            },delay);
+            midiRecPlayTimers.push(id);
+        });
+        const endT=sess.durationMs/1000;
+        const remain=Math.max(0,(endT-playhead)/speed);
+        midiRecPlayTimers.push(setTimeout(()=>{
+            if(!midiRecPlayback)return;
+            midiRecOnNaturalEnd(sess);
+        },remain*1000+120));
+        midiRecRafId=requestAnimationFrame(midiRecPlaybackTick);
+    }
+    async function toggleMidiRecPlayback(){
+        if(helpActive)return;
+        if(midiRecPlayback){stopMidiRecPlayback({rewind:true});return;}
+        loadMidiSessionsFromStorage();
+        const s=getMidiRecSelectedSession();
+        if(s){
+            const et=s.durationMs/1000;
+            if(midiRecPlayheadSec>=et-0.04)midiRecPlayheadSec=0;
+        }
+        await startMidiRecPlayback();
+    }
+    function toggleMidiPlayerPanel(){
+        const p=document.getElementById('midiPlayerPanel');
+        if(!p)return;
+        const isOpen=p.style.display==='flex';
+        if(isOpen){
+            stopMidiRecPlayback({rewind:true});
+            p.style.display='none';
+            return;
+        }
+        p.style.display='flex';
+        loadMidiSessionsFromStorage();
+        refreshMidiRecSessionSelect();
+        midiRecPlaySpeed=MIDI_REC_SPEEDS[midiRecSpeedIdx=1];
+        const sb=document.getElementById('midiRecSpeedBox');
+        if(sb)sb.textContent='×'+midiRecPlaySpeed.toFixed(1);
+        syncMidiRecRepeatButtonChrome();
+        updateMidiRecSeekBounds();
+        midiRecPlayheadSec=0;
+        midiRecScrubToTime(0);
+    }
+    function onMidiRecSessionChange(){
+        stopMidiRecPlayback({rewind:true});
+        loadMidiSessionsFromStorage();
+        midiRecPlayheadSec=0;
+        updateMidiRecSeekBounds();
+        midiRecScrubToTime(0);
+    }
+    function cycleMidiRecPlaySpeed(){
+        if(helpActive)return;
+        const was=midiRecPlayback;
+        if(was)stopMidiRecPlayback({rewind:false});
+        midiRecSpeedIdx=(midiRecSpeedIdx+1)%MIDI_REC_SPEEDS.length;
+        midiRecPlaySpeed=MIDI_REC_SPEEDS[midiRecSpeedIdx];
+        const sb=document.getElementById('midiRecSpeedBox');
+        if(sb)sb.textContent='×'+midiRecPlaySpeed.toFixed(1);
+        if(was)void startMidiRecPlayback();
+    }
+    function midiEncodeVarLen(n){
+        n=Math.max(0,n|0);
+        const stack=[];
+        let v=n;
+        stack.unshift(v&127);
+        v>>=7;
+        while(v>0){stack.unshift((v&127)|128);v>>=7;}
+        return Uint8Array.from(stack);
+    }
+    function encodeStandardMidiFile0(events,bpmExport){
+        const PPQ=480;
+        const bpmX=Math.max(40,Math.min(208,bpmExport||120));
+        const micro=Math.round(60000000/bpmX);
+        const evs=events.slice().sort((a,b)=>{
+            if(a.t!==b.t)return a.t-b.t;
+            const sa=typeof a.seq==='number'?a.seq:0,sb=typeof b.seq==='number'?b.seq:0;
+            return sa-sb;
+        });
+        const track=[];
+        track.push(...midiEncodeVarLen(0),0xff,0x51,0x03,(micro>>16)&255,(micro>>8)&255,micro&255);
+        let prevTick=0;
+        for(const e of evs){
+            const tick=Math.round((e.t/1000)*(bpmX/60)*PPQ);
+            const d=Math.max(0,tick-prevTick);
+            prevTick=tick;
+            track.push(...midiEncodeVarLen(d));
+            if(e.cc){
+                const cc=Math.max(0,Math.min(127,(e.ctrl!=null?e.ctrl:64)|0));
+                const vv=Math.max(0,Math.min(127,(e.val!=null?e.val:0)|0));
+                track.push(0xB0,cc,vv);
+            }else if(e.on)track.push(0x90,e.note&127,Math.max(1,(e.vel||80)&127));
+            else track.push(0x80,e.note&127,0);
+        }
+        track.push(...midiEncodeVarLen(0),0xff,0x2f,0x00);
+        const td=new Uint8Array(track);
+        const len=td.length;
+        const mtrk=new Uint8Array(8+len);
+        mtrk.set([0x4d,0x54,0x72,0x6b,(len>>24)&255,(len>>16)&255,(len>>8)&255,len&255],0);
+        mtrk.set(td,8);
+        const header=new Uint8Array(14);
+        header.set([0x4d,0x54,0x68,0x64,0,0,0,6,0,0,0,1,(PPQ>>8)&255,PPQ&255],0);
+        const out=new Uint8Array(header.length+mtrk.length);
+        out.set(header,0);
+        out.set(mtrk,header.length);
+        return out;
+    }
+    function midiRecFilenameTimestamp(sess){
+        let d;
+        try{
+            if(sess&&typeof sess.createdAt==='string'&&sess.createdAt.trim())
+                d=new Date(sess.createdAt);
+            else if(sess&&typeof sess.id==='number'&&sess.id>1e11)
+                d=new Date(sess.id);
+            else
+                d=new Date();
+        }catch(e){d=new Date();}
+        if(!(d instanceof Date)||isNaN(d.getTime()))d=new Date();
+        const p=n=>String(n).padStart(2,'0');
+        return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'_'+p(d.getHours())+'-'+p(d.getMinutes())+'-'+p(d.getSeconds());
+    }
+    function exportMidiRecorderSession(){
+        const sess=getMidiRecSelectedSession();
+        if(!sess||!sess.events||!sess.events.length)return;
+        const bytes=encodeStandardMidiFile0(sess.events,(typeof bpm==='number'?bpm:120));
+        const blob=new Blob([bytes],{type:'audio/midi'});
+        const a=document.createElement('a');
+        const safe=(sess.title||'take').replace(/[^\w\-]+/g,'_').slice(0,32);
+        a.href=URL.createObjectURL(blob);
+        a.download=safe+'_'+midiRecFilenameTimestamp(sess)+'.mid';
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    }
+
     // ── DOMContentLoaded & init ───────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded',()=>{
         window.addEventListener('pointerdown',()=>{void userUnlockAudioAndMidi().catch(()=>{});},{once:true,passive:true,capture:true});
@@ -3361,6 +3884,20 @@
                 if(!slp.contains(e.target)&&!slWrap.contains(e.target))slp.style.display='none';
             }
         });
+        const msel=document.getElementById('midiRecSessionSelect');
+        if(msel)msel.addEventListener('change',()=>{if(!helpActive)onMidiRecSessionChange();});
+        const msk=document.getElementById('midiRecSeek');
+        if(msk){
+            msk.addEventListener('pointerdown',()=>{midiRecSeekDragging=true;});
+            msk.addEventListener('pointerup',()=>{midiRecSeekDragging=false;});
+            msk.addEventListener('pointercancel',()=>{midiRecSeekDragging=false;});
+            msk.addEventListener('input',()=>{
+                if(helpActive)return;
+                const v=parseFloat(msk.value)||0;
+                midiRecScrubToTime(v/1000);
+            });
+        }
+        syncMidiRecRepeatButtonChrome();
     });
     let _resizeOsmdTimer=null;
     let _lastResizeWidth=0;
@@ -5575,7 +6112,10 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         scoreSteps=[];
         resetScoreOsmdFollowSnap();
         extractScorePedalEventsFromSheet();
-        if(!osmdInstance||!osmdInstance.cursor)return;
+        if(!osmdInstance||!osmdInstance.cursor){
+            invalidateMidiRecorderTimeline();
+            return;
+        }
         let mergedAll;
         try{
             mergedAll=osmdMergeRawRowsToMergedSteps(expandRawRowsWithRepeats(osmdCollectRawCursorRows()));
@@ -5601,6 +6141,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 fingerMap:m.fingerMap||{}
             });
         });
+        invalidateMidiRecorderTimeline();
     }
     function initScorePracticeSteps(){
         const loops=1;
