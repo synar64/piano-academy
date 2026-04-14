@@ -281,8 +281,8 @@ const MODS=[
 const T={
  EN:{
   badge:{b:'Beginner',i:'Intermediate',a:'Advanced'},lbl:'Last visited',
-  cards:[{t:'Sense',d:'Identify notes and intervals purely by ear.'},{t:'Sight',d:'Practice reading notes from the staff in real time.'},{t:'Chords',d:'Learn chord shapes, inversions and functional notation.'},{t:'Scales',d:'Master all scales and fingering in every key.'},{t:'Hanon',d:'Virtuoso finger exercises for technique and independence.'},{t:'Repertoire',d:'Load your own MusicXML / MXL scores — link a folder or import files. Practice step-by-step or play along with Demo.'}],
-  stl:'My Results',sts:'XP & Progress',stm:'Modules',stc:'Close',rstm:'Reset all progress and XP?',lvs:['Beginner','Student','Practitioner','Musician','Virtuoso','Master'],
+  cards:[{t:'Sense',d:'Identify notes by ear. (Coming soon: Intervals & Chords)'},{t:'Sight',d:'Practice reading notes from the staff in real time.'},{t:'Chords',d:'Learn chord shapes, inversions and functional notation.'},{t:'Scales',d:'Master all scales and fingering in every key.'},{t:'Hanon',d:'Virtuoso finger exercises for technique and endurance.'},{t:'Repertoire',d:'Load your own MusicXML / MXL scores.'}],
+  stl:'My Results',sts:'XP & Progress',stm:'Modules',stc:'Close',lvs:['Beginner','Student','Practitioner','Musician','Virtuoso','Master'],
   atl:'Login',atr:'Register',als:'Log In',ars:'Create Account',acl:'Cancel',
   authTit:'Profile',
   auOut:'Sign out',
@@ -293,8 +293,8 @@ const T={
  },
  HU:{
   badge:{b:'Kezdő',i:'Haladó',a:'Mester'},lbl:'Legutóbb nyitott',
-  cards:[{t:'Sense',d:'Ismerd fel a hangközöket és akkordokat pusztán a füledre hagyatkozva.'},{t:'Sight',d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},{t:'Chords',d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},{t:'Scales',d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},{t:'Hanon',d:'Virtuóz ujjgyakorlatok a technika, a függetlenség és az állóképesség fejlesztésére.'},{t:'Repertoire',d:'Töltsd be saját MusicXML / MXL kottáidat — jelölj ki mappát vagy importálj fájlokat. Gyakorolj lépésenként vagy játssz együtt a Demóval.'}],
-  stl:'Eredményeim',sts:'XP és előrehaladás',stm:'Modulok',stc:'Bezárás',rstm:'Biztosan törlöd az összes előrehaladást?',lvs:['Kezdő','Tanuló','Gyakorló','Zenész','Virtuóz','Mester'],
+  cards:[{t:'Sense',d:'Ismerd fel a hangokat pusztán a füledre hagyatkozva. (Coming soon: Intervals & Chords)'},{t:'Sight',d:'Gyakorold az egyéni hangok gyors, lapról történő olvasását és leütését.'},{t:'Chords',d:'Tanuld meg az akkordok szerkezetét, fordításait és funkcionális jelölését.'},{t:'Scales',d:'Sajátítsd el az összes zenei skálát és ujjrendet minden hangnemben.'},{t:'Hanon',d:'Virtuóz ujjgyakorlatok a technika és az állóképesség fejlesztésére.'},{t:'Repertoire',d:'Töltsd be saját MusicXML / MXL kottáidat.'}],
+  stl:'Eredményeim',sts:'XP és előrehaladás',stm:'Modulok',stc:'Bezárás',lvs:['Kezdő','Tanuló','Gyakorló','Zenész','Virtuóz','Mester'],
   atl:'Bejelentkezés',atr:'Regisztráció',als:'Bejelentkezés',ars:'Fiók létrehozása',acl:'Mégse',
   authTit:'Profil',
   auOut:'Kijelentkezés',
@@ -465,7 +465,7 @@ function setLang(l){
  setTxt('sb-stats', l==='HU'?'Eredmények':'Results');
  setTxt('sb-prof', L.authTit);
  setTxt('sb-info', l==='HU'?'Tudj meg többet':'Learn More');
- setTxt('sb-contact', l==='HU'?'Kapcsolat':'Contact');
+ setTxt('sb-contact', 'Contact');
  
  setTxt('h-tit', l==='HU' ? 'Üdvözöllek az Akadémián' : 'Welcome to the Academy');
  setTxt('h-sub', l==='HU' 
@@ -535,7 +535,36 @@ async function doLogout(){
  toast(lang==='HU'?'Kijelentkeztél — beléphetsz más fiókkal.':'Signed out — you can sign in with a different account.');
 }
 function sendContact(){toast('✓ '+(lang==='HU'?'Üzenet elküldve!':'Message sent!'));closeM('contactM');}
-function submitRev(){toast('✓ '+(lang==='HU'?'Köszönjük a véleményt!':'Thank you for your review!'));closeM('revM');}
+function initRevStars(){
+ var srow=document.getElementById('srow');
+ if(!srow||srow.dataset.built)return;
+ srow.dataset.built='1';
+ for(var i=1;i<=5;i++){
+  (function(n){
+   var s=document.createElement('span');
+   s.className='star'; s.setAttribute('role','button'); s.setAttribute('aria-label',String(n));
+   s.textContent='★';
+   s.onclick=function(){
+    var all=srow.querySelectorAll('.star');
+    for(var j=0;j<all.length;j++) all[j].classList.toggle('on',j<n);
+   };
+   srow.appendChild(s);
+  })(i);
+ }
+}
+function submitRev(){
+ var stars=document.querySelectorAll('#srow .star.on').length;
+ var ta=document.getElementById('rv-txt');
+ var comment=ta&&ta.value?ta.value:'';
+ if(window.AkiraDb&&typeof AkiraDb.insertEvent==='function'){
+  void AkiraDb.insertEvent('feedback_rating',{metadata:{rating:stars,has_comment:!!String(comment).trim()}});
+ }
+ if(ta)ta.value='';
+ var all=document.querySelectorAll('#srow .star');
+ for(var k=0;k<all.length;k++) all[k].classList.remove('on');
+ toast('✓ '+(lang==='HU'?'Köszönjük az értékelést!':'Thank you for the rating!'));
+ closeM('revM');
+}
 
 function buildStats(){
  const L=T[lang]; const tot=Object.keys(visited).length,sess=Object.values(visited).reduce((a,b)=>a+b,0);
@@ -557,15 +586,13 @@ function initParticles(){
  window.addEventListener('resize',rsz);init();anim();
 }
 
-window.onload=()=>{
-  initParticles(); updXp();
-  if(window.AkiraDb&&typeof AkiraDb.init==='function')void AkiraDb.init().catch(function(e){console.warn('AkiraDb.init',e);});
-  const savedLang = localStorage.getItem('akira_lang');
-  if (savedLang) resumeApp(savedLang);
-  else {
-      const gate = document.getElementById('langGate');
-      if(gate) gate.style.display = 'flex';
-  }
+window.onload=function(){
+ initParticles(); updXp(); initRevStars();
+ var p=(window.AkiraDb&&typeof AkiraDb.init==='function')?AkiraDb.init():Promise.resolve();
+ p.then(function(){if(window.AkiraDb)console.log('Akira Academy online & tracking.');}).catch(function(e){console.warn('Supabase init error',e);});
+ var savedLang=localStorage.getItem('akira_lang');
+ if(savedLang)resumeApp(savedLang);
+ else{var gate=document.getElementById('langGate');if(gate)gate.style.display='flex';}
 };
 </script>
 </body>
