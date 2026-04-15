@@ -1,0 +1,11 @@
+{
+  "name": "Akíra — Kotta műhely",
+  "short_name": "Műhely",
+  "description": "MusicXML gyakorlás, demo, metronóm",
+  "start_url": "skalak.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#1a1a1d",
+  "lang": "hu"
+}
