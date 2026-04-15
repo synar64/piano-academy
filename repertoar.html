@@ -837,36 +837,36 @@
     const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','REPERTOIRE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','REPERTOÁR']};
     const MODAL_STRINGS={
         EN:{
-            'txt-infoTitle': 'Repertoire module — guide',
-            'txt-infoScoresTitle': 'Score files & sources',
-            'txt-infoScoresBody': 'This module only reads MusicXML (.xml, .musicxml) and compressed .mxl (ZIP with MusicXML). There is no PDF import — PDF is not machine-readable for practice, cursor, MIDI, or measure range; MusicXML is easy to export from any notation app.\n\nLoad:\n• Score file icon (right toolbar, document with staff lines) — pick a file; opens at once.\n• Library (tap score title) — + File / + Batch copies into browser storage; Link folder (Chrome/Edge) lists every .xml / .mxl in a folder you choose.\n• URL — paste a direct link to .musicxml or .mxl. Many sites block cross-site downloads (CORS); saving the file and using the score file icon is often easier.\n\nWhere to get MusicXML:\n• MuseScore Desktop — File → Export → MusicXML (licensing varies by piece).\n• IMSLP and other libraries — choose a MusicXML edition when available, or export from MuseScore / Finale / Dorico / etc.\n• Flat.io, Noteflight, and similar — export MusicXML, then open here.',
-            'txt-howTitle':  'Practice flow',
-            'txt-howBody':   'START — step-by-step practice: play only the notes the score highlights, in order. Spacebar starts or stops.\nDEMO (▶) — the app plays the piece with the current measure highlighted and optional built-in piano sound. Use the ▲▼ arrows next to the ▶ button to adjust playback speed (0.3×–1.8×); tap the speed number to reset to 1.0×. To the right of the speed box, the square loop button toggles DEMO repeat: when the piece reaches the end, DEMO starts again until you tap the button off (▶ still stops playback at any time). If book view uses one column, DEMO temporarily switches to two columns for smoother page scrolling, then restores your layout when DEMO ends.\n\nWhen a measure range is set (soft amber band on the score), START and DEMO work only in that range — not the whole piece.\nNext to the title display, ▲ / ▼ loads the previous or next piece in the library; tap the title to open the full library.\n\nThe sections below explain measure selection and bookmarks in more detail.',
-            'txt-infoMeasureGuideTitle': 'Measure range — choosing and clearing',
-            'txt-infoMeasureGuideBody': 'What it does: limits START and DEMO to certain measures. The selected area is shown as a light amber tint on the score.\n\nHow to set the range:\n• Open the measure range dialog (staff-lines icon, top right of the 2×2 control block). Enter the first and last measure number, then tap OK.\n• Click-to-select on the score: turn ON the tilted pointer (top left of that block), or use the checkbox in the measure range dialog. It is OFF by default so normal clicks on the score do not change the selection.\n\nWith click-to-select ON:\n• One click on a measure — only that measure stays selected (previous selection is replaced).\n• Shift+click another measure — every measure from the one you last clicked up to the new click is included (you can extend the range in several steps).\n• Cmd+click (Mac) or Ctrl+click (Windows) — add or remove single measures without clearing the rest.\n\nHow to clear the range (whole piece again):\n• Tap ∅ bottom left of the 2×2 block — same as ∅ next to OK in the measure range dialog.\n• Bookmarks open from bottom right. Turning click-to-select OFF only stops further clicks from changing the range; it does not remove the amber band — use ∅ to clear the range.\n\nWhen you are done, turn click-to-select OFF if you do not want accidental changes.',
-            'txt-infoBookmarksGuideTitle': 'Bookmarks B1 · B2 · B3',
-            'txt-infoBookmarksGuideBody': 'Saved only in your browser, separately for each score file.\n\n• Click B1, B2, or B3 — loads that slot for the current score: restores the saved measure range, scroll position in the score area, and (in two- or three-column book view) which page spread you were on.\n• Shift+click the same button — saves the current state into that slot (for this file only).\n\nSaved: the active measure selection (amber band), vertical scroll in the score panel, and the spread index in multi-column book view.\n\nNot saved: zoom, number of columns (1 / 2 / 3), tempo, or other files. If nothing was saved in a slot, a normal click tells you it is empty.\n\nLOG in the bookmark panel shows a short history of completed practice runs (tempo, steps, measure range if any).',
-            'txt-infoPanelTitle': 'Toolbar (right of the sheet)',
-            'txt-infoPanelBody': 'Expand corners — full-screen score view: hides rack and keyboard; score fills the area; browser fullscreen optional (Esc exits).\nSliders — zoom, page margins, staff spacing.\nOpen book — cycles 1 / 2 / 3 columns (scroll vs spreads). With 2–3 columns, ◀ ▶ change spreads.\nSun button — cycles score colours: light, paper (sepia), dark with white notation, dark with warm notation.\nScore file — open .xml / .musicxml / .mxl from disk.\n2×2 block next to the piano button: top left — click-to-select on the score; top right — measure range dialog; bottom left — ∅ clears the measure selection (full score again); bottom right — bookmarks.\nStar — five view presets: click a number to load zoom + layout; Shift+click saves the current view.',
+            'txt-infoTitle': 'Repertoire Module — User Guide',
+            'txt-infoScoresTitle': '',
+            'txt-infoScoresBody': 'Welcome to your interactive practice workstation! This module is designed to help you master your favorite pieces at your own pace with real-time feedback.\n\n📁 Loading Scores\n\nSupported Formats: MusicXML (.xml, .musicxml) and compressed .mxl files. (Please note: PDF files are not interactive and cannot be processed here.)\n\nOpen a File: Click the Sheet Music icon on the right toolbar to browse files on your device.\n\nLibrary Management: Click the Score Title on the top display to open your Library. Use the + File or + Batch buttons to import new scores. In Chrome/Edge, the Link Folder feature allows you to sync an entire local directory.\n\nWeb Sources: If a direct URL fails to load, download the file to your device first, then open it manually using the file icon.',
+            'txt-howTitle':  '🚀 Practice & Playback',
+            'txt-howBody':   'START Mode: This is your personal coach. It guides you through the piece note-by-note, highlighting the next key and waiting for your input. Press Space to start or stop practicing.\n\nDEMO Mode: Listen to a perfect performance of the piece.\n\nUse the small arrows next to ▶ to speed up or slow down. Click the multiplier number to reset to the original (1x) tempo.\n\nThe Square icon toggles the Loop: when active, the demo will automatically restart once it reaches the end.\n\nREC (MIDI Recording): Record your own performance! Hit the red circle to start recording, then use the Keyboard icon to open the Player. Here you can listen back, manage your sessions, or export your playing as a standard MIDI file.',
+            'txt-infoMeasureGuideTitle': '🎯 Setting a Measure Range (Selection)',
+            'txt-infoMeasureGuideBody': 'Want to focus on a difficult section? You can isolate specific measures, which will appear with a highlighted background on the score.\n\nManual Input: Click the Lines icon (top-right of the four small icons next to the piano) and enter the start and end measure numbers.\n\nClick on Score: Enable the Cursor icon to select measures directly.\n\nSingle Measure: Simple click.\n\nRange: Click the first measure, then Shift + Click the last one.\n\nAdd/Remove: Use Ctrl (Windows) or Cmd (Mac) to toggle specific measures.\n\nClear: Use the ∅ icon to reset and select the entire piece.',
+            'txt-infoBookmarksGuideTitle': '🔖 Bookmarks (B1, B2, B3)',
+            'txt-infoBookmarksGuideBody': 'Each score has three dedicated slots to remember your view and selection settings.\n\nLoad: Click a B-button.\n\nSave: Shift + Click a B-button to save your current range and scroll position.',
+            'txt-infoPanelTitle': '🛠️ Advanced Tools',
+            'txt-infoPanelBody': 'Customize View: Use the sliders on the right to adjust Zoom, Margin, and Line Spacing.\n\nLayout: Use the Open Book icon to switch between 1, 2, or 3-column views.\n\nColor Themes: Use the Sun icon to choose between eye-friendly themes (Dark, Sepia) or high-contrast Light mode.',
             'txt-infoShortcutsTitle': 'Keyboard',
             'txt-infoShortcutsBody': '← → — previous / next spread when BOOK uses 2–3 columns.\nSpace — START / STOP practice.\nNumpad + / − — zoom in or out.',
             'txt-ctrlTitle': 'Rack (below the score)',
-            'txt-ctrl0':     'Clef strip — cycles Treble+Bass / Treble only / Bass only (hints and which staff you practice).',
-            'txt-ctrl4':     'Eye — practice hints: key LEDs and ▼ markers above the keyboard (cyan = right hand, pastel orange = left hand); tap again to turn off.',
+            'txt-ctrl0':     'Clef Toggles: Use the 𝄞 / 𝄢 icons to hide the right or left-hand staff if you want to practice them separately.',
+            'txt-ctrl4':     '',
             'txt-infoHelpTitle': 'Help mode (? )',
-            'txt-infoHelpBody': 'Turn ? on, then tap any control that has a description — text appears in the info bar. Tap ? again to exit. The I button opens this guide (EN / HU with the language buttons).',
+            'txt-infoHelpBody': 'Tip: Enable Help Mode (?), then click on any control on the screen for a quick explanation in the info bar!',
             'txt-gotIt':     'Got it',
             'txt-logTitle':  'Practice log (recent sessions)',
             'txt-logClose':  'Close',
             'txt-measureRangeTitle': 'Measure range',
             'txt-measureRangeSec': 'START / DEMO scope',
-            'txt-measureRangeClickPickLabel': 'Allow clicking the score to choose measures (Shift / Ctrl+click as described in the guide)',
+            'txt-measureRangeClickPickLabel': 'Let me pick measures by clicking the score (see the guide for Shift-click and Ctrl-click).',
             'txt-measureRangeClose': 'Close',
             'txt-bookmarksTitle': 'Bookmarks',
             'txt-bookmarksClose': 'Close',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Score library',
-            'txt-scoreLibHint': 'Several named libraries; each has its own piece list (stored in the browser only).\n\nOn first visit, a \"Samples\" library is filled from samples/manifest.json (list of .mxl/.xml) plus the files in samples/; you can remove pieces with Del — they will not reappear unless you clear site data. To add scores, put the file in samples/ and add its filename to manifest.json, then clear localStorage key repertoar_builtin_samples_seeded_v1 once (or site data).\n\n+ File / + Batch — import MusicXML/MXL into storage.\nLink folder — Chrome/Edge can attach a local folder; all .xml / .mxl inside stay listed after refresh.\nURL — only works if the server allows other sites to fetch the file (CORS). MuseScore, IMSLP, and many hosts do not; download the file and use the score file icon on the right instead.\nSave — store the currently open score under a name in the active library.',
+            'txt-scoreLibHint': 'You can keep more than one library. Each library has its own list of pieces. Nothing leaves your browser unless you export it yourself.\n\nThe first time you open this page, a sample library may appear. You can delete pieces you do not want. Use + File or + Batch to bring your own MusicXML or MXL files in. In Chrome or Edge, Link folder lets you attach a folder on your computer so its scores stay listed after you refresh.\n\nIf a pasted web link does not download, save the file with your browser first, then open it with the score icon on the right.\n\nSave stores the score that is open now under a name inside the library you picked.',
             'txt-scoreLibLibsHdr': 'Libraries',
             'btnScoreLibAddLibrary': '+ New collection',
             'txt-scoreLibPiecesHdr': 'Pieces',
@@ -877,34 +877,34 @@
         HU:{
             'txt-infoTitle': 'Repertoár modul — útmutató',
             'txt-infoScoresTitle': 'Kottafájlok és források',
-            'txt-infoScoresBody': 'A modul csak MusicXML (.xml, .musicxml) és tömörített .mxl (ZIP-ben MusicXML) fájlt tud megnyitni. PDF-et nem: gyakorlásra, kurzorra, MIDI-re és ütemtartományra a PDF nem alkalmas; MusicXML-et viszont a legtöbb kottaszerkesztőből egyszerűen exportálhatsz.\n\nBetöltés:\n• Kottafájl ikon a jobb oldali eszköztáron (dokumentum kottavonalakkal) — kiválasztod a fájlt, és azonnal megnyílik.\n• Könyvtár — kattints a kotta címére a kijelzőn; a + File / + Batch a böngésző tárhelyére másolja a fájlokat. A Link mappa (Chrome, Edge) egy kiválasztott mappa összes .xml és .mxl fájlját kilistázza.\n• URL — közvetlen .musicxml vagy .mxl cím. Sok szerver nem engedi a másik oldalról való letöltést (CORS); ilyenkor gyakran egyszerűbb letölteni a fájlt, majd a kottafájl ikonnal megnyitni.\n\nHonnan legyen MusicXML:\n• MuseScore (asztali) — Fájl → Exportálás → MusicXML (a darab licencétől függ, mit szabad).\n• IMSLP és más gyűjtemények — ha van MusicXML kiadás, azt válaszd, vagy exportálj más programból (MuseScore, Finale, Dorico stb.).\n• Flat.io, Noteflight és hasonlók — export MusicXML, majd megnyitás itt.',
+            'txt-infoScoresBody': 'Ez a modul MusicXML fájlokat (.xml, .musicxml) és csomagolt .mxl fájlokat nyit meg. PDF kottát nem tud megjeleníteni ebben a formában.\n\nA gépedről a jobb oldali sávban lévő kotta-ikonra kattintva választhatsz fájlt, és megnyílik.\n\nHa sok darabot tartasz rendben, kattints a kijelzőn a címre: megnyílik a könyvtár. Az új kottát a + File vagy a + Batch gombbal viheted be. Chrome-ban és Edge-ben a Link mappa egy mappa összes megfelelő fájlját kilistázza.\n\nHa beillesztett webcím nem tölt be, töltsd le a fájlt a böngésződdel a szokásos módon, majd nyisd meg a kotta-ikonnal.\n\nA legtöbb kottaszerkesztőből exportálhatsz MusicXML-be (például MuseScore, Finale vagy Dorico).',
             'txt-howTitle':  'Gyakorlás menete',
-            'txt-howBody':   'START — lépésről lépésre gyakorlod a kotta által kiemelt hangokat, a megadott sorrendben. Szóköz: indítás vagy leállítás.\nDEMO (▶) — az alkalmazás lejátsza a darabot: az aktuális ütem kiemelve látszik, a hangot pedig opcionálisan a beépített zongora adja. A ▶ gomb melletti ▲▼ nyilakkal állítható a lejátszási sebesség (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. A sebességkijelző jobb oldalán a négyzetes ismétlés ikon kapcsolja a DEMO ismétlést: a darab végén újraindul, amíg ki nem kapcsolod (a ▶ továbbra is bármikor megállítja a lejátszást). Ha a könyvet egy hasábban nézed, a DEMO alatt átmenetileg két hasábra vált a gördülékenyebb lapkövetés miatt; a DEMO végén visszaáll a korábbi nézet.\n\nHa be van állítva ütemtartomány (enyhe borostyánsárga szín a kottán), a START és a DEMO csak erre a szakaszra vonatkozik, nem az egész darabra.\nA cím melletti ▲ és ▼ az aktuális könyvtárban az előző vagy a következő darabra vált; a címre kattintva megnyílik a teljes könyvtár.\n\nA következő két fejezet részletesen elmagyarázza az ütemek kijelölését és a könyvjelzőket.',
+            'txt-howBody':   'A START végigvezet a darabon. A kotta mutatja, melyik hang következik, és milyen sorrendben kell játszanod. A szóköz indítja vagy leállítja a gyakorlást.\n\nA DEMO lejátsza helyetted a művet. Az épp aktuális ütem kiemelve marad. A ▶ melletti kis nyilakkal lassíthatsz vagy gyorsíthatsz; a számra kattintva visszaáll az 1×-es tempó. A négyzetes gomb bekapcsolja vagy kikapcsolja az ismétlést: ha be van kapcsolva, a darab végén a DEMO újraindul, amíg ki nem kapcsolod. A ▶ mindig leállítja a lejátszást. Ha egy hasábban olvasod a kottát, a DEMO alatt ideiglenesen két hasábra válthat a lap, hogy könnyebben követhető legyen, majd a DEMO végén visszaáll a nézet.\n\nHa csak egy szakaszt jelöltél ki ütemekben (világosabb háttér a kottán), a START és a DEMO csak arra a szakaszra vonatkozik.\n\nA cím melletti ▲ és ▼ az előző vagy a következő darabra lapoz ugyanabban a könyvtárban. Magára a címre kattintva megnyílik a teljes lista.\n\nA REC gombbal felvételt készíthetsz arról, ami itt lejátszódik. Újabb REC megnyomásával leállítod. A kis billentyűzet ikon megnyitja a lejátszót: ott választhatsz felvételt, meghallgathatod, állíthatod a tempót, vagy elmentheted MIDI fájlba.\n\nLentebb az ütemek kijelölését és a könyvjelzőket részletezzük.',
             'txt-infoMeasureGuideTitle': 'Ütemtartomány — kijelölés és törlés',
-            'txt-infoMeasureGuideBody': 'Mire való: meghatározza, hogy a START és a DEMO a kotta mely ütemein dolgozzon. A kijelölt rész enyhén borostyánsárga háttérrel látszik.\n\nBeállítás:\n• Nyisd meg az ütemtartomány ablakot (vonalkás ikon a 2×2-es gombcsoport jobb felső mezőjében). Írd be az első és az utolsó ütem számát, majd koppints az OK gombra.\n• Egérrel a kottán: kapcsold be a ferde egérmutató ikont (bal felső mező ugyanabban a csoportban), vagy jelöld be ugyanezt az ütemtartomány ablakban. Alapból ki van kapcsolva, hogy véletlen kattintásra ne változzon a kijelölés.\n\nHa be van kapcsolva az egérrel választás:\n• Egy kattintás egy ütemre — csak az az ütem marad kijelölve (a korábbi kijelölés törlődik).\n• Shift és kattintás egy másik ütemre — minden ütem bekerül a két ütem között, az első kattintásodtól számítva (több lépésben is bővítheted a szakaszt).\n• Macen Cmd + kattintás, Windowson Ctrl + kattintás — egy-egy ütem külön be- vagy kikapcsolható a kijelölésből.\n\nKijelölés törlése (újra az egész darab):\n• A 2×2-es csoport bal alsó mezőjében a ∅ gomb (ugyanolyan színű, mint a többi ikon), vagy ugyanez az ütemtartomány ablakban az OK mellett. Ez törli a tartományt: a START és a DEMO ismét az egész kottára vonatkozik.\n• A könyvjelzőt a jobb alsó gomb nyitja. Ha kikapcsolod az egérrel választást, attól a borostyánsárga sáv még megmarad; a tartományt csak a ∅ gombbal törölheted.\n\nHa nem szeretnél többé a kottán kattintással módosítani a kijelölést, kapcsold ki az egérrel választást is.',
+            'txt-infoMeasureGuideBody': 'Megadhatod, hogy a START és a DEMO csak a darab egy részén dolgozzon. Ez a rész világosabb háttérrel látszik a kottán.\n\nAz ütemeket beírhatod egy ablakba: nyisd meg a vonalkás ikont (a zongora melletti négy kis ikon közül a jobb felső). Add meg az első és az utolsó ütem számát, majd erősítsd meg.\n\nÜtemeket a kottára kattintva is kijelölhetsz. Ehhez kapcsold be, hogy a kotta kattintható legyen (ferde egér ikon ugyanebben a négyesben, vagy ugyanez a jelölőnégyzet az ütemablakban). Egy sima kattintás egy ütemre: csak az marad kijelölve. Shift és másik ütemre kattintás: a két ütem között minden bekerül. Macen a Cmd, Windowson a Ctrl egy-egy ütem hozzáadására vagy levételére szolgál.\n\nHa újra az egész darabot szeretnéd, nyomd meg a ∅ jelet (üres halmaz). Ez a négyes bal alsó ikonja, és az ütemablakban is ott van az OK mellett. Ha kikapcsolod a kottán való választást, a színes sáv ettől még megmarad; a teljes darabhoz mindig a ∅ kell.\n\nHa nem akarsz véletlenül átírni semmit, kapcsold ki a kottán való választást, ha végeztél.',
             'txt-infoBookmarksGuideTitle': 'Könyvjelzők B1 · B2 · B3',
-            'txt-infoBookmarksGuideBody': 'Csak a böngészőben tárolódnak; minden kottafájlhoz külön tartoznak a B1, B2, B3 helyek.\n\n• Egyszerű kattintás a B1, B2 vagy B3 gombon — betölti a mentést az épp nyitott darabhoz: visszaáll a mentett ütemtartomány, a kotta görgetési helyzete, és ha két vagy három hasábban nézed a könyvet, az is, melyik oldalpáron voltál.\n• Shift és kattintás ugyanezen a gombon — elmenti az aktuális állapotot ebbe a helyre (csak ehhez a fájlhoz).\n\nMit ment: a kijelölt ütemeket (amit a borostyánsárga mutat), a kottaablak függőleges görgetését, több hasábnál pedig az aktuális oldalpár sorszámát.\n\nMit nem ment: a nagyítást, a hasábszámot (1 / 2 / 3), a tempót, más darabot. Üres helyre sima kattintáskor jelzi, hogy még nincs ott mentés.\n\nA könyvjelzők panelen a LOG a korábbi gyakorlások rövid listája (tempó, lépésszám, ütemtartomány, ha volt).',
+            'txt-infoBookmarksGuideBody': 'A könyvjelzők a böngésződben maradnak. Minden kottafájlhoz három hely tartozik: B1, B2, B3.\n\nHa egyszer rákattintasz egy gombra, betöltöd, amit oda mentettél ehhez a fájlhoz: az ütemtartományt, ha volt, a görgetés helyét, és ha két vagy három hasábban olvasol, azt is, melyik oldalpáron álltál. Ha közben nyomva tartod a Shiftet, és úgy kattintasz, elmented az aktuális nézetet abba a helyre.\n\nNem menti el a nagyítást, a hasábszámot, a tempót, és más fájlokra nincs hatása. Ha üres volt a hely, egy sima kattintás jelzi.\n\nA LOG a korábbi gyakorlások rövid listája: tempó, hány lépés volt, és ha volt ütemkorlát, az is.',
             'txt-infoPanelTitle': 'Eszköztár a kotta mellett (jobb)',
-            'txt-infoPanelBody': 'Sarkok ikon — teljes képernyős kotta nézet: eltűnik a rack és a billentyűzet, a kotta kitölti a területet; böngészőben teljes képernyő is lehetséges (Esc kilép).\nCsúszkák — nagyítás, lapmargó, kottasorok távolsága.\nNyitott könyv ikon — 1, 2 vagy 3 hasáb (folyamatos görgetés vagy oldalanként). Két vagy három hasábnál a ◀ ▶ gombok lapoznak.\nNap gomb — négy megjelenés váltása: világos, papír (bézs), sötét fehér jegyzettel, sötét meleg tónusú jegyzettel.\nKottafájl — .xml, .musicxml vagy .mxl megnyitása a gépről.\nA zongora gomb melletti 2×2-es négyes: bal felső — egérrel kijelölés a kottán; jobb felső — ütemtartomány ablak; bal alsó — ∅ törli az ütemkijelölést (vissza az egész kotta); jobb alsó — könyvjelző.\nCsillag — öt nézetmentés: számra kattintva betöltés, Shift + szám mentés (nagyítás és elrendezés).',
+            'txt-infoPanelBody': 'A sarkok ikon elrejti a rackot és a billentyűzetet, hogy a kotta nagyobb legyen. A böngésző saját teljes képernyős módja is használható; az Esc kilép belőle.\n\nA csúszkák a nagyítást, a lap margóját és a kottasorok távolságát állítják.\n\nA nyitott könyv ikon egy, két vagy három hasábot ad. Két vagy három hasábban a ◀ és ▶ lapoz.\n\nA nap ikon négy színállapotot ad: világos, bézs papír, sötét fehér jegyzettel, sötét meleg tónussal.\n\nA kotta ikon megnyit egy MusicXML vagy MXL fájlt a gépről.\n\nA zongora melletti négy kis ikon sorrendben: kattintással ütemválasztás a kottán, ütemablak, a kijelölés törlése, könyvjelzők.\n\nA csillag öt mentett nézetet tart: számra kattintva betöltöd; ha közben nyomva tartod a Shiftet, elmented a jelenlegi nagyítást és elrendezést.',
             'txt-infoShortcutsTitle': 'Billentyűparancsok',
             'txt-infoShortcutsBody': '← → — előző vagy következő oldalpár, ha a könyv nézet két vagy három hasábos.\nSzóköz — START vagy STOP (gyakorlás).\nNumerikus + / − — nagyítás léptetése.',
             'txt-ctrlTitle': 'Rack (a kotta alatt)',
-            'txt-ctrl0':     'Kulcssáv — sorrendben: két kottasor (violin- és basszuskulcs), csak violin, csak basszus. Meghatározza a segédleteket és azt, melyik sort gyakorlod.',
-            'txt-ctrl4':     'Szem ikon — gyakorláskor LED a billentyűkön és ▼ a sávban (kék = jobb kéz, pasztell narancs = bal kéz); újra rákattintva kikapcsolható.',
+            'txt-ctrl0':     'A kulcssáv váltogatja, hogy mindkét sor, csak a felső (violinkulcs) vagy csak az alsó (basszuskulcs) látszik. Ez szabja meg, melyik sort gyakorlod, és hogyan jelennek meg a segédek.',
+            'txt-ctrl4':     'A szem ikon be- és kikapcsolja a segédeket: fény a billentyűkön és háromszögek a billentyűzet fölött. A kék a jobb kézhez tartozik, a lágy narancs a balhoz. Újabb kattintásra minden eltűnik.',
             'txt-infoHelpTitle': 'Súgó mód (? )',
-            'txt-infoHelpBody': 'Kapcsold be a ? gombot, majd kattints bármely olyan elemre, amelyhez leírás tartozik — a szöveg az infósávba kerül. A ? újbóli megnyomásával kilépsz. Az I gomb ezt az útmutatót nyitja meg; a nyelvet az EN / HU gombokkal válthatod.',
+            'txt-infoHelpBody': 'A ? gomb bekapcsolja a súgó módot. Ezután kattints egy vezérlőre: egy rövid sor jelenik meg az infósávban. A ? újabb megnyomására kilépsz. Az I gomb ezt az oldalt nyitja meg. A nyelvet az EN és a HU gombokkal válthatod.',
             'txt-gotIt':     'Értettem',
             'txt-logTitle':  'Gyakorlás napló (utolsó futások)',
             'txt-logClose':  'Bezár',
             'txt-measureRangeTitle': 'Ütemtartomány',
             'txt-measureRangeSec': 'START / DEMO hatókör',
-            'txt-measureRangeClickPickLabel': 'Engedélyezem, hogy a kottán kattintva válasszak ütemeket (Shift és Ctrl: lásd az útmutatóban)',
+            'txt-measureRangeClickPickLabel': 'A kottára kattintva is választhatok ütemeket (a részletek az útmutatóban: Shift és Ctrl).',
             'txt-measureRangeClose': 'Bezár',
             'txt-bookmarksTitle': 'Könyvjelzők',
             'txt-bookmarksClose': 'Bezár',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Kottakönyvtár',
-            'txt-scoreLibHint': 'Több elnevezett könyvtár; mindegyik saját darablistát tart (csak a böngészőben tárolva).\n\nElső látogatáskor a samples/manifest.json felsorolásából (és a samples/ mappában lévő fájlokból) töltődik a „Minták” gyűjtemény; egyenként törölheted (Töröl) — nem jönnek vissza, hacsak nem törlöd a böngésző adatait. Új .mxl: tedd a mappába, írd be a fájlnevet a manifest.json-ba, majd egyszer töröld a repertoar_builtin_samples_seeded_v1 kulcsot (vagy az oldal tárhelyét).\n\n+ File / + Batch — MusicXML/MXL import a tárhelyre.\nLink mappa — Chrome/Edge: helyi mappa csatolása; a benne lévő .xml / .mxl fájlok újratöltés után is listázva maradnak.\nURL — csak akkor működik, ha a szerver engedi a külső letöltést (CORS). A MuseScore, IMSLP és sok más oldal általában nem; töltsd le a fájlt, és használd a jobb oldali kotta-fájl ikont.\nMentés — az épp nyitott kotta elmentése névvel az aktív könyvtárba.',
+            'txt-scoreLibHint': 'Több könyvtárat is felvehetsz, mindegyiknek saját darablistája van. Minden adat a böngésződben marad, amíg te nem törlöd.\n\nElső alkalommal megjelenhet egy mintagyűjtemény. A nem kellő darabokat törölheted. Saját kottáidat a + File vagy a + Batch gombbal hozhatod be. Chrome-ban és Edge-ben a Link mappa egy mappa fájljait tartja számon, és újratöltés után is ott maradnak.\n\nHa egy beillesztett webcím nem tölt be, mentsd le a fájlt a böngészővel, majd nyisd meg a jobb oldali kotta-ikonnal.\n\nA Mentés az épp nyitott kottát menti el névvel abba a könyvtárba, amelyiket kiválasztottad.',
             'txt-scoreLibLibsHdr': 'Könyvtárak',
             'btnScoreLibAddLibrary': '+ Új gyűjtemény',
             'txt-scoreLibPiecesHdr': 'Darabok',
@@ -3409,6 +3409,9 @@
     const MIDI_REC_SPEEDS=[0.5,1,1.5,2];
     let midiRecSeekDragging=false,midiRecPlayBaseAudioTime=0,midiRecPlayContentAnchorSec=0;
     let midiRecRepeatEnabled=false;
+    /** Belső zongora lejátszás: mint élő MIDI — CC64 alatt nem küldünk keyUp-ot note-offra, csak felengedéskor (sor + ürítés). */
+    let midiRecPlaybackSustainActive=false;
+    const midiRecPlaybackSustainReleaseQueue=new Set();
     /** Web MIDI callback közben true — ne duplázzuk a virtuális billentyű rögzítésével. */
     let _midiRecorderFromHardwareInput=false;
     function loadMidiSessionsFromStorage(){
@@ -3600,6 +3603,8 @@
         midiRecPlayTimers.forEach(id=>clearTimeout(id));
         midiRecPlayTimers=[];
         midiRecPlayback=false;
+        midiRecPlaybackSustainActive=false;
+        midiRecPlaybackSustainReleaseQueue.clear();
         const pb=document.getElementById('midiRecPlayBtn');
         if(pb)pb.textContent='▶';
         try{
@@ -3649,9 +3654,13 @@
         stopMidiRecPlayback({rewind:false});
         if(audioCtx.state==='suspended')try{await audioCtx.resume();}catch(e){}
         if(audioOn&&!midiOutPort&&!salamanderPiano){try{await initAudio();}catch(e){}}
+        midiRecPlaybackSustainActive=false;
+        midiRecPlaybackSustainReleaseQueue.clear();
         const speed=Math.max(0.25,midiRecPlaySpeed||1);
         const evs=sess.events.slice().sort((a,b)=>{
             if(a.t!==b.t)return a.t-b.t;
+            const ca=!!a.cc,cb=!!b.cc;
+            if(ca!==cb)return ca?-1:1;
             const sa=typeof a.seq==='number'?a.seq:0,sb=typeof b.seq==='number'?b.seq:0;
             return sa-sb;
         });
@@ -3673,7 +3682,8 @@
                 if(!midiRecPlayback)return;
                 if(evt.cc&&evt.ctrl===64){
                     const vv=Math.max(0,Math.min(127,evt.val|0));
-                    try{updatePedalStripVisual(vv>=64);}catch(e){}
+                    const pedOn=vv>=64;
+                    try{updatePedalStripVisual(pedOn);}catch(e){}
                     if(midiOutPort){
                         try{
                             if(midiOutPort.state!=='open')midiOutPort.open();
@@ -3681,7 +3691,19 @@
                         }catch(e){}
                     }
                     if(audioOn&&salamanderPiano){
-                        try{if(vv>=64)salamanderPiano.pedalDown();else salamanderPiano.pedalUp();}catch(e){}
+                        try{
+                            if(!pedOn){
+                                if(midiRecPlaybackSustainActive){
+                                    midiRecPlaybackSustainReleaseQueue.forEach(m=>{
+                                        try{salamanderPiano.keyUp({midi:m&127});}catch(e2){}
+                                    });
+                                    midiRecPlaybackSustainReleaseQueue.clear();
+                                }
+                                midiRecPlaybackSustainActive=false;
+                            }else{
+                                midiRecPlaybackSustainActive=true;
+                            }
+                        }catch(e){}
                     }
                     return;
                 }
@@ -3709,7 +3731,12 @@
                             midiOutPort.send([0x80|DEMO_MIDI_CHANNEL,n,0]);
                         }catch(e){}
                     }
-                    if(salamanderPiano){try{salamanderPiano.keyUp({midi:n});}catch(e){}}
+                    if(salamanderPiano){
+                        try{
+                            if(midiRecPlaybackSustainActive)midiRecPlaybackSustainReleaseQueue.add(n);
+                            else salamanderPiano.keyUp({midi:n});
+                        }catch(e){}
+                    }
                 }
             },delay);
             midiRecPlayTimers.push(id);
