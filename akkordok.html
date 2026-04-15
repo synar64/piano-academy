@@ -27,39 +27,15 @@
 
         /* ── KOTTA ── */
         .sheet-container {
-    flex-grow: 1; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; /* Ez középre teszi a tartalmat */
-    padding: 10px 20px; 
-    width: 100%; 
-    box-sizing: border-box; 
-    overflow: auto; /* Ha nagyobb a kotta, lehessen görgetni */
-}
-
-#vexflow-container svg {
-    margin: 0 auto; /* Ez az SVG-t magát kényszeríti középre a div-en belül */
-    display: block;
-}
-.sheet-viewport {
-    width: 100%;
-    max-width: 2450px;
-    aspect-ratio: 2450 / 600; /* Visszaállítjuk az eredeti arányt */
-    position: relative;
-    overflow: visible !important;
-}
-
-.sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; opacity: 0.35; pointer-events: none; }
-
-#staffCanvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10;
-    pointer-events: none;
-}
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible;
+        }
+        .sheet-viewport {
+            width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; position: relative; overflow: hidden;
+            background: transparent; border: none; border-radius: 0; box-shadow: none;
+        }
+        .sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; opacity: 0.35; pointer-events: none; }
+        #staffCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
 
         /* ── WORKSTATION CHASSIS ── */
         .lower-section { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
@@ -147,7 +123,7 @@
 
         /* KULCS SPLIT GOMB */
         .clef-split {
-            display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark);
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
             border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
             overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s;
         }
@@ -157,20 +133,20 @@
             color:#444; transition:color 0.15s; padding:0;
         }
         .clef-split span.active { color:#fff; }
-        .clef-divider { height:1px; width:100%; background:#222; flex-shrink:0; }
+        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
 
         /* LANG SPLIT GOMB */
         .lang-split {
-            display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark);
+            display:flex; width:95px; height:38px; background:var(--btn-dark);
             border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
         }
         .lang-split button {
             flex:1; background:transparent; border:none; cursor:pointer;
-            font-weight:700; font-size:11px; font-family:'Inter',sans-serif; color:var(--text-dim);
+            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
         }
         .lang-split button.active { color:#fff; }
         .lang-split button:active { background: rgba(255,255,255,0.05); }
-        .lang-divider { height:1px; width:100%; background:#222; }
+        .lang-divider { width:1px; background:#222; margin:6px 0; }
 
         /* AKKORDTÁRCSA */
         #wheelCanvas {
@@ -204,116 +180,83 @@
         .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
-        .key-glow.pressed::after { 
-            content: ''; position: absolute; pointer-events: none; z-index: 150; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            border-radius: 0 0 4px 4px; 
-            background: rgba(0, 0, 0, 0.10); /* Ez adja meg a lenyomás sötétedését */
-            box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); 
-        }
-
-        /* 2. FEKETE BILLENTYŰK (Precíziós fény, ami nem rontja el a fehéret) */
-        .black-glow.pressed::after { 
-            content: '' !important;
-            top: 6px !important; 
-            left: 24% !important; 
-            width: 49% !important; 
-            height: 78.5% !important; 
-            border-radius: 2px !important; 
-            background: rgba(255, 255, 255, 0.17) !important; /* Erős fehér fény a feketén */
-            z-index: 200 !important; /* A fehér fölé emeljük */
-            box-shadow: none !important;
-        }
+        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255,255,255,0.15); box-shadow: inset 0 -10px 15px rgba(255,255,255,0.3); z-index: 40; }
 
         /* ── MODÁLIS ABLAKOK ── */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-overlay.active { display: flex; }
         .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1); }
         .modal-title { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 16px; margin-top: 0; margin-bottom: 25px; border-bottom: 2px solid #111; padding-bottom: 15px; }
         .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; transition: 0.1s; letter-spacing: 1px; }
         .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
 
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
-        .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 16px; font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: left; width: 100%; box-shadow: none; }
-        .patch-btn:hover { background: #1e1e21; color: #fff; border-color: #555; }
-        .patch-btn:active { transform: translateY(1px); }
         .key-glow.chord-hint .key-led { opacity: 1; }
 
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 </head>
 <body>
 
-    <!-- LEVEL BROWSER MODAL -->
+    <!-- KOTTA -->
+    <!-- INFO MODAL -->
     <div id="infoModal" class="modal-overlay">
-    <div class="modal-content" style="max-width:640px; text-align:left;">
-        <h2 class="modal-title" id="txt-infoTitle" style="text-align:center; color:var(--oled-text); border-bottom:1px solid #333; padding-bottom:15px;">AKKORDOK — MODUL ÚTMUTATÓ</h2>
-        
-        <div style="margin-bottom:18px;">
-            <div style="font-family:'Share Tech Mono'; font-size:11px; color:var(--lcd-label-color); text-transform:uppercase; letter-spacing:2px; font-weight:bold; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:5px;" id="txt-howTitle">Hogyan működik</div>
-            <p style="font-size:14px; color:#aaa; line-height:1.7; margin:0;" id="txt-howBody">16 akkord jelenik meg a kottán. Nyomd le egyszerre az akkord összes hangját a zongorán. Engedd fel a folytatáshoz. A téves hangok pirossal jelennek meg.</p>
-        </div>
-
-        <div style="margin-bottom:18px;">
-            <div style="font-family:'Share Tech Mono'; font-size:11px; color:var(--lcd-label-color); text-transform:uppercase; letter-spacing:2px; font-weight:bold; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:5px;" id="txt-ctrlTitle">Vezérlők</div>
-            
-            <div style="display:flex; gap:10px; margin-bottom:7px; align-items:baseline;">
-                <span style="font-family:'Share Tech Mono'; font-size:11px; background:#111; border:1px solid #222; border-radius:3px; padding:2px 8px; min-width:80px; text-align:center; color:#555;">Mód ▲▼</span>
-                <span style="font-size:14px; color:#999;" id="txt-ctrl1">Hangok (csak kotta), Akkordok (név + hangok), Római (szám).</span>
+        <div class="modal-content" style="max-width:640px;text-align:left;">
+            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Chords — Module Guide</h2>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">16 chords appear on the staff. Hold all the correct notes of each chord simultaneously on the piano. Release to advance to the next chord. Wrong notes are highlighted in red.</p></div>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Notes (sheet only), Chords (name + notes after solving), Roman (numeral).</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Level ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Root position → Inversions → 7th chords.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Top / Bottom</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Toggle treble and bass clef chord generation independently.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Shows individual note names within each chord and activates LED guides.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Wheel</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Opens the Circle of Fifths. Click any sector to set the tonal center. Drag to reposition.</span></div>
             </div>
-            <div style="display:flex; gap:10px; margin-bottom:7px; align-items:baseline;">
-                <span style="font-family:'Share Tech Mono'; font-size:11px; background:#111; border:1px solid #222; border-radius:3px; padding:2px 8px; min-width:80px; text-align:center; color:#555;">Szint ▲▼</span>
-                <span style="font-size:14px; color:#999;" id="txt-ctrl2">7 szint: Alap → 1./2. Ford. → Vegyes → Szept. Alap → Szept. Ford. → Szept. Vegyes.</span>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:7px; align-items:center;">
-                <div style="background:#111; border:1px solid #222; padding:4px; border-radius:3px; min-width:80px; display:flex; justify-content:center; color:#555; font-size:14px;">𝄞 / 𝄢</div>
-                <span style="font-size:14px; color:#999;" id="txt-ctrl3">Violin és basszus kulcsos akkordok külön-külön be/ki.</span>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:7px; align-items:center;">
-                <div style="background:#111; border:1px solid #222; padding:4px; border-radius:3px; min-width:80px; display:flex; justify-content:center; color:#555;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">In <strong style="color:var(--oled-text);">Roman</strong> mode, the chord name is hidden until you solve it — great for training functional harmony recognition.</p></div>
+            <div style="margin-bottom:22px;">
+                <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-wheelTitle">Chord Wheel</div>
+                <div style="display:flex;gap:20px;align-items:center;">
+                    <svg width="130" height="130" viewBox="0 0 130 130" style="flex-shrink:0;">
+                        <circle cx="65" cy="65" r="60" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                        <circle cx="65" cy="65" r="38" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                        <circle cx="65" cy="65" r="18" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                        <!-- 12 elválasztó vonal -->
+                        <g stroke="rgba(255,255,255,0.1)" stroke-width="1">
+                            <line x1="65" y1="5" x2="65" y2="47"/><line x1="65" y1="83" x2="65" y2="125"/>
+                            <line x1="96" y1="12" x2="80" y2="39"/><line x1="50" y1="91" x2="34" y2="118"/>
+                            <line x1="118" y1="34" x2="91" y2="50"/><line x1="39" y1="80" x2="12" y2="96"/>
+                            <line x1="125" y1="65" x2="83" y2="65"/><line x1="47" y1="65" x2="5" y2="65"/>
+                            <line x1="118" y1="96" x2="91" y2="80"/><line x1="39" y1="50" x2="12" y2="34"/>
+                            <line x1="96" y1="118" x2="80" y2="91"/><line x1="50" y1="39" x2="34" y2="12"/>
+                        </g>
+                        <!-- Kiemelt 3 szelet (F=IV, C=I, G=V) -->
+                        <path d="M65,65 L65,5 A60,60 0 0,1 125,65 L83,65 A18,18 0 0,0 65,47 Z" fill="rgba(179,230,255,0.12)" stroke="rgba(179,230,255,0.6)" stroke-width="1.5"/>
+                        <!-- Hangok -->
+                        <text x="65" y="24" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="11" font-weight="bold">C</text>
+                        <text x="65" y="18" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="Inter" font-size="8" dy="12">I</text>
+                        <text x="98" y="46" text-anchor="middle" fill="#555" font-family="Share Tech Mono" font-size="10">G</text>
+                        <text x="95" y="46" text-anchor="middle" fill="rgba(179,230,255,0.7)" font-family="Share Tech Mono" font-size="10" dy="10">V</text>
+                        <text x="34" y="46" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="10">F</text>
+                        <text x="34" y="46" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="Inter" font-size="8" dy="10">IV</text>
+                        <text x="116" y="68" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">D</text>
+                        <text x="14" y="68" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">Bb</text>
+                        <text x="98" y="92" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">A</text>
+                        <text x="34" y="92" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">Eb</text>
+                        <text x="65" y="112" text-anchor="middle" fill="#444" font-family="Share Tech Mono" font-size="9">F#</text>
+                        <!-- Középső -->
+                        <text x="65" y="61" text-anchor="middle" fill="#555" font-family="Share Tech Mono" font-size="8">KEY</text>
+                        <text x="65" y="73" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="12" font-weight="bold">C</text>
+                    </svg>
+                    <p style="font-size:13px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-wheelBody">Press <strong style="color:var(--oled-text);">Wheel</strong> to open the draggable Circle of Fifths. The highlighted sector shows the I, IV and V chords of the selected key. Click any sector to change the key — the info bar shows the three main chords instantly. Drag the wheel anywhere on screen.</p>
                 </div>
-                <span style="font-size:14px; color:#999;" id="txt-ctrl4">Megjeleníti az egyes hangneveket és aktiválja a LED vezetőket.</span>
             </div>
-
-            <div style="display:flex; gap:10px; margin-bottom:7px; align-items:center;">
-                <div style="background:#111; border:1px solid #222; padding:4px; border-radius:3px; min-width:80px; display:flex; justify-content:center; color:#555;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 12 L12 2 A10 10 0 0 1 21 10 Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="2" fill="#000"/></svg>
-                </div>
-                <span style="font-size:14px; color:#999;" id="txt-ctrl5">Megnyitja a kvintkor tárcsát a hangnem beállításához.</span>
-            </div>
+            <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
         </div>
-        
+    </div>
 
-        <div style="margin-bottom:22px;">
-            <div style="font-family:'Share Tech Mono'; font-size:11px; color:var(--lcd-label-color); text-transform:uppercase; letter-spacing:2px; font-weight:bold; margin-bottom:8px; border-bottom:1px solid #222; padding-bottom:5px;" id="txt-wheelTitle">Akkordtárcsa</div>
-            <div style="display:flex; gap:20px; align-items:center;">
-                <svg width="130" height="130" viewBox="0 0 130 130" style="flex-shrink:0;">
-                    <circle cx="65" cy="65" r="60" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-                    <circle cx="65" cy="65" r="18" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-                    <g stroke="rgba(255,255,255,0.1)" stroke-width="1">
-                        <line x1="65" y1="5" x2="65" y2="47"/><line x1="125" y1="65" x2="83" y2="65"/>
-                    </g>
-                    <path d="M65,65 L65,5 A60,60 0 0,1 125,65 L83,65 A18,18 0 0,0 65,47 Z" fill="rgba(179,230,255,0.12)" stroke="rgba(179,230,255,0.6)" stroke-width="1.5"/>
-                    <text x="65" y="73" text-anchor="middle" fill="#b3e6ff" font-family="Share Tech Mono" font-size="12" font-weight="bold">C</text>
-                </svg>
-                <p style="font-size:13px; color:#aaa; line-height:1.6; margin:0;" id="txt-wheelBody">A kiemelt szelet mutatja a kiválasztott hangnem I, IV és V akkordját. Kattints bármely szektorra a váltáshoz — az Info sávban azonnal megjelennek a fő akkordok. A tárcsát bárhova húzhatod.</p>
-            </div>
+    <div class="sheet-container">
+        <div id="sheetViewport" class="sheet-viewport">
+            <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
+            <canvas id="staffCanvas" width="2450" height="480"></canvas>
         </div>
-
-        <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%; padding:12px;">ÉRTETTEM</button>
-    </div>
-</div>
-
-    <div class="sheet-container" style="align-items:flex-start;overflow-y:auto;overflow-x:auto;padding:30px 20px 100px 20px;">
-        <div id="vexflow-container" style="display:flex;justify-content:center;align-items:flex-start;width:100%;min-height:200px;flex-direction:column;"></div>
-    </div>
-    <div style="position:fixed;right:20px;top:20px;display:flex;flex-direction:column;gap:6px;z-index:1000;">
-        <div onclick="fitWidth()" title="Fit Width" style="background:#111;border:1px solid #444;color:#aaa;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.8);user-select:none;">↔</div>
-        <div onclick="fitHeight()" title="Fit Height" style="background:#111;border:1px solid #444;color:#aaa;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.8);user-select:none;">↕</div>
-        
     </div>
 
     <canvas id="wheelCanvas" width="400" height="400"></canvas>
@@ -336,7 +279,7 @@
 
                 <!-- INFO SÁV -->
                 <div class="info-bar-integrated">
-                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">PRESS START TO BEGIN — NYOMJ STARTOT A KEZDÉSHEZ</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">PRESS START TO BEGIN</div>
                 </div>
 
                 <!-- MASTER DASHBOARD -->
@@ -352,40 +295,29 @@
 
                     <!-- BAL — modul-specifikus -->
                     <div class="control-group">
-    <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
-    </a>
-        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
-        <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
-        <div class="clef-divider"></div>
-        <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
-    </button>
-    
-    <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-</svg>
-    </button>
-
-    <button id="btnWheel" class="sq-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CHORD WHEEL">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="12" cy="12" r="10"></circle>
-    <path d="M12 12 L12 2 A10 10 0 0 1 21 10 Z" fill="currentColor" stroke="none"></path>
-    <circle cx="12" cy="12" r="2" fill="#000"></circle>
-</svg>
-    </button>
-</div>
+                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                            <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
+                            <div class="clef-divider"></div>
+                            <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
+                        </button>
+                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint()" data-help="HINTS: DISPLAYS NOTE NAMES WITHIN EACH CHORD">Hints</button>
+                        <button id="btnKeys" class="hardware-btn" onclick="if(!helpActive) toggleKeys()" data-help="KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE PIANO KEYBOARD">Keys</button>
+                        <button id="btnWheel" class="hardware-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CHORD WHEEL">Wheel</button>
+                    </div>
 
                     <!-- KÖZÉP: OLED + START -->
                     <div class="center-console">
                         <div style="display:flex; align-items:center; gap:32px;">
-                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE CHORD PRACTICE SESSION" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">START</button>
+                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE CHORD PRACTICE SESSION">
+                                <span id="startLabel" class="active">START</span>
+                                <div class="split-div"></div>
+                                <span id="stopLabel">STOP</span>
+                            </div>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▲</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▲</button>
                                     <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▲</button>
                                 </div>
                                 <div class="oled-wrapper">
@@ -400,7 +332,7 @@
                                             <div class="oled-main" id="lcdModeText">NOTES</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledLevel" class="oled-section" onclick="if(!helpActive) openLevelBrowser()" data-help="LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS">
+                                        <div id="oledLevel" class="oled-section" onclick="if(!helpActive) cycleLevel(1)" data-help="LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS">
                                             <div class="oled-header">Level</div>
                                             <div class="oled-main" id="lcdLevelText">ROOT</div>
                                         </div>
@@ -414,11 +346,10 @@
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) toggleMode()">▼</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleLevel(-1)">▼</button>
                                     <button class="nav-disk-btn" style="opacity:0;pointer-events:none;">▼</button>
                                 </div>
                             </div>
-                            <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playChordDemo()" data-help="DEMO: PLAYS THE 16 CHORD SEQUENCE — KEYS LIGHT UP IN SYNC" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
 
@@ -436,23 +367,19 @@
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
-                        <!-- Vertikális ? / ⓘ páros -->
-                        <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
-                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-weight:regular;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
-                            <div style="height:1px;background:#222;"></div>
-                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="7" x2="12" y2="7" stroke-width="3"></line> <line x1="12" y1="11" x2="12" y2="17" stroke-width="3"></line> </svg>
-</button>
-                        </div>
-                        <!-- Vertikális EN/HU -->
                         <div class="lang-split">
                             <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
-                        </div>                       
-                       
+                        </div>
+                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
+                        <div style="width:16px;"></div>
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
+                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+                        </button>
                     </div>
                 </div>
 
@@ -472,8 +399,8 @@
 <script>
     let currentLang = 'EN';
     const MODULE_NAMES = {
-        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON'],
-        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON']
+        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
+        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
     };
     const AKKORD_T = {
         EN: {
@@ -481,7 +408,7 @@
             howBody:'16 chords appear on the staff. Hold all the correct notes of each chord simultaneously on the piano. Release to advance to the next chord. Wrong notes are highlighted in red.',
             ctrlTitle:'Controls', gotIt:'Got It',
             ctrl1:'Notes (sheet only), Chords (name + notes after solving), Roman (numeral).',
-            ctrl2:'7 levels: <strong style="color:var(--oled-text)">Root</strong> (basic triads) → <strong style="color:var(--oled-text)">1st/2nd Inv</strong> (triad inversions) → <strong style="color:var(--oled-text)">Mixed</strong> (all triads) → <strong style="color:var(--oled-text)">7th Root</strong> (seventh chords) → <strong style="color:var(--oled-text)">7th Inv</strong> (all 3 inversions) → <strong style="color:var(--oled-text)">7th Mix</strong> (maximum difficulty). Click the Level display to open the level browser.',
+            ctrl2:'Root position → Inversions → 7th chords.',
             ctrl3:'Toggle treble and bass clef chord generation independently.',
             ctrl4:'Shows individual note names within each chord and activates LED guides.',
             ctrl5:'Opens the Circle of Fifths wheel. Click any sector to set the tonal center. Drag to reposition.',
@@ -490,37 +417,28 @@
             wheelTitle:'Chord Wheel',
             wheelBody:'Press <strong style="color:var(--oled-text);">Wheel</strong> to open the draggable Circle of Fifths. The highlighted sector shows the I, IV and V chords of the selected key. Click any sector to change the key — the info bar shows the three main chords instantly. Drag the wheel anywhere on screen.',
             ready:'SYSTEM READY — PRESS START TO BEGIN',
-            playing: 'PLAYING — HOLD THE CORRECT CHORDS SIMULTANEOUSLY',
             helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
             btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnKeys:'Keys', btnWheel:'Wheel',
             btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
             hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLE TREBLE CLEF CHORDS',
-            hBottom:'BOTTOM CLEF: TOGGLE BASS CLEF CHORDS', hHints:'HINTS: 1× NOTE NAMES | 2× + KEYS LED | 3× OFF', hDemo:'DEMO: PLAYS THE 16 CHORD SEQUENCE — KEYS LIGHT UP IN SYNC', hKeys:'KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE KEYBOARD', hWheel:'WHEEL: DRAGGABLE CHORD WHEEL — SHOWS KEY RELATIONSHIPS',
+            hBottom:'BOTTOM CLEF: TOGGLE BASS CLEF CHORDS', hHints:'HINTS: SHOWS NOTE NAMES WITHIN EACH CHORD', hKeys:'KEYS: BLUE LED LIGHTS UP THE CHORD NOTES ON THE KEYBOARD', hWheel:'WHEEL: DRAGGABLE CHORD WHEEL — SHOWS KEY RELATIONSHIPS',
             hStart:'START/STOP: BEGIN OR END THE CHORD PRACTICE', hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI',
             hMixer:'MIXER: OPEN ADSR PANEL', hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',
             hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
             hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
             hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
             hMode:'MODE: NOTES (SHEET ONLY) → CHORDS (NAME REVEALED) → ROMAN (NUMERAL)',
-            hLevel:'LEVEL: ROOT → 1ST INV → 2ND INV → MIXED → 7TH ROOT → 7TH INV → 7TH MIX',
+            hLevel:'LEVEL: ROOT POSITION → INVERSIONS → 7TH CHORDS',
             hProgress:'PROGRESS: CURRENT CHORD NUMBER OUT OF 16',
             oledNotes:'NOTES', oledChords:'CHORDS', oledRoman:'ROMAN',
-            oledRoot:'ROOT', oled1inv:'1ST INV', oled2inv:'2ND INV', oledMix:'MIXED', oled7root:'7TH ROOT', oled7inv:'7TH INV', oled7mix:'7TH MIX',
-            levelTitle:'Select Level', levelCancel:'Cancel',
-            lb1t:'1 — ROOT',     lb1d:'Root position triads only. The lowest note is always the root.',
-            lb2t:'2 — 1ST INV',  lb2d:'First inversion triads. The third is in the bass (e.g. C/E).',
-            lb3t:'3 — 2ND INV',  lb3d:'Second inversion triads. The fifth is in the bass (e.g. C/G).',
-            lb4t:'4 — MIXED',    lb4d:'Root position and both inversions mixed. The real test of triad recognition.',
-            lb5t:'5 — 7TH ROOT', lb5d:'Seventh chords in root position. Four notes — adds tension and colour.',
-            lb6t:'6 — 7TH INV',  lb6d:'All three inversions only — no root position (⁶, ⁴₃, ²). Advanced level.',
-            lb7t:'7 — 7TH MIX',  lb7d:'Root position + all three inversions of seventh chords mixed. Maximum difficulty.',
+            oledRoot:'ROOT', oledInv:'INVERSION', oled7th:'7THS',
         },
         HU: {
             infoTitle:'Akkordok — Modul útmutató', howTitle:'Hogyan működik',
             howBody:'16 akkord jelenik meg a kottán. Nyomd le egyszerre az akkord összes hangját a zongorán. Engedd fel a folytatáshoz. A téves hangok pirossal jelennek meg.',
             ctrlTitle:'Vezérlők', gotIt:'Értettem',
             ctrl1:'Hangok (csak kotta), Akkordok (név + hangok megoldás után), Római (szám).',
-            ctrl2:'7 szint: <strong style="color:var(--oled-text)">Alap</strong> (hármashangzatok) → <strong style="color:var(--oled-text)">1./2. Ford.</strong> (fordítások) → <strong style="color:var(--oled-text)">Vegyes</strong> (minden hármas) → <strong style="color:var(--oled-text)">Szept. Alap</strong> (szeptim akkordok) → <strong style="color:var(--oled-text)">Szept. Ford.</strong> (mind a 3 fordítás) → <strong style="color:var(--oled-text)">Szept. Vegyes</strong> (max. nehézség). Kattints a Level ablakra a szintválasztóhoz.',
+            ctrl2:'Alap helyzet → Fordítások → Szeptim akkordok.',
             ctrl3:'Violin és basszus kulcsos akkordok külön-külön be/ki.',
             ctrl4:'Megjeleníti az egyes hangneveket az akkordon belül és aktiválja a LED vezétőket.',
             ctrl5:'Megnyitja a kvintkor tárcsát. Kattints bármely szektorra a hangnem beállításához. Húzd át bárhova.',
@@ -529,30 +447,21 @@
             wheelTitle:'Akkordtárcsa',
             wheelBody:'Nyomd a <strong style="color:var(--oled-text);">Tárcsa</strong> gombot a mozgatható kvintkor megnyitásához. A kiemelt szelet mutatja a kiválasztott hangnem I, IV és V akkordját. Kattints bármelyik szektorra a hangnem váltáshoz — az info sávban azonnal megjelennek a fő akkordok. A tárcsát bárhova húzhatod a képernyőn.',
             ready:'RENDSZER KÉSZ — NYOMJ STARTOT A KEZDÉSHEZ',
-            playing: 'LEJÁTSZÁS — TARTSD LENYOMVA A HELYES HANGOKAT!',
             helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
             btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnKeys:'Billentyű', btnWheel:'Tárcsa',
             btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
             hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE', hTop:'FELSŐ KULCS: VIOLIN KULCSOS AKKORDOK BE/KI',
-            hBottom:'ALSÓ KULCS: BASSZUS KULCSOS AKKORDOK BE/KI', hHints:'HINTS: 1× HANGNEVEK | 2× + BILLENTYŰ LED | 3× KI', hDemo:'DEMÓ: LEJÁTSSZA A 16 AKKORD SOROZATOT — BILLENTYŰK SZINKRONBAN VILLANNAK', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKKORD HANGJAIT A ZONGORÁN', hWheel:'TÁRCSA: MOZGATHATÓ AKKORDTÁRCSA — KVINTKOR KAPCSOLATOK',
+            hBottom:'ALSÓ KULCS: BASSZUS KULCSOS AKKORDOK BE/KI', hHints:'HANGNEM: HANGNEVEKET MUTAT AZ AKKORDON BELÜL', hKeys:'BILLENTYŰ: KÉK LED JELZI AZ AKKORD HANGJAIT A ZONGORÁN', hWheel:'TÁRCSA: MOZGATHATÓ AKKORDTÁRCSA — KVINTKOR KAPCSOLATOK',
             hStart:'START/STOP: AKKORD GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA', hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI — MIDI-VEL IS MŰKÖDIK',
             hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA', hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',
             hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ — HOGYAN MŰKÖDIK',
             hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
             hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
             hMode:'MÓD: HANGOK (CSAK KOTTA) → AKKORDOK (NÉV FELTÁRUL) → RÓMAI (SZÁM)',
-            hLevel:'SZINT: ALAP → 1. FORD. → 2. FORD. → VEGYES → SZEPT. ALAP → SZEPT. FORD. → SZEPT. VEGYES',
+            hLevel:'SZINT: ALAP HELYZET → FORDÍTÁSOK → SZEPTIM AKKORDOK',
             hProgress:'HALADÁS: AKTUÁLIS AKKORD SORSZÁMA 16-BÓL',
             oledNotes:'HANGOK', oledChords:'AKKORDOK', oledRoman:'RÓMAI',
-            oledRoot:'ALAP', oled1inv:'1. FORD.', oled2inv:'2. FORD.', oledMix:'VEGYES', oled7root:'SZEPT.', oled7inv:'SZEPT.FORD', oled7mix:'SZEPT.VEG.',
-            levelTitle:'Szint kiválasztása', levelCancel:'Mégse',
-            lb1t:'1 — ALAP HELYZET',   lb1d:'Csak alap helyzetű hármashangzatok. A legalsó hang mindig az alaphang.',
-            lb2t:'2 — 1. FORDÍTÁS',    lb2d:'1. fordítású hármashangzatok. A terc van a basszusban (pl. C/E).',
-            lb3t:'3 — 2. FORDÍTÁS',    lb3d:'2. fordítású hármashangzatok. A kvint van a basszusban (pl. C/G).',
-            lb4t:'4 — VEGYES',         lb4d:'Alap helyzet és mindkét fordítás keverve. Az igazi hármashangzat-felismerési teszt.',
-            lb5t:'5 — SZEPTIM ALAP',   lb5d:'Szeptim akkordok alap helyzetben. Négy hang — feszültséget és színt ad.',
-            lb6t:'6 — SZEPTIM FORD.',  lb6d:'Csak fordítások, alap helyzet nélkül (⁶, ⁴₃, ²). Haladó szint.',
-            lb7t:'7 — SZEPTIM VEGYES', lb7d:'Szeptim alap helyzet + mind a 3 fordítás keverve. Maximális nehézség.',
+            oledRoot:'ALAP', oledInv:'FORDÍTÁS', oled7th:'SZEPTIM',
         }
     };
 
@@ -565,12 +474,13 @@
         document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
         const T = AKKORD_T[lang];
         const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-wheelTitle','txt-wheelBody','txt-gotIt'];
-        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.tipTitle,T.tipBody,T.wheelTitle,T.wheelBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
         // Csak szöveges gombok
-        
+        const btnMap={'btnHintName':T.btnHints,'btnKeys':T.btnKeys,'btnWheel':T.btnWheel};
+        Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
         const helpMap={
-            'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':T.hHints,'btnDemo':T.hDemo,'btnWheel':T.hWheel,
+            'btnHome':T.hHome,'btnClef':T.hClef,'btnHintName':T.hHints,'btnKeys':T.hKeys,'btnWheel':T.hWheel,
             'btnStart':T.hStart,'audioToggle':T.hPiano,
             'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
             'oledModule':T.hModule,'oledMode':T.hMode,'oledLevel':T.hLevel,'oledProgress':T.hProgress
@@ -580,17 +490,8 @@
         document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][2];
         const modeNames={'sheet':T.oledNotes,'lead':T.oledChords,'roman':T.oledRoman};
         document.getElementById('lcdModeText').innerText = modeNames[currentMode] || T.oledNotes;
-        const levelNames={1:T.oledRoot,2:T.oled1inv,3:T.oled2inv,4:T.oledMix,5:T.oled7root,6:T.oled7inv,7:T.oled7mix};
+        const levelNames={1:T.oledRoot,2:T.oledInv,3:T.oled7th};
         document.getElementById('lcdLevelText').innerText = levelNames[currentLevel] || T.oledRoot;
-        // Level browser szövegek
-        document.getElementById('txt-levelTitle').innerText = T.levelTitle;
-        document.getElementById('txt-levelCancel').innerText = T.levelCancel;
-        for (let i=1; i<=7; i++) {
-            const et = document.getElementById('lb'+i+'-title');
-            const ed = document.getElementById('lb'+i+'-desc');
-            if (et) et.innerText = T['lb'+i+'t'];
-            if (ed) ed.innerText = T['lb'+i+'d'];
-        }
         if(helpActive) setInfoBar(T.helpMode, null);
         else if(!isRunning) setInfoBar(T.ready, null);
         draw();
@@ -614,298 +515,35 @@
     }
 
     function updateStartStop(running) {
-        const btn = document.getElementById('btnStart');
-        if (btn) btn.textContent = running ? 'STOP' : 'START';
+        document.getElementById('startLabel').classList.toggle('active', !running);
+        document.getElementById('stopLabel').classList.toggle('active', running);
     }
     // ── AKKORD ADATOK (eredeti, érintetlen) ──
     const CHORDS = {
         treble: {
-            // 1. Alap helyzet - BŐVÍTETT KROMATIKUS LISTA
-            "1": [
-                {name:"C",   roman:"I",   notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"C#",  roman:"I",   notes:[{m:61,n:'C#4',off:-6,s:'#'},{m:65,n:'F4',off:-4,s:''},{m:68,n:'G#4',off:-2,s:'#'}]},
-                {name:"Db",  roman:"I",   notes:[{m:61,n:'Db4',off:-6,s:'♭'},{m:65,n:'F4',off:-4,s:''},{m:68,n:'Ab4',off:-2,s:'♭'}]},
-                {name:"D",   roman:"I",   notes:[{m:62,n:'D4',off:-5,s:''},{m:66,n:'F#4',off:-3,s:'#'},{m:69,n:'A4',off:-1,s:''}]},
-                {name:"Eb",  roman:"I",   notes:[{m:63,n:'Eb4',off:-5,s:'♭'},{m:67,n:'G4',off:-2,s:''},{m:70,n:'B4',off:0,s:'♭'}]},
-                {name:"E",   roman:"I",   notes:[{m:64,n:'E4',off:-4,s:''},{m:68,n:'G#4',off:-2,s:'#'},{m:71,n:'H4',off:0,s:''}]},
-                {name:"F",   roman:"IV",  notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"F#",  roman:"I",   notes:[{m:66,n:'F#4',off:-3,s:'#'},{m:70,n:'A#4',off:-1,s:'#'},{m:73,n:'C#5',off:1,s:'#'}]},
-                {name:"G",   roman:"V",   notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
-                {name:"Ab",  roman:"I",   notes:[{m:68,n:'Ab4',off:-2,s:'♭'},{m:72,n:'C5',off:1,s:''},{m:75,n:'Eb5',off:2,s:'♭'}]},
-                {name:"A",   roman:"I",   notes:[{m:69,n:'A4',off:-1,s:''},{m:73,n:'C#5',off:1,s:'#'},{m:76,n:'E5',off:3,s:''}]},
-                {name:"Bb",  roman:"I",   notes:[{m:70,n:'Bb4',off:0,s:'♭'},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]},
-                {name:"H",   roman:"I",   notes:[{m:71,n:'H4',off:0,s:''},{m:75,n:'D#5',off:2,s:'#'},{m:78,n:'F#5',off:4,s:'#'}]},
-                // Moll akkordok a leggyakoribb hangnemekhez
-                {name:"Cm",  roman:"i",   notes:[{m:60,n:'C4',off:-6,s:''},{m:63,n:'Eb4',off:-5,s:'♭'},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"Dm",  roman:"ii",  notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
-                {name:"Em",  roman:"iii", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
-                {name:"Fm",  roman:"iv",  notes:[{m:65,n:'F4',off:-3,s:''},{m:68,n:'Ab4',off:-2,s:'♭'},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Gm",  roman:"v",   notes:[{m:67,n:'G4',off:-2,s:''},{m:70,n:'Bb4',off:0,s:'♭'},{m:74,n:'D5',off:2,s:''}]},
-                {name:"Am",  roman:"vi",  notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
-                {name:"Hm",  roman:"vii", notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]}
-            ],
-            // 2. 1. fordítás - BŐVÍTETT KROMATIKUS LISTA
-            "2": [
-                {name:"C/E",   roman:"I⁶",   notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Db/F",  roman:"I⁶",   notes:[{m:65,n:'F4',off:-3,s:''},{m:68,n:'Ab4',off:-2,s:'♭'},{m:73,n:'Db5',off:2,s:'♭'}]},
-                {name:"D/F#",  roman:"I⁶",   notes:[{m:66,n:'F#4',off:-3,s:'#'},{m:69,n:'A4',off:-1,s:''},{m:74,n:'D5',off:2,s:''}]},
-                {name:"Eb/G",  roman:"I⁶",   notes:[{m:67,n:'G4',off:-2,s:''},{m:70,n:'Bb4',off:0,s:'♭'},{m:75,n:'Eb5',off:2,s:'♭'}]},
-                {name:"E/G#",  roman:"I⁶",   notes:[{m:68,n:'G#4',off:-2,s:'#'},{m:71,n:'H4',off:0,s:''},{m:76,n:'E5',off:3,s:''}]},
-                {name:"F/A",   roman:"IV⁶",  notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:77,n:'F5',off:4,s:''}]},
-                {name:"F#/A#", roman:"I⁶",   notes:[{m:70,n:'A#4',off:-1,s:'#'},{m:73,n:'C#5',off:1,s:'#'},{m:78,n:'F#5',off:4,s:'#'}]},
-                {name:"G/H",   roman:"V⁶",   notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:79,n:'G5',off:5,s:''}]},
-                {name:"Ab/C",  roman:"I⁶",   notes:[{m:72,n:'C5',off:1,s:''},{m:75,n:'Eb5',off:2,s:'♭'},{m:80,n:'Ab5',off:6,s:'♭'}]},
-                {name:"A/C#",  roman:"I⁶",   notes:[{m:73,n:'C#5',off:1,s:'#'},{m:76,n:'E5',off:3,s:''},{m:81,n:'A5',off:7,s:''}]},
-                {name:"Bb/D",  roman:"I⁶",   notes:[{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:82,n:'Bb5',off:8,s:'♭'}]},
-                {name:"H/D#",  roman:"I⁶",   notes:[{m:75,n:'D#5',off:2,s:'#'},{m:78,n:'F#5',off:4,s:'#'},{m:83,n:'H5',off:9,s:''}]},
-                // Moll fordítások
-                {name:"Cm/Eb", roman:"i⁶",   notes:[{m:63,n:'Eb4',off:-5,s:'♭'},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Dm/F",  roman:"ii⁶",  notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:74,n:'D5',off:2,s:''}]},
-                {name:"Em/G",  roman:"iii⁶", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:76,n:'E5',off:3,s:''}]},
-                {name:"Am/C",  roman:"vi⁶",  notes:[{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:69,n:'A4',off:-1,s:''}]}
-            ],
-            // 3. 2. fordítás - BŐVÍTETT KROMATIKUS LISTA
-            "3": [
-                {name:"C/G",   roman:"I⁶₄",   notes:[{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
-                {name:"Db/Ab", roman:"I⁶₄",   notes:[{m:68,n:'Ab4',off:-2,s:'♭'},{m:73,n:'Db5',off:2,s:'♭'},{m:77,n:'F5',off:4,s:''}]},
-                {name:"D/A",   roman:"I⁶₄",   notes:[{m:69,n:'A4',off:-1,s:''},{m:74,n:'D5',off:2,s:''},{m:78,n:'F#5',off:4,s:'#'}]},
-                {name:"Eb/B",  roman:"I⁶₄",   notes:[{m:70,n:'Bb4',off:0,s:'♭'},{m:75,n:'Eb5',off:2,s:'♭'},{m:79,n:'G5',off:5,s:''}]},
-                {name:"E/H",   roman:"I⁶₄",   notes:[{m:71,n:'H4',off:0,s:''},{m:76,n:'E5',off:3,s:''},{m:80,n:'G#5',off:5,s:'#'}]},
-                {name:"F/C",   roman:"IV⁶₄",  notes:[{m:72,n:'C5',off:1,s:''},{m:77,n:'F5',off:4,s:''},{m:81,n:'A5',off:7,s:''}]},
-                {name:"F#/C#", roman:"I⁶₄",   notes:[{m:73,n:'C#5',off:1,s:'#'},{m:78,n:'F#5',off:4,s:'#'},{m:82,n:'A#5',off:7,s:'#'}]},
-                {name:"G/D",   roman:"V⁶₄",   notes:[{m:74,n:'D5',off:2,s:''},{m:79,n:'G5',off:5,s:''},{m:83,n:'H5',off:9,s:''}]},
-                {name:"Ab/Eb", roman:"I⁶₄",   notes:[{m:75,n:'Eb5',off:2,s:'♭'},{m:80,n:'Ab5',off:6,s:'♭'},{m:84,n:'C6',off:11,s:''}]},
-                {name:"A/E",   roman:"I⁶₄",   notes:[{m:76,n:'E5',off:3,s:''},{m:81,n:'A5',off:7,s:''},{m:85,n:'C#6',off:12,s:'#'}]},
-                {name:"Bb/F",  roman:"I⁶₄",   notes:[{m:77,n:'F5',off:4,s:''},{m:82,n:'Bb5',off:8,s:'♭'},{m:86,n:'D6',off:13,s:''}]},
-                {name:"H/F#",  roman:"I⁶₄",   notes:[{m:78,n:'F#5',off:4,s:'#'},{m:83,n:'H5',off:9,s:''},{m:87,n:'D#6',off:14,s:'#'}]},
-                // Moll 2. fordítások
-                {name:"Am/E",  roman:"vi⁶₄",  notes:[{m:76,n:'E5',off:3,s:''},{m:81,n:'A5',off:7,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Dm/A",  roman:"ii⁶₄",  notes:[{m:69,n:'A4',off:-1,s:''},{m:74,n:'D5',off:2,s:''},{m:65,n:'F4',off:-3,s:''}]},
-                {name:"Em/H",  roman:"iii⁶₄", notes:[{m:71,n:'H4',off:0,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]}
-            ],
-            // 4. Vegyes (1+2+3 keverve) — ugyanazok a poolok összefűzve, buildSequence kezeli
-            "4": [
-                // C és rokonai
-                {name:"C", roman:"I", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"C/E", roman:"I⁶", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"C/G", roman:"I⁶₄", notes:[{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
-                // G és rokonai
-                {name:"G", roman:"V", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
-                {name:"G/H", roman:"V⁶", notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:79,n:'G5',off:5,s:''}]},
-                // D és rokonai (A-dúr, G-dúr, D-dúr tárcsához)
-                {name:"D", roman:"I", notes:[{m:62,n:'D4',off:-5,s:''},{m:66,n:'F#4',off:-3,s:'#'},{m:69,n:'A4',off:-1,s:''}]},
-                {name:"D/F#", roman:"I⁶", notes:[{m:66,n:'F#4',off:-3,s:'#'},{m:69,n:'A4',off:-1,s:''},{m:74,n:'D5',off:2,s:''}]},
-                // A és rokonai
-                {name:"A", roman:"I", notes:[{m:69,n:'A4',off:-1,s:''},{m:73,n:'C#5',off:1,s:'#'},{m:76,n:'E5',off:3,s:''}]},
-                {name:"A/C#", roman:"I⁶", notes:[{m:73,n:'C#5',off:1,s:'#'},{m:76,n:'E5',off:3,s:''},{m:81,n:'A5',off:7,s:''}]},
-                // F és Bb (Eb-dúr, Bb-dúr, F-dúr tárcsához)
-                {name:"F", roman:"IV", notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Bb", roman:"I", notes:[{m:70,n:'Bb4',off:0,s:'♭'},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]},
-                {name:"Bb/D", roman:"I⁶", notes:[{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:82,n:'Bb5',off:8,s:'♭'}]},
-                // Mollok a színesítéshez
-                {name:"Am", roman:"vi", notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
-                {name:"Dm", roman:"ii", notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
-                {name:"Em", roman:"iii", notes:[{m:64,n:'E4',off:-4,s:''},{m:68,n:'G#4',off:-2,s:'#'},{m:71,n:'H4',off:0,s:''}]}
-            ],
-            // 5. Szeptim alap helyzet
-            "5": [
-                {name:"G7",    roman:"V⁷",    notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]},
-                {name:"Cmaj7", roman:"Imaj⁷", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
-                {name:"Am7",   roman:"vi⁷",   notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''}]},
-                {name:"Dm7",   roman:"ii⁷",   notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Em7",   roman:"iii⁷",  notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]}
-            ],
-            // 6. Szeptim fordítások
-            "6": [
-                // G7 mind a 3 fordítása
-                {name:"G7/H",   roman:"V⁷⁶",    notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"G7/D",   roman:"V⁴₃",    notes:[{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
-                {name:"G7/F",   roman:"V²",      notes:[{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
-                // Cmaj7 mind a 3 fordítása
-                {name:"Cmaj7/E",roman:"Imaj⁷⁶",  notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Cmaj7/G",roman:"Imaj⁴₃",  notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''}]},
-                {name:"Cmaj7/H",roman:"Imaj²",   notes:[{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                // Am7 mind a 3 fordítása
-                {name:"Am7/C",  roman:"vi⁷⁶",   notes:[{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''}]},
-                {name:"Am7/E",  roman:"vi⁴₃",   notes:[{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Am7/G",  roman:"vi²",     notes:[{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
-                // Dm7 mind a 3 fordítása
-                {name:"Dm7/F",  roman:"ii⁷⁶",   notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''}]},
-                {name:"Dm7/A",  roman:"ii⁴₃",   notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''}]},
-                {name:"Dm7/C",  roman:"ii²",     notes:[{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
-                // Em7 mind a 3 fordítása
-                {name:"Em7/G",  roman:"iii⁷⁶",  notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''}]},
-                {name:"Em7/H",  roman:"iii⁴₃",  notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"Em7/D",  roman:"iii²",    notes:[{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}
-            ],
-            // 7. Szeptim vegyes — alap helyzet + mind a 3 fordítás
-            "7": [
-                {name:"G7",     roman:"V⁷",     notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]},
-                {name:"G7/H",   roman:"V⁷⁶",   notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"G7/D",   roman:"V⁴₃",   notes:[{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
-                {name:"G7/F",   roman:"V²",     notes:[{m:77,n:'F5',off:4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
-                {name:"Cmaj7",  roman:"Imaj⁷",  notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]},
-                {name:"Cmaj7/E",roman:"Imaj⁷⁶", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Cmaj7/G",roman:"Imaj⁴₃", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''}]},
-                {name:"Cmaj7/H",roman:"Imaj²",  notes:[{m:71,n:'H4',off:0,s:''},{m:72,n:'C5',off:1,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"Am7",    roman:"vi⁷",    notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''}]},
-                {name:"Am7/C",  roman:"vi⁷⁶",  notes:[{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''}]},
-                {name:"Am7/E",  roman:"vi⁴₃",  notes:[{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Am7/G",  roman:"vi²",    notes:[{m:79,n:'G5',off:5,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]},
-                {name:"Dm7",    roman:"ii⁷",    notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]},
-                {name:"Dm7/F",  roman:"ii⁷⁶",  notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''}]},
-                {name:"Dm7/A",  roman:"ii⁴₃",  notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''}]},
-                {name:"Dm7/C",  roman:"ii²",    notes:[{m:72,n:'C5',off:1,s:''},{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]},
-                {name:"Em7",    roman:"iii⁷",   notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]},
-                {name:"Em7/G",  roman:"iii⁷⁶", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''}]},
-                {name:"Em7/H",  roman:"iii⁴₃", notes:[{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]},
-                {name:"Em7/D",  roman:"iii²",   notes:[{m:74,n:'D5',off:2,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}
-            ]
+            "1": [ {name:"C", roman:"I", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''}]}, {name:"F", roman:"IV", notes:[{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''}]}, {name:"Am", roman:"vi", notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]}, {name:"Dm", roman:"ii", notes:[{m:62,n:'D4',off:-5,s:''},{m:65,n:'F4',off:-3,s:''},{m:69,n:'A4',off:-1,s:''}]}, {name:"G", roman:"V", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''}]}, {name:"Em", roman:"iii", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]} ],
+            "2": [ {name:"C", roman:"I", notes:[{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''}]}, {name:"C", roman:"I", notes:[{m:67,n:'G4',off:-2,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''}]} ],
+            "3": [ {name:"G7", roman:"V7", notes:[{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''},{m:74,n:'D5',off:2,s:''},{m:77,n:'F5',off:4,s:''}]}, {name:"Cmaj7", roman:"Imaj7", notes:[{m:60,n:'C4',off:-6,s:''},{m:64,n:'E4',off:-4,s:''},{m:67,n:'G4',off:-2,s:''},{m:71,n:'H4',off:0,s:''}]}, {name:"Am7", roman:"vi7", notes:[{m:69,n:'A4',off:-1,s:''},{m:72,n:'C5',off:1,s:''},{m:76,n:'E5',off:3,s:''},{m:79,n:'G5',off:5,s:''}]} ]
         },
         bass: {
-            "1": [
-                {name:"C",  roman:"I",   notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
-                {name:"C#", roman:"I",   notes:[{m:49,n:'C#3',off:-1,s:'#'},{m:53,n:'F3',off:1,s:''},{m:56,n:'G#3',off:3,s:'#'}]},
-                {name:"D",  roman:"I",   notes:[{m:50,n:'D3',off:0,s:''},{m:54,n:'F#3',off:2,s:'#'},{m:57,n:'A3',off:4,s:''}]},
-                {name:"Eb", roman:"I",   notes:[{m:51,n:'Eb3',off:0,s:'♭'},{m:55,n:'G3',off:3,s:''},{m:58,n:'Bb3',off:5,s:'♭'}]},
-                {name:"E",  roman:"I",   notes:[{m:52,n:'E3',off:1,s:''},{m:56,n:'G#3',off:3,s:'#'},{m:59,n:'H3',off:5,s:''}]},
-                {name:"F",  roman:"IV",  notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]},
-                {name:"F#", roman:"I",   notes:[{m:54,n:'F#3',off:2,s:'#'},{m:58,n:'A#3',off:4,s:'#'},{m:61,n:'C#4',off:6,s:'#'}]},
-                {name:"G",  roman:"V",   notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"Ab", roman:"I",   notes:[{m:44,n:'Ab2',off:-4,s:'♭'},{m:48,n:'C3',off:-1,s:''},{m:51,n:'Eb3',off:0,s:'♭'}]},
-                {name:"A",  roman:"I",   notes:[{m:45,n:'A2',off:-3,s:''},{m:49,n:'C#3',off:-1,s:'#'},{m:52,n:'E3',off:1,s:''}]},
-                {name:"Bb", roman:"I",   notes:[{m:46,n:'Bb2',off:-3,s:'♭'},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
-                {name:"H",  roman:"I",   notes:[{m:47,n:'H2',off:-2,s:''},{m:51,n:'D#3',off:0,s:'#'},{m:54,n:'F#3',off:2,s:'#'}]},
-                // Alap mollok a basszushoz
-                {name:"Am", roman:"vi",  notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
-                {name:"Dm", roman:"ii",  notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]},
-                {name:"Em",  roman:"iii", notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:59,n:'H3',off:5,s:''}]}
-            ],
-            "2": [
-                {name:"C/E",   roman:"I⁶",   notes:[{m:40,n:'E2',off:-6,s:''},{m:43,n:'G2',off:-4,s:''},{m:48,n:'C3',off:-1,s:''}]},
-                {name:"Db/F",  roman:"I⁶",   notes:[{m:41,n:'F2',off:-5,s:''},{m:44,n:'Ab2',off:-4,s:'♭'},{m:49,n:'Db3',off:-1,s:'♭'}]},
-                {name:"D/F#",  roman:"I⁶",   notes:[{m:42,n:'F#2',off:-5,s:'#'},{m:45,n:'A2',off:-3,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"Eb/G",  roman:"I⁶",   notes:[{m:43,n:'G2',off:-4,s:''},{m:46,n:'Bb2',off:-3,s:'♭'},{m:51,n:'Eb3',off:0,s:'♭'}]},
-                {name:"E/G#",  roman:"I⁶",   notes:[{m:44,n:'G#2',off:-4,s:'#'},{m:47,n:'H2',off:-2,s:''},{m:52,n:'E3',off:1,s:''}]},
-                {name:"F/A",   roman:"IV⁶",  notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:53,n:'F3',off:2,s:''}]},
-                {name:"F#/A#", roman:"I⁶",   notes:[{m:46,n:'A#2',off:-3,s:'#'},{m:49,n:'C#3',off:-1,s:'#'},{m:54,n:'F#3',off:2,s:'#'}]},
-                {name:"G/H",   roman:"V⁶",   notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''}]},
-                {name:"Ab/C",  roman:"I⁶",   notes:[{m:48,n:'C3',off:-1,s:''},{m:51,n:'Eb3',off:0,s:'♭'},{m:56,n:'Ab3',off:3,s:'♭'}]},
-                {name:"A/C#",  roman:"I⁶",   notes:[{m:49,n:'C#3',off:-1,s:'#'},{m:52,n:'E3',off:1,s:''},{m:57,n:'A3',off:4,s:''}]},
-                {name:"Bb/D",  roman:"I⁶",   notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:58,n:'Bb3',off:5,s:'♭'}]},
-                {name:"H/D#",  roman:"I⁶",   notes:[{m:51,n:'D#3',off:0,s:'#'},{m:54,n:'F#3',off:2,s:'#'},{m:59,n:'H3',off:5,s:''}]},
-                // Moll fordítások a basszushoz
-                {name:"Am/C",  roman:"vi⁶",  notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:45,n:'A2',off:-3,s:''}]},
-                {name:"Dm/F",  roman:"ii⁶",  notes:[{m:41,n:'F2',off:-5,s:''},{m:45,n:'A2',off:-3,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"Em/G",  roman:"iii⁶", notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:52,n:'E3',off:1,s:''}]}
-            ],
-            "3": [
-                {name:"C/G",   roman:"I⁶₄",   notes:[{m:43,n:'G2',off:-4,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
-                {name:"Db/Ab", roman:"I⁶₄",   notes:[{m:44,n:'Ab2',off:-4,s:'♭'},{m:49,n:'Db3',off:-1,s:'♭'},{m:53,n:'F3',off:1,s:''}]},
-                {name:"D/A",   roman:"I⁶₄",   notes:[{m:45,n:'A2',off:-3,s:''},{m:50,n:'D3',off:0,s:''},{m:54,n:'F#3',off:2,s:'#'}]},
-                {name:"Eb/B",  roman:"I⁶₄",   notes:[{m:46,n:'Bb2',off:-3,s:'♭'},{m:51,n:'Eb3',off:0,s:'♭'},{m:55,n:'G3',off:3,s:''}]},
-                {name:"E/H",   roman:"I⁶₄",   notes:[{m:47,n:'H2',off:-2,s:''},{m:52,n:'E3',off:1,s:''},{m:56,n:'G#3',off:3,s:'#'}]},
-                {name:"F/C",   roman:"IV⁶₄",  notes:[{m:48,n:'C3',off:-1,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]},
-                {name:"F#/C#", roman:"I⁶₄",   notes:[{m:49,n:'C#3',off:-1,s:'#'},{m:54,n:'F#3',off:2,s:'#'},{m:58,n:'A#3',off:4,s:'#'}]},
-                {name:"G/D",   roman:"V⁶₄",   notes:[{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''},{m:59,n:'H3',off:5,s:''}]},
-                {name:"Ab/Eb", roman:"I⁶₄",   notes:[{m:51,n:'Eb3',off:0,s:'♭'},{m:56,n:'Ab3',off:3,s:'♭'},{m:60,n:'C4',off:6,s:''}]},
-                {name:"A/E",   roman:"I⁶₄",   notes:[{m:52,n:'E3',off:1,s:''},{m:57,n:'A3',off:4,s:''},{m:61,n:'C#4',off:6,s:'#'}]},
-                {name:"Bb/F",  roman:"I⁶₄",   notes:[{m:53,n:'F3',off:2,s:''},{m:58,n:'Bb3',off:5,s:'♭'},{m:62,n:'D4',off:7,s:''}]},
-                {name:"H/F#",  roman:"I⁶₄",   notes:[{m:54,n:'F#3',off:2,s:'#'},{m:59,n:'H3',off:5,s:''},{m:63,n:'D#4',off:8,s:'#'}]}
-            ],
-            "4": [
-                // C és rokonai
-                {name:"C", roman:"I", notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
-                {name:"C/E", roman:"I⁶", notes:[{m:40,n:'E2',off:-6,s:''},{m:43,n:'G2',off:-4,s:''},{m:48,n:'C3',off:-1,s:''}]},
-                {name:"C/G", roman:"I⁶₄", notes:[{m:43,n:'G2',off:-4,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
-                // G és rokonai
-                {name:"G", roman:"V", notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"G/H", roman:"V⁶", notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''}]},
-                // D és rokonai (A-dúr, G-dúr tárcsához)
-                {name:"D", roman:"I", notes:[{m:50,n:'D3',off:0,s:''},{m:54,n:'F#3',off:2,s:'#'},{m:57,n:'A3',off:4,s:''}]},
-                {name:"D/F#", roman:"I⁶", notes:[{m:42,n:'F#2',off:-5,s:'#'},{m:45,n:'A2',off:-3,s:''},{m:50,n:'D3',off:0,s:''}]},
-                // A és rokonai
-                {name:"A", roman:"I", notes:[{m:45,n:'A2',off:-3,s:''},{m:49,n:'C#3',off:-1,s:'#'},{m:52,n:'E3',off:1,s:''}]},
-                {name:"A/C#", roman:"I⁶", notes:[{m:49,n:'C#3',off:-1,s:'#'},{m:52,n:'E3',off:1,s:''},{m:57,n:'A3',off:4,s:''}]},
-                // F és Bb (Eb-dúr, Bb-dúr tárcsához)
-                {name:"F", roman:"IV", notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]},
-                {name:"Bb", roman:"I", notes:[{m:46,n:'Bb2',off:-3,s:'♭'},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
-                // Mollok
-                {name:"Am", roman:"vi", notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
-                {name:"Dm", roman:"ii", notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]},
-                {name:"Em",  roman:"iii", notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:59,n:'H3',off:5,s:''}]}
-            ],
-            "5": [
-                {name:"Cmaj7", roman:"Imaj⁷", notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:59,n:'H3',off:5,s:''}]},
-                {name:"D7",    roman:"V⁷",    notes:[{m:50,n:'D3',off:0,s:''},{m:54,n:'F#3',off:2,s:'#'},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]},
-                {name:"E7",    roman:"V⁷",    notes:[{m:40,n:'E2',off:-6,s:''},{m:44,n:'G#2',off:-4,s:'#'},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"Fmaj7", roman:"IVmaj⁷",notes:[{m:41,n:'F2',off:-5,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
-                {name:"G7",    roman:"V⁷",    notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
-                {name:"A7",    roman:"V⁷",    notes:[{m:45,n:'A2',off:-3,s:''},{m:49,n:'C#3',off:-1,s:'#'},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
-                {name:"H7",    roman:"V⁷",    notes:[{m:47,n:'H2',off:-2,s:''},{m:51,n:'D#3',off:0,s:'#'},{m:54,n:'F#3',off:2,s:'#'},{m:57,n:'A3',off:4,s:''}]},
-                {name:"Am7",   roman:"vi⁷",   notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
-                {name:"Dm7",   roman:"ii⁷",   notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]},
-                {name:"Em7",   roman:"iii⁷",  notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:59,n:'H3',off:5,s:''},{m:62,n:'D4',off:7,s:''}]}
-            ],
-            "6": [
-                // G7 mind a 3 fordítása (meglévő)
-                {name:"G7/H",   roman:"V⁷⁶",    notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''}]},
-                {name:"G7/D",   roman:"V⁴₃",    notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''}]},
-                {name:"G7/F",   roman:"V²",     notes:[{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
-                // Am7 mind a 3 fordítása (A-dúr, G-dúr tárcsához)
-                {name:"Am7/C",  roman:"vi⁷⁶",   notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''}]},
-                {name:"Am7/E",  roman:"vi⁴₃",   notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''}]},
-                {name:"Am7/G",  roman:"vi²",    notes:[{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
-                // Dm7 mind a 3 fordítása
-                {name:"Dm7/F",  roman:"ii⁷⁶",   notes:[{m:41,n:'F2',off:-5,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"Dm7/A",  roman:"ii⁴₃",   notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:41,n:'F2',off:-5,s:''}]},
-                {name:"Dm7/C",  roman:"ii²",    notes:[{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:41,n:'F2',off:-5,s:''},{m:45,n:'A2',off:-3,s:''}]},
-                // Cmaj7 mind a 3 fordítása
-                {name:"Cmaj7/E",roman:"Imaj⁷⁶", notes:[{m:40,n:'E2',off:-6,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:48,n:'C3',off:-1,s:''}]},
-                {name:"Cmaj7/G",roman:"Imaj⁴₃", notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:48,n:'C3',off:-1,s:''},{m:40,n:'E2',off:-6,s:''}]},
-                {name:"Cmaj7/H",roman:"Imaj²",  notes:[{m:47,n:'H2',off:-2,s:''},{m:48,n:'C3',off:-1,s:''},{m:40,n:'E2',off:-6,s:''},{m:43,n:'G2',off:-4,s:''}]}
-            ],
-            // 7. Szeptim vegyes — alap helyzet + mind a 3 fordítás
-            "7": [
-                {name:"G7",     roman:"V⁷",    notes:[{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
-                {name:"G7/H",   roman:"V⁷⁶",   notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''}]},
-                {name:"G7/D",   roman:"V⁴₃",   notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''}]},
-                {name:"G7/F",   roman:"V²",     notes:[{m:53,n:'F3',off:2,s:''},{m:43,n:'G2',off:-4,s:''},{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"Am7",    roman:"vi⁷",   notes:[{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]},
-                {name:"Am7/C",  roman:"vi⁷⁶",  notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''}]},
-                {name:"Am7/E",  roman:"vi⁴₃",  notes:[{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''}]},
-                {name:"Am7/G",  roman:"vi²",    notes:[{m:55,n:'G3',off:3,s:''},{m:45,n:'A2',off:-3,s:''},{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''}]},
-                {name:"Dm7",    roman:"ii⁷",   notes:[{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''}]},
-                {name:"Dm7/F",  roman:"ii⁷⁶",  notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''}]},
-                {name:"Dm7/A",  roman:"ii⁴₃",  notes:[{m:57,n:'A3',off:4,s:''},{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''}]},
-                {name:"Dm7/C",  roman:"ii²",    notes:[{m:48,n:'C3',off:-1,s:''},{m:50,n:'D3',off:0,s:''},{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''}]}
-            ]
+            "1": [ {name:"C", roman:"I", notes:[{m:48,n:'C3',off:-1,s:''},{m:52,n:'E3',off:1,s:''},{m:55,n:'G3',off:3,s:''}]}, {name:"F", roman:"IV", notes:[{m:53,n:'F3',off:2,s:''},{m:57,n:'A3',off:4,s:''},{m:60,n:'C4',off:6,s:''}]} ],
+            "2": [ {name:"G", roman:"V", notes:[{m:47,n:'H2',off:-2,s:''},{m:50,n:'D3',off:0,s:''},{m:55,n:'G3',off:3,s:''}]} ],
+            "3": [ {name:"D", roman:"II", notes:[{m:50,n:'D3',off:0,s:''},{m:54,n:'F#3',off:2,s:'♯'},{m:57,n:'A3',off:4,s:''}]} ]
         }
     };
 
-    // ── VexFlow Kotta ──
-    const VF = Vex.Flow;
-    const VFAnnotation = VF.Annotation || Vex.Flow.Annotation;
-    const VJ_TOP = (VFAnnotation && VFAnnotation.VerticalJustify) ? VFAnnotation.VerticalJustify.TOP : 1;
-    const VJ_BOTTOM = (VFAnnotation && VFAnnotation.VerticalJustify) ? VFAnnotation.VerticalJustify.BOTTOM : 4;
-    let KOTTA_ZOOM = 1.0;
-    let bookViewActive = false;
-        const VEXFLOW_BASE_WIDTH = 1100;
-        const VEXFLOW_ROW_HEIGHT = 280;
-    const C_LINES = '#4a4a4a', C_BRIGHT = '#c3c3c3', C_PAST = '#888888';
-    const C_ACTIVE = '#b3e6ff', C_INACTIVE = 'rgba(179,230,255,0.28)', C_ERROR = '#ff6655';
+    const TREBLE_BASE_Y = 141.5, TREBLE_SP_Y = 11.14;
+    const BASS_BASE_Y = 374.16, BASS_SP_Y = 10.71;
 
     // ── ÁLLAPOTOK ──
     let isRunning = false, showNames = false, showKeys = false, showWheel = false, helpActive = false, audioOn = true;
-    let currentKey = 'C'; // Ez tárolja a tárcsán kiválasztott hangnemet
-    let hintsState = 0;
-    let demoPlaying = false, demoTimeouts = [];
     let activeRH = true, activeLH = true;
     let currentMode = 'sheet', currentLevel = 1;
     let seq = [], currentStep = 0, activeMidiNotes = new Set();
     let waitingForRelease = false;
-    let audioCtx = null, salamanderPiano = null, _pianoInitPromise = null;
-    let _midiInited = false;
+    let audioInited = false;
+    let audioCtx, sampleBuffers = {}, activeNodes = {};
+    let masterReverb, reverbGain;
 
     // Kulcs váltó
     let clefState = 0;
@@ -926,7 +564,8 @@
         { name: 'SIGHT READ', url: 'kottaolvasas.html' },
         { name: 'CHORDS', url: 'akkordok.html' },
         { name: 'SCALES', url: 'skalak.html' },
-        { name: 'HANON', url: 'hanon.html' }
+        { name: 'HANON', url: 'hanon.html' },
+        { name: 'RHYTHM', url: 'ritmus.html' }
     ];
     let currentModuleIdx = 2; // CHORDS
     const MODULE_DESC = {
@@ -935,14 +574,16 @@
             'SIGHT READ — read notes on the staff and play them',
             'CHORDS — recognise and play chord shapes',
             'SCALES — practice all major and minor scales',
-            'HANON — classic finger exercises with analysis'
+            'HANON — classic finger exercises with analysis',
+            'RHYTHM — coming soon'
         ],
         HU: [
             'HALLÁS — azonosítsd a hangokat a zongorán',
             'KOTTAOLVASÁS — olvasd és játszd le a kottajeleket',
             'AKKORDOK — akkordok felismerése és lejátszása',
             'SKÁLÁK — dúr és moll skálák gyakorlása',
-            'HANON — klasszikus ujjgyakorlatok elemzéssel'
+            'HANON — klasszikus ujjgyakorlatok elemzéssel',
+            'RITMUS — hamarosan'
         ]
     };
 
@@ -964,7 +605,7 @@
     function updateLCD() {
         const T = AKKORD_T[currentLang];
         document.getElementById('lcdModeText').innerText = {'sheet':T.oledNotes,'lead':T.oledChords,'roman':T.oledRoman}[currentMode];
-        document.getElementById('lcdLevelText').innerText = {1:T.oledRoot,2:T.oled1inv,3:T.oled2inv,4:T.oledMix,5:T.oled7root,6:T.oled7inv,7:T.oled7mix}[currentLevel]||T.oledRoot;
+        document.getElementById('lcdLevelText').innerText = {1:T.oledRoot,2:T.oledInv,3:T.oled7th}[currentLevel];
     }
     function updateProgress() {
         document.getElementById('lcdProgress').innerText = `${currentStep} / 16`;
@@ -978,9 +619,14 @@
     // ── HELP ──
     function toggleHelp() {
         helpActive = !helpActive;
-        const btnHelp = document.getElementById('btnHelp');
-        if (helpActive) { btnHelp.style.color = '#fff'; document.body.classList.add('help-mode-active'); setInfoBar(AKKORD_T[currentLang].helpMode, null); }
-        else { btnHelp.style.color = '#444'; document.body.classList.remove('help-mode-active'); updateInfoBar(); }
+        document.getElementById('btnHelp').classList.toggle('active', helpActive);
+        if (helpActive) {
+            document.body.classList.add('help-mode-active');
+            setInfoBar(AKKORD_T[currentLang].helpMode, null);
+        } else {
+            document.body.classList.remove('help-mode-active');
+            updateInfoBar();
+        }
     }
     document.addEventListener('click', (e) => {
         if (e.target.closest('#btnHelp')) return;
@@ -1010,131 +656,37 @@
         updateLCD();
         if (isRunning) stopPractice(); else draw();
     }
-    function openLevelBrowser() {
-        // Aktív szint kiemelése
-        for (let i=1; i<=7; i++) {
-            const btn = document.getElementById('lb-'+i);
-            if (btn) btn.style.borderColor = (i === currentLevel) ? 'var(--oled-text)' : '#333';
-        }
-        document.getElementById('levelBrowserModal').style.display = 'flex';
-    }
-    function closeLevelBrowser() {
-        document.getElementById('levelBrowserModal').style.display = 'none';
-    }
-    function selectLevel(level) {
-        currentLevel = level;
-        closeLevelBrowser();
-        updateLCD();
-        if (isRunning) stopPractice();
-    }
     function cycleLevel(dir) {
         if (helpActive) return;
-        currentLevel = ((currentLevel - 1 + dir + 7) % 7) + 1;
+        currentLevel = ((currentLevel - 1 + dir + 3) % 3) + 1;
         updateLCD();
         if (isRunning) stopPractice();
     }
     function updateKeyboardHints() {
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
-        if (showKeys && isRunning && seq.length > 0 && currentStep < seq.length) {
+        if (showKeys && seq.length > 0 && currentStep < seq.length) {
             seq[currentStep].chord.notes.forEach(n => {
                 document.getElementById(`k-${n.m}`)?.classList.add('chord-hint');
             });
         }
     }
 
-    function cycleHints() {
+    function toggleHint() {
         if (helpActive) return;
-        hintsState = (hintsState + 1) % 3;
-        showNames = hintsState >= 1;
-        showKeys  = hintsState >= 2;
-        const btn = document.getElementById('btnHints');
-        btn.classList.toggle('active', hintsState > 0);
-        const isHU = currentLang === 'HU';
-        const infoTexts = isHU
-            ? ['SEGÉD KIKAPCSOLVA', 'HANGNEVEK AKTÍV', 'HANGNEVEK + LED AKTÍV']
-            : ['HINTS OFF', 'NOTE NAMES ON', 'NOTE NAMES + LEDS ON'];
-        setInfoBar(infoTexts[hintsState], null);
-        updateKeyboardHints();
+        showNames = !showNames;
+        document.getElementById('btnHintName').classList.toggle('active', showNames);
         draw();
     }
-    function toggleHint() { cycleHints(); }
-    function toggleKeys() { cycleHints(); }
-    function playChordDemo() {
-        if (demoPlaying) { stopDemo(); return; }
-        initAudio().then(() => {
-            setTimeout(() => {
-                let wait = 0;
-                const tryPlay = () => {
-                    if (salamanderPiano && salamanderPiano.loaded) {
-                        demoPlaying = true;
-                        document.getElementById('btnDemo').classList.add('active');
-                        _startChordDemo();
-                        return;
-                    }
-                    if (++wait > 120) return;
-                    setTimeout(tryPlay, 100);
-                };
-                tryPlay();
-            }, 400);
-        }).catch(e => { if (String(e && e.message) === 'NEED_HTTP_NOT_FILE') return; });
-    }
-    function stopDemo() {
-        demoPlaying = false;
-        document.getElementById('btnDemo').classList.remove('active');
-        demoTimeouts.forEach(t => clearTimeout(t)); demoTimeouts = [];
-        if (salamanderPiano) { try { salamanderPiano.stopAll(); } catch (e) {} }
-        document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
-        currentStep = 0; updateProgress(); draw();
-        updateInfoBar();
-    }
-    function _startChordDemo() {
-        if (seq.length === 0) buildSequence();
-        demoTimeouts.forEach(t => clearTimeout(t)); demoTimeouts = [];
-        if (salamanderPiano) { try { salamanderPiano.stopAll(); } catch (e) {} }
-        if (!audioCtx || !salamanderPiano) return;
-        const chordDur = 1.2;
-        let time = audioCtx.currentTime + 0.15;
-        document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
-        seq.forEach((item, i) => {
-            const delayMs = (time - audioCtx.currentTime) * 1000;
-            const flashDur = chordDur * 0.8 * 1000;
-            demoTimeouts.push(setTimeout(() => {
-                if (!demoPlaying) return;
-                currentStep = i; updateProgress(); draw();
-            }, delayMs));
-            item.chord.notes.forEach(n => {
-                const m = n.m & 127;
-                const tEnd = time + chordDur;
-                const vel = 0.58;
-                const dOn = Math.max(0, (time - audioCtx.currentTime) * 1000);
-                const dOff = Math.max(0, (tEnd - audioCtx.currentTime) * 1000);
-                demoTimeouts.push(setTimeout(() => {
-                    if (!demoPlaying) return;
-                    try { salamanderPiano.keyDown({ midi: m, velocity: vel }); } catch (e) {}
-                }, dOn));
-                demoTimeouts.push(setTimeout(() => {
-                    if (!demoPlaying) return;
-                    try { salamanderPiano.keyUp({ midi: m }); } catch (e) {}
-                }, dOff));
-                demoTimeouts.push(setTimeout(() => {
-                    if (!demoPlaying) return;
-                    const key = document.getElementById(`k-${n.m}`);
-                    if (key) {
-                        key.classList.add('chord-hint');
-                        demoTimeouts.push(setTimeout(() => key.classList.remove('chord-hint'), flashDur));
-                    }
-                }, delayMs));
-            });
-            time += chordDur;
-        });
-        const totalMs = (time - audioCtx.currentTime) * 1000;
-        demoTimeouts.push(setTimeout(() => { stopDemo(); }, totalMs));
-        setInfoBar('▶ DEMO — CHORD SEQUENCE', null);
+    function toggleKeys() {
+        if (helpActive) return;
+        showKeys = !showKeys;
+        document.getElementById('btnKeys').classList.toggle('active', showKeys);
+        updateKeyboardHints();
     }
     function toggleAudio() {
         audioOn = !audioOn;
         document.getElementById('audioToggle').classList.toggle('active', audioOn);
-        if (audioOn) void initAudio().catch(() => {});
+        if (audioOn && !audioInited) initAudio();
     }
     function toggleVst() {
         if (helpActive) return;
@@ -1146,30 +698,12 @@
     // ── SEQUENCE (eredeti logika) ──
     function buildSequence() {
         seq = [];
-        // A 12 hangnem skálái félhangokban megadva (0=C, 1=C#, stb.)
-        const scales = {
-            'C': [0,2,4,5,7,9,11], 'G': [7,9,11,0,2,4,6], 'D': [2,4,6,7,9,11,1],
-            'A': [9,11,1,2,4,6,8], 'E': [4,6,8,9,11,1,3], 'B': [11,1,3,4,6,8,10],
-            'F#':[6,8,10,11,1,3,5], 'Db':[1,3,5,6,8,10,0], 'Ab':[8,10,0,1,3,5,7],
-            'Eb':[3,5,7,8,10,0,2], 'Bb':[10,0,2,3,5,7,9], 'F': [5,7,9,10,0,2,4]
-        };
-        // Megnézzük, mi van a tárcsán. Ha nincs találat, C-dúrt használunk.
-        const currentScale = scales[currentKey] || scales['C'];
-
         for (let i = 0; i < 16; i++) {
             let clef = 'treble';
             if (activeRH && activeLH) clef = Math.random() > 0.5 ? 'treble' : 'bass';
             else if (activeLH && !activeRH) clef = 'bass';
-            
             let pool = CHORDS[clef][currentLevel.toString()] || CHORDS[clef]["1"];
-            
-            // SZŰRÉS: Csak azokat az akkordokat tartjuk meg, amiknek minden hangja illik a skálába
-            let validChords = pool.filter(c => c.notes.every(n => currentScale.includes(n.m % 12)));
-            
-            // Ha a szűrő után nem maradt akkord (pl. túl nehéz szinten vagyunk), az eredeti listát használjuk
-            let finalPool = validChords.length > 0 ? validChords : pool;
-            
-            let chord = finalPool[Math.floor(Math.random() * finalPool.length)];
+            let chord = pool[Math.floor(Math.random() * pool.length)];
             seq.push({ clef, chord, isError: false });
         }
         currentStep = 0; waitingForRelease = false;
@@ -1182,101 +716,84 @@
         if (!isRunning) {
             initAudio(); buildSequence(); isRunning = true;
             updateStartStop(true);
-            updateInfoBar(AKKORD_T[currentLang].playing);
+            updateInfoBar('PLAYING — HOLD THE CORRECT CHORD NOTES SIMULTANEOUSLY');
             draw();
         } else stopPractice();
     }
     function stopPractice() {
         isRunning = false; waitingForRelease = false;
         updateStartStop(false);
-        if (demoPlaying) stopDemo();
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('chord-hint'));
         updateInfoBar(); draw();
     }
-    function ensurePianoLoadContextOrThrow() {
-        if (location.protocol === 'file:') {
-            const hu = currentLang === 'HU';
-            setInfoBar(hu
-                ? 'Nincs hang (file://). python3 -m http.server → http://localhost:8080/akkordok.html'
-                : 'No audio on file://. Use: python3 -m http.server → http://localhost:8080/akkordok.html', document.getElementById('audioToggle'));
-            throw new Error('NEED_HTTP_NOT_FILE');
-        }
-    }
-    function showFileProtocolAudioHintIfNeeded() {
-        if (location.protocol !== 'file:') return;
-        const hu = currentLang === 'HU';
-        setInfoBar(hu
-            ? 'Akkordok zongorájához http://localhost/… (ne file://).'
-            : 'Chords piano needs http://localhost/… (not file://).', null);
-    }
-    function attachChordMidiInputs() {
-        if (_midiInited || !navigator.requestMIDIAccess) return;
-        navigator.requestMIDIAccess().then(m => {
-            _midiInited = true;
-            m.inputs.forEach(input => input.onmidimessage = (msg) => {
-                const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
-                if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
-                else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
-            });
-        }).catch(() => {});
-    }
     async function initAudio() {
-        ensurePianoLoadContextOrThrow();
-        if (salamanderPiano && salamanderPiano.loaded) {
-            if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
-            attachChordMidiInputs();
-            return;
+        if (audioInited) return; audioInited = true;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+        let len = audioCtx.sampleRate * 2.5;
+        let impulse = audioCtx.createBuffer(2, len, audioCtx.sampleRate);
+        for (let i = 0; i < len; i++) {
+            let decay = Math.pow(1 - i / len, 3);
+            impulse.getChannelData(0)[i] = (Math.random() * 2 - 1) * decay;
+            impulse.getChannelData(1)[i] = (Math.random() * 2 - 1) * decay;
         }
-        if (!_pianoInitPromise) {
-            _pianoInitPromise = (async () => {
-                const Tone = await import('https://esm.sh/tone@14.7.77');
-                const pianoMod = await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
-                const Piano = pianoMod.Piano || pianoMod.default?.Piano || pianoMod.default;
-                await Tone.start();
-                const p = new Piano({ velocities: 5, release: true, pedal: true }).toDestination();
-                await p.load();
-                salamanderPiano = p;
-                audioCtx = Tone.getContext().rawContext;
-            })();
+        masterReverb = audioCtx.createConvolver();
+        masterReverb.buffer = impulse;
+        reverbGain = audioCtx.createGain();
+        reverbGain.gain.value = 0;
+        masterReverb.connect(reverbGain).connect(audioCtx.destination);
+        const samples = { 36:'C2', 48:'C3', 60:'C4', 72:'C5' };
+        for (let k in samples) {
+            try {
+                const r = await fetch(`https://tonejs.github.io/audio/salamander/${samples[k]}.mp3`);
+                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
+            } catch(e) {}
         }
-        try {
-            await _pianoInitPromise;
-            attachChordMidiInputs();
-        } catch (e) {
-            if (String(e.message) !== 'NEED_HTTP_NOT_FILE') {
-                console.error('Piano (Tone) load:', e);
-                const hu = currentLang === 'HU';
-                setInfoBar(hu ? 'Zongora betöltés hiba — F12' : 'Piano load error — see F12', document.getElementById('audioToggle'));
-            }
-            _pianoInitPromise = null;
-            salamanderPiano = null;
-            throw e;
+        if (navigator.requestMIDIAccess) {
+            navigator.requestMIDIAccess().then(m => {
+                m.inputs.forEach(input => input.onmidimessage = (msg) => {
+                    const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
+                    if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
+                    else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
+                });
+            }).catch(() => {});
         }
     }
 
     function playTone(note, vel) {
-        if (!audioOn) return;
-        void (async () => {
-            try {
-                await initAudio();
-                if (!salamanderPiano) return;
-                if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
-                const vEl = document.getElementById('vst_d');
-                const velo = vEl ? parseFloat(vEl.value) : 1.0;
-                const scale = Number.isFinite(velo) ? velo : 1.0;
-                const v = Math.min(1, Math.max(0.02, ((vel | 0) / 127) * scale));
-                try { salamanderPiano.keyUp({ midi: note & 127 }); } catch (e) {}
-                salamanderPiano.keyDown({ midi: note & 127, velocity: v });
-            } catch (e) {
-                if (String(e && e.message) === 'NEED_HTTP_NOT_FILE') return;
-            }
-        })();
+        if (!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
+        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch(e) {} delete activeNodes[note]; }
+        const source = audioCtx.createBufferSource();
+        let closest = 36, minDiff = 999;
+        for (let b in sampleBuffers) { let diff = Math.abs(note - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
+        source.buffer = sampleBuffers[closest];
+        source.playbackRate.value = Math.pow(2, (note - closest) / 12);
+        const gain = audioCtx.createGain();
+        const panner = audioCtx.createStereoPanner();
+        let wideAmount = parseFloat(document.getElementById('vst_wide').value) || 0;
+        panner.pan.setValueAtTime(Math.max(-1, Math.min(1, ((note - 60) / 30) * wideAmount)), audioCtx.currentTime);
+        let atk = parseFloat(document.getElementById('vst_a').value) || 0.01;
+        let dec = parseFloat(document.getElementById('vst_e').value) || 10.0;
+        let velo = parseFloat(document.getElementById('vst_d').value) || 1.0;
+        if (reverbGain) reverbGain.gain.value = parseFloat(document.getElementById('vst_rev').value) || 0;
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        if (atk > 0.05) gain.gain.linearRampToValueAtTime((vel/127)*velo, audioCtx.currentTime + atk);
+        else gain.gain.setValueAtTime((vel/127)*velo, audioCtx.currentTime);
+        if (dec < 9.5) gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dec);
+        source.connect(gain); gain.connect(panner); panner.connect(audioCtx.destination); gain.connect(masterReverb);
+        source.start(); activeNodes[note] = { source, gain };
     }
 
     function handleNoteOff(midi) {
         activeMidiNotes.delete(midi);
-        if (salamanderPiano) {
-            try { salamanderPiano.keyUp({ midi: midi & 127 }); } catch (e) {}
+        if (activeNodes[midi]) {
+            let rel = parseFloat(document.getElementById('vst_r').value) || 0.8;
+            const gainNode = activeNodes[midi].gain;
+            gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + rel);
+            activeNodes[midi].source.stop(audioCtx.currentTime + rel + 0.1);
+            delete activeNodes[midi];
         }
         if (activeMidiNotes.size === 0 && waitingForRelease) { waitingForRelease = false; draw(); }
         checkMatch();
@@ -1316,201 +833,90 @@
     function noteName(n) { return currentLang === 'EN' ? n.replace(/H/g, 'B') : n; }
     function chordName(name) { return currentLang === 'EN' ? name.replace(/H/g, 'B') : name; }
 
-    // ── VexFlow segédfüggvények ──
-    function getMaxZoom() {
-        const c = document.querySelector('.sheet-container'); if (!c) return 2.5;
-        return Math.min(2.5, (c.clientWidth - 100) / VEXFLOW_BASE_WIDTH);
+    // ── KOTTA RAJZOLÁS (eredeti logika) ──
+    const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+
+    function drawLedgers(x, offset, baseLineY, spacing, color) {
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.shadowBlur = 0;
+        if (offset <= -6) for (let p = -6; p >= offset; p -= 2) { let py = baseLineY - (p * spacing); ctx.beginPath(); ctx.moveTo(x-22, py); ctx.lineTo(x+22, py); ctx.stroke(); }
+        if (offset >= 6)  for (let p = 6;  p <= offset; p += 2) { let py = baseLineY - (p * spacing); ctx.beginPath(); ctx.moveTo(x-22, py); ctx.lineTo(x+22, py); ctx.stroke(); }
     }
-    function fitWidth() {
-        const c = document.querySelector('.sheet-container'); if (!c) return;
-        KOTTA_ZOOM = Math.max(0.5, Math.min(getMaxZoom(), (c.clientWidth - 80) / VEXFLOW_BASE_WIDTH)); draw();
-    }
-    function fitHeight() {
-        const ls = document.querySelector('.lower-section');
-        const availH = window.innerHeight - (ls ? ls.offsetHeight : 300) - 60;
-        // Target: fit exactly 2 grand-staff rows plus a small buffer
-        KOTTA_ZOOM = Math.max(0.35, Math.min(getMaxZoom(), availH / (2 * VEXFLOW_ROW_HEIGHT + 40))); draw();
-    }
-    function toggleBookView() {
-        bookViewActive = !bookViewActive;
-        const btn = document.getElementById('btnBookView');
-        if (btn) { btn.style.background = bookViewActive ? '#333' : '#111'; btn.style.color = bookViewActive ? '#fff' : '#aaa'; }
-        fitWidth();
-    }
-    function noteNameToVexKey(nn) {
-        const m = nn.match(/^([A-H])([b#]?)(\d+)$/);
-        if (!m) return 'c/4';
-        let l = m[1].toLowerCase(); if (l === 'h') l = 'b';
-        return l + '/' + m[3];
-    }
-    function renderChordRow(vfCtx, rowChords, rowStartIdx, x, y, showClef) {
-        const staveW = VEXFLOW_BASE_WIDTH - 60;
-        const clefW = showClef ? 100 : 30;
-        const fmtW = staveW - clefW;
-        // Grand staff: treble 45px below row top (room for annotations), bass 120px below treble
-        const trebleY = y + 45;
-        const bassY = trebleY + 120;
-
-        // ALWAYS draw both staves — grand staff is always visible
-        const staveTreble = new VF.Stave(x, trebleY, staveW);
-        const staveBass   = new VF.Stave(x, bassY,   staveW);
-        if (showClef) { staveTreble.addClef('treble'); staveBass.addClef('bass'); }
-
-        vfCtx.setLineWidth(0.5); vfCtx.setStrokeStyle(C_LINES); vfCtx.setFillStyle(C_LINES);
-        staveTreble.setContext(vfCtx);
-        staveTreble.getModifiers().forEach(mod => mod.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
-        staveTreble.draw();
-        staveBass.setContext(vfCtx);
-        staveBass.getModifiers().forEach(mod => mod.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
-        staveBass.draw();
-
-        // Brace + single connector — always drawn, must use C_BRIGHT fill to prevent black scum
-        vfCtx.setLineWidth(1.0); vfCtx.setStrokeStyle(C_BRIGHT); vfCtx.setFillStyle(C_BRIGHT);
-        new VF.StaveConnector(staveTreble, staveBass).setType(VF.StaveConnector.type.BRACE).setContext(vfCtx).draw();
-        new VF.StaveConnector(staveTreble, staveBass).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(vfCtx).draw();
-
-        const buildVoice = (isTreble) => {
-            const clef    = isTreble ? 'treble' : 'bass';
-            const emptyKey = isTreble ? 'b/4' : 'd/3';   // neutral rest position
-
-            const vfNotes = rowChords.map((item, li) => {
-                const gi       = rowStartIdx + li;
-                const isActive = isRunning && gi === currentStep;
-                const isSolved = gi < currentStep || (gi === currentStep && waitingForRelease);
-                const color    = isActive ? (item.isError ? C_ERROR : C_ACTIVE) : isSolved ? C_PAST : C_INACTIVE;
-                const chord    = item.chord;
-                const showNotes = currentMode === 'sheet' || isSolved;
-
-                // Split notes at middle C (C4 = MIDI 60):  ≥60 → treble,  <60 → bass
-                const staveNotes = [...chord.notes]
-                    .filter(n => isTreble ? n.m >= 60 : n.m < 60)
-                    .sort((a, b) => a.m - b.m);
-
-                // Chord name/label belongs to whichever stave has notes
-                // Treble owns it when any note ≥ 60; bass owns it when all notes < 60
-                const hasTreble  = chord.notes.some(n => n.m >= 60);
-                const ownsLabel  = isTreble ? hasTreble : !hasTreble;
-
-                // ── No notes for this stave: invisible quarter-rest spacer ──
-                // (use StaveNote 'qr' instead of GhostNote so spacing stays consistent)
-                if (staveNotes.length === 0) {
-                    const g = new VF.StaveNote({ clef, keys: [emptyKey], duration: 'qr' });
-                    g.setStyle({ fillStyle: 'rgba(0,0,0,0)', strokeStyle: 'rgba(0,0,0,0)' }); return g;
-                }
-
-                // ── Notes exist but hidden (lead/roman unsolved) → invisible rest + labels ──
-                if (!showNotes) {
-                    const vfn = new VF.StaveNote({ clef, keys: [emptyKey], duration: 'qr' });
-                    vfn.setStyle({ fillStyle: 'rgba(0,0,0,0)', strokeStyle: 'rgba(0,0,0,0)' });
-                    if (ownsLabel && (currentMode === 'lead' || currentMode === 'roman')) {
-                        const dt  = currentMode === 'roman' ? chord.roman : chordName(chord.name);
-                        const ann = new VFAnnotation(dt).setFont('Share Tech Mono', 13, 'bold').setVerticalJustification(VJ_TOP);
-                        ann.setStyle({ fillStyle: color, strokeStyle: color });
-                        vfn.addModifier(ann);
-                    }
-                    if (showNames) {
-                        const names = staveNotes.map(n => noteName(n.n).replace('#', '♯')).join(' ');
-                        const ann   = new VFAnnotation(names).setFont('Share Tech Mono', 8, 'bold')
-                            .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
-                        ann.setStyle({ fillStyle: color, strokeStyle: color });
-                        vfn.addModifier(ann);
-                    }
-                    return vfn;
-                }
-
-                // ── Visible chord notes — solid quarter notes with stems ──
-                const keys = staveNotes.map(n => noteNameToVexKey(n.n));
-                const vfn  = new VF.StaveNote({ clef, keys, duration: 'q', auto_stem: true });
-                staveNotes.forEach((n, idx) => {
-                    const accT = n.s === '#' ? '#' : n.s === '♭' ? 'b' : null;
-                    if (accT) vfn.addModifier(new VF.Accidental(accT), idx);
-                });
-                vfn.setStyle({ fillStyle: color, strokeStyle: color });
-                if (vfn.setLedgerLineStyle) {
-                    const lc = isActive ? C_ACTIVE : isSolved ? '#666' : C_INACTIVE;
-                    vfn.setLedgerLineStyle({ strokeStyle: lc, fillStyle: lc, lineWidth: 1.5 });
-                }
-                if (showNames) {
-                    const names = staveNotes.map(n => noteName(n.n).replace('#', '♯')).join(' ');
-                    const ann   = new VFAnnotation(names).setFont('Share Tech Mono', 8, 'bold')
-                        .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
-                    ann.setStyle({ fillStyle: color, strokeStyle: color });
-                    vfn.addModifier(ann);
-                }
-                if (ownsLabel && (currentMode === 'lead' || currentMode === 'roman')) {
-                    const dt  = currentMode === 'roman' ? chord.roman : chordName(chord.name);
-                    const ann = new VFAnnotation(dt).setFont('Share Tech Mono', 13, 'bold').setVerticalJustification(VJ_TOP);
-                    ann.setStyle({ fillStyle: color, strokeStyle: color });
-                    vfn.addModifier(ann);
-                    if (currentMode === 'roman' && isSolved) {
-                        const na = new VFAnnotation('(' + chordName(chord.name) + ')').setFont('Share Tech Mono', 10, 'normal').setVerticalJustification(VJ_BOTTOM);
-                        na.setStyle({ fillStyle: C_PAST, strokeStyle: C_PAST });
-                        vfn.addModifier(na);
-                    }
-                }
-                return vfn;
-            });
-            const v = new VF.Voice({ num_beats: rowChords.length, beat_value: 4 });
-            v.setStrict(false); v.addTickables(vfNotes); return v;
-        };
-
-        // Format and draw both voices independently — same note count keeps them aligned
-        const tv = buildVoice(true), bv = buildVoice(false);
-        new VF.Formatter().joinVoices([tv]).format([tv], fmtW); tv.draw(vfCtx, staveTreble);
-        new VF.Formatter().joinVoices([bv]).format([bv], fmtW); bv.draw(vfCtx, staveBass);
-    }
-    // ── KOTTA RAJZOLÁS (VexFlow) ──
 
     function draw() {
-        const container = document.getElementById('vexflow-container');
-        if (!container) return;
-        container.innerHTML = '';
-        if (!seq || seq.length === 0) return;
-        try {
-            const ls = document.querySelector('.lower-section');
-            const availH = window.innerHeight - (ls ? ls.offsetHeight : 300) - 60;
-            const rowH = VEXFLOW_ROW_HEIGHT * KOTTA_ZOOM;
-            const ROWS = Math.max(1, Math.floor(availH / rowH));
-            const CPR = Math.ceil(seq.length / ROWS);
-            if (bookViewActive) {
-                const tRPS = ROWS * 2;
-                const sIdx = Math.floor(currentStep / (CPR * tRPS));
-                const st = sIdx * tRPS * CPR;
-                const wrapper = document.createElement('div');
-                wrapper.style.cssText = 'display:flex;gap:30px;justify-content:center;width:100%;';
-                container.appendChild(wrapper);
-                for (let pg = 0; pg < 2; pg++) {
-                    const pd = document.createElement('div'); pd.style.cssText = 'flex-shrink:0;'; wrapper.appendChild(pd);
-                    const renderer = new VF.Renderer(pd, VF.Renderer.Backends.SVG);
-                    renderer.resize(VEXFLOW_BASE_WIDTH * KOTTA_ZOOM, (ROWS * VEXFLOW_ROW_HEIGHT + 50) * KOTTA_ZOOM);
-                    const vfCtx = renderer.getContext(); vfCtx.scale(KOTTA_ZOOM, KOTTA_ZOOM);
-                    for (let r = 0; r < ROWS; r++) {
-                        const rs = st + (pg * ROWS + r) * CPR;
-                        const rc = seq.slice(rs, rs + CPR); if (rc.length === 0) break;
-                        renderChordRow(vfCtx, rc, rs, 30, r * VEXFLOW_ROW_HEIGHT, r === 0);
-                    }
-                }
-            } else {
-                const pIdx = Math.floor(currentStep / (CPR * ROWS));
-                const st = pIdx * ROWS * CPR;
-                const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
-                renderer.resize(VEXFLOW_BASE_WIDTH * KOTTA_ZOOM, (ROWS * VEXFLOW_ROW_HEIGHT + 60) * KOTTA_ZOOM);
-                const vfCtx = renderer.getContext(); vfCtx.scale(KOTTA_ZOOM, KOTTA_ZOOM);
-                for (let r = 0; r < ROWS; r++) {
-                    const rs = st + r * CPR;
-                    const rc = seq.slice(rs, rs + CPR); if (rc.length === 0) break;
-                    renderChordRow(vfCtx, rc, rs, 30, r * VEXFLOW_ROW_HEIGHT, r === 0);
-                }
-                const tp = Math.ceil(seq.length / (CPR * ROWS));
-                if (tp > 1) {
-                    const lbl = document.createElement('div');
-                    lbl.style.cssText = 'text-align:center;font-family:"Share Tech Mono";font-size:11px;color:#444;margin-top:4px;';
-                    lbl.textContent = (pIdx + 1) + ' / ' + tp;
-                    container.appendChild(lbl);
+        ctx.clearRect(0, 0, 2450, 480);
+        if (!seq.length) return;
+
+        const activeColor   = 'rgba(179, 230, 255, 1.0)';
+        const inactiveColor = 'rgba(179, 230, 255, 0.3)';
+        const errorColor    = '#ff6655';
+        const activeLedger  = 'rgba(210, 210, 210, 1.0)';
+        const inactiveLedger= 'rgba(210, 210, 210, 0.3)';
+
+        const startX = 180, endX = 2380, xSpacing = (endX - startX) / 15;
+
+        seq.forEach((item, i) => {
+            let color = (isRunning && i === currentStep) ? activeColor : inactiveColor;
+            if (item.isError && i === currentStep) color = errorColor;
+            ctx.globalAlpha = 1.0;
+
+            let x = startX + i * xSpacing;
+            let baseLineY = item.clef === 'treble' ? TREBLE_BASE_Y : BASS_BASE_Y;
+            let spacing   = item.clef === 'treble' ? TREBLE_SP_Y   : BASS_SP_Y;
+            let textY     = item.clef === 'treble' ? TREBLE_BASE_Y - 55 : BASS_BASE_Y - 55;
+
+            // Akkord neve / római szám (lead/roman módban)
+            if (currentMode === 'lead' || currentMode === 'roman') {
+                ctx.fillStyle = color; ctx.shadowBlur = 0;
+                ctx.font = '400 28px "Share Tech Mono"'; ctx.textAlign = 'center';
+                let displayText = currentMode === 'roman' ? item.chord.roman : chordName(item.chord.name);
+                ctx.fillText(displayText, x, textY);
+
+                let isSolved = (i < currentStep) || (i === currentStep && waitingForRelease);
+                if (currentMode === 'roman' && isSolved) {
+                    ctx.font = '400 14px "Share Tech Mono"';
+                    ctx.fillStyle = inactiveColor;
+                    ctx.fillText(`(${chordName(item.chord.name)})`, x, textY + 22);
                 }
             }
-        } catch(e) { console.error('VexFlow draw error:', e); }
-        updateKeyboardHints();
+
+            // Kottafejek megjelenítése
+            let isSolved = (i < currentStep) || (i === currentStep && waitingForRelease);
+            let showNotes = (currentMode === 'sheet') || ((currentMode === 'lead' || currentMode === 'roman') && isSolved);
+
+            if (showNotes) {
+                item.chord.notes.forEach(n => {
+                    let noteY = baseLineY - (n.off * spacing);
+                    let isActive = (isRunning && i === currentStep);
+                    drawLedgers(x, n.off, baseLineY, spacing, isActive ? activeLedger : inactiveLedger);
+                    ctx.fillStyle = color; ctx.shadowBlur = 0;
+                    if (n.s !== '') {
+                        ctx.font = n.s === '♭' ? '46px Arial' : '34px Arial';
+                        ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+                        ctx.fillText(n.s, x - 28, noteY + (n.s === '♭' ? 6 : 12));
+                    }
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.beginPath(); ctx.ellipse(x, noteY, 14, 10, -Math.PI/10, 0, 2*Math.PI); ctx.fill();
+                });
+            }
+
+            // Hangnevek (hints) — mindig látszik ha be van kapcsolva, módtól függetlenül
+            if (showNames) {
+                ctx.fillStyle = color; ctx.font = '400 16px "Share Tech Mono"'; ctx.textAlign = 'center';
+                ctx.textBaseline = 'alphabetic';
+                let hintStr = item.chord.notes.map(n => noteName(n.n).replace('#','♯')).join(' + ');
+                let topY = Math.min(...item.chord.notes.map(n => baseLineY - (n.off * spacing)));
+                let hintY;
+                if (currentMode === 'sheet') {
+                    hintY = item.clef === 'treble' ? TREBLE_BASE_Y - 55 : BASS_BASE_Y - 55;
+                    if (topY < hintY + 20) hintY = topY - 20;
+                } else {
+                    hintY = textY - 40;
+                    if (showNotes && topY < textY + 20) hintY = topY - 20;
+                }
+                ctx.fillText(hintStr, x, hintY);
+            }
+        });
+        ctx.globalAlpha = 1.0;
     }
 
     // ── AKKORDTÁRCSA ──
@@ -1554,7 +960,6 @@
                 const key = WHEEL_MAJORS[activeWheelKeyIndex];
                 const rel = WHEEL_MINORS[activeWheelKeyIndex];
                 setInfoBar(`KEY: ${key} — I IV V: ${key}, ${WHEEL_MAJORS[(activeWheelKeyIndex+5)%12]}, ${WHEEL_MAJORS[(activeWheelKeyIndex+7)%12]}`, null);
-                currentKey = key;
                 drawWheel();
             }
         }
@@ -1660,15 +1065,7 @@
             const k = document.createElement('div'); const isW = whites.includes(m%12);
             k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
             if (isW) { k.style.left = (wIdx*1.92307)+'%'; k.style.width = '1.92307%'; k.style.height = '100%'; wIdx++; }
-            else {
-                const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
-                const noteInOctave = m % 12;
-                const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
-                k.style.left = ((wIdx * 1.92307) + offset) + '%';
-                k.style.width = '1.241%';
-                k.style.height = '65%';
-                k.style.zIndex = '200';
-            }
+            else { k.style.left = ((wIdx*1.92307)-0.6)+'%'; k.style.width = '1.2%'; k.style.height = '65%'; k.style.zIndex = '200'; }
             k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); };
             k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); };
             k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
@@ -1679,35 +1076,13 @@
         }
     }
 
-    window.addEventListener('resize', () => { if (seq && seq.length > 0) draw(); });
-
     window.onload = () => {
-        create88();
-        document.getElementById('clefRH').style.color = '#fff';
-        document.getElementById('clefLH').style.color = '#fff';
-        const sl = localStorage.getItem('akira_lang') || 'EN';
-        currentLang = sl; setLang(sl);
-        showFileProtocolAudioHintIfNeeded();
+        const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
         updateLCD(); updateProgress();
-        buildSequence();
-        document.fonts.ready.then(() => { fitWidth(); });
+        create88();
+        document.fonts.ready.then(draw);
         window.addEventListener('pointerdown', () => initAudio(), { once: true });
     };
 </script>
-<div id="levelBrowserModal" class="modal-overlay" style="z-index: 999999 !important;">
-        <div class="modal-content" style="max-width: 800px; padding: 20px; position: relative; z-index: 1000000;">
-            <h2 class="modal-title" id="txt-levelTitle">SELECT LEVEL</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; text-align: left;">
-                <button id="lb-1" class="patch-btn" onclick="selectLevel(1)"><b id="lb1-title"></b><br><small id="lb1-desc" style="opacity:0.6;"></small></button>
-                <button id="lb-2" class="patch-btn" onclick="selectLevel(2)"><b id="lb2-title"></b><br><small id="lb2-desc" style="opacity:0.6;"></small></button>
-                <button id="lb-3" class="patch-btn" onclick="selectLevel(3)"><b id="lb3-title"></b><br><small id="lb3-desc" style="opacity:0.6;"></small></button>
-                <button id="lb-4" class="patch-btn" onclick="selectLevel(4)"><b id="lb4-title"></b><br><small id="lb4-desc" style="opacity:0.6;"></small></button>
-                <button id="lb-5" class="patch-btn" onclick="selectLevel(5)"><b id="lb5-title"></b><br><small id="lb5-desc" style="opacity:0.6;"></small></button>
-                <button id="lb-6" class="patch-btn" onclick="selectLevel(6)"><b id="lb6-title"></b><br><small id="lb6-desc" style="opacity:0.6;"></small></button>
-                <button id="lb-7" class="patch-btn" onclick="selectLevel(7)"><b id="lb7-title"></b><br><small id="lb7-desc" style="opacity:0.6;"></small></button>
-            </div>
-            <button class="modal-btn" onclick="closeLevelBrowser()" id="txt-levelCancel">CANCEL</button>
-        </div>
-    </div>
 </body>
 </html>
