@@ -2,318 +2,264 @@
 <html lang="en" translate="no" class="notranslate">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Akíra Piano Academy | Workstation - Hanon</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --rack-bg: #1a1a1d;
-            --rack-border: #2a2a2d;
-            --btn-dark: #101012;
-            --btn-border: #050505;
-            --text-dim: #555;
-            --lcd-bg-dark: #111213;
-            --lcd-label-color: #557799;
-            --oled-text: #b3e6ff;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif; background: #000;
-            margin: 0; padding: 0; height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column; justify-content: space-between; color: #fff;
-            -webkit-user-select: none; user-select: none;
-        }
-
-        /* ── KOTTA KIJELZŐ ── */
-        .sheet-container {
-            flex-grow: 1; display: flex; align-items: center; justify-content: center;
-            padding: 10px 20px; width: 100%; box-sizing: border-box; overflow: visible;
-        }
-        .sheet-viewport {
-            width: 100%; max-width: 2450px; aspect-ratio: 2450 / 480; position: relative; overflow: visible;
-            background: transparent;
-        }
-        .sheet-image { width: 100%; height: 100%; object-fit: contain; z-index: 1; position: absolute; opacity: 0.35; pointer-events: none; }
-        #staffCanvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10; pointer-events: none;
-        }
-
-        /* ── WORKSTATION CHASSIS ── */
-        .lower-section { width: 100%; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-        .workstation-chassis {
-            display: flex; width: 100%; max-width: 2560px; position: relative;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.9); border-radius: 6px 6px 0 0; background: var(--rack-bg);
-        }
-        .wood-cheek {
-            width: 24px; background: linear-gradient(to right, #3a1c0d, #1a0c05);
-            box-shadow: inset 1px 0 2px rgba(255,255,255,0.1), inset -2px 0 5px rgba(0,0,0,0.8);
-            border-radius: 6px 0 0 0; z-index: 10;
-        }
-        .wood-cheek.right { border-radius: 0 6px 0 0; background: linear-gradient(to left, #3a1c0d, #1a0c05); }
-        .synth-core { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
-
-        /* ── INFO SÁV ── */
-        .info-bar-integrated {
-            width: 100%; height: 45px; background-color: var(--lcd-bg-dark); border-bottom: 2px solid #080808;
-            display: flex; align-items: center; z-index: 10; position: relative; overflow: hidden;
-        }
-        .info-bar-text {
-            font-family: 'Share Tech Mono', monospace; font-size: 18px; font-weight: bold;
-            color: var(--oled-text); text-transform: uppercase; letter-spacing: 2px;
-            position: absolute; white-space: nowrap; transition: left 0.15s, right 0.15s; line-height: 45px; vertical-align: middle;
-        }
-
-        /* ── MIXER OVERLAY ── */
-        .settings-bar {
-            position: absolute; bottom: 100%; left: 0; width: 100%; height: 85px; background: var(--lcd-bg-dark);
-            display: none; align-items: center; justify-content: space-around; z-index: 50; border-top: 2px solid #333;
-            box-shadow: 0 -10px 30px #000; padding: 0 20px; box-sizing: border-box;
-        }
-        .settings-control { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 150px; z-index: 2; position: relative; }
-        .settings-control label { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono', monospace; cursor: pointer; text-transform: uppercase; font-weight: bold; }
-        .settings-control input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: #111; border-radius: 3px; outline: none; cursor: pointer; box-shadow: inset 0 1px 3px #000; }
-        .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 20px; background: #888; border: 1px solid #111; border-radius: 2px; box-shadow: 0 2px 4px #000; cursor: grab; }
-
-        /* ── MASTER DASHBOARD ── */
-        .master-dashboard {
-            display: flex; justify-content: space-between; align-items: center;
-            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 100% 3px;
-            padding: 25px 30px; border-top: 1px solid #333; position: relative; width: 100%; box-sizing: border-box;
-        }
-        .dashboard-logo { position: absolute; top: -35px; left: 30px; z-index: 5; pointer-events: none; }
-        .control-group { display: flex; align-items: center; gap: 8px; z-index: 10; }
-
-        /* HARDVER GOMBOK */
-        .hardware-btn {
-            width: 95px; height: 38px; background-color: var(--btn-dark); color: var(--text-dim);
-            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
-            font-weight: 700; font-size: 12px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; text-decoration: none;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s; text-shadow: none !important;
-        }
-        .hardware-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .hardware-btn.active { color: #ffffff; background-color: #121214; }
-
-        /* START|STOP SPLIT */
-        .start-split {
-            display:flex; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000;
-            overflow:hidden; transition:transform 0.1s; cursor:pointer;
-        }
-        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .start-split span {
-            display:flex; align-items:center; justify-content:center;
-            font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif;
-            color:#444; transition:color 0.15s; text-transform:uppercase;
-        }
-        .start-split span#startLabel { padding: 0 12px 0 22px; }
-        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
-        .start-split span.active { color:#fff; }
-        .start-split .split-div { width:1px; background:#333; margin:6px 0; flex-shrink:0; }
-
-        /* KIS NÉGYZETES GOMBOK */
-        .sq-btn {
-            width: 38px; height: 38px; background-color: var(--btn-dark); color: #444;
-            border: 1px solid var(--btn-border); border-radius: 3px; cursor: pointer;
-            font-size: 16px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 3px 0 #000; transition: transform 0.1s, color 0.15s; flex-shrink: 0;
-        }
-        .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .sq-btn.active { color: #fff; background-color: #121214; }
-
-        /* KULCS SPLIT GOMB */
-        .clef-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000;
-            overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s;
-        }
-        .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .clef-split span {
-            flex:1; display:flex; align-items:center; justify-content:center;
-            color:#444; transition:color 0.15s; padding:0;
-        }
+        :root { --rack-bg:#1a1a1d; --rack-border:#2a2a2d; --btn-dark:#101012; --btn-border:#050505; --text-dim:#555; --lcd-bg-dark:#111213; --lcd-label-color:#557799; --oled-text:#b3e6ff; }
+        body { font-family:'Inter',sans-serif; background:#000; margin:0; padding:0; height:100vh; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; color:#fff; -webkit-user-select:none; user-select:none; }
+        .sheet-container { flex-grow:1; display:flex; justify-content:center; align-items:flex-start; padding:30px 20px 100px 20px; width:100%; box-sizing:border-box; overflow-y:auto; position:relative; }
+.sheet-viewport { width:100%; max-width:2450px; position:relative; overflow:visible; background:transparent; }
+.lower-section { width:100%; display:flex; flex-direction:column; align-items:center; flex-shrink:0; position:relative; z-index:9999; box-shadow: 0 -20px 40px rgba(0,0,0,0.9); }
+.zoom-controls { position:fixed; right:20px; top:20px; display:flex; flex-direction:column; gap:6px; z-index:1000; }
+.zoom-btn { background:#111; border:1px solid #444; color:#aaa; width:38px; height:38px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,0.8); transition:0.2s; user-select:none; }
+.zoom-btn:hover { background:#222; color:#fff; transform:scale(1.1); }
+        .workstation-chassis { display:flex; width:100%; max-width:2560px; position:relative; box-shadow:0 -10px 40px rgba(0,0,0,0.9); border-radius:6px 6px 0 0; background:var(--rack-bg); }
+        .wood-cheek { width:24px; background:linear-gradient(to right,#3a1c0d,#1a0c05); box-shadow:inset 1px 0 2px rgba(255,255,255,0.1),inset -2px 0 5px rgba(0,0,0,0.8); border-radius:6px 0 0 0; z-index:10; }
+        .wood-cheek.right { border-radius:0 6px 0 0; background:linear-gradient(to left,#3a1c0d,#1a0c05); }
+        .synth-core { flex-grow:1; display:flex; flex-direction:column; position:relative; }
+        .info-bar-integrated { width:100%; height:45px; background-color:var(--lcd-bg-dark); border-bottom:2px solid #080808; display:flex; align-items:center; z-index:10; position:relative; overflow:hidden; }
+        .info-bar-text { font-family:'Share Tech Mono',monospace; font-size:18px; font-weight:bold; color:var(--oled-text); text-transform:uppercase; letter-spacing:2px; position:absolute; white-space:nowrap; transition:left 0.15s,right 0.15s; line-height:45px; }
+        .settings-bar { position:absolute; bottom:100%; left:0; width:100%; height:85px; background:var(--lcd-bg-dark); display:none; align-items:center; justify-content:space-around; z-index:50; border-top:2px solid #333; box-shadow:0 -10px 30px #000; padding:0 20px; box-sizing:border-box; }
+        .settings-control { display:flex; flex-direction:column; align-items:center; gap:8px; width:150px; z-index:2; position:relative; }
+        .settings-control label { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono',monospace; cursor:pointer; text-transform:uppercase; font-weight:bold; }
+        .settings-control input[type="range"] { -webkit-appearance:none; width:100%; height:6px; background:#111; border-radius:3px; outline:none; cursor:pointer; box-shadow:inset 0 1px 3px #000; }
+        .settings-control input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:20px; background:#888; border:1px solid #111; border-radius:2px; box-shadow:0 2px 4px #000; cursor:grab; }
+        .master-dashboard { display:flex; justify-content:space-between; align-items:center; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px); background-size:100% 3px; padding:25px 30px; border-top:1px solid #333; position:relative; width:100%; box-sizing:border-box; }
+        .dashboard-logo { position:absolute; top:-35px; left:30px; z-index:5; pointer-events:none; }
+        .control-group { display:flex; align-items:center; gap:8px; z-index:10; }
+        .hardware-btn { width:95px; height:38px; background-color:var(--btn-dark); color:var(--text-dim); border:1px solid var(--btn-border); border-radius:3px; cursor:pointer; font-weight:700; font-size:12px; text-transform:uppercase; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 3px 0 #000; transition:transform 0.1s; }
+        .hardware-btn:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .hardware-btn.active { color:#fff; background-color:#121214; }
+        .sq-btn { width:38px; height:38px; background-color:var(--btn-dark); color:#444; border:1px solid var(--btn-border); border-radius:3px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 #000; transition:transform 0.1s,color 0.15s; flex-shrink:0; }
+        .sq-btn:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .sq-btn.active { color:#fff; background-color:#121214; }
+        .clef-split { display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s; }
+        .clef-split:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
+        .clef-split span { flex:1; display:flex; align-items:center; justify-content:center; color:#444; transition:color 0.15s; padding:0; }
         .clef-split span.active { color:#fff; }
-        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
-
-        /* LANG SPLIT GOMB */
-        .lang-split {
-            display:flex; width:95px; height:38px; background:var(--btn-dark);
-            border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden;
-        }
-        .lang-split button {
-            flex:1; background:transparent; border:none; cursor:pointer;
-            font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim);
-        }
+        .clef-divider { height:1px; width:100%; background:#222; flex-shrink:0; }
+        .lang-split { display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
+        .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:11px; font-family:'Inter',sans-serif; color:var(--text-dim); }
         .lang-split button.active { color:#fff; }
-        .lang-split button:active { background: rgba(255,255,255,0.05); }
-        .lang-divider { width:1px; background:#222; margin:6px 0; }
-
-        body.help-mode-active, body.help-mode-active * { cursor: help !important; }
-
-        /* ── CENTER CONSOLE (4-részes OLED + nyilak) ── */
-        .center-console { flex: 1; display: flex; justify-content: center; position: relative; }
-        .lcd-arrow-wrapper { display: flex; flex-direction: column; align-items: center; width: 620px; }
-        .arrow-row { display: flex; width: 100%; justify-content: space-around; margin: 4px 0; }
-        .nav-disk-btn { width: 22px; height: 22px; background: #222; border: 1px solid #111; border-radius: 50%; color: #888; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 2px rgba(0,0,0,0.6); transition: 0.1s; flex-shrink: 0; }
-        .nav-disk-btn:active { transform: translateY(2px); box-shadow: 0 0 1px rgba(0,0,0,0.6); }
-
-        .oled-wrapper { background: #111; padding: 2px; border-radius: 4px; width: 100%; box-shadow: 0 2px 4px rgba(255,255,255,0.1); box-sizing: border-box; }
-        .oled-screen { background: var(--lcd-bg-dark); border: 2px solid #222; border-radius: 2px; display: flex; box-shadow: inset 0 3px 8px rgba(0,0,0,0.9); overflow: hidden; }
-        .oled-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px 0; cursor: pointer; }
-        .oled-divider { width: 1px; background: rgba(255,255,255,0.05); margin: 5px 0; }
-        .oled-header { font-size: 11px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; }
-        .oled-main { font-size: 20px; color: var(--oled-text); font-family: 'Share Tech Mono'; font-weight: bold; text-transform: uppercase; text-shadow: none !important; }
-
-        /* HANON PATCH BROWSER */
-        .patch-browser-content { max-width: 500px; }
-        .patch-grid-hanon { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-        .patch-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 12px 5px; font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.1s; text-align: center; }
-        .patch-btn:hover { background: #222; color: #fff; }
-        .patch-btn:active { transform: translateY(2px); }
-        .patch-btn.disabled { color: #333; cursor: not-allowed; }
-        .patch-btn.disabled:hover { background: #111; color: #333; }
-
-        /* ── ZONGORA ── */
-        .piano-crop-wrapper { width: 100%; position: relative; aspect-ratio: 2500/248; background: #000; overflow: visible; border-top: 2px solid #000; }
-        .piano-inner { width: 100%; aspect-ratio: 2500/284; position: absolute; top: 0; left: 0; }
-        .piano-img { width: 100%; height: 100%; display: block; filter: grayscale(100%); pointer-events: none; }
-        .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
-        .key-glow { position: absolute; top: 0; cursor: pointer; }
-        .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
-        .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255,255,255,0.15); box-shadow: inset 0 -10px 15px rgba(255,255,255,0.3); z-index: 40; }
-
-        /* ── MODÁLIS ABLAKOK ── */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--rack-bg); padding: 30px; border: 2px solid var(--rack-border); border-radius: 6px; text-align: center; max-width: 550px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,1), inset 0 1px 1px rgba(255,255,255,0.05); }
-        .modal-title { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: 16px; margin-top: 0; margin-bottom: 25px; border-bottom: 2px solid #111; padding-bottom: 15px; }
-        .modal-stats { display: flex; justify-content: space-around; margin-bottom: 20px; }
-        .modal-stat-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .modal-stat-label { font-size: 10px; color: var(--lcd-label-color); font-family: 'Share Tech Mono'; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
-        .modal-stat-value { font-family: 'Share Tech Mono'; font-size: 28px; color: var(--oled-text); font-weight: bold; }
-        .modal-tip { background: #111; border-left: 4px solid #333; padding: 15px; margin: 20px 0; text-align: left; font-size: 13px; color: #aaa; line-height: 1.5; border-radius: 0 4px 4px 0; font-family: 'Inter', sans-serif; }
-        .modal-btn { background-color: var(--btn-dark); color: #aaa; border: 1px solid var(--btn-border); border-radius: 4px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 14px; padding: 12px 40px; box-shadow: 0 3px 0 #000; transition: 0.1s; letter-spacing: 1px; }
-        .modal-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #000; }
-
-        body.help-mode-active { cursor: help; } body.help-mode-active * { cursor: help !important; }
+        .lang-split button:active { background:rgba(255,255,255,0.05); }
+        .lang-divider { height:1px; width:100%; background:#222; }
+        body.help-mode-active, body.help-mode-active * { cursor:help !important; }
+        .center-console { flex:1; display:flex; justify-content:center; position:relative; }
+        .lcd-arrow-wrapper { display:flex; flex-direction:column; align-items:center; width:620px; }
+        .arrow-row { display:flex; width:100%; justify-content:space-around; margin:4px 0; }
+        .nav-disk-btn { width:22px; height:22px; background:#222; border:1px solid #111; border-radius:50%; color:#888; font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 2px rgba(0,0,0,0.6); transition:0.1s; flex-shrink:0; }
+        .nav-disk-btn:active { transform:translateY(2px); box-shadow:0 0 1px rgba(0,0,0,0.6); }
+        .oled-wrapper { background:#111; padding:2px; border-radius:4px; width:100%; box-shadow:0 2px 4px rgba(255,255,255,0.1); box-sizing:border-box; }
+        .oled-screen { background:var(--lcd-bg-dark); border:2px solid #222; border-radius:2px; display:flex; box-shadow:inset 0 3px 8px rgba(0,0,0,0.9); overflow:hidden; }
+        .oled-section { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:10px 0; cursor:pointer; }
+        .oled-divider { width:1px; background:rgba(255,255,255,0.05); margin:5px 0; }
+        .oled-header { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono'; text-transform:uppercase; font-weight:bold; margin-bottom:2px; }
+        .oled-main { font-size:20px; color:var(--oled-text); font-family:'Share Tech Mono'; font-weight:bold; text-transform:uppercase; }
+        .patch-browser-content { max-width:500px; }
+        .patch-grid-hanon { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:25px; }
+        .patch-btn { background:#111; border:1px solid #333; color:#aaa; padding:12px 5px; font-family:'Share Tech Mono',monospace; font-size:14px; cursor:pointer; border-radius:4px; transition:0.1s; text-align:center; }
+        .patch-btn:hover { background:#222; color:#fff; }
+        .patch-btn.disabled { color:#333; cursor:not-allowed; }
+        .patch-btn.disabled:hover { background:#111; color:#333; }
+        .piano-crop-wrapper { width:100%; position:relative; aspect-ratio:2500/248; background:#000; overflow:visible; border-top:2px solid #000; }
+        .piano-inner { width:100%; aspect-ratio:2500/284; position:absolute; top:0; left:0; }
+        .piano-img { width:100%; height:100%; display:block; filter:grayscale(100%); pointer-events:none; }
+        .hitbox-layer { position:absolute; top:0; left:0; width:100%; height:100%; z-index:100; }
+        .key-glow { position:absolute; top:0; cursor:pointer; }
+        .key-glow.pressed::after { content:''; position:absolute; pointer-events:none; z-index:150; top:0; left:0; width:100%; height:100%; border-radius:0 0 4px 4px; background:rgba(0,0,0,0.11); box-shadow:inset 6px 0 10px -2px rgba(0,0,0,0.6); }
+        .black-glow.pressed::after { top:6px; left:25%; width:50%; height:77%; border-radius:2px; background:rgba(255,255,255,0.36); z-index:40; }
+        .key-led { position:absolute; top:-22px; left:50%; transform:translateX(-50%); width:8px; height:8px; border-radius:50%; background-color:var(--oled-text); opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:9999; }
+        .key-glow.demo-flash .key-led { opacity:1; background:rgba(179,230,255,0.95) !important; box-shadow:0 0 12px rgba(179,230,255,0.8) !important; }
+        .key-glow.chord-hint .key-led { opacity:1; }
+        .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
+        .metro-preset:hover { background:#333;color:#fff; }
+        .metro-preset:active { transform:translateY(1px); }
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; }
+        .modal-content { background:var(--rack-bg); padding:30px; border:2px solid var(--rack-border); border-radius:6px; text-align:center; max-width:550px; width:90%; box-shadow:0 20px 50px rgba(0,0,0,1); }
+        .modal-title { color:#aaa; text-transform:uppercase; letter-spacing:2px; font-weight:800; font-size:16px; margin-top:0; margin-bottom:25px; border-bottom:2px solid #111; padding-bottom:15px; }
+        .modal-stats { display:flex; justify-content:space-around; margin-bottom:20px; }
+        .modal-stat-box { display:flex; flex-direction:column; align-items:center; gap:4px; }
+        .modal-stat-label { font-size:10px; color:var(--lcd-label-color); font-family:'Share Tech Mono'; text-transform:uppercase; letter-spacing:1px; font-weight:bold; }
+        .modal-stat-value { font-family:'Share Tech Mono'; font-size:28px; color:var(--oled-text); font-weight:bold; }
+        .modal-tip { background:#111; border-left:4px solid #333; padding:15px; margin:20px 0; text-align:left; font-size:13px; color:#aaa; line-height:1.5; border-radius:0 4px 4px 0; font-family:'Inter',sans-serif; }
+        .modal-btn { background-color:var(--btn-dark); color:#aaa; border:1px solid var(--btn-border); border-radius:4px; font-weight:800; cursor:pointer; text-transform:uppercase; font-size:14px; padding:12px 40px; box-shadow:0 3px 0 #000; transition:0.1s; letter-spacing:1px; }
+        .modal-btn:active { transform:translateY(3px); box-shadow:0 0 0 #000; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 </head>
 <body>
-
-    <!-- RESULT MODAL -->
     <div id="resultModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">Session Complete</h2>
             <div class="modal-stats">
-                <div class="modal-stat-box">
-                    <div class="modal-stat-label">Avg Tempo</div>
-                    <div id="modalBpm" class="modal-stat-value">0 BPM</div>
-                </div>
-                <div class="modal-stat-box">
-                    <div class="modal-stat-label">Stability</div>
-                    <div id="modalUni" class="modal-stat-value">100%</div>
-                </div>
+                <div class="modal-stat-box"><div class="modal-stat-label">Avg Tempo</div><div id="modalBpm" class="modal-stat-value">0 BPM</div></div>
+                <div class="modal-stat-box"><div class="modal-stat-label">Stability</div><div id="modalUni" class="modal-stat-value">100%</div></div>
             </div>
             <div id="modalTip" class="modal-tip">Excellent work!</div>
             <button class="modal-btn" onclick="closeModal()">Acknowledge</button>
         </div>
     </div>
-
-    <!-- PATCH BROWSER MODAL -->
     <div id="patchBrowserModal" class="modal-overlay">
         <div class="modal-content patch-browser-content">
             <h2 class="modal-title">Hanon Patch Browser</h2>
-            <div style="text-align:left; margin-bottom:10px; color:var(--text-dim); font-size:11px; font-weight:bold; letter-spacing:1px;">PART I — EXERCISES 1–20</div>
+            <div style="text-align:left;margin-bottom:10px;color:var(--text-dim);font-size:11px;font-weight:bold;letter-spacing:1px;">PART I — EXERCISES 1–20</div>
             <div class="patch-grid-hanon">
-                <button class="patch-btn" onclick="selectPatch(1, 'HANON No.1')">No. 1</button>
-                <button class="patch-btn disabled">No. 2 <span style="font-size:10px; display:block; color:#444;">Soon</span></button>
-                <button class="patch-btn disabled">No. 3 <span style="font-size:10px; display:block; color:#444;">Soon</span></button>
+                <button class="patch-btn" onclick="selectPatch(1,'No. 1')">No. 1</button>
+                <button class="patch-btn" onclick="selectPatch(2,'No. 2')">No. 2</button>
+                <button class="patch-btn" onclick="selectPatch(3,'No. 3')">No. 3</button>
+                <button class="patch-btn" onclick="selectPatch(4,'No. 4')">No. 4</button>
+                <button class="patch-btn" onclick="selectPatch(5,'No. 5')">No. 5</button>
+                <button class="patch-btn" onclick="selectPatch(6,'No. 6')">No. 6</button>
+                <button class="patch-btn" onclick="selectPatch(7,'No. 7')">No. 7</button>
+                <button class="patch-btn" onclick="selectPatch(8,'No. 8')">No. 8</button>
+                <button class="patch-btn" onclick="selectPatch(9,'No. 9')">No. 9</button>
+                <button class="patch-btn" onclick="selectPatch(10,'No. 10')">No. 10</button>
+                <button class="patch-btn" onclick="selectPatch(11,'No. 11')">No. 11</button>
+                <button class="patch-btn" onclick="selectPatch(12,'No. 12')">No. 12</button>
+                <button class="patch-btn" onclick="selectPatch(13,'No. 13')">No. 13</button>
+                <button class="patch-btn" onclick="selectPatch(14,'No. 14')">No. 14</button>
+                <button class="patch-btn" onclick="selectPatch(15,'No. 15')">No. 15</button>
+                <button class="patch-btn" onclick="selectPatch(16,'No. 16')">No. 16</button>
+                <button class="patch-btn" onclick="selectPatch(17,'No. 17')">No. 17</button>
+                <button class="patch-btn" onclick="selectPatch(18,'No. 18')">No. 18</button>
+                <button class="patch-btn" onclick="selectPatch(19,'No. 19')">No. 19</button>
+                <button class="patch-btn" onclick="selectPatch(20,'No. 20')">No. 20</button>
             </div>
             <button class="modal-btn" onclick="closePatchBrowser()">Cancel</button>
         </div>
     </div>
-
-    <!-- KOTTA -->
-    <!-- INFO MODAL -->
     <div id="infoModal" class="modal-overlay">
         <div class="modal-content" style="max-width:640px;text-align:left;">
-            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;">Hanon — Module Guide</h2>
-            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Classic Hanon finger exercises displayed on the staff. Play each note in sequence — the exercise scrolls through positions automatically. BPM and stability are tracked in real time.</p></div>
+            <h2 class="modal-title" id="txt-infoTitle" style="text-align:center;color:var(--oled-text);border-bottom:1px solid #333;padding-bottom:15px;">Hanon — Module Guide</h2>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-howTitle">How It Works</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-howBody">Classic Hanon finger exercises on the staff. Play each note in sequence. BPM and stability tracked in real time.</p></div>
             <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-ctrlTitle">Controls</div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl1">Sprint (1×), Marathon (3×), Training (endless).</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Exercise ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Select the Hanon exercise number.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Top / Bottom</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Toggle treble and bass clef note generation independently.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Hints</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Displays note names above each notehead.</span></div>
-                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Fingers</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl5">Displays official fingering numbers (1–5) below noteheads.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Exercise ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl2">Select from 20 Hanon exercises. Click to browse all.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl3">Treble and bass clef staves — toggle independently.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl4">Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Rhythm ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';" id="txt-ctrl6">Select a rhythmic pattern. Click Demo to preview.</span></div>
             </div>
-            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.</p></div>
+            <div style="margin-bottom:18px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-metroTitle">Metronome</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-metroBody">Built-in metronome with adjustable BPM (40–200). Use the ▲▼ arrows to set tempo. Click the ˅ button to open settings: choose from 4 click sounds (Woodblock, Mechanical, Drumsticks, Electronic), adjust volume, and toggle first-beat accent.</p></div>
+            <div style="margin-bottom:22px;"><div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-tipTitle">Learning Tip</div><p style="font-size:14px;color:#aaa;line-height:1.7;margin:0;font-family:'Inter',sans-serif;" id="txt-tipBody">After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher and keep your wrist relaxed.</p></div>
             <button class="modal-btn" onclick="document.getElementById('infoModal').style.display='none'" id="txt-gotIt" style="width:100%;">Got It</button>
         </div>
     </div>
-
     <div class="sheet-container">
-        <div class="sheet-viewport">
-            <img src="kottavonal_feher.png" class="sheet-image" id="sheetBg">
-            <canvas id="staffCanvas" width="2450" height="480"></canvas>
+        <div class="sheet-viewport" id="vexflow-container" style="display:flex; justify-content:center; align-items:flex-start; width:100%; height:100%; padding-top:20px;"></div>
+        
+        <div class="zoom-controls">
+            <div class="zoom-btn" onclick="fitWidth()" title="Fit Width" style="font-size:18px;">↔</div>
+            <div class="zoom-btn" onclick="fitHeight()" title="Fit Height" style="font-size:18px;">↕</div>
+            <div class="zoom-btn" id="btnBookView" onclick="toggleBookView()" title="Book View" style="font-size:16px;">📖</div>
         </div>
     </div>
-
-    <!-- WORKSTATION CHASSIS -->
     <div class="lower-section">
         <div class="workstation-chassis">
             <div class="wood-cheek"></div>
             <div class="synth-core">
-
-                <!-- MIXER OVERLAY -->
                 <div id="mixerBar" class="settings-bar">
                     <div class="settings-control"><label>Attack</label><input type="range" id="vst_a" min="0" max="1" step="0.01" value="0.0"></div>
                     <div class="settings-control"><label>Decay</label><input type="range" id="vst_e" min="1" max="10" step="0.1" value="5.0"></div>
                     <div class="settings-control"><label>Release</label><input type="range" id="vst_r" min="0.1" max="3" step="0.1" value="0.6"></div>
                     <div class="settings-control"><label>Velocity</label><input type="range" id="vst_d" min="0.1" max="2" step="0.1" value="1.0"></div>
                 </div>
-
-                <!-- INFO SÁV -->
                 <div class="info-bar-integrated">
-                    <div id="infoBarText" class="info-bar-text" style="left:50%; transform:translateX(-50%);">SELECT EXERCISE OR PRESS START</div>
+                    <div id="infoBarText" class="info-bar-text" style="left:50%;transform:translateX(-50%);">SELECT EXERCISE OR PRESS START</div>
                 </div>
-
-                <!-- MASTER DASHBOARD -->
                 <div class="master-dashboard">
                     <div class="dashboard-logo">
-                        <svg viewBox="0 0 300 40" style="height:25px; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.8));">
+                        <svg viewBox="0 0 300 40" style="height:25px;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.8));">
                             <text x="60" y="30" fill="#666" font-family="'Inter',sans-serif" font-weight="800" font-size="32" text-anchor="end">AK</text>
                             <path d="M 64 30 L 72 30 L 72 12 L 68 12 L 68 0 L 64 0 Z" fill="#555"/>
                             <text x="76" y="30" fill="#666" font-family="'Inter',sans-serif" font-weight="800" font-size="32" text-anchor="start">RA</text>
                             <text x="135" y="28" fill="#444" font-family="'Inter',sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
                         </svg>
                     </div>
-
-                    <!-- BAL — modul-specifikus -->
+                    <!-- BAL — Home + Clef + Hints(4-state eye) + Metronóm -->
                     <div class="control-group">
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
                         <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
                             <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
                             <div class="clef-divider"></div>
                             <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
                         </button>
-                        <button id="btnHintName" class="hardware-btn" onclick="if(!helpActive) toggleHint('name')" data-help="HINTS: SHOWS NOTE NAMES ABOVE NOTEHEADS">Hints</button>
-                        <button id="btnHintFinger" class="hardware-btn" onclick="if(!helpActive) toggleHint('finger')" data-help="FINGERS: SHOWS OFFICIAL FINGERING (1–5) ON SHEET">Fingers</button>
-                    </div>
-
-                    <!-- KÖZÉP: OLED + START -->
-                    <div class="center-console">
-                        <div style="display:flex; align-items:center; gap:32px;">
-                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE">
-                                <span id="startLabel" class="active">START</span>
-                                <div class="split-div"></div>
-                                <span id="stopLabel">STOP</span>
+                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEY LEDS | 4× OFF">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+                        </button>
+                        <div style="width:8px;"></div>
+                        <div class="metronome-block" style="display:flex;align-items:center;gap:4px;position:relative;">
+                            <button id="metroToggle" class="sq-btn" onclick="if(!helpActive) toggleMetronome()" data-help="METRONOME: START/STOP CLICK">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L7 22h10l-5-20z"/><circle cx="12" cy="18" r="1"/></svg>
+                            </button>
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                                <button class="nav-disk-btn metro-tempo-btn" data-dir="1" style="width:24px;height:24px;border-radius:50%;font-size:9px;padding:0;display:flex;align-items:center;justify-content:center;">▲</button>
+                                <div id="metroBpmBox" onclick="if(!helpActive) toggleBpmPresets()" style="width:70px;height:38px;background:#111;display:flex;align-items:center;justify-content:center;border:1px solid #050505;border-radius:3px;box-shadow:inset 0 2px 5px rgba(0,0,0,0.8);cursor:pointer;position:relative;">
+                                    <div id="metroBpmDisplay" style="font-family:'Share Tech Mono';font-size:20px;color:#b3e6ff;font-weight:bold;">80</div>
+                                </div>
+                                <button class="nav-disk-btn metro-tempo-btn" data-dir="-1" style="width:24px;height:24px;border-radius:50%;font-size:9px;padding:0;display:flex;align-items:center;justify-content:center;">▼</button>
                             </div>
+                            <div id="bpmPresetsPopup" style="display:none;position:absolute;bottom:55px;left:42px;background:#1a1a1d;border:1px solid #333;padding:8px;border-radius:4px;z-index:1001;box-shadow:0 10px 30px #000;">
+                                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
+                                    <button class="metro-preset" onclick="setTempoPreset(40)">40</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(60)">60</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(72)">72</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(80)">80</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(92)">92</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(100)">100</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(108)">108</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(120)">120</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(140)">140</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(160)">160</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(180)">180</button>
+                                    <button class="metro-preset" onclick="setTempoPreset(208)">208</button>
+                                </div>
+                            </div>
+                            <button id="metroMenuBtn" class="sq-btn" onclick="if(!helpActive) toggleMetroMenu()" data-help="METRONOME SETTINGS: SOUND, VOLUME, ACCENT, PRESETS">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+                            </button>
+                            <div id="metroSettingsMenu" style="display:none;position:absolute;bottom:55px;left:0;background:#1a1a1d;border:1px solid #333;padding:15px;border-radius:4px;z-index:1000;flex-direction:column;gap:10px;box-shadow:0 10px 30px #000;width:200px;">
+                                <div style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;">Sound Type</div>
+                                <select id="metroSoundSelect" style="background:#111;color:#eee;border:1px solid #333;padding:5px;font-family:'Share Tech Mono';border-radius:3px;">
+                                    <option value="woodblock">Woodblock</option>
+                                    <option value="mechanical" selected>Mechanical</option>
+                                    <option value="drumstick">Drumsticks</option>
+                                    <option value="electronic">Electronic</option>
+                                </select>
+                                <div style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;margin-top:5px;">Volume</div>
+                                <input type="range" id="metroVolumeSlider" min="0" max="1" step="0.05" value="0.5" style="width:100%;">
+                                <div style="display:flex;align-items:center;gap:10px;margin-top:5px;">
+                                    <input type="checkbox" id="metroAccentCheck" checked>
+                                    <label for="metroAccentCheck" style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;cursor:pointer;">Accent on 1</label>
+                                </div>
+                                <div style="font-family:'Share Tech Mono';font-size:10px;color:#557799;text-transform:uppercase;margin-top:8px;">Time Signature</div>
+                                <select id="metroTimeSigSelect" style="background:#111;color:#eee;border:1px solid #333;padding:5px;font-family:'Share Tech Mono';border-radius:3px;width:100%;">
+                                    <option value="1">1/4</option>
+                                    <option value="2" selected>2/4</option>
+                                    <option value="3">3/4</option>
+                                    <option value="4">4/4</option>
+                                    <option value="5">5/4</option>
+                                    <option value="6">6/8</option>
+                                    <option value="7">7/8</option>
+                                    <option value="9">9/8</option>
+                                    <option value="12">12/8</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- KÖZÉP: START + OLED + DEMO -->
+                    <div class="center-console">
+                        <div style="display:flex;align-items:center;gap:16px;">
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EXERCISE" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1×), MARATHON (3×), TRAINING (∞)">▲</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(1)">▲</button>
-                                    <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(-1)">▲</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleRhythm(1)">▲</button>
                                 </div>
                                 <div class="oled-wrapper">
                                     <div class="oled-screen">
@@ -322,19 +268,19 @@
                                             <div class="oled-main" id="lcdModuleText">HANON</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP">
+                                        <div id="oledMode" class="oled-section" onclick="if(!helpActive) cycleMode(1)" data-help="MODE: SPRINT (1X) | MARATHON (3X) | TRAINING = ENDLESS">
                                             <div class="oled-header">Mode</div>
                                             <div class="oled-main" id="lcdModeText">SPRINT</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledExercise" class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="EXERCISE: CLICK TO BROWSE HANON EXERCISES">
+                                        <div id="oledExercise" class="oled-section" onclick="if(!helpActive) openPatchBrowser()" data-help="EXERCISE: CLICK TO BROWSE — USE ARROWS TO CHANGE">
                                             <div class="oled-header">Exercise</div>
-                                            <div class="oled-main" id="lcdHanonText">No. 1</div>
+                                            <div class="oled-main" id="lcdExerciseText">No. 1</div>
                                         </div>
                                         <div class="oled-divider"></div>
-                                        <div id="oledStats" class="oled-section" data-help="STATS: REAL-TIME BPM AND TIMING STABILITY">
-                                            <div class="oled-header">BPM / Stab</div>
-                                            <div class="oled-main" id="lcdStats">0 / 100%</div>
+                                        <div id="oledRhythm" class="oled-section" onclick="if(!helpActive) cycleRhythm(1)" data-help="RHYTHM: CLICK TO CYCLE — USE ARROWS TO CHANGE PATTERN">
+                                            <div class="oled-header">Rhythm</div>
+                                            <div class="oled-main" id="lcdRhythm">EVEN</div>
                                         </div>
                                     </div>
                                 </div>
@@ -342,590 +288,991 @@
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(1)">▼</button>
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleMode(-1)">▼</button>
-                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(-1)">▼</button>
-                                    <button class="nav-disk-btn" style="opacity:0; pointer-events:none;">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleHanon(1)">▼</button>
+                                    <button class="nav-disk-btn" onclick="if(!helpActive) cycleRhythm(-1)">▼</button>
                                 </div>
                             </div>
+                            <button id="btnDemo" class="hardware-btn" onclick="if(!helpActive) playRhythmDemo()" data-help="DEMO: CLICK TO HEAR THE EXERCISE — KEYS LIGHT UP IN SYNC" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">DEMO</button>
                         </div>
                     </div>
-
-                    <!-- JOBB — globális + home + info -->
+                    <!-- JOBB — Audio + Fullscreen + ?/ⓘ + EN/HU -->
                     <div class="control-group">
-                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD">
-                            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/>
-                                <rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
-                                <rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/>
-                                <line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
-                                <line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/>
-                            </svg>
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH">
+                            <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
                         </button>
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
+                        <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
+                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-weight:regular;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
+                            <div style="height:1px;background:#222;"></div>
+                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="7" x2="12" y2="7" stroke-width="3"/><line x1="12" y1="11" x2="12" y2="17" stroke-width="3"/></svg>
+                            </button>
+                        </div>
                         <div class="lang-split">
                             <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
                         </div>
-                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px; font-weight:bold; font-family:'Inter',sans-serif;">?</button>
-                        <div style="width:16px;"></div>
-                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
-                        </a>
-                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
-                        </button>
                     </div>
                 </div>
-
-                <!-- ZONGORA -->
                 <div class="piano-crop-wrapper">
                     <div class="piano-inner">
                         <img src="grandpiano-keys.png" class="piano-img">
                         <div id="hb-wrap" class="hitbox-layer"></div>
                     </div>
                 </div>
-
             </div>
             <div class="wood-cheek right"></div>
         </div>
     </div>
-
 <script>
-    let currentLang = 'EN';
-    const MODULE_NAMES = {
-        EN: ['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','RHYTHM'],
-        HU: ['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','RITMUS']
+    let currentLang='EN';
+    const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON']};
+    const HANON_T={
+        EN:{infoTitle:'Hanon — Module Guide',howTitle:'How It Works',howBody:'Classic Hanon finger exercises on the staff. Play each note in sequence. BPM and stability tracked in real time.',ctrlTitle:'Controls',gotIt:'Got It',ctrl1:'Sprint (1×), Marathon (3×), Training (endless).',ctrl2:'Select from 20 Hanon exercises. Click to browse all.',ctrl3:'Treble and bass clef staves — toggle independently.',ctrl4:'Cycles through: 1× note names, 2× + fingering, 3× + key LEDs, 4× all off.',ctrl6:'Select a rhythmic pattern. Click Demo to preview.',metroTitle:'Metronome',metroBody:'Built-in metronome with adjustable BPM (40–200). Use the ▲▼ arrows to set tempo. Click the ˅ button to open settings: choose from 4 click sounds (Woodblock, Mechanical, Drumsticks, Electronic), adjust volume, and toggle first-beat accent.',tipTitle:'Learning Tip',tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher and keep your wrist relaxed.',ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hHome:'HOME: RETURN TO MAIN MODULE MENU',hHints:'HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× + KEY LEDS | 4× OFF',hStart:'START/STOP: BEGIN OR END THE EXERCISE',hDemo:'DEMO: CLICK TO HEAR THE EXERCISE — KEYS LIGHT UP IN SYNC',hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH',hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT',hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',hInfo:'INFO: OPEN MODULE GUIDE',hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',hMode:'MODE: SPRINT (1X) | MARATHON (3X) | TRAINING = ENDLESS',hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',hRhythm:'RHYTHM: ARROWS TO CHANGE — CLICK TO CYCLE',hMetro:'METRONOME: START/STOP CLICK — BPM SYNCED WITH EXERCISE'},
+        HU:{infoTitle:'Hanon — Modul útmutató',howTitle:'Hogyan működik',howBody:'Klasszikus Hanon ujjgyakorlatok a kottán. Játszd le a hangokat sorban. BPM és stabilitás valós időben követhető.',ctrlTitle:'Vezérlők',gotIt:'Értettem',ctrl1:'Sprint (1×), Maraton (3×), Tréning (végtelen).',ctrl2:'20 Hanon gyakorlat közül választhatsz. Kattints a böngészéshez.',ctrl3:'Violin és basszus kulcs — külön-külön kapcsolható.',ctrl4:'Körkörösen kapcsol: 1× hangnevek, 2× + ujjrend, 3× + billentyű LED, 4× mind ki.',ctrl6:'Ritmusképlet kiválasztása. Kattints a Demo gombra a lejátszáshoz.',metroTitle:'Metronóm',metroBody:'Beépített metronóm állítható BPM-mel (40–200). A ▲▼ nyilakkal állítsd a tempót. A ˅ gombbal nyisd meg a beállításokat: 4 kattanáshang (Woodblock, Mechanical, Drumsticks, Electronic), hangerő és első ütés hangsúlyozás.',tipTitle:'Tanulási tipp',tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld és tartsd lazán a csuklódat.',ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE',hHints:'SEGÉDEK: 1× HANGNEVEK | 2× + UJJREND | 3× + BILLENTYŰ LED | 4× KI',hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',hDemo:'DEMÓ: KATTINTS A GYAKORLAT MEGHALLGATÁSÁHOZ — BILLENTYŰK SZINKRONBAN VILLANNAK',hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI',hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',hInfo:'INFO: MODUL ÚTMUTATÓ',hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',hMode:'MÓD: SPRINT (1×) | MARATON (3×) | TRAINING = VÉGTELEN',hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',hRhythm:'RITMUS: NYILAKKAL VÁLTASZ — KATTINTS A CIKLÁLÁSHOZ',hMetro:'METRONÓM: KATTANÁS BE/KI — BPM SZINKRONBAN A GYAKORLATTAL'}
     };
-    const HANON_T = {
-        EN: {
-            infoTitle:'Hanon — Module Guide', howTitle:'How It Works',
-            howBody:'Classic Hanon finger exercises displayed on the staff. Play each note in sequence — the exercise scrolls through positions automatically. BPM and stability are tracked in real time.',
-            ctrlTitle:'Controls', gotIt:'Got It',
-            ctrl1:'Sprint (1×), Marathon (3×), Training (endless).',
-            ctrl2:'Select the Hanon exercise number.',
-            ctrl3:'Toggle treble and bass clef note generation independently.',
-            ctrl4:'Displays note names above each notehead.',
-            ctrl5:'Displays official fingering numbers (1–5) below noteheads.',
-            tipTitle:'Learning Tip',
-            tipBody:'After the session, the analysis shows which finger caused the most slowdowns. Focus on lifting that finger higher before each keystroke and keep your wrist relaxed.',
-            ready:'SYSTEM READY — SELECT EXERCISE OR PRESS START',
-            helpMode:'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
-            btnHome:'Home', btnTop:'Top', btnBottom:'Bottom', btnHints:'Hints', btnFingers:'Fingers',
-            btnStart:'START', btnPiano:'Piano', btnMixer:'Mixer', btnFullscr:'Fullscr', btnHelp:'Help', btnInfo:'Info',
-            hHome:'HOME: RETURN TO MAIN MODULE MENU', hTop:'TOP CLEF: TOGGLES RIGHT HAND NOTES',
-            hBottom:'BOTTOM CLEF: TOGGLES LEFT HAND NOTES', hHints:'HINTS: SHOWS NOTE NAMES ABOVE NOTEHEADS',
-            hFingers:'FINGERS: SHOWS OFFICIAL FINGERING (1–5) ON SHEET', hStart:'START/STOP: BEGIN OR END THE EXERCISE',
-            hPiano:'PIANO AUDIO: TOGGLE INTERNAL SYNTH — ALSO WORKS WITH MIDI KEYBOARD', hMixer:'MIXER: OPEN ADSR PANEL',
-            hFullscr:'FULLSCREEN MODE — PRESS AGAIN TO EXIT', hHelp:'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION', hInfo:'INFO: OPEN MODULE GUIDE — HOW IT WORKS AND WHAT THE BUTTONS DO',
-            hClef:'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
-            hModule:'MODULE: CLICK TO NAVIGATE — USE ARROWS TO BROWSE',
-            hMode:'MODE: SPRINT (1X) = ONE PASS | MARATHON (3X) = THREE TIMES | TRAINING = ENDLESS LOOP',
-            hExercise:'EXERCISE: CLICK TO BROWSE HANON EXERCISES',
-            hStats:'STATS: REAL-TIME BPM AND TIMING STABILITY',
-        },
-        HU: {
-            infoTitle:'Hanon — Modul útmutató', howTitle:'Hogyan működik',
-            howBody:'Klasszikus Hanon ujjgyakorlatok a kottán. Játszd le a hangokat sorban — a gyakorlat automatikusan lépdel a pozíciókon. A BPM és stabilitás valós időben követhető.',
-            ctrlTitle:'Vezérlők', gotIt:'Értettem',
-            ctrl1:'Sprint (1×), Maraton (3×), Tréning (végtelen).',
-            ctrl2:'Válaszd ki a Hanon gyakorlatszámot.',
-            ctrl3:'Violin és basszus kulcsos hangok külön-külön be/ki.',
-            ctrl4:'Megjeleníti a hangneveket a kottafej felett.',
-            ctrl5:'Megjeleníti a hivatalos ujjrendszámokat (1–5) a kottafej alatt.',
-            tipTitle:'Tanulási tipp',
-            tipBody:'A session után az elemzés megmutatja melyik ujj okozta a legtöbb lassulást. Koncentrálj arra, hogy azt az ujjat magasabbra emeld leütés előtt, és tartsd lazán a csuklódat.',
-            ready:'RENDSZER KÉSZ — VÁLASSZ GYAKORLATOT VAGY NYOMJ STARTOT',
-            helpMode:'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
-            btnHome:'Főoldal', btnTop:'Felső', btnBottom:'Alsó', btnHints:'Hangnév', btnFingers:'Ujjrend',
-            btnStart:'START', btnPiano:'Zongora', btnMixer:'Keverő', btnFullscr:'Teljes', btnHelp:'Súgó', btnInfo:'Info',
-            hHome:'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE', hTop:'FELSŐ KULCS: JOBB KÉZ BE/KI',
-            hBottom:'ALSÓ KULCS: BAL KÉZ BE/KI', hHints:'HANGNEM: HANGNEVEK MEGJELENÍTÉSE A KOTTÁN',
-            hFingers:'UJJREND: HIVATALOS SKÁLAUJJREND (1–5)', hStart:'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
-            hPiano:'ZONGORA HANG: SZINTETIZÁTOR BE/KI — MIDI BILLENTYŰZETTEL IS MŰKÖDIK', hMixer:'KEVERŐ: ADSR PANEL MEGNYITÁSA',
-            hFullscr:'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ', hHelp:'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT', hInfo:'INFO: MODUL ÚTMUTATÓ — HOGYAN MŰKÖDIK ÉS MIRE JÓK A GOMBOK',
-            hClef:'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
-            hModule:'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
-            hMode:'MÓD: SPRINT (1×) = EGY FUTAM | MARATON (3×) = HÁROMSZOROS | TRAINING = VÉGTELEN HUROK',
-            hExercise:'GYAKORLAT: KATTINTS A HANON GYAKORLATOK BÖNGÉSZŐJÉHEZ',
-            hStats:'STATISZTIKA: VALÓS IDEJŰ BPM ÉS IDŐZÍTÉSI STABILITÁS',
-        }
-    };
-
-    function setLang(lang) {
-        localStorage.setItem('akira_lang', lang);
-        currentLang = lang;
-        document.getElementById('btnLangEN').classList.toggle('active', lang==='EN');
-        document.getElementById('btnLangHU').classList.toggle('active', lang==='HU');
-        document.getElementById('btnLangEN').style.color = lang==='EN' ? '#fff' : 'var(--text-dim)';
-        document.getElementById('btnLangHU').style.color = lang==='HU' ? '#fff' : 'var(--text-dim)';
-        const T = HANON_T[lang];
-        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5','txt-tipTitle','txt-tipBody','txt-gotIt'];
-        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl5,T.tipTitle,T.tipBody,T.gotIt];
+    function setLang(lang){
+        localStorage.setItem('akira_lang',lang);currentLang=lang;
+        document.getElementById('btnLangEN').classList.toggle('active',lang==='EN');
+        document.getElementById('btnLangHU').classList.toggle('active',lang==='HU');
+        document.getElementById('btnLangEN').style.color=lang==='EN'?'#fff':'var(--text-dim)';
+        document.getElementById('btnLangHU').style.color=lang==='HU'?'#fff':'var(--text-dim)';
+        const T=HANON_T[lang];
+        const ids=['txt-infoTitle','txt-howTitle','txt-howBody','txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl6','txt-metroTitle','txt-metroBody','txt-tipTitle','txt-tipBody','txt-gotIt'];
+        const vals=[T.infoTitle,T.howTitle,T.howBody,T.ctrlTitle,T.ctrl1,T.ctrl2,T.ctrl3,T.ctrl4,T.ctrl6,T.metroTitle,T.metroBody,T.tipTitle,T.tipBody,T.gotIt];
         ids.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=vals[i];});
-        // Csak szöveges gombok fordítása (ikonos sq-btn-ek nem)
-        const btnMap={'btnHintName':T.btnHints,'btnHintFinger':T.btnFingers};
-        Object.entries(btnMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.innerText=txt;});
-        const helpMap={
-            'btnHome':T.hHome,'btnClef':T.hClef,
-            'btnHintName':T.hHints,'btnHintFinger':T.hFingers,
-            'btnStart':T.hStart,'audioToggle':T.hPiano,
-            'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,
-            'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledStats':T.hStats
-        };
+        const helpMap={'btnHome':T.hHome,'btnClef':T.hClef,'btnHints':T.hHints,'btnStart':T.hStart,'btnDemo':T.hDemo,'audioToggle':T.hPiano,'btnFullscreen':T.hFullscr,'btnHelp':T.hHelp,'btnInfo':T.hInfo,'oledModule':T.hModule,'oledMode':T.hMode,'oledExercise':T.hExercise,'oledRhythm':T.hRhythm,'metroToggle':T.hMetro};
         Object.entries(helpMap).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.dataset.help=txt;});
-        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[lang][4];
-        if(helpActive) setInfoBar(T.helpMode, null);
-        else if(!isRunning) setInfoBar(T.ready, null);
+        document.getElementById('lcdModuleText').innerText=MODULE_NAMES[lang][4];
+        const R=RHYTHMS[currentRhythmIdx];
+        document.getElementById('lcdRhythm').innerText=lang==='HU'?R.labelHU:R.label;
+        if(helpActive)setInfoBar(T.helpMode,null);
+        else if(!isRunning)setInfoBar(T.ready,null);
     }
-
-    function setInfoBar(text, targetEl) {
-        const bar = document.getElementById('infoBarText');
-        if (!targetEl) {
-            bar.style.left='50%'; bar.style.right='auto'; bar.style.transform='translateX(-50%)';
-            bar.innerHTML = text; return;
-        }
-        const barRect = bar.parentElement.getBoundingClientRect();
-        const cx = targetEl.getBoundingClientRect().left + targetEl.getBoundingClientRect().width/2 - barRect.left;
-        if (cx / barRect.width < 0.5) {
-            bar.innerHTML = '<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>' + text;
-            bar.style.left = Math.max(cx - 10, 20) + 'px'; bar.style.right='auto'; bar.style.transform='none';
-        } else {
-            bar.innerHTML = text + '<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';
-            bar.style.right = Math.max(barRect.width - cx - 10, 20) + 'px'; bar.style.left='auto'; bar.style.transform='none';
-        }
+    function setInfoBar(text,targetEl){
+        const bar=document.getElementById('infoBarText');
+        if(!targetEl){bar.style.left='50%';bar.style.right='auto';bar.style.transform='translateX(-50%)';bar.innerHTML=text;return;}
+        const barRect=bar.parentElement.getBoundingClientRect();
+        const cx=targetEl.getBoundingClientRect().left+targetEl.getBoundingClientRect().width/2-barRect.left;
+        if(cx/barRect.width<0.5){bar.innerHTML='<span style="opacity:0.5;margin-right:8px;font-size:11px;">▼</span>'+text;bar.style.left=Math.max(cx-10,20)+'px';bar.style.right='auto';bar.style.transform='none';}
+        else{bar.innerHTML=text+'<span style="opacity:0.5;margin-left:8px;font-size:11px;">▼</span>';bar.style.right=Math.max(barRect.width-cx-10,20)+'px';bar.style.left='auto';bar.style.transform='none';}
     }
-
-    function updateStartStop(running) {
-        document.getElementById('startLabel').classList.toggle('active', !running);
-        document.getElementById('stopLabel').classList.toggle('active', running);
-    }
-    // ── AUDIO ──
-    let audioInited = false;
-    let audioCtx, sampleBuffers = {}, activeNodes = {}, audioOn = true;
-
-    async function initAudio() {
-        if (audioInited) return; audioInited = true;
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
-        const s = { 36: 'C2', 48: 'C3', 60: 'C4', 72: 'C5' };
-        for (let k in s) {
-            try {
-                const r = await fetch(`https://tonejs.github.io/audio/salamander/${s[k]}.mp3`);
-                sampleBuffers[k] = await audioCtx.decodeAudioData(await r.arrayBuffer());
-            } catch (e) {}
-        }
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then(m => {
-                m.inputs.forEach(input => input.onmidimessage = (msg) => {
-                    const cmd = msg.data[0] >> 4, n = msg.data[1], v = msg.data[2];
-                    if (cmd === 9 && v > 0) { document.getElementById(`k-${n}`)?.classList.add('pressed'); handleNoteOn(n, v); }
-                    else if (cmd === 8 || (cmd === 9 && v === 0)) { document.getElementById(`k-${n}`)?.classList.remove('pressed'); handleNoteOff(n); }
-                });
-            }).catch(e => {});
+    function updateStartStop(running){const btn=document.getElementById('btnStart');if(btn)btn.textContent=running?'STOP':'START';}
+    let audioCtx=null,salamanderPiano=null,_pianoInitPromise=null;
+    let _midiInited=false,audioOn=true;
+    /** Hanon: gyakran 2 hang egyszerre + magas MIDI/egeres velocity → a Tone-piano könnyen túlvezérelt / „kemény”. */
+    const HANON_PIANO_OUTPUT_DB=-7;
+    const HANON_PLAY_VELOCITY_FACTOR=0.72;
+    const HANON_PLAY_VELOCITY_CAP=0.62;
+    const HANON_DEMO_NOTE_VELOCITY=0.44;
+    function ensurePianoLoadContextOrThrow(){
+        if(location.protocol==='file:'){
+            const hu=currentLang==='HU';
+            setInfoBar(hu
+                ?'Nincs hang (file://). python3 -m http.server → http://localhost:8080/hanon.html'
+                :'No audio on file://. Use: python3 -m http.server → http://localhost:8080/hanon.html',document.getElementById('audioToggle'));
+            throw new Error('NEED_HTTP_NOT_FILE');
         }
     }
-
-    function playTone(note, vel) {
-        if (!audioCtx || !audioOn || Object.keys(sampleBuffers).length === 0) return;
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        if (activeNodes[note]) { try { activeNodes[note].source.stop(); } catch (e) {} delete activeNodes[note]; }
-        const source = audioCtx.createBufferSource();
-        let closest = 36, minDiff = 999;
-        for (let b in sampleBuffers) { let diff = Math.abs(note - b); if (diff < minDiff) { minDiff = diff; closest = b; } }
-        source.buffer = sampleBuffers[closest];
-        source.playbackRate.value = Math.pow(2, (note - closest) / 12);
-        const gain = audioCtx.createGain();
-        const v_d = parseFloat(document.getElementById('vst_d').value) || 1.0;
-        gain.gain.setValueAtTime((vel / 127) * v_d, audioCtx.currentTime);
-        source.connect(gain).connect(audioCtx.destination); source.start();
-        activeNodes[note] = { source, gain };
+    function showFileProtocolAudioHintIfNeeded(){
+        if(location.protocol!=='file:')return;
+        const hu=currentLang==='HU';
+        setInfoBar(hu
+            ?'Hanon zongorájához http://localhost/… (ne file://).'
+            :'Hanon piano needs http://localhost/… (not file://).',null);
     }
-
-    function handleNoteOff(midi) {
-        if (!activeNodes[midi]) return;
-        const v_r = parseFloat(document.getElementById('vst_r').value);
-        const gainNode = activeNodes[midi].gain;
-        gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + v_r);
-        activeNodes[midi].source.stop(audioCtx.currentTime + v_r + 0.1);
-        delete activeNodes[midi];
+    function attachHanonMidiInputs(){
+        if(_midiInited||!navigator.requestMIDIAccess)return;
+        navigator.requestMIDIAccess().then(m=>{
+            _midiInited=true;
+            m.inputs.forEach(input=>input.onmidimessage=(msg)=>{
+                const cmd=msg.data[0]>>4,n=msg.data[1],v=msg.data[2];
+                if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
+                else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleNoteOff(n);}
+            });
+        }).catch(()=>{});
     }
-
-    // ── HELP ──
-    let helpActive = false;
-    function toggleHelp() {
-        helpActive = !helpActive;
-        document.getElementById('btnHelp').classList.toggle('active', helpActive);
-        if (helpActive) {
-            document.body.classList.add('help-mode-active');
-            setInfoBar(HANON_T[currentLang].helpMode, null);
-        } else {
-            document.body.classList.remove('help-mode-active');
-            setInfoBar(HANON_T[currentLang].ready, null);
+    async function initAudio(){
+        ensurePianoLoadContextOrThrow();
+        if(salamanderPiano&&salamanderPiano.loaded){
+            if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
+            attachHanonMidiInputs();
+            return;
+        }
+        if(!_pianoInitPromise){
+            _pianoInitPromise=(async()=>{
+                const Tone=await import('https://esm.sh/tone@14.7.77');
+                const pianoMod=await import('https://esm.sh/@tonejs/piano@0.2.1?deps=tone@14.7.77');
+                const Piano=pianoMod.Piano||pianoMod.default?.Piano||pianoMod.default;
+                await Tone.start();
+                const p=new Piano({velocities:5,release:true,pedal:true}).toDestination();
+                if(typeof p.volume!=='undefined')p.volume.value=HANON_PIANO_OUTPUT_DB;
+                await p.load();
+                salamanderPiano=p;
+                audioCtx=Tone.getContext().rawContext;
+            })();
+        }
+        try{
+            await _pianoInitPromise;
+            attachHanonMidiInputs();
+        }catch(e){
+            if(String(e.message)!=='NEED_HTTP_NOT_FILE'){
+                console.error('Piano (Tone) load:',e);
+                const hu=currentLang==='HU';
+                setInfoBar(hu?'Zongora betöltés hiba — F12':'Piano load error — F12',document.getElementById('audioToggle'));
+            }
+            _pianoInitPromise=null;
+            salamanderPiano=null;
+            throw e;
         }
     }
-
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('#btnHelp')) return;
-        if (helpActive) {
-            e.preventDefault(); e.stopPropagation();
-            const target = e.target.closest('[data-help]');
-            if (target) {
-                const bar = document.getElementById('infoBarText');
-                const txt = target.dataset.help;
-                const barRect = bar.parentElement.getBoundingClientRect();
-                const cx = target.getBoundingClientRect().left + target.getBoundingClientRect().width/2 - barRect.left;
-                if (cx / barRect.width < 0.5) {
-                    bar.innerHTML = '<span style="font-size:11px;opacity:0.6;">▼</span> ' + txt;
-                    bar.style.left = (cx - 12) + 'px'; bar.style.right = 'auto'; bar.style.transform = 'none';
-                } else {
-                    bar.innerHTML = txt + ' <span style="font-size:11px;opacity:0.6;">▼</span>';
-                    bar.style.right = (barRect.width - cx - 12) + 'px'; bar.style.left = 'auto'; bar.style.transform = 'none';
-                }
+    function playTone(note,vel){
+        if(!audioOn)return;
+        void (async()=>{
+            try{
+                await initAudio();
+                if(!salamanderPiano)return;
+                if(audioCtx&&audioCtx.state==='suspended')await audioCtx.resume();
+                const vEl=document.getElementById('vst_d');
+                const velo=vEl?parseFloat(vEl.value):1.0;
+                const scale=Number.isFinite(velo)?velo:1.0;
+                let v=((vel|0)/127)*scale*HANON_PLAY_VELOCITY_FACTOR;
+                v=Math.min(HANON_PLAY_VELOCITY_CAP,Math.max(0.02,v));
+                try{ salamanderPiano.keyUp({ midi:note&127 }); }catch(e){}
+                salamanderPiano.keyDown({ midi:note&127, velocity:v });
+            }catch(e){
+                if(String(e&&e.message)==='NEED_HTTP_NOT_FILE')return;
+            }
+        })();
+    }
+    function handleNoteOff(midi){
+        if(salamanderPiano){
+            try{ salamanderPiano.keyUp({ midi:midi&127 }); }catch(e){}
+        }
+    }
+    let helpActive=false;
+    function toggleHelp(){
+        helpActive=!helpActive;document.getElementById('btnHelp').classList.toggle('active',helpActive);
+        if(helpActive){document.body.classList.add('help-mode-active');setInfoBar(HANON_T[currentLang].helpMode,null);}
+        else{document.body.classList.remove('help-mode-active');setInfoBar(HANON_T[currentLang].ready,null);}
+    }
+    document.addEventListener('click',(e)=>{
+        if(e.target.closest('#btnHelp'))return;
+        if(helpActive){
+            e.preventDefault();e.stopPropagation();
+            const target=e.target.closest('[data-help]');
+            if(target){
+                const bar=document.getElementById('infoBarText');const txt=target.dataset.help;
+                const barRect=bar.parentElement.getBoundingClientRect();
+                const cx=target.getBoundingClientRect().left+target.getBoundingClientRect().width/2-barRect.left;
+                if(cx/barRect.width<0.5){bar.innerHTML='<span style="font-size:11px;opacity:0.6;">▼</span> '+txt;bar.style.left=(cx-12)+'px';bar.style.right='auto';bar.style.transform='none';}
+                else{bar.innerHTML=txt+' <span style="font-size:11px;opacity:0.6;">▼</span>';bar.style.right=(barRect.width-cx-12)+'px';bar.style.left='auto';bar.style.transform='none';}
             }
         }
-    }, true);
-
-    // ── FULLSCREEN ──
-    function toggleFullScreen() {
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
-        else if (document.exitFullscreen) document.exitFullscreen();
-    }
-    document.addEventListener('fullscreenchange', () => {
-        document.getElementById('btnFullscreen').classList.toggle('active', !!document.fullscreenElement);
-    });
-
-    // ── MODALS ──
-    function openPatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'flex'; }
-    function closePatchBrowser() { document.getElementById('patchBrowserModal').style.display = 'none'; }
-    function closeModal() { document.getElementById('resultModal').style.display = 'none'; stopPractice(); }
-
-    // ── MODULE VÁLTÓ ──
-    const modules = [
-        { name: 'EAR TRAIN', url: 'hallasfejleszto.html' },
-        { name: 'SIGHT READ', url: 'kottaolvasas.html' },
-        { name: 'CHORDS', url: 'akkordok.html' },
-        { name: 'SCALES', url: 'skalak.html' },
-        { name: 'HANON', url: 'hanon.html' },
-        { name: 'RHYTHM', url: 'ritmus.html' }
-    ];
-    let currentModuleIdx = 4; // HANON
-    function cycleModule(dir) {
-        if (helpActive) return;
-        currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length;
-        document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name;
-    }
-    function loadModule() {
-        if (helpActive) return;
-        if (currentModuleIdx !== 4) window.location.href = modules[currentModuleIdx].url;
-    }
-
-    // ── ÁLLAPOTOK ──
-    let isRunning = false, activeRH = true, activeLH = true;
-    let currentNoteInBlock = 0, currentBlockIndex = 0;
-    let showNames = false, showFinger = false;
-    let seqBlocks = [];
-    let lastHitTime = 0, hitIntervals = [], fingerTimes = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-
-    // Kulcs váltó
-    let clefState = 0;
-    function cycleClef() {
-        if (helpActive) return;
-        clefState = (clefState + 1) % 3;
-        activeRH = clefState !== 2;
-        activeLH = clefState !== 1;
-        document.getElementById('clefRH').style.color = activeRH ? '#fff' : '#444';
-        document.getElementById('clefLH').style.color = activeLH ? '#fff' : '#444';
-        if (isRunning) stopPractice();
-        buildSequence(); draw();
-    }
-
-    // ── MODE ──
-    const MODES = ['SPRINT', 'MARATHON', 'TRAINING'];
-    let currentModeIdx = 0;
-    function cycleMode(dir) {
-        if (helpActive) return;
-        currentModeIdx = (currentModeIdx + dir + MODES.length) % MODES.length;
-        document.getElementById('lcdModeText').innerText = MODES[currentModeIdx];
-        if (isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    // ── HANON VÁLTÓ ──
-    const hanonList = [{ val: 1, name: 'No. 1' }]; // bővíthető
-    let currentHanonIdx = 0;
-    function cycleHanon(dir) {
-        if (helpActive) return;
-        let next = currentHanonIdx + dir;
-        if (next < 0 || next >= hanonList.length) return;
-        currentHanonIdx = next;
-        document.getElementById('lcdHanonText').innerText = hanonList[currentHanonIdx].name;
-        document.getElementById('hanonSelectValue').value = hanonList[currentHanonIdx].val;
-        if (isRunning) stopPractice(); buildSequence(); draw();
-    }
-    function selectPatch(val, name) {
-        currentHanonIdx = hanonList.findIndex(h => h.val === val);
-        if (currentHanonIdx < 0) currentHanonIdx = 0;
-        document.getElementById('lcdHanonText').innerText = hanonList[currentHanonIdx].name;
-        document.getElementById('hanonSelectValue').value = val;
-        closePatchBrowser();
-        if (isRunning) stopPractice(); buildSequence(); draw();
-    }
-
-    // ── EGYÉB GOMBOK ──
-    // toggleHand replaced by cycleClef above
-    function toggleHint(type) {
-        if (type === 'name') { showNames = !showNames; document.getElementById('btnHintName').classList.toggle('active', showNames); }
-        else { showFinger = !showFinger; document.getElementById('btnHintFinger').classList.toggle('active', showFinger); }
+    },true);
+    function toggleFullScreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen();}
+    document.addEventListener('fullscreenchange',()=>{document.getElementById('btnFullscreen').classList.toggle('active',!!document.fullscreenElement);});
+    function openPatchBrowser(){document.getElementById('patchBrowserModal').style.display='flex';}
+    function closePatchBrowser(){document.getElementById('patchBrowserModal').style.display='none';}
+    function closeModal(){document.getElementById('resultModal').style.display='none';stopPractice();}
+    const modules=[{name:'EAR TRAIN',url:'hallasfejleszto.html'},{name:'SIGHT READ',url:'kottaolvasas.html'},{name:'CHORDS',url:'akkordok.html'},{name:'SCALES',url:'skalak.html'},{name:'HANON',url:'hanon.html'}];
+    let currentModuleIdx=4;
+    function cycleModule(dir){if(helpActive)return;currentModuleIdx=(currentModuleIdx+dir+modules.length)%modules.length;document.getElementById('lcdModuleText').innerText=MODULE_NAMES[currentLang][currentModuleIdx];}
+    function loadModule(){if(helpActive)return;if(currentModuleIdx!==4)window.location.href=modules[currentModuleIdx].url;}
+    let isRunning=false,activeRH=true,activeLH=true;
+    let currentNoteInBlock=0,currentBlockIndex=0;
+    let showNames=false,showFinger=false,showLeds=false;
+    let hintState=0; // 0=off, 1=names, 2=names+fingers, 3=names+fingers+leds
+    function cycleHints(){
+        hintState=(hintState+1)%4;
+        showNames=hintState>=1;
+        showFinger=hintState>=2;
+        showLeds=hintState>=3;
+        document.getElementById('btnHints').classList.toggle('active',hintState>0);
+        // Info bar feedback
+        const stateLabels = currentLang==='HU'
+            ? ['SEGÉDEK KI','HANGNEVEK','HANGNEVEK + UJJREND','HANGNEVEK + UJJREND + LED']
+            : ['HINTS OFF','NOTE NAMES','NOTE NAMES + FINGERING','NOTE NAMES + FINGERING + LEDS'];
+        setInfoBar(stateLabels[hintState], document.getElementById('btnHints'));
+        updateKeyLeds();
         draw();
     }
-    function toggleAudio() {
-        audioOn = !audioOn;
-        document.getElementById('audioToggle').classList.toggle('active', audioOn);
-        if (audioOn && !audioCtx) initAudio();
+    function updateKeyLeds(){
+        document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('chord-hint'));
+        if(!showLeds||seqBlocks.length===0)return;
+        let note=seqBlocks[currentBlockIndex]?seqBlocks[currentBlockIndex][currentNoteInBlock]:null;
+        if(!note)return;
+        if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-hint');}
+        if(activeLH){const el=document.getElementById('k-'+note.m_lh);if(el)el.classList.add('chord-hint');}
     }
-    function toggleVst() {
-        if (helpActive) return;
-        let mb = document.getElementById('mixerBar');
-        mb.style.display = (mb.style.display === 'flex') ? 'none' : 'flex';
+    let seqBlocks=[];
+    let lastHitTime=0,hitIntervals=[],fingerTimes={1:[],2:[],3:[],4:[],5:[]};
+    let demoActiveNoteIdx=-1;
+    let clefState=0;
+    function cycleClef(){
+        if(helpActive)return;clefState=(clefState+1)%3;activeRH=clefState!==2;activeLH=clefState!==1;
+        document.getElementById('clefRH').style.color=activeRH?'#fff':'#444';
+        document.getElementById('clefLH').style.color=activeLH?'#fff':'#444';
+        if(isRunning)stopPractice();buildSequence();draw();
     }
-
-    // ── HANON 1 LOGIKA (eredeti, érintetlen) ──
-    const C_MAJOR_MIDI = [0, 2, 4, 5, 7, 9, 11];
-    const NOTE_NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'H'];
-
-    function getNoteInfo(diatonicStep) {
-        let octave = Math.floor(diatonicStep / 7);
-        let noteIndex = diatonicStep % 7;
-        let midi = (octave * 12) + 12 + C_MAJOR_MIDI[noteIndex];
-        let name = NOTE_NAMES[noteIndex];
-        return { midi, name };
+    const MODES=['SPRINT','MARATHON','TRAINING'];let currentModeIdx=0;
+    const RHYTHMS=[
+        {id:'EVEN',label:'EVEN',labelHU:'EGYENLETES',desc:'Even eighth notes — standard Hanon tempo',descHU:'Egyenletes nyolcadok — standard Hanon tempó',ratios:[1,1]},
+        {id:'DOTTED',label:'DOTTED',labelHU:'PUNKTÍROZOTT',desc:'Long-short pairs — develops accentuation',descHU:'Hosszú-rövid párok — hangsúlyfejlesztés',ratios:[3,1]},
+        {id:'REVERSE',label:'REVERSE',labelHU:'FORDÍTOTT',desc:'Short-long pairs — reverse dotted',descHU:'Rövid-hosszú párok — fordított punktírozott',ratios:[1,3]},
+        {id:'SWING',label:'SWING',labelHU:'SWING',desc:'Jazz swing feel — triplet-based groove',descHU:'Jazz swing érzés — triola alapú groove',ratios:[2,1]},
+        {id:'SYNCOPATED',label:'SYNCOPA',labelHU:'SZINKÓPA',desc:'Syncopated rhythm',descHU:'Szinkópa ritmus',ratios:[1,2,1]},
+    ];
+    let currentRhythmIdx=0,rhythmNoteIdx=0;
+    function cycleRhythm(dir){
+        if(helpActive)return;currentRhythmIdx=(currentRhythmIdx+dir+RHYTHMS.length)%RHYTHMS.length;rhythmNoteIdx=0;
+        const R=RHYTHMS[currentRhythmIdx];const isHU=currentLang==='HU';
+        document.getElementById('lcdRhythm').innerText=isHU?R.labelHU:R.label;
+        setInfoBar((isHU?R.descHU:R.desc).toUpperCase()+(isHU?' — KATTINTS A DEMO GOMBRA':' — CLICK DEMO TO PREVIEW'),null);
+        if(isRunning)stopPractice();buildSequence();draw();
     }
+    function cycleMode(dir){
+        if(helpActive)return;currentModeIdx=(currentModeIdx+dir+MODES.length)%MODES.length;
+        document.getElementById('lcdModeText').innerText=MODES[currentModeIdx];
+        const R=RHYTHMS[currentRhythmIdx];document.getElementById('lcdRhythm').innerText=currentLang==='HU'?R.labelHU:R.label;
+        if(isRunning)stopPractice();buildSequence();draw();
+    }
+    let bpm=80;const BPM_MIN=40,BPM_MAX=208;
+    function cycleTempo(delta){
+        if(helpActive)return;
+        bpm=Math.min(BPM_MAX,Math.max(BPM_MIN,bpm+delta));
+        const isHU=currentLang==='HU';
+        setInfoBar((isHU?'TEMPÓ: ':'TEMPO: ')+bpm+' BPM',null);
+    }
+    const hanonList=[];for(let i=1;i<=20;i++)hanonList.push({val:i,name:'No. '+i});
+    let currentHanonIdx=0;
 
-    function buildHanon1() {
-        let fullSeq = [];
-        let ascPattern  = [0,  2,  3,  4,  5,  4,  3,  2];
-        let descPattern = [0, -2, -3, -4, -5, -4, -3, -2];
-        let f_rh_asc  = [1, 2, 3, 4, 5, 4, 3, 2];
-        let f_lh_asc  = [5, 4, 3, 2, 1, 2, 3, 4];
-        let f_rh_desc = [5, 4, 3, 2, 1, 2, 3, 4];
-        let f_lh_desc = [1, 2, 3, 4, 5, 4, 3, 2];
+    // Hanon exercises 1–20: ascending pattern offsets from root
+    // Each exercise has 8 notes ascending, then mirrors descending
+    const HANON_PATTERNS={
+        1:{asc:[0,2,3,4,5,4,3,2], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
+        2:{asc:[0,3,4,2,5,4,3,2], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
+        3:{asc:[0,2,4,3,5,4,3,2], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
+        4:{asc:[0,2,3,5,4,3,2,4], f_rh_asc:[1,2,3,5,4,3,2,4], f_lh_asc:[5,4,3,1,2,3,4,2]},
+        5:{asc:[0,2,4,3,2,4,5,4], f_rh_asc:[1,2,4,3,2,4,5,4], f_lh_asc:[5,4,2,3,4,2,1,2]},
+        6:{asc:[0,2,4,5,4,2,3,4], f_rh_asc:[1,2,4,5,4,2,3,4], f_lh_asc:[5,4,2,1,2,4,3,2]},
+        7:{asc:[0,2,1,2,3,4,5,4], f_rh_asc:[1,2,1,2,3,4,5,4], f_lh_asc:[5,4,5,4,3,2,1,2]},
+        8:{asc:[0,4,3,2,1,2,3,4], f_rh_asc:[1,5,4,3,2,3,4,5], f_lh_asc:[5,1,2,3,4,3,2,1]},
+        9:{asc:[0,1,2,3,4,5,4,3], f_rh_asc:[1,2,3,4,5,4,3,2], f_lh_asc:[5,4,3,2,1,2,3,4]},
+        10:{asc:[0,4,3,4,5,4,3,2], f_rh_asc:[1,4,3,4,5,4,3,2], f_lh_asc:[5,2,3,2,1,2,3,4]},
+        11:{asc:[0,2,3,4,2,3,4,5], f_rh_asc:[1,2,3,4,2,3,4,5], f_lh_asc:[5,4,3,2,4,3,2,1]},
+        12:{asc:[0,4,3,2,4,3,2,1], f_rh_asc:[1,5,4,3,5,4,3,2], f_lh_asc:[5,1,2,3,1,2,3,4]},
+        13:{asc:[0,3,2,1,2,3,4,5], f_rh_asc:[1,4,3,2,3,4,5,4], f_lh_asc:[5,2,3,4,3,2,1,2]},
+        14:{asc:[0,2,4,2,3,5,3,4], f_rh_asc:[1,2,4,2,3,5,3,4], f_lh_asc:[5,4,2,4,3,1,3,2]},
+        15:{asc:[0,4,2,3,1,2,4,5], f_rh_asc:[1,5,3,4,2,3,5,4], f_lh_asc:[5,1,3,2,4,3,1,2]},
+        16:{asc:[0,1,3,2,4,3,5,4], f_rh_asc:[1,2,4,3,5,4,3,2], f_lh_asc:[5,4,2,3,1,2,3,4]},
+        17:{asc:[0,2,1,3,2,4,3,5], f_rh_asc:[1,3,2,4,3,5,4,3], f_lh_asc:[5,3,4,2,3,1,2,3]},
+        18:{asc:[0,2,1,4,3,2,5,4], f_rh_asc:[1,3,2,5,4,3,4,3], f_lh_asc:[5,3,4,1,2,3,2,3]},
+        19:{asc:[0,4,2,5,3,1,4,2], f_rh_asc:[1,5,3,4,2,3,5,3], f_lh_asc:[5,1,3,2,4,3,1,3]},
+        20:{asc:[0,1,2,3,4,3,4,5], f_rh_asc:[1,2,3,4,5,4,5,4], f_lh_asc:[5,4,3,2,1,2,1,2]},
+    };
 
-        // Felfelé
-        for (let rootStep = 28; rootStep <= 34; rootStep++) {
-            for (let i = 0; i < 8; i++) {
-                let currentStepRH = rootStep + ascPattern[i];
-                let currentStepLH = (rootStep - 7) + ascPattern[i];
-                let infoRH = getNoteInfo(currentStepRH);
-                let infoLH = getNoteInfo(currentStepLH);
-                fullSeq.push({
-                    n: infoRH.name, s: '',
-                    m_rh: infoRH.midi, step_rh: currentStepRH,
-                    m_lh: infoLH.midi, step_lh: currentStepLH,
-                    f_rh: f_rh_asc[i], f_lh: f_lh_asc[i]
-                });
+    function buildHanonExercise(num){
+        const P=HANON_PATTERNS[num]||HANON_PATTERNS[1];
+        let fullSeq=[];
+        // Build descending pattern: negate and reverse the logic
+        let descPattern=P.asc.map(v=>-v);
+        let f_rh_desc=P.f_lh_asc.slice(); // descending RH uses ascending LH fingering pattern
+        let f_lh_desc=P.f_rh_asc.slice(); // descending LH uses ascending RH fingering pattern
+        // Ascending: C4 (step 28) up to G4 (step 34), 7 root positions
+        for(let rootStep=28;rootStep<=34;rootStep++){
+            for(let i=0;i<8;i++){
+                let csRH=rootStep+P.asc[i];let csLH=(rootStep-7)+P.asc[i];
+                let iRH=getNoteInfo(csRH);let iLH=getNoteInfo(csLH);
+                fullSeq.push({n:iRH.name,s:'',m_rh:iRH.midi,step_rh:csRH,m_lh:iLH.midi,step_lh:csLH,f_rh:P.f_rh_asc[i],f_lh:P.f_lh_asc[i]});
             }
         }
-
-        // Lefelé
-        for (let rootStep = 39; rootStep >= 31; rootStep--) {
-            for (let i = 0; i < 8; i++) {
-                let currentStepRH = rootStep + descPattern[i];
-                let currentStepLH = (rootStep - 7) + descPattern[i];
-                let infoRH = getNoteInfo(currentStepRH);
-                let infoLH = getNoteInfo(currentStepLH);
-                fullSeq.push({
-                    n: infoRH.name, s: '',
-                    m_rh: infoRH.midi, step_rh: currentStepRH,
-                    m_lh: infoLH.midi, step_lh: currentStepLH,
-                    f_rh: f_rh_desc[i], f_lh: f_lh_desc[i]
-                });
+        // Descending: from top back down, 9 root positions
+        for(let rootStep=39;rootStep>=31;rootStep--){
+            for(let i=0;i<8;i++){
+                let csRH=rootStep+descPattern[i];let csLH=(rootStep-7)+descPattern[i];
+                let iRH=getNoteInfo(csRH);let iLH=getNoteInfo(csLH);
+                fullSeq.push({n:iRH.name,s:'',m_rh:iRH.midi,step_rh:csRH,m_lh:iLH.midi,step_lh:csLH,f_rh:f_rh_desc[i],f_lh:f_lh_desc[i]});
             }
         }
-
-        // Záróhang C4
-        let finRH = getNoteInfo(28), finLH = getNoteInfo(21);
-        fullSeq.push({ n: finRH.name, s: '', m_rh: finRH.midi, step_rh: 28, m_lh: finLH.midi, step_lh: 21, f_rh: 1, f_lh: 5 });
+        // Final note
+        let fRH=getNoteInfo(28),fLH=getNoteInfo(21);
+        fullSeq.push({n:fRH.name,s:'',m_rh:fRH.midi,step_rh:28,m_lh:fLH.midi,step_lh:21,f_rh:1,f_lh:5});
         return fullSeq;
     }
+    function cycleHanon(dir){
+        if(helpActive)return;let next=currentHanonIdx+dir;if(next<0||next>=hanonList.length)return;
+        currentHanonIdx=next;document.getElementById('lcdExerciseText').innerText=hanonList[currentHanonIdx].name;document.getElementById('hanonSelectValue').value=hanonList[currentHanonIdx].val;
+        if(isRunning)stopPractice();buildSequence();draw();
+    }
+    function selectPatch(val,name){
+        currentHanonIdx=hanonList.findIndex(h=>h.val===val);if(currentHanonIdx<0)currentHanonIdx=0;
+        document.getElementById('lcdExerciseText').innerText=hanonList[currentHanonIdx].name;document.getElementById('hanonSelectValue').value=val;
+        closePatchBrowser();if(isRunning)stopPractice();buildSequence();draw();
+    }
+    function toggleAudio(){audioOn=!audioOn;document.getElementById('audioToggle').classList.toggle('active',audioOn);if(audioOn)void initAudio().catch(()=>{});}
+    const C_MAJOR_MIDI=[0,2,4,5,7,9,11];const NOTE_NAMES=['C','D','E','F','G','A','H'];
+    function getNoteInfo(diatonicStep){let octave=Math.floor(diatonicStep/7);let noteIndex=diatonicStep%7;let midi=(octave*12)+12+C_MAJOR_MIDI[noteIndex];return{midi,name:NOTE_NAMES[noteIndex]};}
+    const VF = Vex.Flow;
 
-    function buildSequence() {
-        let rawSeq = buildHanon1();
-        let loops = (MODES[currentModeIdx] === 'SPRINT') ? 1 : (MODES[currentModeIdx] === 'MARATHON' ? 3 : 100);
-        let flatSeq = [];
-        for (let l = 0; l < loops; l++) flatSeq = flatSeq.concat(rawSeq);
-        seqBlocks = [];
-        for (let i = 0; i < flatSeq.length; i += 16) seqBlocks.push(flatSeq.slice(i, i + 16));
-        currentBlockIndex = 0; currentNoteInBlock = 0;
+    // VexFlow 4.x kompatibilitás — biztonságos osztály-feloldás
+    const VFAnnotation = VF.Annotation || Vex.Flow.Annotation;
+    const VJ_TOP = (VFAnnotation && VFAnnotation.VerticalJustify) ? VFAnnotation.VerticalJustify.TOP : 1;
+    const VJ_BOTTOM = (VFAnnotation && VFAnnotation.VerticalJustify) ? VFAnnotation.VerticalJustify.BOTTOM : 4;
+
+    // 1. OKOSÍTOTT MIDI FORDÍTÓ (Felismeri a # és b hangokat)
+    function midiToVexFlow(midi) {
+        if (!midi) return { key: "c/4", accidental: null };
+        const notes = [
+            {n:"c", a:null}, {n:"c", a:"#"}, {n:"d", a:null}, {n:"e", a:"b"},
+            {n:"e", a:null}, {n:"f", a:null}, {n:"f", a:"#"}, {n:"g", a:null},
+            {n:"a", a:"b"}, {n:"a", a:null}, {n:"b", a:"b"}, {n:"b", a:null}
+        ];
+        const octave = Math.floor(midi / 12) - 1;
+        const noteInfo = notes[midi % 12];
+        return { key: `${noteInfo.n}/${octave}`, accidental: noteInfo.a };
     }
 
-    // ── KOTTA KALIBRÁCIÓ ──
-    const KOTTA_E4_Y = 187.6;
-    const KOTTA_VONALKOZ_FEL_RH = 11.14;
-    const KOTTA_G2_Y = 417;
-    const KOTTA_VONALKOZ_FEL_LH = 10.71;
+    // === AKÍRA ZOOM ÉS STÍLUS BEÁLLÍTÁSOK ===
+    let KOTTA_ZOOM = 1.1; 
+    let bookViewActive = false;
+    const VEXFLOW_BASE_WIDTH = 1100; // px — alap kottaszélesség zoom nélkül
+    const VEXFLOW_ROW_HEIGHT = 230;  // px — egy sor magassága zoom nélkül
 
-    const canvas = document.getElementById('staffCanvas'), ctx = canvas.getContext('2d');
+    const C_LINES  = '#4a4a4a'; 
+    const C_BRIGHT = '#c3c3c3'; 
+    const C_PAST   = '#888888';
+    const C_ACTIVE = '#00d0ff'; 
+
+    function getMaxZoom() {
+        // A zoom ne takarja el a jobb oldali gombokat — max a rendelkezésre álló szélesség 95%-a
+        const container = document.querySelector('.sheet-container');
+        if (!container) return 2.5;
+        const availW = container.clientWidth - 100; // 100px margó a zoom gomboknak
+        return Math.min(2.5, availW / VEXFLOW_BASE_WIDTH);
+    }
+
+    function zoomKotta(delta) {
+        KOTTA_ZOOM = Math.max(0.5, Math.min(getMaxZoom(), KOTTA_ZOOM + delta));
+        draw();
+    }
+
+    function fitWidth() {
+        const container = document.querySelector('.sheet-container');
+        if (!container) return;
+        const availW = container.clientWidth - (bookViewActive ? 120 : 80); // margó a zoom gomboknak
+        const targetW = bookViewActive ? (availW / 2 - 20) : availW;
+        KOTTA_ZOOM = Math.max(0.5, Math.min(getMaxZoom(), targetW / VEXFLOW_BASE_WIDTH));
+        draw();
+    }
+
+    function fitHeight() {
+        const lowerSection = document.querySelector('.lower-section');
+        const workstationH = lowerSection ? lowerSection.offsetHeight : 300;
+        const availH = window.innerHeight - workstationH - 60;
+        // Cél: pontosan annyi sor férjen el amennyit az aktuális lap tartalmaz
+        const currentPageRows = Math.min(seqBlocks.length, 4); // max 4 sor reális
+        const targetZoom = availH / (currentPageRows * VEXFLOW_ROW_HEIGHT + 50);
+        KOTTA_ZOOM = Math.max(0.5, Math.min(getMaxZoom(), targetZoom));
+        draw();
+    }
+
+    function toggleBookView() {
+        bookViewActive = !bookViewActive;
+        document.getElementById('btnBookView').style.background = bookViewActive ? '#333' : '#111';
+        document.getElementById('btnBookView').style.color = bookViewActive ? '#fff' : '#aaa';
+        // Auto fit-width a könyv nézethez
+        fitWidth();
+    }
+
+    function buildSequence(){
+        let exerciseNum=hanonList[currentHanonIdx].val;
+        let rawSeq=buildHanonExercise(exerciseNum);
+        let loops=MODES[currentModeIdx]==='SPRINT'?1:MODES[currentModeIdx]==='MARATHON'?3:100;
+        let flatSeq=[];for(let l=0;l<loops;l++)flatSeq=flatSeq.concat(rawSeq);
+        seqBlocks=[];
+        for(let i=0;i<flatSeq.length;i+=32) seqBlocks.push(flatSeq.slice(i,i+32));
+        currentBlockIndex=0;currentNoteInBlock=0;rhythmNoteIdx=0;
+        syncMetroTimeSig();
+    }
 
     function draw() {
-        ctx.clearRect(0, 0, 2450, 480);
+        const container = document.getElementById('vexflow-container');
+        container.innerHTML = ''; 
         if (seqBlocks.length === 0) return;
 
-        let block = seqBlocks[currentBlockIndex];
-        let totalNotes = block.length;
-        let startX = 180, endX = 2380;
-        let spacingX = totalNotes > 1 ? (endX - startX) / (totalNotes - 1) : 0;
+        try {
+        const lowerSection = document.querySelector('.lower-section');
+        const workstationHeight = lowerSection ? lowerSection.offsetHeight : 300; 
+        const availableHeight = window.innerHeight - workstationHeight - 60; 
+        
+        const rowHeight = VEXFLOW_ROW_HEIGHT * KOTTA_ZOOM;
+        let ROWS_PER_PAGE = Math.floor(availableHeight / rowHeight);
+        if (ROWS_PER_PAGE < 1) ROWS_PER_PAGE = 1; 
 
-        block.forEach((n, i) => {
-            let alpha = 1.0;
-            if (!isRunning && i === 0 && currentBlockIndex === 0) alpha = 1.0;
-            let x = startX + (i * spacingX);
-            let isActive = (isRunning && i === currentNoteInBlock);
-            let isPast = (isRunning && i < currentNoteInBlock);
-            let color = isActive ? 'rgba(179,230,255,1.0)' : isPast ? 'rgba(179,230,255,0.15)' : 'rgba(179,230,255,0.3)';
+        if (bookViewActive) {
+            // === KÖNYV NÉZET — két oldal egymás mellett ===
+            const totalRowsPerSpread = ROWS_PER_PAGE * 2; // bal + jobb oldal
+            const spreadIndex = Math.floor(currentBlockIndex / totalRowsPerSpread);
+            const startIndex = spreadIndex * totalRowsPerSpread;
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'display:flex; gap:30px; justify-content:center; width:100%;';
+            container.appendChild(wrapper);
 
-            if (activeRH) {
-                ctx.globalAlpha = 1.0;
-                let y = KOTTA_E4_Y - ((n.step_rh - 30) * KOTTA_VONALKOZ_FEL_RH);
-                ctx.save(); ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : isPast ? 'rgba(210,210,210,0.15)' : 'rgba(210,210,210,0.3)'; ctx.lineWidth = 2;
-                if (n.step_rh <= 28) { for (let s = 28; s >= n.step_rh; s -= 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                if (n.step_rh >= 40) { for (let s = 40; s <= n.step_rh; s += 2) { let ly = KOTTA_E4_Y - ((s - 30) * KOTTA_VONALKOZ_FEL_RH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                ctx.restore();
-                ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI / 10, 0, 2 * Math.PI); ctx.fillStyle = color; ctx.fill();
-                if (showNames) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.n, x, y - 22); }
-                if (showFinger) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.f_rh, x, y + 34); }
+            // Bal és jobb oldal renderelése
+            for (let page = 0; page < 2; page++) {
+                const pageDiv = document.createElement('div');
+                pageDiv.style.cssText = 'flex-shrink:0;';
+                wrapper.appendChild(pageDiv);
+
+                const renderer = new VF.Renderer(pageDiv, VF.Renderer.Backends.SVG);
+                renderer.resize(VEXFLOW_BASE_WIDTH * KOTTA_ZOOM, (ROWS_PER_PAGE * VEXFLOW_ROW_HEIGHT + 50) * KOTTA_ZOOM);
+                const ctx = renderer.getContext();
+                ctx.scale(KOTTA_ZOOM, KOTTA_ZOOM);
+
+                for (let i = 0; i < ROWS_PER_PAGE; i++) {
+                    const blockIdx = startIndex + (page * ROWS_PER_PAGE) + i;
+                    const block = seqBlocks[blockIdx];
+                    if (!block) break;
+
+                    let active = -1;
+                    if (currentBlockIndex === blockIdx) active = currentNoteInBlock;
+                    else if (currentBlockIndex > blockIdx) active = 999;
+
+                    renderSystem(ctx, block, 30, i * VEXFLOW_ROW_HEIGHT, active);
+                }
+
+                // Oldalszám alul
+                const pageNum = spreadIndex * 2 + page + 1;
+                const totalPages = Math.ceil(seqBlocks.length / ROWS_PER_PAGE);
+                if (pageNum <= totalPages) {
+                    const label = document.createElement('div');
+                    label.style.cssText = 'text-align:center; font-family:"Share Tech Mono"; font-size:11px; color:#444; margin-top:5px;';
+                    label.textContent = pageNum + ' / ' + totalPages;
+                    pageDiv.appendChild(label);
+                }
+            }
+        } else {
+            // === NORMÁL NÉZET — egy oldal középen ===
+            const pageIndex = Math.floor(currentBlockIndex / ROWS_PER_PAGE);
+            const startIndex = pageIndex * ROWS_PER_PAGE;
+
+            const renderer = new VF.Renderer(container, VF.Renderer.Backends.SVG);
+            renderer.resize(VEXFLOW_BASE_WIDTH * KOTTA_ZOOM, (ROWS_PER_PAGE * VEXFLOW_ROW_HEIGHT + 50) * KOTTA_ZOOM); 
+            const ctx = renderer.getContext();
+            ctx.scale(KOTTA_ZOOM, KOTTA_ZOOM);
+
+            for (let i = 0; i < ROWS_PER_PAGE; i++) {
+                const block = seqBlocks[startIndex + i];
+                if (!block) break; 
+
+                let active = -1;
+                if (currentBlockIndex === startIndex + i) active = currentNoteInBlock;
+                else if (currentBlockIndex > startIndex + i) active = 999; 
+
+                renderSystem(ctx, block, 30, i * VEXFLOW_ROW_HEIGHT, active);
             }
 
-            if (activeLH) {
-                ctx.globalAlpha = 1.0;
-                // Hanon LH: step=21 = C3, step=19 = G2 (KOTTA_G2_Y)
-                // Offset = 19 hogy G2 (step=19) → y = KOTTA_G2_Y - 0 = G2 pixel pozíció
-                let y = KOTTA_G2_Y - ((n.step_lh - 19) * KOTTA_VONALKOZ_FEL_LH);
-                ctx.save(); ctx.strokeStyle = isActive ? 'rgba(210,210,210,1.0)' : isPast ? 'rgba(210,210,210,0.15)' : 'rgba(210,210,210,0.3)'; ctx.lineWidth = 2;
-                // Léniavonalak: bass clef alatt step<=17 (C3 alatti), fölötte step>=29
-                if (n.step_lh <= 17) { for (let s = 17; s >= n.step_lh; s -= 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                if (n.step_lh >= 29) { for (let s = 29; s <= n.step_lh; s += 2) { let ly = KOTTA_G2_Y - ((s - 19) * KOTTA_VONALKOZ_FEL_LH); ctx.beginPath(); ctx.moveTo(x - 20, ly); ctx.lineTo(x + 20, ly); ctx.stroke(); } }
-                ctx.restore();
-                ctx.beginPath(); ctx.ellipse(x, y, 14, 10, -Math.PI / 10, 0, 2 * Math.PI); ctx.fillStyle = color; ctx.fill();
-                if (showNames) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.n, x, y - 22); }
-                if (showFinger) { ctx.font = 'bold 18px Inter'; ctx.fillStyle = '#b3e6ff'; ctx.textAlign = 'center'; ctx.fillText(n.f_lh, x, y + 34); }
+            // Oldalszám
+            const totalPages = Math.ceil(seqBlocks.length / ROWS_PER_PAGE);
+            if (totalPages > 1) {
+                const label = document.createElement('div');
+                label.style.cssText = 'text-align:center; font-family:"Share Tech Mono"; font-size:11px; color:#444; margin-top:5px;';
+                label.textContent = (pageIndex + 1) + ' / ' + totalPages;
+                container.appendChild(label);
             }
+        }
+        } catch(e) {
+            console.error('VexFlow draw error:', e);
+        }
+
+        updateKeyLeds(); 
+    }
+
+    function renderSystem(ctx, block, x, y, activeIndex) {
+        const measures = [];
+        for (let i = 0; i < block.length; i += 8) {
+            measures.push(block.slice(i, i + 8));
+        }
+
+        function createVoice(notesData, isTreble, baseIndex) {
+            const notes = notesData.map((n, i) => {
+                const globalNoteIndex = baseIndex + i;
+                const midi = isTreble ? n.m_rh : n.m_lh;
+                
+                const vfInfo = midiToVexFlow(midi);
+                
+                const vfNote = new VF.StaveNote({
+                    clef: isTreble ? "treble" : "bass",
+                    keys: [vfInfo.key],
+                    duration: "16" 
+                });
+
+                // Módosítójelek automatikus hozzáadása
+                if (vfInfo.accidental) {
+                    vfNote.addModifier(new VF.Accidental(vfInfo.accidental));
+                }
+
+                let color = C_BRIGHT;
+                if (globalNoteIndex === activeIndex) color = C_ACTIVE;
+                else if (activeIndex !== -1 && globalNoteIndex < activeIndex) color = C_PAST;
+
+                vfNote.setStyle({ fillStyle: color, strokeStyle: color });
+                vfNote.setStyle({ fillStyle: color, strokeStyle: color });
+
+            // --- FINOMHANGOLT SEGÉDVONALAK ---
+            // Ha a hang éppen aktív (kék), a vonal is kék. Minden más esetben egy elegáns középszürke!
+            let ledgerColor = (globalNoteIndex === activeIndex) ? C_ACTIVE : '#666666';
+            
+            if (vfNote.setLedgerLineStyle) {
+                vfNote.setLedgerLineStyle({ 
+                    strokeStyle: ledgerColor, 
+                    fillStyle: ledgerColor, 
+                    lineWidth: 1.5 // Visszavettük 1.5-ra, ahogy kérted!
+                });
+            }
+            // ---------------------------------
+
+                // === HANGNEVEK (showNames) ===
+                if (showNames) {
+                    const midi = isTreble ? n.m_rh : n.m_lh;
+                    const noteIdx = midi % 12;
+                    const noteLetters = currentLang === 'HU'
+                        ? ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','H']
+                        : ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+                    const oct = Math.floor(midi / 12) - 1;
+                    const noteName = noteLetters[noteIdx] + oct;
+                    // Position: treble = above (3), bass = below (4)
+                    const ann = new VFAnnotation(noteName)
+                        .setFont('Share Tech Mono', 8, 'bold')
+                        .setVerticalJustification(isTreble ? VJ_TOP : VJ_BOTTOM);
+                    ann.setStyle({ fillStyle: color, strokeStyle: color });
+                    vfNote.addModifier(ann);
+                }
+
+                // === UJJREND (showFinger) ===
+                if (showFinger) {
+                    const finger = isTreble ? n.f_rh : n.f_lh;
+                    if (finger !== undefined && finger !== null) {
+                        // Ujjrend Annotation-ként — treble: lent, bass: fent (ellenkezője a hangneveknek)
+                        const fAnn = new VFAnnotation(finger.toString())
+                            .setFont('Inter', 7, 'bold')
+                            .setVerticalJustification(isTreble ? VJ_BOTTOM : VJ_TOP);
+                        fAnn.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT });
+                        vfNote.addModifier(fAnn);
+                    }
+                }
+                return vfNote;
+            });
+
+            const voice = new VF.Voice({ num_beats: scoreTimeSig, beat_value: 4 }).addTickables(notes);
+            voice.setStrict(false);
+            const beams = VF.Beam.generateBeams(notes);
+            beams.forEach(b => b.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
+            
+            return { voice, beams };
+        }
+
+        let currentX = x;
+        const stavesTreble = [];
+        const stavesBass = [];
+        const voicesTreble = [];
+        const voicesBass = [];
+
+        measures.forEach((measureData, mIndex) => {
+            const isFirst = (mIndex === 0);
+            const isLast = (mIndex === measures.length - 1);
+            
+            const mWidth = isFirst ? 300 : 250; 
+
+            const staveTreble = new VF.Stave(currentX, y, mWidth);
+            const staveBass = new VF.Stave(currentX, y + 110, mWidth); // 110px a pótvonalaknak
+
+            if (isFirst) {
+                staveTreble.addClef("treble").addTimeSignature(scoreTimeSig + "/4");
+                staveBass.addClef("bass").addTimeSignature(scoreTimeSig + "/4");
+            }
+            if (isLast) {
+                staveTreble.setEndBarType(VF.Barline.type.SINGLE);
+                staveBass.setEndBarType(VF.Barline.type.SINGLE);
+            }
+
+            stavesTreble.push(staveTreble);
+            stavesBass.push(staveBass);
+
+            if (activeRH) voicesTreble.push(createVoice(measureData, true, mIndex * 8));
+            if (activeLH) voicesBass.push(createVoice(measureData, false, mIndex * 8));
+
+            currentX += mWidth;
         });
-        ctx.globalAlpha = 1.0;
-    }
 
-    // ── PRACTICE KONTROL ──
-    function handleMainButton() {
-        if (!isRunning) {
-            initAudio(); buildSequence(); isRunning = true;
-            updateStartStop(true);
-            lastHitTime = 0; hitIntervals = []; fingerTimes = { 1: [], 2: [], 3: [], 4: [], 5: [] };
-            document.getElementById('lcdStats').innerText = '0 / 100%';
-            setInfoBar(`PLAYING — ${MODES[currentModeIdx]} — HANON ${hanonList[currentHanonIdx].name.toUpperCase()}`, null);
-            draw();
-        } else stopPractice();
-    }
+        stavesTreble.forEach((stave, i) => {
+            stave.setContext(ctx);
+            ctx.setLineWidth(0.5); 
+            ctx.setStrokeStyle(C_LINES);
+            ctx.setFillStyle(C_LINES);
+            stave.getModifiers().forEach(mod => mod.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
+            stave.draw();
+            
+            const bStave = stavesBass[i];
+            bStave.setContext(ctx);
+            bStave.getModifiers().forEach(mod => mod.setStyle({ fillStyle: C_BRIGHT, strokeStyle: C_BRIGHT }));
+            bStave.draw();
+            
+            ctx.setLineWidth(1.0); 
+        });
 
-    function stopPractice() {
-        isRunning = false; currentNoteInBlock = 0; currentBlockIndex = 0;
-        updateStartStop(false);
-        setInfoBar(HANON_T[currentLang].ready, null);
-        draw();
-    }
-
-    function showResults() {
-        isRunning = false;
-        document.getElementById('btnStart').innerText = 'START';
-        document.getElementById('btnStart').classList.remove('running');
-        if (hitIntervals.length === 0) { stopPractice(); return; }
-
-        let avgDiff = hitIntervals.reduce((a, b) => a + b) / hitIntervals.length;
-        let avgBpm = Math.round(60000 / avgDiff);
-        let finalUniformity = document.getElementById('lcdStats').innerText.split('/')[1]?.trim() || '100%';
-
-        let weakestFinger = 0, maxAvgTime = 0;
-        for (let f = 1; f <= 5; f++) {
-            if (fingerTimes[f].length > 0) {
-                let avg = fingerTimes[f].reduce((a, b) => a + b) / fingerTimes[f].length;
-                if (avg > maxAvgTime) { maxAvgTime = avg; weakestFinger = f; }
-            }
+        ctx.setStrokeStyle(C_BRIGHT);
+        ctx.setFillStyle(C_BRIGHT);
+        if (stavesTreble.length > 0) {
+            new VF.StaveConnector(stavesTreble[0], stavesBass[0]).setType(VF.StaveConnector.type.BRACE).setContext(ctx).draw();
+            new VF.StaveConnector(stavesTreble[0], stavesBass[0]).setType(VF.StaveConnector.type.SINGLE_LEFT).setContext(ctx).draw();
+            new VF.StaveConnector(stavesTreble[stavesTreble.length-1], stavesBass[stavesBass.length-1]).setType(VF.StaveConnector.type.SINGLE_RIGHT).setContext(ctx).draw();
         }
 
-        const fingerNames = ['', 'Thumb (1)', 'Index (2)', 'Middle (3)', 'Ring (4)', 'Pinky (5)'];
-        let tipText = 'Excellent work! Your timing was consistent throughout the exercise.';
-        if (weakestFinger === 4 || weakestFinger === 5) {
-            tipText = `The data shows your <b>${fingerNames[weakestFinger]}</b> was the slowest. This is natural in Hanon exercises — focus on lifting that finger higher before each keystroke.`;
-        } else if (weakestFinger > 0) {
-            tipText = `Your <b>${fingerNames[weakestFinger]}</b> caused the most slowdowns. Check your hand position and keep your wrist relaxed.`;
-        }
+        voicesTreble.forEach((v, i) => {
+            const width = (i === 0) ? 220 : 210;
+            new VF.Formatter().joinVoices([v.voice]).format([v.voice], width);
+            v.voice.draw(ctx, stavesTreble[i]);
+            v.beams.forEach(b => {
+                const globalBase = i * 8;
+                if(activeIndex !== -1 && activeIndex >= globalBase + 8) b.setStyle({fillStyle: C_PAST, strokeStyle: C_PAST});
+                b.setContext(ctx).draw();
+            });
+        });
 
-        document.getElementById('modalBpm').innerText = avgBpm + ' BPM';
-        document.getElementById('modalUni').innerText = finalUniformity;
-        document.getElementById('modalTip').innerHTML = tipText;
-        document.getElementById('resultModal').style.display = 'flex';
-        draw();
+        voicesBass.forEach((v, i) => {
+            const width = (i === 0) ? 220 : 210;
+            new VF.Formatter().joinVoices([v.voice]).format([v.voice], width);
+            v.voice.draw(ctx, stavesBass[i]);
+            v.beams.forEach(b => {
+                const globalBase = i * 8;
+                if(activeIndex !== -1 && activeIndex >= globalBase + 8) b.setStyle({fillStyle: C_PAST, strokeStyle: C_PAST});
+                b.setContext(ctx).draw();
+            });
+        });
     }
-
-    function handleNoteOn(midi, vel = 100) {
-        playTone(midi, vel);
-        if (!isRunning || seqBlocks.length === 0) return;
-        let note = seqBlocks[currentBlockIndex][currentNoteInBlock];
-
-        // Hit detekció: ha mindkét kéz aktív, elég bármelyik helyes hang
-        // (egéren/billentyűzeten nem lehet egyszerre két hangot leütni)
-        let hit = false;
-        if (activeRH && midi === note.m_rh) hit = true;
-        if (activeLH && midi === note.m_lh) hit = true;
-
-        if (hit) {
-            let now = performance.now();
-            if (lastHitTime > 0) {
-                let diff = now - lastHitTime;
-                hitIntervals.push(diff);
-                if (activeRH && note.f_rh) fingerTimes[note.f_rh].push(diff);
-                if (activeLH && note.f_lh) fingerTimes[note.f_lh].push(diff);
-
-                let currentBpm = Math.round(60000 / diff);
-                let avg = hitIntervals.reduce((a, b) => a + b) / hitIntervals.length;
-                let dev = Math.sqrt(hitIntervals.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / hitIntervals.length);
-                let uniformity = Math.round(Math.max(0, 100 - (dev / 3)));
-                document.getElementById('lcdStats').innerText = `${currentBpm} / ${uniformity}%`;
+    function handleMainButton(){
+        if(demoRunning)stopDemo();
+        if(!isRunning){initAudio();buildSequence();isRunning=true;updateStartStop(true);lastHitTime=0;hitIntervals=[];fingerTimes={1:[],2:[],3:[],4:[],5:[]};setInfoBar(`PLAYING — ${MODES[currentModeIdx]} — HANON ${hanonList[currentHanonIdx].name.toUpperCase()}`,null);draw();}
+        else stopPractice();
+    }
+    function stopPractice(){isRunning=false;currentNoteInBlock=0;currentBlockIndex=0;updateStartStop(false);setInfoBar(HANON_T[currentLang].ready,null);draw();}
+    function showResults(){
+        isRunning=false;updateStartStop(false);
+        if(hitIntervals.length===0){stopPractice();return;}
+        let avgDiff=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let avgBpm=Math.round(60000/avgDiff);
+        let avg2=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let dev=Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avg2,2),0)/hitIntervals.length);
+        let uniformity=Math.round(Math.max(0,100-(dev/3)))+'%';
+        let weakestFinger=0,maxAvgTime=0;
+        for(let f=1;f<=5;f++){if(fingerTimes[f].length>0){let avg=fingerTimes[f].reduce((a,b)=>a+b)/fingerTimes[f].length;if(avg>maxAvgTime){maxAvgTime=avg;weakestFinger=f;}}}
+        const fingerNames=['','Thumb (1)','Index (2)','Middle (3)','Ring (4)','Pinky (5)'];
+        let tipText='Excellent work! Your timing was consistent throughout the exercise.';
+        if(weakestFinger===4||weakestFinger===5)tipText=`The data shows your <b>${fingerNames[weakestFinger]}</b> was the slowest. Focus on lifting that finger higher before each keystroke.`;
+        else if(weakestFinger>0)tipText=`Your <b>${fingerNames[weakestFinger]}</b> caused the most slowdowns. Check your hand position and keep your wrist relaxed.`;
+        document.getElementById('modalBpm').innerText=avgBpm+' BPM';document.getElementById('modalUni').innerText=uniformity;document.getElementById('modalTip').innerHTML=tipText;
+        document.getElementById('resultModal').style.display='flex';draw();
+    }
+    function handleNoteOn(midi,vel=100){
+        playTone(midi,vel);if(!isRunning||seqBlocks.length===0)return;
+        let note=seqBlocks[currentBlockIndex][currentNoteInBlock];let hit=false;
+        if(activeRH&&midi===note.m_rh)hit=true;if(activeLH&&midi===note.m_lh)hit=true;
+        if(hit){
+            let now=performance.now();
+            if(lastHitTime>0){
+                let diff=now-lastHitTime;hitIntervals.push(diff);
+                if(activeRH&&note.f_rh)fingerTimes[note.f_rh].push(diff);if(activeLH&&note.f_lh)fingerTimes[note.f_lh].push(diff);
+                let currentBpm=Math.round(60000/diff);let avg=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
+                let dev=Math.sqrt(hitIntervals.reduce((a,b)=>a+Math.pow(b-avg,2),0)/hitIntervals.length);
+                let uniformity=Math.round(Math.max(0,100-(dev/3)));
+                setInfoBar(`BPM: ${currentBpm}  |  STABILITY: ${uniformity}%  |  ${RHYTHMS[currentRhythmIdx].label}`,null);
             }
-            lastHitTime = now;
-            currentNoteInBlock++;
-            if (currentNoteInBlock >= seqBlocks[currentBlockIndex].length) {
-                currentNoteInBlock = 0; currentBlockIndex++;
-                if (currentBlockIndex >= seqBlocks.length) { showResults(); return; }
-            }
+            lastHitTime=now;currentNoteInBlock++;
+            if(currentNoteInBlock>=seqBlocks[currentBlockIndex].length){currentNoteInBlock=0;currentBlockIndex++;if(currentBlockIndex>=seqBlocks.length){showResults();return;}}
             draw();
         }
     }
-
-    // ── BILLENTYŰZET ──
-    function create88() {
-        const wrap = document.getElementById('hb-wrap');
-        const whites = [0, 2, 4, 5, 7, 9, 11]; let wIdx = 0;
-        for (let m = 21; m <= 108; m++) {
-            const k = document.createElement('div'); const isW = whites.includes(m % 12);
-            k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
-            if (isW) { k.style.left = (wIdx * 1.92307) + '%'; k.style.width = '1.92307%'; k.style.height = '100%'; wIdx++; }
-            else { k.style.left = ((wIdx * 1.92307) - 0.6) + '%'; k.style.width = '1.2%'; k.style.height = '65%'; k.style.zIndex = '200'; }
-            k.onmousedown = (e) => { e.preventDefault(); k.classList.add('pressed'); handleNoteOn(m, 100); };
-            k.onmouseup = () => { k.classList.remove('pressed'); handleNoteOff(m); };
-            k.onmouseleave = () => { k.classList.remove('pressed'); handleNoteOff(m); };
+    let demoRunning=false,demoTimeouts=[];
+    function playRhythmDemo(){
+        if(demoRunning){stopDemo();return;}
+        initAudio().then(()=>{
+            setTimeout(()=>{
+                let wait=0;
+                const t=()=>{
+                    if(salamanderPiano&&salamanderPiano.loaded){
+                        _playDemo();
+                        return;
+                    }
+                    if(++wait>120)return;
+                    setTimeout(t,100);
+                };
+                t();
+            },300);
+        }).catch(e=>{if(String(e&&e.message)==='NEED_HTTP_NOT_FILE')return;});
+    }
+    function stopDemo(){
+        demoRunning=false;
+        document.getElementById('btnDemo').classList.remove('active');
+        demoTimeouts.forEach(t=>clearTimeout(t));
+        demoTimeouts=[];
+        if(salamanderPiano){try{ salamanderPiano.stopAll(); }catch(e){}}
+        demoActiveNoteIdx=-1;
+        document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
+        currentNoteInBlock=0;currentBlockIndex=0;
+        draw();
+        setInfoBar(HANON_T[currentLang].ready,null);
+    }
+    function _playDemo(){
+        if(!audioCtx||!salamanderPiano)return;
+        const rawSeq=buildHanonExercise(hanonList[currentHanonIdx].val);
+        const R=RHYTHMS[currentRhythmIdx];const baseDur=60/bpm;
+        let time=audioCtx.currentTime+0.15;
+        snapMetroToBeat0(time);
+        demoTimeouts.forEach(t=>clearTimeout(t));
+        demoTimeouts=[];
+        if(salamanderPiano){try{ salamanderPiano.stopAll(); }catch(e){}}
+        demoActiveNoteIdx=-1;document.querySelectorAll('.key-glow').forEach(k=>k.classList.remove('demo-flash'));
+        if(seqBlocks.length===0)buildSequence();
+        demoRunning=true;
+        document.getElementById('btnDemo').classList.add('active');
+        
+        rawSeq.forEach((note,i)=>{
+            const ratio=R.ratios[i%R.ratios.length];const dur=baseDur*ratio;
+            const delayMs=(time-audioCtx.currentTime)*1000;const flashDur=Math.min(dur*0.85*1000,400);
+            const blockIdx=Math.floor(i/32);const noteIdx=i%32;
+            
+            const tid1=setTimeout(()=>{
+                if(!demoRunning)return;
+                demoActiveNoteIdx=noteIdx;currentBlockIndex=blockIdx;currentNoteInBlock=noteIdx;draw();
+                const tid2=setTimeout(()=>{if(demoRunning&&demoActiveNoteIdx===noteIdx){demoActiveNoteIdx=-1;draw();}},flashDur);
+                demoTimeouts.push(tid2);
+            },delayMs);
+            demoTimeouts.push(tid1);
+            [activeRH?note.m_rh:null,activeLH?note.m_lh:null].forEach(midiNote=>{
+                if(!midiNote)return;
+                const m=midiNote&127;
+                const tOff=time+dur;
+                const vel=HANON_DEMO_NOTE_VELOCITY;
+                const dOn=Math.max(0,(time-audioCtx.currentTime)*1000);
+                const dOff=Math.max(0,(tOff-audioCtx.currentTime)*1000);
+                demoTimeouts.push(setTimeout(()=>{
+                    if(!demoRunning)return;
+                    try{ salamanderPiano.keyDown({ midi:m, velocity:vel }); }catch(e){}
+                },dOn));
+                demoTimeouts.push(setTimeout(()=>{
+                    if(!demoRunning)return;
+                    try{ salamanderPiano.keyUp({ midi:m }); }catch(e){}
+                },dOff));
+                const tid3=setTimeout(()=>{
+                    if(!demoRunning)return;
+                    const key=document.getElementById(`k-${midiNote}`);
+                    if(key){key.classList.add('demo-flash');const tid4=setTimeout(()=>key.classList.remove('demo-flash'),flashDur);demoTimeouts.push(tid4);}
+                },delayMs);
+                demoTimeouts.push(tid3);
+            });
+            time+=dur;
+        });
+        const totalMs=(time-audioCtx.currentTime)*1000;
+        const tidEnd=setTimeout(()=>{if(demoRunning)stopDemo();},totalMs);
+        demoTimeouts.push(tidEnd);
+        const isHU=currentLang==='HU';setInfoBar((isHU?'▶ MINTA: ':'▶ DEMO: ')+(isHU?R.descHU:R.desc).toUpperCase()+'  |  '+bpm+' BPM  |  '+rawSeq.length+' NOTES',null);
+    }
+    function create88(){
+        const wrap=document.getElementById('hb-wrap');const whites=[0,2,4,5,7,9,11];let wIdx=0;
+        for(let m=21;m<=108;m++){
+            const k=document.createElement('div');const isW=whites.includes(m%12);
+            k.id=`k-${m}`;k.className=`key-glow ${isW?'white-glow':'black-glow'}`;
+            if(isW){k.style.left=(wIdx*1.92307)+'%';k.style.width='1.92307%';k.style.height='100%';wIdx++;}
+            else{
+                const blackOffsets={1:-0.621,3:-0.477,6:-0.723,8:-0.559,10:-0.415};
+                const noteInOctave=m%12;const offset=blackOffsets[noteInOctave]!==undefined?blackOffsets[noteInOctave]:-0.6;
+                k.style.left=((wIdx*1.92307)+offset)+'%';k.style.width='1.241%';k.style.height='65%';k.style.zIndex='200';
+            }
+            const led=document.createElement('div');led.className='key-led';k.appendChild(led);
+            k.onmousedown=(e)=>{e.preventDefault();k.classList.add('pressed');handleNoteOn(m,82);};
+            k.onmouseup=()=>{k.classList.remove('pressed');handleNoteOff(m);};
+            k.onmouseleave=()=>{k.classList.remove('pressed');handleNoteOff(m);};
             wrap.appendChild(k);
         }
     }
+    // --- METRONOME ---
+    let metroIsRunning=false, metroNextNoteTime=0, metroCurrentBeat=0;
+    let metroSoundType='mechanical', metroVolume=0.5, metroAccent=true, metroTimeSig=2;
 
-    window.onload = () => { 
-        const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
-        create88(); 
-        buildSequence(); 
-        draw();
-        window.addEventListener('pointerdown', () => initAudio(), { once: true });
+    // Single source of truth: beats per measure derived from the VexFlow score.
+    // All Hanon exercises are in 2/4 → 2 beats per measure.
+    let scoreTimeSig = 2;
+
+    function syncMetroTimeSig() {
+        metroTimeSig = scoreTimeSig;
+        metroCurrentBeat = 0;
+        const sel = document.getElementById('metroTimeSigSelect');
+        if (sel) sel.value = String(scoreTimeSig);
+    }
+    const metroSamples={};
+    let metroSamplesLoaded=false;
+
+    const METRO_B64={
+        'woodblock':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAGhACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrKysrKysrKysrKysrKysrKysrKysrKysrK6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAZiQQAB4AAABoSA0XNPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAAECRnUnT3gCrhoSf/O1AAAAtt3pR48VisiUeM64G4BcAIADgG4Xg3wcgOQXAuCGKxkiU///pAeP1eh5pnWo47Ycg9ZCzrV8ffAMPf//4f/+AAAAHh4eXSAAAAAAeHh4eGAAAACA8PDw9IAAAAIDw8PH4AAAAAAeHh4eGAAAACA8PDw9IAAAAIDw8PD8AAAAPTllgAgAArldAAATAYCgQBgGAYJBwJmDANmDYeUXmEwymFZXTIEFfwgOji1ATj4JTHj4TI4YzQo4TTELQMODUDDQTE7BQQCbADiqBjYdgEgoDA4GBQihsohonTAFBABALAwQJQOTkFIV4GgtA2MPo+wIBAImkDDpcAweCAbFJJAPEYkp/AxoFAoCyQyFHKEFhZVf/45JNE8TSJiQH//SSMkUTFJIy///RRRUkZCUFj3/lhcJA0JQkDQlWwlEAAA7AHAAAhOP/6ey5kVmbIzIZGBQYYXDxidHHBYoapLBjULBACTlQCpgvzLef9rHH///3zGluO0w5dwqSHMmxjokYAAoowKIj1OBWW4G2BxAA57w6u5YpcFpSeseFaG6iXjQ5Y+kBxjIm0E2/3ZGtR0jB3gMsTJXDEIwD6qqmoqgBqDjfgACE1KTCvG7fIMc5uo6BZGZjpRIgLfxivAEDUdTDnzfeof+Mwg71h0TwfI8XdwgwAzPAMDI7RkBkfAmHiYAFgKH5AAH2d6vDMZ4+z9P85SjhEqkL3LjTFkGbxwiesyq1jjXstbMma1HECJrAnMes99a+yYutLnoVr2rXYRwNiaFYnAvDo3TYVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7MMT6AEmMYTn9zYAgzAxnfKxIrVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7MMT9gAg4ZTHsgfIpM5DlPYAyRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMTWA8AAAf4AAAAgAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'woodblock_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAGNgCfn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5/MzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM6enp6enp6enp6enp6enp6enp6enp6enp6f////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAU6QQAB4AAABjZHN40VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAAEDSbSVWMgCp7FCl/OdIA0AAAAAT/jDDWGGFJKH8ctrbD1h1TrHedLQ0MOOE4XTXPBRbfIYAAABAIKK7Z2zt34ft9wwp6fPv//////4VIxDjls7Xeqdd7v0boJiFpy8am793IYfyHIxD8bl9PmP/+AAB//////gAADv+OHh62AAACA8PDx/4AAAIDw8PfgAAAA34XaAqAADuXgAgAQIAAAAjiYVI0YgK95g0KK0hUBGSQd4wKTB4MNd3pVUWKowFDCAdOFC2PlwMMBGUMzwYMRTcMDQCMMBRMJxGMMQcMFA/WjAhieFP+YTgUzqfUpMCQHSpcyC///aUgmAIEBYAUkP/7jM//6qjhpeIZjiTBhCBiea5nGMQhDMEADk3f8wTDoWAqe5/yKsFTx38soSnSyuAP/EAAACggABK1//lJSWEP0W1AQj+FuL8W5ChngtHA3zAXCJxLBBjZF1////U6taKLBG4BURBYgzxbAAAHEGADhiQ//iqyloOWQgSTggcDTQvUP///+panugmXB3gcsiKjLigTBMDqkAAIggAwOIAAA5/8M6SNsVbtAMhj4UuqEBifW5d0mm3///9LqWPwC/B2iyWj7DNttvQp/3IAARrLbLaImzJFwCwWU8FETurKxD9comY990zGeSzvLRL2pndPrO6avikOLfGrxkYBiYEIR24kO0ScsjCB5BHIWRz2LI5MQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqoAACRl5JVJtDMlBIFVG3AyBSP/+ZCRF1VMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE0oBHUIVH/PmACLMQ5rzdzY1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sgxPwABdiHL+ViSSksEaT0bL2NVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMTiA8LkMxqAASEAAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'mechanical':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAHiQB7e3t7e3t7e3t7e3t7e3t7e3t7sLCwsLCwsLCwsLCwsLCwsLCwsLDPz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz+7u7u7u7u7u7u7u7u7u7u7u7u7u//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAPtQQAB4AAAB4mdBNrvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABrgBZfQQACOgsy2/NYAIpjMAEXEAAGVtwQWJz4jD6gQjwsUDBQEAx+CZ8EAQGggc/+flz//h+CDuCDv4g5Q58Mf//8o7Mx4i0KGVBBUQNNuolFt+5zTBv1tGSiiNEYdWhka5ghuYk6ZI+JUzECBJiBgS4TFK19M9EhPIISIPjBFK0ChpC2GiwLQs9rRNfskaeqo6b/tzRTqvqyGkfZoFLTlUzJ5DqUF5giyvoGrv5D9HOVY27VLK52JQZSxqvhIWVUjB3UbegcCQSehbI+3Id1LqsVoLk9S0+sOyu3LMOVc4TZoYjGqbWFyGpVGqszLcK9vOkpLFPG5fYzq4VbNV2dVed39am1TO1ljjv4vRSufnM88Ofz/ypKWtWz7l/5d///XbtzGevVsqb///uN2HaCAwAAEEv6aQydkQgVM96ZsFPEIhrsQFWnFXU60qmR+uVHWBYhyQalpQfiJLaja100q6UWkktNjAufB7tvta7//l1/y2r4aa0d+G+2uHO4c73bb/+a/h5qdr////9rUTU6bHkTVv//8X8o1LTVukSf21wanhYO/5a8iWIDQAK9k6FCCE0/Lh0SVaX7TQQsRBbjMpHF+jjKpHIbdcN0GYqC7HGhp6QHNUxGLCiT6p+adtTsW64O5PJ8YRdD/UbKJxpQevuc35CMX+qTCQQxQDJbKl//Q7//kIqjU9/w7//CT8jRXu+ZgUcAbEjAAcU41TOPp2amGUTZNJoRk4uAlHALAqCFR5gzPkwTOsdFIj2SC9t3kzpwoz9imCDZaLPpVC9daRZzBx+rflHP+K3KOQDtJ/+68NTgKYrgAEVPhk1TpmSFREymlOrSjys5da0mEzKpNrB6wXUnahBayuHoSv/oH4Tt2Z6cMrS0fNrWVjbHCzmDjdf6DH/HzjlGhEVk2v2nVZgQLDjAAlAJocrxWXr0AfXEtMiYhVbA7qA2KTbRsazzxLOHj/+3DE1ACPUWlZ/YWAIaeeqL2HqbQuzLCWvlGp7vrfarvQOnJxJ2VJ3Uat/8eOb6jk1jlBaWk43byTuBBYKYAClKpUETrQ6Q4A817N2RzLggpuMsau1eMuzlVdKXZ2CRrAY68x8IjyPZd4JJtoMKDqCNlepL/+gvb8eyE0lKBPHMqXq7uqeXMrhNwAD+ZzJU2Q/gAoAVCZOlcmXQrwsQBh2Dk+SiCTcuck2mQiSpK0ijBFAk6LEq3+gYKS00FSs0jn////rvhqq2cokSx5OJHhIkK/ekxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tAxPOACcyxR+ywr0E1lij9lhXsVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+0DE9gAJELE/7CTxIS4XJ32DKiRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMT8g8pAsTPnsMzoAAA/wAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'mechanical_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAH1wCGhoaGhoaGhoaGhoaGhoaGhoaGsLCwsLCwsLCwsLCwsLCwsLCwsLDR0dHR0dHR0dHR0dHR0dHR0dHR0e/v7+/v7+/v7+/v7+/v7+/v7+/v//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJASTQQAB4AAAB9fIRHnDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAABtABafQQACPxsy2/NaAQiVQSMzQACAgBwQGic+XPlAQghBA4UDEH3g//nBO9HwQ5R31h8uf/6gQcCDv4IOLg/icH4P8u+ZZlVEGZQnE3EsOBkAgkRykJA8eJRdKRA2XBAhAaSkguBOOuAIFg4NCltgIxA7xhIwEFDCRIAjhw6UqZoTwADFogBBhUGX7AI9Fu3NUJacZFkR1ERTIKHR5CsN2rTsxa1F38IBSaqoWQvIY9AXZac7Mpiz2O3MUUocprU5K4ddJ5nooLc7E4vt2IdjmHKGk1Rurdl7cWk2muxC3T2/r2/tXbk3Uw3diV29DUpa7P1pfe3KbMTi8sw5T1bl6xTdlWeGWOdLqmgzrY5Xeyu0tBWo45GnYik9Y+ksfhzPnv1uta3ytruX91/tKlNHcmYzDvzTw1ZVHZie////893PhVcSAAAAAABUuIDwawto3QvR6QjQVwZpPQ8Ftaw/gH2kRMRhgQoTJJIxHqUSoKIBlByxtCKiSiaEuMkyTDkl00ZaJIpl08gMl0SURIgWoTIkg3h7JEsuyT1oonUkuvOpGyVZiipLUbGSy4g1Ziykn/qSSSpJJf/6P///omJqjpf//rRapJFFEkTXMks4UsFSM3rUIgYgD7LKCMtWxQQiWGfceGYAujJVsMXrKYFgM+h2mEeNoV7q2Ccg/ySIc7AeYa+sYVx5LlYMpy8s/jPE9bosZylSInwpaYOM9lW9teLv2b+QAi36DCEhcPlgJCOWnCcEWNN/5z48SXR5ym84qIxNn///5vN////5vN6C7t+MQSEgAAR4Ackx1EzqGnfMkAKpjyoZDQS6KH0DRBoS3maY1Xdsdu9mfzh5Stnb2R9eDz0WH60wdf8787R/oIg+hL5FhJ3ut7+9/nf5xn+25s8WRbPmAdvOjUU2MAAAOAJgEaF3LjjrRCwEeEzda0dWKpa/K7W9aflMQDP/jhSUv5v8wavIGA6jh7DMiI1v+/0/yWCBFEgCxoTCrZ7bt9f9Tv6vWkqUC+YwMgaTq+2+VzhQBAz4AjArMVHmLYzRIus5YXPBQFwGsoDbhFLQlKsTVfdzm0XGjIaTQkVLP/fKBqLFCJB8snZ/T/MP/7YMT9gJIdl0389oAB+LKofYedvKt+pevHR8MGOIA993J2VSEEUD2gBD84wjeIVxOWyQVriOE6i8ji78yupgELpywkLDn4c7LB9a1isbXmbsmA9BHec/n4OQXChxxhQ//S357//8oy//0b6VCCX6GCNZiYh0NTBIL0ABmIAGx1YZMZB6B2swAw14C70WeFUsMM6l1WxDUPJHBW+tanbTSOvLEtmZ//7zOGoLBUAZJ/MtQpmb/jMzND//iqpeGAlUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7UMTuAAsAz0HtMVaBVxon/YSqnFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+0DE9IAJKNFB7LDs4UWZ532WIeRVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7EMT3g8moxSnsGHFAAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+        'drumstick':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAFAAAHvQCIiIiIiIiIiIiIiIiIiIiIiIiIu7u7u7u7u7u7u7u7u7u7u7u7u7vV1dXV1dXV1dXV1dXV1dXV1dXV1e7u7u7u7u7u7u7u7u7u7u7u7u7u//////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAWgQQAB4AAAB739+mZYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vQxAAAE30ZWbQXgCPFI6o/NcBAsdZAAAAAAA4AAAAACjkAAAAX/owJxDFBE3SjxOIYhiGIYaZ1qN/vFGBOGmaaHs8icQw0DQJ2abPaA8eMCGE7LmdaHoer1ec5BwkAhhLHCGr1eh5OxNB6C4Kir9+/jxMsafOc61Gz2Y1er1er39mA0B6x6x6y5qOMwKxkZ37+Pe93794rE4hiGIYySoePQQg6FZELg+CAIAg7/lw/+cqUAAAOAAAEAAAAAIB+AkqZSDVdrvpUiMJsvL4wLLzExwGkRbqna3q0DAYMaUXbflK8xGQQg7AkBGJpOHA5o4MAMzNphmAQkgsW+UBCoATMLpwBee1piCYwiIDCoRMjjhoA8EH0LTmFjCAhy+r6sxXxfMBg5xFrIJTFw/QCpeCgElJggPgUNDQqlMqiTdX2X6AgSDAeCgKm4Fgy4hapdRgUACoDBwFTEh9TB88I8xt5qstVKspAMFAGYdCUpyuwzLr77GAAyYSDJQAf/eO4NeOKd//dJL8FA0RAFXMt/9/+aNqlr7WzmKiXlRE8FREeDSqw39kDIAAAAN//wVCLMWIP5ChZWEnotAQ2CrcvxiP5QYnUFUoAWPt9ldjVNWaVROzbdWzCarVWbRGTN402GZQr1pKOSwyWq97P5U3flUGO/ZcqCn/W1ThwgcImiqx0FL1yR/LHHkugGzhVazDEagJ2WmRaGuf////+OM11GgHd8SwAOAH+tS2J8ZhMiANeDaIb2aYzhIfyPlCvrif51+3YundYr22J6v95zPKJ4ICLQ3Z//9bQPD7lKdJ0sNUo3pWut9w3DBhwxwmx1R/mBtXAAA53hAAAA4Af/oG9IJsViK1sN7RqLwwYyim+2cmxdWp6iDdJKTTQqEyC4C3E5/SWtV76TqMCkJGg0amk8npN+R6qWPHgLDTKujKlBjKFAAf/YbKUBNLoE9rmQO+kIohGxVf/qPUNj0F00Tei2tr9IaR7N//64iOmqD0UqnXK1Hx0e/hq4hiAHaWzKqAAANuoPsE0AB//7cIcDiD1/WxRb0xlhFpSid/R6kA/YfVJpQdudo8hNEUNv30OzyFxqMSEhZ2+b8sJIhQFZmcytmjHoP/7cMTQAI+M3UPc/AABSBupPReJ+AKgD7m5rmnM7FEMgySImziqWZxaa2gpJDqPt6c4keI/WjdWlBK0ztR8Box/6mjxUSUBcLjSg2PNb/o84bEvrppMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqv//rb26xUW/iwrVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+zDE+oIJSL9H5rz8IQOYKLwXrUlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+zDE+AAHyL9B4L1LARkYJzyXnaVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+xDE24PBRAEMAAAAAAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ==',
+        'drumstick_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAEAAAHBwCHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4fKysrKysrKysrKysrKysrKysrKysrKysrK7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7P////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAOIQQAB4AAABwdwX253AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAAB7C5f/QRACOoLWv/NaBA3v6qd1Qm6mBHwAAAAJwABAAEyEIQhCZCZCEIx30IQn0IRvIQn/5CEIRv/QgGBg/BAEwf/ygIf/8CBj/lwf2durIDpdMMMEAoDAALHC3MEdNYiuCGVwVVGgLodxJADkCLAMDiAcPIQKYKJC8yYikiZ0pBQFLscEhRi4YcBWGMZPVA7YPKgkiSjyoDC4oxZgDAV0koQwyNycnGMSEU2nmdKHg4U6r8Rt5zAF2su4pmMlUaG+YC7UMy13mG2JM1lxmetyfKPS2BbkoZzQ8HDBkjACnM7Ym9zoAEQY8wDQkZl//G1yt5bdqXN0bEy2lmojZjtIoFBicVHNP13X1ZV3/////x/boyCU0uv//xdp6XdiVH///////y3/1Mwim3j//////8w1eXfqX8dvgAUAAAAGAelQGiVWYEAhByX5TgljwggsMuyIKh2Zmy7TXn+y/KJNeBEUfFxWv3h95vplUrXzFEi6zDKmlL30VNMwlvUwS/o61FJY4aNpd6VNVpJ/K/HnWavNOFLca0bTpT6XM87qOE41LS8/cRXbFUkU+QQwKHHWkoFp3WJOVGbPP//1p6UOSCMkQPT5lQVz4bfAaAM8oBZlHSolPHt6jVgFl/1D1A25m19qDhXv8m8dQdJ1V//hRMLsIaegCqideydr/WOol0HAA6i0i4Qd9PWjfOtxPj/MGAT1K0hQt///tR1DmUjeON4h0WPr/x0MgJAFCiqs6t70X2DEKggDv7qVxwYlW5nnLIH/NHVXMI+H3IlVL6IMg+Oarrk2HtqRIoDSX8f3B1IdREHoPJpea9/5jx+ikIMS1Nf6KecAOE8ocb/+hqEw9mqwKZ9YGVAiAH2TAoI/mmzs4IJExFD8n9tfpdSFPFL1n//DXJmZPK5vg/++v4sFyvFSYub2Jqyivb/879R6W/8oUFUSQfC7Gpo9Lf/QuRINnq7s3/+4DEzwDSOOVF/YwAIZWcqDmHnjj/veZqho6AFcwsTXS68tmKXElRAWxPhqRAS+oxAmUhpzZxlqUUjNnHKU0RApDf+UsAKJDzZFaWaskVr/2cVS6v+e14DkFoqKmqvM9/88CxxJrVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7QMT/AApI40fsLVGBRBynfSepuFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxP2DyoTlQeeVFKgAAD/AAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=',
+        'electronic':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAADAAAFtACzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Pm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ub///////////////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAVGQQAB4AAABbR9xADeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABwQhYVRgACMZJin3OYBQIAAAAetXi+2Pd7BMLJkyadjgfPiAEAyJwfB8P4Pg+DgIcvxIcE4Pv/4Pg+D/Lg+//5d5cHwfPwwAAgcAwSAAqG6qjxIKAYLFAEHJCDjPLyMLDcxt7TCY0TdMNhEymHjQwLDiuDQAYBBxg8smHQKYEIQ8FyFRdoQ8ih0KCTMlk6E0vS+wCMZwQcOrEZC8KhrXJsus07qQS04dLrp6vbSxKNtfUzgRQaFLtfd2J/kYfWdmKW/zctrbdnuu/WWlOS2tKqWgjSZWr+vrU1Nl///1ZTJKGipu46pn1EAZhnUua6/sO/+v/+/9WlginlE/Xs6//4+9NErWPP//+U2W5YSqpAZFAAAvAQCVZaqAwJE2EBNhGAWUXtWQnS7MMt44LWbDomAJBOEWLItjEEEQJhpGFyDaFCAJBdC5HoqjEelDwuCYeEp49OkI9GpU4Wjv//4xFk3////////84fCtgLmgGAuEcQhy7AIsGsDBjwUxhkKTpa0ADU1gJuoBaO6IIkqC6pUD8WDw5XWqHIek1sRmjs9MWRJc+iU7hYKE5yWFkZFHJUxBTUUzLjEwMFWyyOWJGAAAJAqJxXEQZFlp6JVQ0hSbJSKBMISBMaSNMjZxnyjXILRK7UxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE44BLkQ81vYUAKRiOZTWGGa1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxOqDxRhRG4YkxwgAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=',
+        'electronic_accent':'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAADAAAFtACzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Pm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ub///////////////////////////////////////////8AAABQTEFNRTMuMTAwBLkAAAAAAAAAABUgJAVEQQAB4AAABbTklhU+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//vAxAAABhQBZ1QAACL7qGr3N4CRACAEA/eTgEAwXB8HDgnB+sHz8Rh/LggCAY1AgCGJwfD/wf/wf1eQB8P8uD4f//Lg+AABgAAgAAwbdvXBUcBWEZigGOkICUEMx8iqEFkT1ygyYxNtBDDRISYDEygUAyIzHAdRZcqsybZIdVVMJK5i18FdRSSJbZjdO2O06LemhaYqhqJMHoSX6p0em/bra2/rgR13esoZfCYddqSOTKs4lLluxCL2JqHoc/v/8vpoLgyJS668OZdQAqd3C7+n+lXP+tTW8spqU5UGOVLVs6iUvX1//////Ga26tnW5mg3RVu6//+CW1+Xf////uz/O1plwALRAAAI4ACZqU8cSqMbEgkRy1SA6WuSmu7My/Dpw7K+HBSwLQ9YXQQjyhg0VNYVBcFhYQB7UeKyDw9WdaNVTTYn///////lQ5D1VRYCiKqkRCnAxgEURPABKAKgDjK3IE32LxSOC2Cz0QbaIAy0WB88jPBZtdQZdFV29aSbJFNmpvQhViW51sOwCYV/+yKSCGTkU8gYLIo5CypMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqcjabcFwAAAoeEZAKxIPCkRHLi2ejSirxzj0AqXzZOHP6JJVE4aIktUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DE6wBJfLE3vYQAITwPpj2Eje1VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQxOoDxPRBF4SkwOgAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=',
     };
+
+    async function loadMetroSamples(){
+        if(metroSamplesLoaded) return;
+        for(const [key,dataUri] of Object.entries(METRO_B64)){
+            try{
+                const res=await fetch(dataUri);
+                metroSamples[key]=await audioCtx.decodeAudioData(await res.arrayBuffer());
+            }catch(e){console.warn('Metro sample decode error:',key,e);}
+        }
+        metroSamplesLoaded=true;
+    }
+
+    function metroScheduler(){
+        if(!metroIsRunning) return;
+        while(metroNextNoteTime<audioCtx.currentTime+0.1){
+            playMetroClick(metroNextNoteTime,metroCurrentBeat);
+            metroNextNoteTime+=60.0/bpm;
+            metroCurrentBeat=(metroCurrentBeat+1)%metroTimeSig;
+        }
+        setTimeout(metroScheduler,25);
+    }
+
+    function playMetroClick(time,beat){
+        const isAccent=(beat===0&&metroAccent);
+        const sampleKey=isAccent?metroSoundType+'_accent':metroSoundType;
+        const buf=metroSamples[sampleKey]||metroSamples[metroSoundType];
+        if(!buf) return;
+        const src=audioCtx.createBufferSource();
+        src.buffer=buf;
+        const g=audioCtx.createGain();
+        g.gain.setValueAtTime(metroVolume,time);
+        src.connect(g).connect(audioCtx.destination);
+        src.start(time);
+    }
+
+    // Re-align the metronome so beat 1 (accent) fires at exactly `t`.
+    // Any clicks already queued in Web Audio before `t` will still fire, but from `t`
+    // onward the phase is perfectly locked to the demo's first note.
+    function snapMetroToBeat0(t){
+        if(!metroIsRunning) return;
+        metroNextNoteTime=t;
+        metroCurrentBeat=0;
+    }
+
+    async function toggleMetronome(){
+        if(!audioCtx) await initAudio();
+        else if(audioCtx.state==='suspended') await audioCtx.resume();
+        metroIsRunning=!metroIsRunning;
+        document.getElementById('metroToggle').classList.toggle('active',metroIsRunning);
+        if(metroIsRunning){
+            document.getElementById('metroBpmDisplay').innerText=bpm;
+            if(!metroSamplesLoaded) await loadMetroSamples();
+            metroNextNoteTime=audioCtx.currentTime+0.05;
+            metroCurrentBeat=0;
+            metroScheduler();
+        }
+    }
+
+    function toggleMetroMenu(){
+        const menu=document.getElementById('metroSettingsMenu');
+        menu.style.display=(menu.style.display==='none'||menu.style.display==='')?'flex':'none';
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+        const sel=document.getElementById('metroSoundSelect');
+        if(sel) sel.addEventListener('change',function(){metroSoundType=this.value;});
+        const vol=document.getElementById('metroVolumeSlider');
+        if(vol) vol.addEventListener('input',function(){metroVolume=parseFloat(this.value);});
+        const acc=document.getElementById('metroAccentCheck');
+        if(acc) acc.addEventListener('change',function(){metroAccent=this.checked;});
+        const tsig=document.getElementById('metroTimeSigSelect');
+        if(tsig) tsig.addEventListener('change',function(){
+            scoreTimeSig=parseInt(this.value);
+            metroTimeSig=scoreTimeSig;
+            metroCurrentBeat=0;
+        });
+
+        // Hold-to-repeat for tempo arrows (accelerating)
+        document.querySelectorAll('.metro-tempo-btn').forEach(btn=>{
+            let holdTimer=null,repeatTimer=null,repeatCount=0;
+            const dir=parseInt(btn.dataset.dir);
+            function getStep(){
+                // Enyhe: 1,1,1,2,2,5,5,5,10,10...
+                if(repeatCount<3) return 1;
+                if(repeatCount<5) return 2;
+                if(repeatCount<8) return 5;
+                return 10;
+            }
+            function doStep(){
+                if(helpActive) return;
+                cycleTempo(dir*getStep());
+                repeatCount++;
+            }
+            function startHold(){
+                repeatCount=0;
+                doStep();
+                holdTimer=setTimeout(()=>{
+                    repeatTimer=setInterval(doStep,120);
+                },400);
+            }
+            function stopHold(){
+                clearTimeout(holdTimer);
+                clearInterval(repeatTimer);
+                holdTimer=null;repeatTimer=null;repeatCount=0;
+            }
+            btn.addEventListener('mousedown',e=>{e.preventDefault();startHold();});
+            btn.addEventListener('mouseup',stopHold);
+            btn.addEventListener('mouseleave',stopHold);
+            btn.addEventListener('touchstart',e=>{e.preventDefault();startHold();},{passive:false});
+            btn.addEventListener('touchend',stopHold);
+            btn.addEventListener('touchcancel',stopHold);
+        });
+    });
+
+    function setTempoPreset(val){
+        if(helpActive) return;
+        bpm=val;
+        const isHU=currentLang==='HU';
+        setInfoBar((isHU?'TEMPÓ: ':'TEMPO: ')+bpm+' BPM',null);
+        const d=document.getElementById('metroBpmDisplay');
+        if(d) d.innerText=bpm;
+        // Close the popup
+        document.getElementById('bpmPresetsPopup').style.display='none';
+    }
+
+    function toggleBpmPresets(){
+        const popup=document.getElementById('bpmPresetsPopup');
+        popup.style.display=(popup.style.display==='none'||popup.style.display==='')?'grid':'none';
+    }
+
+    document.addEventListener('click',function(e){
+        const menu=document.getElementById('metroSettingsMenu');
+        const btn=document.getElementById('metroMenuBtn');
+        if(menu&&btn&&!menu.contains(e.target)&&!btn.contains(e.target)) menu.style.display='none';
+        const popup=document.getElementById('bpmPresetsPopup');
+        const bpmBox=document.getElementById('metroBpmBox');
+        if(popup&&bpmBox&&!popup.contains(e.target)&&!bpmBox.contains(e.target)) popup.style.display='none';
+    });
+
+    const _origCycleTempo=cycleTempo;
+    cycleTempo=function(delta){
+        _origCycleTempo(delta);
+        const d=document.getElementById('metroBpmDisplay');
+        if(d) d.innerText=bpm;
+    };
+    window.addEventListener('resize', () => { if(seqBlocks.length > 0) draw(); });
+    window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);showFileProtocolAudioHintIfNeeded();create88();buildSequence();draw();window.addEventListener('pointerdown',()=>initAudio(),{once:true});};
 </script>
 </body>
 </html>

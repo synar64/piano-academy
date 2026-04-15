@@ -110,22 +110,16 @@
         .sq-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .sq-btn.active { color: #ffffff; background-color: #121214; }
 
-        .start-split { display:flex; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 4px 0 #000; overflow:hidden; cursor:pointer; transition:transform 0.1s; }
-        .start-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
-        .start-split span { display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; letter-spacing:2px; font-family:'Inter',sans-serif; color:#444; text-transform:uppercase; }
-        .start-split span#startLabel { padding: 0 12px 0 22px; }
-        .start-split span#stopLabel  { padding: 0 20px 0 12px; }
-        .start-split span.active { color:#fff; }
-        .start-split .split-div { width:1px; background:#333; margin:6px 0; }
-        .lang-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
-        .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:12px; font-family:'Inter',sans-serif; color:var(--text-dim); }
+        .lang-split { display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; }
+        .lang-split button { flex:1; background:transparent; border:none; cursor:pointer; font-weight:700; font-size:11px; font-family:'Inter',sans-serif; color:var(--text-dim); }
         .lang-split button.active { color:#fff; }
-        .lang-divider { width:1px; background:#222; margin:6px 0; }
-        .clef-split { display:flex; width:95px; height:38px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s; }
+        .lang-split button:active { background:rgba(255,255,255,0.05); }
+        .lang-divider { height:1px; width:100%; background:#222; }
+        .clef-split { display:flex; flex-direction:column; width:38px; height:76px; background:var(--btn-dark); border:1px solid var(--btn-border); border-radius:3px; box-shadow:0 3px 0 #000; overflow:hidden; cursor:pointer; padding:0; align-items:center; transition:transform 0.1s; }
         .clef-split:active { transform: translateY(2px); box-shadow: 0 0 0 #000; }
         .clef-split span { flex:1; display:flex; align-items:center; justify-content:center; color:#444; transition:color 0.15s; }
         .clef-split span.active { color:#fff; }
-        .clef-divider { width:1px; background:#222; margin:6px 0; flex-shrink:0; }
+        .clef-divider { height:1px; width:100%; background:#222; flex-shrink:0; }
         body.help-mode-active, body.help-mode-active * { cursor: help !important; }
 
         /* INFO MODAL — nagyobb betűk */
@@ -153,7 +147,7 @@
         .hitbox-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .key-glow { position: absolute; top: 0; cursor: pointer; }
         .key-glow.pressed::after { content: ''; position: absolute; pointer-events: none; z-index: 150; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0 0 4px 4px; background: rgba(0,0,0,0.11); box-shadow: inset 6px 0 10px -2px rgba(0,0,0,0.6); }
-        .black-glow.pressed::after { top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 13px); border-radius: 3px; background: rgba(255,255,255,0.15); box-shadow: inset 0 -10px 15px rgba(255,255,255,0.3); z-index: 40; }
+        .black-glow.pressed::after { top: 6px; left: 25%; width: 50%; height: 77%; border-radius: 2px; background: rgba(255,255,255,0.36); z-index: 40; }
         .key-led { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background-color: var(--oled-text); opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
         .key-glow.ear-hint .key-led { opacity: 1; }
 
@@ -216,10 +210,10 @@
             </div>
             <div class="info-section">
                 <div class="info-section-title" id="txt-ctrlTitle">Controls</div>
-                <div class="info-row"><span class="info-tag">Top / Bottom</span><span class="info-desc" id="txt-ctrl1">Toggle Treble clef (C4–G5) and Bass clef (F2–C4) note pools.</span></div>
-                <div class="info-row"><span class="info-tag">Chromatic</span><span class="info-desc" id="txt-ctrl2">Adds black key notes (sharps/flats) to the pool — significantly harder.</span></div>
-                <div class="info-row"><span class="info-tag">Hints</span><span class="info-desc" id="txt-ctrl3">Shows the note name on the staff before you play it. Great for learning.</span></div>
-                <div class="info-row"><span class="info-tag">Replay</span><span class="info-desc" id="txt-ctrl4">Replays the current note's sound without penalty.</span></div>
+                <div class="info-row" style="align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:90px;display:flex;justify-content:center;color:#555;font-size:14px;">𝄞 / 𝄢</div><span class="info-desc" id="txt-ctrl1">Toggle Treble clef (C4–G5) and Bass clef (F2–C4) note pools.</span></div>
+                <div class="info-row" style="align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:90px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span class="info-desc" id="txt-ctrl2x">Cycles through: 1× note names on staff, 2× + key LED highlights, 3× all off.</span></div>
+                <div class="info-row" style="align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:90px;display:flex;justify-content:center;color:#555;font-family:'Share Tech Mono';font-size:18px;font-weight:bold;">♯</div><span class="info-desc" id="txt-ctrl2">Adds black key notes (sharps/flats) to the pool — significantly harder.</span></div>
+                <div class="info-row" style="align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:90px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 5"/><path d="M6 9v6a6 6 0 0 0 12 0v-2"/></svg></div><span class="info-desc" id="txt-ctrl4">Replays the current note's sound without penalty.</span></div>
                 <div class="info-row"><span class="info-tag">Timer ▲▼</span><span class="info-desc" id="txt-ctrl5">Adjust seconds per note (3–15s). Cannot be changed during a session.</span></div>
             </div>
             <div class="info-section">
@@ -260,25 +254,31 @@
                         </svg>
                     </div>
 
-                    <!-- BAL CSOPORT -->
+                    <!-- BAL — Home + Clef + Eye(3-state) + Chromatic + Replay -->
                     <div class="control-group">
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+                        </a>
                         <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
                             <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
                             <div class="clef-divider"></div>
                             <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
                         </button>
-                        <button id="btnAcc"    class="hardware-btn"        onclick="if(!helpActive) toggleAccidentals()"  data-help="CHROMATIC: ADD BLACK KEY NOTES (SHARPS/FLATS) TO THE POOL">Chromatic</button>
-                        <button id="btnHint"   class="hardware-btn"        onclick="if(!helpActive) toggleHint()"         data-help="HINTS: SHOWS THE NOTE NAME ON THE STAFF BEFORE YOU PLAY IT">Hints</button>
+                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + KEY LEDS | 3× OFF">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+                        </button>
+                        <button id="btnAcc" class="sq-btn" onclick="if(!helpActive) toggleAccidentals()" data-help="CHROMATIC: ADD BLACK KEY NOTES (SHARPS/FLATS) TO THE POOL">
+                            <span style="font-family:'Share Tech Mono';font-size:18px;font-weight:bold;">♯</span>
+                        </button>
+                        <button id="btnRepeat" class="sq-btn" onclick="if(!helpActive) repeatNote()" data-help="REPLAY: PLAY THE CURRENT NOTE AGAIN">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 5"/><path d="M6 9v6a6 6 0 0 0 12 0v-2"/></svg>
+                        </button>
                     </div>
 
                     <!-- KÖZÉP: START + OLED -->
                     <div class="center-console">
                         <div style="display:flex; align-items:center; gap:32px;">
-                            <div id="btnStart" class="start-split" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EAR TRAINING SESSION">
-                                <span id="startLabel" class="active">START</span>
-                                <div class="split-div"></div>
-                                <span id="stopLabel">STOP</span>
-                            </div>
+                            <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="START/STOP: BEGIN OR END THE EAR TRAINING SESSION" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;">START</button>
                             <div class="lcd-arrow-wrapper">
                                 <div class="arrow-row">
                                     <button class="nav-disk-btn" onclick="if(!helpActive) cycleModule(-1)">▲</button>
@@ -319,25 +319,26 @@
                         </div>
                     </div>
 
-                    <!-- JOBB CSOPORT -->
+                    <!-- JOBB — Audio + Fullscreen + ?/ⓘ + EN/HU -->
                     <div class="control-group">
-                        <button id="btnRepeat" class="hardware-btn" onclick="if(!helpActive) repeatNote()" data-help="REPLAY: PLAY THE CURRENT NOTE AGAIN">Replay</button>
+                        <button id="audioToggle" class="sq-btn active" onclick="if(!helpActive) toggleAudio()" data-help="PIANO AUDIO: TOGGLE INTERNAL SYNTH">
+                            <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="1" fill="currentColor" opacity="0.7"/><rect x="5.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><rect x="14.5" y="3" width="4" height="11" rx="0.5" fill="#1a1a1d"/><line x1="9" y1="14" x2="9" y2="21" stroke="#1a1a1d" stroke-width="1.2"/><line x1="15" y1="14" x2="15" y2="21" stroke="#1a1a1d" stroke-width="1.2"/></svg>
+                        </button>
                         <button id="btnFullscreen" class="sq-btn" onclick="if(!helpActive) toggleFullScreen()" data-help="FULLSCREEN MODE — PRESS AGAIN TO EXIT">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
+                        <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
+                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
+                            <div style="height:1px;background:#222;"></div>
+                            <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="7" x2="12" y2="7" stroke-width="3"/><line x1="12" y1="11" x2="12" y2="17" stroke-width="3"/></svg>
+                            </button>
+                        </div>
                         <div class="lang-split">
                             <button id="btnLangEN" onclick="if(!helpActive) setLang('EN')" class="active">EN</button>
                             <div class="lang-divider"></div>
                             <button id="btnLangHU" onclick="if(!helpActive) setLang('HU')">HU</button>
                         </div>
-                        <button id="btnHelp" class="sq-btn" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="font-size:17px;font-weight:bold;font-family:'Inter',sans-serif;">?</button>
-                        <div style="width:16px;"></div>
-                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
-                        </a>
-                        <button id="btnInfo" class="sq-btn" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8" stroke-width="3"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
-                        </button>
                     </div>
                 </div>
 
@@ -413,7 +414,7 @@
     // ── ÁLLAPOTOK ──
     let isRunning = false, helpActive = false, audioInited = false;
     let activeTreble = true, activeBass = false;
-    let useAccidentals = false, useReveal = false;
+    let useAccidentals = false, useReveal = false, showLeds = false;
     let sessionTimer = 10;
     let scoreOk = 0, scoreBad = 0, tasksDone = 0;
     let timerTicker = null, timeLeft = 0;
@@ -423,19 +424,22 @@
     let audioCtx, sampleBuffers = {}, activeNodes = {};
 
     // ── MODULE VÁLTÓ ──
+    const MODULE_NAMES = {
+        EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON'],
+        HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON']
+    };
     const modules = [
-        {name:'EAR TRAIN', url:'hallasfejleszto.html'},
-        {name:'SIGHT READ', url:'kottaolvasas.html'},
-        {name:'CHORDS',    url:'akkordok.html'},
-        {name:'SCALES',    url:'skalak.html'},
-        {name:'HANON',     url:'hanon.html'},
-        {name:'RHYTHM',    url:'ritmus.html'}
+        {url:'hallasfejleszto.html'},
+        {url:'kottaolvasas.html'},
+        {url:'akkordok.html'},
+        {url:'skalak.html'},
+        {url:'hanon.html'}
     ];
     let currentModuleIdx = 0;
     function cycleModule(dir) {
         if (helpActive) return;
         currentModuleIdx = (currentModuleIdx + dir + modules.length) % modules.length;
-        document.getElementById('lcdModuleText').innerText = modules[currentModuleIdx].name;
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[currentLang][currentModuleIdx];
     }
     function loadModule() {
         if (helpActive) return;
@@ -470,6 +474,7 @@
             'txt-ctrlTitle': 'Controls',
             'txt-ctrl1': 'Toggle Treble clef (C4–G5) and Bass clef (F2–C4) note pools.',
             'txt-ctrl2': 'Adds black key notes (sharps/flats) to the pool — significantly harder.',
+            'txt-ctrl2x': 'Cycles through: 1× note names on staff, 2× + key LED highlights, 3× all off.',
             'txt-ctrl3': 'Shows the note name on the staff before you play it. Great for learning.',
             'txt-ctrl4': 'Replays the current note\'s sound without penalty.',
             'txt-ctrl5': 'Adjust seconds per note (3–15s). Cannot be changed during a session.',
@@ -477,7 +482,7 @@
             'txt-progBody': 'Score <strong>100%</strong> on a round to automatically drop the timer by one step — making the next round harder. Reach 3 seconds per note for maximum difficulty.',
             'txt-gotIt': 'Got It',
             'btnViolin': 'Top', 'btnBass': 'Bottom', 'btnAcc': 'Chromatic',
-            'btnHint': 'Hints', 'btnRepeat': 'Replay', 'btnVst': 'Mixer',
+            
             'btnFullscreen': 'Fullscr', 'btnHelp': 'Help',
             // info sáv
             'ready': 'SYSTEM READY — PRESS START TO BEGIN',
@@ -485,7 +490,7 @@
             // result
             'resultMsg100fast': 'Perfect score at maximum speed! Your ear training is at professional level.',
             'resultMsg100': 'Perfect round! You\'ve advanced — now you have <strong>{t} seconds</strong> per note.',
-            'resultMsgFail': 'Good effort! You need 100% to advance. Keep practicing at {t} seconds per note.',
+            'msgListening':'LISTENING — IDENTIFY NOTE {n} OF {t}','msgTimeUp':'TIME UP! — THE NOTE WAS {note}','msgCorrect':'CORRECT! — {note}','msgHigher':'HIGHER ↑ — TRY AGAIN','msgLower':'LOWER ↓ — TRY AGAIN','resultMsgFail': 'Good effort! You need 100% to advance. Keep practicing at {t} seconds per note.',
         },
         HU: {
             'txt-roundComplete': 'Kör lezárva',
@@ -502,6 +507,7 @@
             'txt-ctrlTitle': 'Vezérlők',
             'txt-ctrl1': 'Violin kulcsos (C4–G5) és Basszus kulcsos (F2–C4) hangkészlet be/ki.',
             'txt-ctrl2': 'Fekete billentyűs hangokat (keresztek/bék) ad a készlethez — lényegesen nehezebb.',
+            'txt-ctrl2x': 'Körkörösen kapcsol: 1× hangnevek a kottán, 2× + billentyű LED jelzés, 3× mind ki.',
             'txt-ctrl3': 'Megmutatja a hang nevét a kottán még leütés előtt. Tanuláshoz kiváló.',
             'txt-ctrl4': 'Megismétli az aktuális hangot büntetés nélkül.',
             'txt-ctrl5': 'Másodpercek száma hangjegyenként (3–15s). Futó session közben nem változtatható.',
@@ -509,7 +515,7 @@
             'txt-progBody': '<strong>100%-os</strong> teljesítmény esetén az időkorlát automatikusan egy lépéssel csökken — egyre nehezebb lesz a következő kör. A maximális nehézség 3 másodperc/hang.',
             'txt-gotIt': 'Értettem',
             'btnViolin': 'Felső', 'btnBass': 'Alsó', 'btnAcc': 'Kromatikus',
-            'btnHint': 'Hints', 'btnRepeat': 'Újrajátsz', 'btnVst': 'Keverő',
+            
             'btnFullscreen': 'Teljes', 'btnHelp': 'Help',
             // info sáv
             'ready': 'RENDSZER KÉSZ — NYOMJ STARTOT A KEZDÉSHEZ',
@@ -517,7 +523,7 @@
             // result
             'resultMsg100fast': 'Tökéletes pontszám maximális sebességen! Hallásfejlesztésed profi szintű.',
             'resultMsg100': 'Tökéletes kör! Szintet léptél — most <strong>{t} másodperced</strong> van hangjegyenként.',
-            'resultMsgFail': 'Szép munka! A szintlépéshez 100% kell. Gyakorolj még {t} másodperces tempónál!',
+            'msgListening':'FIGYELJ — AZONOSÍTSD A {n}. HANGOT A {t}-BÓL','msgTimeUp':'LEJÁRT AZ IDŐ! — A HANG: {note}','msgCorrect':'HELYES! — {note}','msgHigher':'MAGASABB ↑ — PRÓBÁLD ÚJRA','msgLower':'MÉLYEBB ↓ — PRÓBÁLD ÚJRA','resultMsgFail': 'Szép munka! A szintlépéshez 100% kell. Gyakorolj még {t} másodperces tempónál!',
         }
     };
 
@@ -535,26 +541,56 @@
         ['txt-roundComplete','txt-correct','txt-wrong','txt-timerLabel','txt-nextRound',
          'txt-infoTitle','txt-howTitle','txt-howBody','txt-feedTitle',
          'txt-feed1','txt-feed2','txt-feed3','txt-feed4',
-         'txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl3','txt-ctrl4','txt-ctrl5',
+         'txt-ctrlTitle','txt-ctrl1','txt-ctrl2','txt-ctrl2x','txt-ctrl4','txt-ctrl5',
          'txt-progTitle','txt-progBody','txt-gotIt'
         ].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.innerHTML = T[id];
         });
-        // Csak szöveges gombok fordítása (ikonos sq-btn-eket kihagyjuk)
-        ['btnAcc','btnHint','btnRepeat'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el && T[id]) el.innerText = T[id];
+        // Csak szöveges gombok fordítása — ikonos sq-btn-eket kihagyjuk
+        // (btnAcc, btnHints, btnRepeat már ikonok, nem kell szöveget frissíteni)
+        // Help szövegek minden gombra
+        const helpMap = currentLang === 'EN' ? {
+            'btnHome':'HOME: RETURN TO MAIN MODULE MENU',
+            'btnClef':'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY',
+            'btnHints':'HINTS: 1× NOTE NAMES | 2× + KEY LEDS | 3× OFF',
+            'btnAcc':'CHROMATIC: ADD BLACK KEY NOTES (SHARPS/FLATS) TO THE POOL',
+            'btnRepeat':'REPLAY: PLAY THE CURRENT NOTE AGAIN',
+            'btnStart':'START/STOP: BEGIN OR END THE EAR TRAINING SESSION',
+            'audioToggle':'PIANO AUDIO: TOGGLE INTERNAL SYNTH',
+            'btnFullscreen':'FULLSCREEN MODE — PRESS AGAIN TO EXIT',
+            'btnHelp':'HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION',
+            'btnInfo':'INFO: OPEN MODULE GUIDE',
+            'oledModule':'MODULE: CLICK TO NAVIGATE TO ANOTHER MODULE',
+            'oledTimer':'TIMER: SECONDS PER NOTE — REACH 100% TO SPEED UP AUTOMATICALLY',
+            'oledProgress':'PROGRESS: CURRENT NOTE IN THE 10-NOTE ROUND',
+            'oledScore':'SCORE: CORRECT HITS / MISTAKES THIS ROUND',
+        } : {
+            'btnHome':'FŐOLDAL: VISSZA A MODULVÁLASZTÓ FŐMENÜBE',
+            'btnClef':'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS',
+            'btnHints':'SEGÉDEK: 1× HANGNEVEK | 2× + BILLENTYŰ LED | 3× KI',
+            'btnAcc':'KROMATIKUS: FEKETE BILLENTYŰS HANGOK (KERESZTEK/BÉK) HOZZÁADÁSA',
+            'btnRepeat':'ÚJRAJÁTSZÁS: AKTUÁLIS HANG ISMÉTLÉSE BÜNTETÉS NÉLKÜL',
+            'btnStart':'START/STOP: GYAKORLAT INDÍTÁSA/LEÁLLÍTÁSA',
+            'audioToggle':'ZONGORA HANG: SZINTETIZÁTOR BE/KI',
+            'btnFullscreen':'TELJES KÉPERNYŐ — ISMÉTELT MEGNYOMÁSSAL VISSZATÉRHETSZ',
+            'btnHelp':'SÚGÓ: KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT',
+            'btnInfo':'INFO: MODUL ÚTMUTATÓ',
+            'oledModule':'MODUL: KATTINTS A MODULVÁLTÁSHOZ — A NYILAKKAL IS BÖNGÉSZHETSZ',
+            'oledTimer':'IDŐKORLÁT: MÁSODPERC HANGJEGYENKÉNT — 100%-NÁL AUTOMATIKUSAN GYORSÍT',
+            'oledProgress':'ELŐREHALADÁS: AKTUÁLIS HANG A 10 HANGOS KÖRBEN',
+            'oledScore':'EREDMÉNY: HELYES / HIBÁS LEÜTÉSEK A KÖRBEN',
+        };
+        Object.entries(helpMap).forEach(([id,txt])=>{
+            const el=document.getElementById(id);
+            if(el) el.dataset.help=txt;
         });
-        // Clef help szövegek
-        const btnClef = document.getElementById('btnClef');
-        if (btnClef) btnClef.dataset.help = currentLang === 'EN'
-            ? 'CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY'
-            : 'KULCS: KÖRKÖRÖSEN VÁLT — VIOLIN + BASSZUS / CSAK VIOLIN / CSAK BASSZUS';
         // Info sáv — csak ha nem fut
         if (!isRunning && !helpActive) {
             setInfoBar(T['ready'], null);
         }
+        // Module név frissítése
+        document.getElementById('lcdModuleText').innerText = MODULE_NAMES[currentLang][currentModuleIdx];
     }
 
     // ── HELP ──
@@ -631,16 +667,19 @@
     }
     function updateKeyLed() {
         document.querySelectorAll('.key-glow').forEach(k => k.classList.remove('ear-hint'));
-        if (useReveal && isRunning && currentStep < seq.length) {
+        if (showLeds && isRunning && currentStep < seq.length) {
             const midi = seq[currentStep].midi;
             document.getElementById(`k-${midi}`)?.classList.add('ear-hint');
         }
     }
 
-    function toggleHint() {
+    let hintState = 0; // 0=off, 1=hints, 2=hints+LED
+    function cycleHints() {
         if (helpActive) return;
-        useReveal = !useReveal;
-        document.getElementById('btnHint').classList.toggle('active', useReveal);
+        hintState = (hintState + 1) % 3;
+        useReveal = hintState >= 1;
+        showLeds = hintState >= 2;
+        document.getElementById('btnHints').classList.toggle('active', hintState > 0);
         updateKeyLed();
         draw();
     }
@@ -677,8 +716,8 @@
 
     // ── PRACTICE KONTROL ──
     function updateStartStop(running) {
-        document.getElementById('startLabel').classList.toggle('active', !running);
-        document.getElementById('stopLabel').classList.toggle('active', running);
+        const btn = document.getElementById('btnStart');
+        if (btn) btn.textContent = running ? 'STOP' : 'START';
     }
 
         function handleMainButton() {
@@ -708,7 +747,7 @@
     function playCurrentAndStartTimer() {
         if (!isRunning || currentStep >= seq.length) return;
         playMidi(seq[currentStep].midi, 100);
-        setInfo(`LISTENING — IDENTIFY NOTE ${currentStep + 1} OF ${seq.length}`, '');
+        setInfo(TRANSLATIONS[currentLang]['msgListening'].replace('{n}',currentStep+1).replace('{t}',seq.length), '');
         updateKeyLed();
         if (timerTicker) clearInterval(timerTicker);
         timeLeft = sessionTimer;
@@ -728,7 +767,7 @@
         scoreBad++;
         seq[currentStep].revealed = true;
         seq[currentStep].wrong = true;
-        setInfo(`TIME UP! — THE NOTE WAS ${seq[currentStep].n}`, 'hint-wrong');
+        setInfo(TRANSLATIONS[currentLang]['msgTimeUp'].replace('{note}',seq[currentStep].n), 'hint-wrong');
         draw();
         updateOLED();
         waitingNext = true;
@@ -805,7 +844,7 @@
             scoreOk++;
             target.revealed = true;
             target.correct = true;
-            setInfo(`CORRECT! — ${target.n}`, 'hint-correct');
+            setInfo(TRANSLATIONS[currentLang]['msgCorrect'].replace('{note}',target.n), 'hint-correct');
             draw();
             updateOLED();
             waitingNext = true;
@@ -815,9 +854,9 @@
             scoreBad++;
             updateOLED();
             if (midi < target.midi) {
-                setInfo('HIGHER ↑ — TRY AGAIN', 'hint-higher');
+                setInfo(TRANSLATIONS[currentLang]['msgHigher'], 'hint-higher');
             } else {
-                setInfo('LOWER ↓ — TRY AGAIN', 'hint-lower');
+                setInfo(TRANSLATIONS[currentLang]['msgLower'], 'hint-lower');
             }
             draw();
         }
@@ -977,22 +1016,40 @@
 
     // ── BILLENTYŰZET ──
     function create88() {
-        const wrap = document.getElementById('hb-wrap');
-        const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
-        for (let m = 21; m <= 108; m++) {
-            const k = document.createElement('div'); const isW = whites.includes(m%12);
-            k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
-            if (isW) { k.style.left = (wIdx*1.92307)+'%'; k.style.width = '1.92307%'; k.style.height = '100%'; wIdx++; }
-            else { k.style.left = ((wIdx*1.92307)-0.6)+'%'; k.style.width = '1.2%'; k.style.height = '65%'; k.style.zIndex = '200'; }
-            k.onmousedown = (e) => { e.preventDefault(); handleNoteOn(m, 100); };
-            k.onmouseup   = () => handleNoteOff(m);
-            k.onmouseleave = () => handleNoteOff(m);
-            const led = document.createElement('div');
-            led.className = 'key-led';
-            k.appendChild(led);
-            wrap.appendChild(k);
+    const wrap = document.getElementById('hb-wrap');
+    const whites = [0,2,4,5,7,9,11]; let wIdx = 0;
+    for (let m = 21; m <= 108; m++) {
+        const k = document.createElement('div'); const isW = whites.includes(m%12);
+        k.id = `k-${m}`; k.className = `key-glow ${isW ? 'white-glow' : 'black-glow'}`;
+        
+        if (isW) { 
+            // Fehér billentyűk: Szélesség a 8.32.27-es fájlból (JÓ ÁRNYÉK)
+            k.style.left = (wIdx * 1.92307) + '%'; 
+            k.style.width = '1.92307%'; 
+            k.style.height = '100%'; 
+            wIdx++; 
+        } else {
+            // Fekete billentyűk: Pozíció ÉS a kisebb szélesség a hallasfejleszto.html-ből
+            const blackOffsets = {1:-0.621, 3:-0.477, 6:-0.723, 8:-0.559, 10:-0.415};
+            const noteInOctave = m % 12;
+            const offset = blackOffsets[noteInOctave] !== undefined ? blackOffsets[noteInOctave] : -0.6;
+            
+            k.style.left = ((wIdx * 1.92307) + offset) + '%';
+            k.style.width = '1.241%'; // Itt a "kisebb, rövidebb" szélesség
+            k.style.height = '65%';
+            k.style.zIndex = '200';
         }
+        
+        k.onmousedown = (e) => { e.preventDefault(); handleNoteOn(m, 100); };
+        k.onmouseup   = () => handleNoteOff(m);
+        k.onmouseleave = () => handleNoteOff(m);
+        
+        const led = document.createElement('div');
+        led.className = 'key-led';
+        k.appendChild(led);
+        wrap.appendChild(k);
     }
+}
 
     window.onload = () => {
         const sl = localStorage.getItem('akira_lang') || 'EN'; setLang(sl);
