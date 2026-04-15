@@ -197,6 +197,20 @@
         .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
         .metro-preset:hover { background:#333;color:#fff; }
         .metro-preset:active { transform:translateY(1px); }
+        #btnMidiRec { color:#666; border-color:#333; transition:color 0.15s,border-color 0.15s,box-shadow 0.15s; }
+        #btnMidiRec.recording { color:#ff2a2a !important; border-color:#cc2222 !important; box-shadow:0 0 10px rgba(255,40,40,0.35); }
+        #midiPlayerPanel { box-shadow:0 12px 32px rgba(0,0,0,0.75); }
+        #midiPlayerPanel input[type="range"] { -webkit-appearance:none; width:100%; height:6px; background:#111; border-radius:3px; outline:none; cursor:pointer; }
+        #midiPlayerPanel input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#b3e6ff; border:1px solid #557799; cursor:grab; }
+        .midi-rec-clock-box {
+            font-family:'Share Tech Mono',monospace;font-size:22px;line-height:1.15;color:#b3e6ff;font-weight:bold;
+            padding:6px 10px;border-radius:3px;background:#111;border:1px solid #050505;
+            box-shadow:inset 0 2px 5px rgba(0,0,0,0.5);min-width:0;flex:1;text-align:center;
+        }
+        #midiRecTimeDisplay { user-select:none;cursor:default; }
+        #midiRecSpeedBox { user-select:none;cursor:pointer;flex:0 0 auto;min-width:4.2em; }
+        #midiRecSpeedBox:hover { border-color:#557799;color:#d8f4ff; }
+        #btnMidiRecRepeat.active { color:#b3e6ff;border-color:#557799; }
         .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; }
         .modal-content { background:var(--rack-bg); padding:30px; border:2px solid var(--rack-border); border-radius:6px; text-align:center; max-width:550px; width:90%; box-shadow:0 20px 50px rgba(0,0,0,1); }
         .modal-title { color:#aaa; text-transform:uppercase; letter-spacing:2px; font-weight:800; font-size:16px; margin-top:0; margin-bottom:25px; border-bottom:2px solid #111; padding-bottom:15px; }
@@ -733,6 +747,32 @@
                                 <button type="button" id="btnDemoRepeat" class="sq-btn" onclick="if(!helpActive) toggleDemoRepeat()" data-help="" title="" aria-label="" style="align-self:center;flex-shrink:0;">
                                     <svg id="demoRepeatIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                                 </button>
+                                <button type="button" id="btnMidiRec" class="sq-btn" onclick="if(!helpActive) void toggleMidiRecorder()" data-help="" title="" aria-label="MIDI REC" style="align-self:center;flex-shrink:0;margin-left:14px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/></svg>
+                                </button>
+                                <div class="midi-player-wrap" style="position:relative;align-self:center;flex-shrink:0;margin-left:2px;">
+                                    <button type="button" id="btnMidiPlayer" class="sq-btn" onclick="if(!helpActive) toggleMidiPlayerPanel()" data-help="" title="" aria-label="MIDI Player" style="display:flex;align-items:center;justify-content:center;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7,5 19,12 7,19"/></svg>
+                                    </button>
+                                    <div id="midiPlayerPanel" style="display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;width:min(92vw,300px);background:#1a1a1d;border:1px solid #333;border-radius:4px;padding:10px 12px;z-index:1200;flex-direction:column;gap:8px;">
+                                        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#557799;text-transform:uppercase;">Sessions</div>
+                                        <select id="midiRecSessionSelect" style="background:#111;color:#eee;border:1px solid #333;padding:6px;font-family:'Share Tech Mono';border-radius:3px;width:100%;font-size:11px;"></select>
+                                        <div style="display:flex;align-items:center;gap:8px;">
+                                            <button type="button" id="midiRecPlayBtn" class="sq-btn" onclick="if(!helpActive) void toggleMidiRecPlayback()" style="width:36px;height:38px;flex-shrink:0;padding:0;align-self:center;" title="Play / Stop">▶</button>
+                                            <div style="flex:1;min-width:0;display:flex;align-items:center;">
+                                                <input type="range" id="midiRecSeek" min="0" max="1000" value="0" step="0.1">
+                                            </div>
+                                            <button type="button" id="btnMidiRecRepeat" class="sq-btn" onclick="if(!helpActive) toggleMidiRecRepeat()" data-help="" title="" aria-label="" style="width:36px;height:38px;flex-shrink:0;padding:0;display:flex;align-items:center;justify-content:center;align-self:center;">
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                                            </button>
+                                        </div>
+                                        <div style="display:flex;align-items:stretch;gap:10px;justify-content:space-between;">
+                                            <div id="midiRecTimeDisplay" class="midi-rec-clock-box" title="">00:00.0</div>
+                                            <div id="midiRecSpeedBox" class="midi-rec-clock-box" onclick="if(!helpActive) cycleMidiRecPlaySpeed()" title="">×1.0</div>
+                                        </div>
+                                        <button type="button" class="hardware-btn" id="midiRecExportBtn" onclick="if(!helpActive) void exportMidiRecorderSession()" style="width:100%;font-size:11px;padding:8px;letter-spacing:1px;">Export .mid</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -797,36 +837,36 @@
     const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','REPERTOIRE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','REPERTOÁR']};
     const MODAL_STRINGS={
         EN:{
-            'txt-infoTitle': 'Repertoire module — guide',
-            'txt-infoScoresTitle': 'Score files & sources',
-            'txt-infoScoresBody': 'This module only reads MusicXML (.xml, .musicxml) and compressed .mxl (ZIP with MusicXML). There is no PDF import — PDF is not machine-readable for practice, cursor, MIDI, or measure range; MusicXML is easy to export from any notation app.\n\nLoad:\n• Score file icon (right toolbar, document with staff lines) — pick a file; opens at once.\n• Library (tap score title) — + File / + Batch copies into browser storage; Link folder (Chrome/Edge) lists every .xml / .mxl in a folder you choose.\n• URL — paste a direct link to .musicxml or .mxl. Many sites block cross-site downloads (CORS); saving the file and using the score file icon is often easier.\n\nWhere to get MusicXML:\n• MuseScore Desktop — File → Export → MusicXML (licensing varies by piece).\n• IMSLP and other libraries — choose a MusicXML edition when available, or export from MuseScore / Finale / Dorico / etc.\n• Flat.io, Noteflight, and similar — export MusicXML, then open here.',
-            'txt-howTitle':  'Practice flow',
-            'txt-howBody':   'START — step-by-step practice: play only the notes the score highlights, in order. Spacebar starts or stops.\nDEMO (▶) — the app plays the piece with the current measure highlighted and optional built-in piano sound. Use the ▲▼ arrows next to the ▶ button to adjust playback speed (0.3×–1.8×); tap the speed number to reset to 1.0×. To the right of the speed box, the square loop button toggles DEMO repeat: when the piece reaches the end, DEMO starts again until you tap the button off (▶ still stops playback at any time). If book view uses one column, DEMO temporarily switches to two columns for smoother page scrolling, then restores your layout when DEMO ends.\n\nWhen a measure range is set (soft amber band on the score), START and DEMO work only in that range — not the whole piece.\nNext to the title display, ▲ / ▼ loads the previous or next piece in the library; tap the title to open the full library.\n\nThe sections below explain measure selection and bookmarks in more detail.',
-            'txt-infoMeasureGuideTitle': 'Measure range — choosing and clearing',
-            'txt-infoMeasureGuideBody': 'What it does: limits START and DEMO to certain measures. The selected area is shown as a light amber tint on the score.\n\nHow to set the range:\n• Open the measure range dialog (staff-lines icon, top right of the 2×2 control block). Enter the first and last measure number, then tap OK.\n• Click-to-select on the score: turn ON the tilted pointer (top left of that block), or use the checkbox in the measure range dialog. It is OFF by default so normal clicks on the score do not change the selection.\n\nWith click-to-select ON:\n• One click on a measure — only that measure stays selected (previous selection is replaced).\n• Shift+click another measure — every measure from the one you last clicked up to the new click is included (you can extend the range in several steps).\n• Cmd+click (Mac) or Ctrl+click (Windows) — add or remove single measures without clearing the rest.\n\nHow to clear the range (whole piece again):\n• Tap ∅ bottom left of the 2×2 block — same as ∅ next to OK in the measure range dialog.\n• Bookmarks open from bottom right. Turning click-to-select OFF only stops further clicks from changing the range; it does not remove the amber band — use ∅ to clear the range.\n\nWhen you are done, turn click-to-select OFF if you do not want accidental changes.',
-            'txt-infoBookmarksGuideTitle': 'Bookmarks B1 · B2 · B3',
-            'txt-infoBookmarksGuideBody': 'Saved only in your browser, separately for each score file.\n\n• Click B1, B2, or B3 — loads that slot for the current score: restores the saved measure range, scroll position in the score area, and (in two- or three-column book view) which page spread you were on.\n• Shift+click the same button — saves the current state into that slot (for this file only).\n\nSaved: the active measure selection (amber band), vertical scroll in the score panel, and the spread index in multi-column book view.\n\nNot saved: zoom, number of columns (1 / 2 / 3), tempo, or other files. If nothing was saved in a slot, a normal click tells you it is empty.\n\nLOG in the bookmark panel shows a short history of completed practice runs (tempo, steps, measure range if any).',
-            'txt-infoPanelTitle': 'Toolbar (right of the sheet)',
-            'txt-infoPanelBody': 'Expand corners — full-screen score view: hides rack and keyboard; score fills the area; browser fullscreen optional (Esc exits).\nSliders — zoom, page margins, staff spacing.\nOpen book — cycles 1 / 2 / 3 columns (scroll vs spreads). With 2–3 columns, ◀ ▶ change spreads.\nSun button — cycles score colours: light, paper (sepia), dark with white notation, dark with warm notation.\nScore file — open .xml / .musicxml / .mxl from disk.\n2×2 block next to the piano button: top left — click-to-select on the score; top right — measure range dialog; bottom left — ∅ clears the measure selection (full score again); bottom right — bookmarks.\nStar — five view presets: click a number to load zoom + layout; Shift+click saves the current view.',
+            'txt-infoTitle': 'Repertoire Module — User Guide',
+            'txt-infoScoresTitle': '',
+            'txt-infoScoresBody': 'Welcome to your interactive practice workstation! This module is designed to help you master your favorite pieces at your own pace with real-time feedback.\n\n📁 Loading Scores\n\nSupported Formats: MusicXML (.xml, .musicxml) and compressed .mxl files. (Please note: PDF files are not interactive and cannot be processed here.)\n\nOpen a File: Click the Sheet Music icon on the right toolbar to browse files on your device.\n\nLibrary Management: Click the Score Title on the top display to open your Library. Use the + File or + Batch buttons to import new scores. In Chrome/Edge, the Link Folder feature allows you to sync an entire local directory.\n\nWeb Sources: If a direct URL fails to load, download the file to your device first, then open it manually using the file icon.',
+            'txt-howTitle':  '🚀 Practice & Playback',
+            'txt-howBody':   'START Mode: This is your personal coach. It guides you through the piece note-by-note, highlighting the next key and waiting for your input. Press Space to start or stop practicing.\n\nDEMO Mode: Listen to a perfect performance of the piece.\n\nUse the small arrows next to ▶ to speed up or slow down. Click the multiplier number to reset to the original (1x) tempo.\n\nThe Square icon toggles the Loop: when active, the demo will automatically restart once it reaches the end.\n\nREC (MIDI Recording): Record your own performance! Hit the red circle to start recording, then use the Keyboard icon to open the Player. Here you can listen back, manage your sessions, or export your playing as a standard MIDI file.',
+            'txt-infoMeasureGuideTitle': '🎯 Setting a Measure Range (Selection)',
+            'txt-infoMeasureGuideBody': 'Want to focus on a difficult section? You can isolate specific measures, which will appear with a highlighted background on the score.\n\nManual Input: Click the Lines icon (top-right of the four small icons next to the piano) and enter the start and end measure numbers.\n\nClick on Score: Enable the Cursor icon to select measures directly.\n\nSingle Measure: Simple click.\n\nRange: Click the first measure, then Shift + Click the last one.\n\nAdd/Remove: Use Ctrl (Windows) or Cmd (Mac) to toggle specific measures.\n\nClear: Use the ∅ icon to reset and select the entire piece.',
+            'txt-infoBookmarksGuideTitle': '🔖 Bookmarks (B1, B2, B3)',
+            'txt-infoBookmarksGuideBody': 'Each score has three dedicated slots to remember your view and selection settings.\n\nLoad: Click a B-button.\n\nSave: Shift + Click a B-button to save your current range and scroll position.',
+            'txt-infoPanelTitle': '🛠️ Advanced Tools',
+            'txt-infoPanelBody': 'Customize View: Use the sliders on the right to adjust Zoom, Margin, and Line Spacing.\n\nLayout: Use the Open Book icon to switch between 1, 2, or 3-column views.\n\nColor Themes: Use the Sun icon to choose between eye-friendly themes (Dark, Sepia) or high-contrast Light mode.',
             'txt-infoShortcutsTitle': 'Keyboard',
             'txt-infoShortcutsBody': '← → — previous / next spread when BOOK uses 2–3 columns.\nSpace — START / STOP practice.\nNumpad + / − — zoom in or out.',
             'txt-ctrlTitle': 'Rack (below the score)',
-            'txt-ctrl0':     'Clef strip — cycles Treble+Bass / Treble only / Bass only (hints and which staff you practice).',
-            'txt-ctrl4':     'Eye — practice hints: key LEDs and ▼ markers above the keyboard (cyan = right hand, pastel orange = left hand); tap again to turn off.',
+            'txt-ctrl0':     'Clef Toggles: Use the 𝄞 / 𝄢 icons to hide the right or left-hand staff if you want to practice them separately.',
+            'txt-ctrl4':     '',
             'txt-infoHelpTitle': 'Help mode (? )',
-            'txt-infoHelpBody': 'Turn ? on, then tap any control that has a description — text appears in the info bar. Tap ? again to exit. The I button opens this guide (EN / HU with the language buttons).',
+            'txt-infoHelpBody': 'Tip: Enable Help Mode (?), then click on any control on the screen for a quick explanation in the info bar!',
             'txt-gotIt':     'Got it',
             'txt-logTitle':  'Practice log (recent sessions)',
             'txt-logClose':  'Close',
             'txt-measureRangeTitle': 'Measure range',
             'txt-measureRangeSec': 'START / DEMO scope',
-            'txt-measureRangeClickPickLabel': 'Allow clicking the score to choose measures (Shift / Ctrl+click as described in the guide)',
+            'txt-measureRangeClickPickLabel': 'Let me pick measures by clicking the score (see the guide for Shift-click and Ctrl-click).',
             'txt-measureRangeClose': 'Close',
             'txt-bookmarksTitle': 'Bookmarks',
             'txt-bookmarksClose': 'Close',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Score library',
-            'txt-scoreLibHint': 'Several named libraries; each has its own piece list (stored in the browser only).\n\nOn first visit, a \"Samples\" library is filled from samples/manifest.json (list of .mxl/.xml) plus the files in samples/; you can remove pieces with Del — they will not reappear unless you clear site data. To add scores, put the file in samples/ and add its filename to manifest.json, then clear localStorage key repertoar_builtin_samples_seeded_v1 once (or site data).\n\n+ File / + Batch — import MusicXML/MXL into storage.\nLink folder — Chrome/Edge can attach a local folder; all .xml / .mxl inside stay listed after refresh.\nURL — only works if the server allows other sites to fetch the file (CORS). MuseScore, IMSLP, and many hosts do not; download the file and use the score file icon on the right instead.\nSave — store the currently open score under a name in the active library.',
+            'txt-scoreLibHint': 'You can keep more than one library. Each library has its own list of pieces. Nothing leaves your browser unless you export it yourself.\n\nThe first time you open this page, a sample library may appear. You can delete pieces you do not want. Use + File or + Batch to bring your own MusicXML or MXL files in. In Chrome or Edge, Link folder lets you attach a folder on your computer so its scores stay listed after you refresh.\n\nIf a pasted web link does not download, save the file with your browser first, then open it with the score icon on the right.\n\nSave stores the score that is open now under a name inside the library you picked.',
             'txt-scoreLibLibsHdr': 'Libraries',
             'btnScoreLibAddLibrary': '+ New collection',
             'txt-scoreLibPiecesHdr': 'Pieces',
@@ -837,34 +877,34 @@
         HU:{
             'txt-infoTitle': 'Repertoár modul — útmutató',
             'txt-infoScoresTitle': 'Kottafájlok és források',
-            'txt-infoScoresBody': 'A modul csak MusicXML (.xml, .musicxml) és tömörített .mxl (ZIP-ben MusicXML) fájlt tud megnyitni. PDF-et nem: gyakorlásra, kurzorra, MIDI-re és ütemtartományra a PDF nem alkalmas; MusicXML-et viszont a legtöbb kottaszerkesztőből egyszerűen exportálhatsz.\n\nBetöltés:\n• Kottafájl ikon a jobb oldali eszköztáron (dokumentum kottavonalakkal) — kiválasztod a fájlt, és azonnal megnyílik.\n• Könyvtár — kattints a kotta címére a kijelzőn; a + File / + Batch a böngésző tárhelyére másolja a fájlokat. A Link mappa (Chrome, Edge) egy kiválasztott mappa összes .xml és .mxl fájlját kilistázza.\n• URL — közvetlen .musicxml vagy .mxl cím. Sok szerver nem engedi a másik oldalról való letöltést (CORS); ilyenkor gyakran egyszerűbb letölteni a fájlt, majd a kottafájl ikonnal megnyitni.\n\nHonnan legyen MusicXML:\n• MuseScore (asztali) — Fájl → Exportálás → MusicXML (a darab licencétől függ, mit szabad).\n• IMSLP és más gyűjtemények — ha van MusicXML kiadás, azt válaszd, vagy exportálj más programból (MuseScore, Finale, Dorico stb.).\n• Flat.io, Noteflight és hasonlók — export MusicXML, majd megnyitás itt.',
+            'txt-infoScoresBody': 'Ez a modul MusicXML fájlokat (.xml, .musicxml) és csomagolt .mxl fájlokat nyit meg. PDF kottát nem tud megjeleníteni ebben a formában.\n\nA gépedről a jobb oldali sávban lévő kotta-ikonra kattintva választhatsz fájlt, és megnyílik.\n\nHa sok darabot tartasz rendben, kattints a kijelzőn a címre: megnyílik a könyvtár. Az új kottát a + File vagy a + Batch gombbal viheted be. Chrome-ban és Edge-ben a Link mappa egy mappa összes megfelelő fájlját kilistázza.\n\nHa beillesztett webcím nem tölt be, töltsd le a fájlt a böngésződdel a szokásos módon, majd nyisd meg a kotta-ikonnal.\n\nA legtöbb kottaszerkesztőből exportálhatsz MusicXML-be (például MuseScore, Finale vagy Dorico).',
             'txt-howTitle':  'Gyakorlás menete',
-            'txt-howBody':   'START — lépésről lépésre gyakorlod a kotta által kiemelt hangokat, a megadott sorrendben. Szóköz: indítás vagy leállítás.\nDEMO (▶) — az alkalmazás lejátsza a darabot: az aktuális ütem kiemelve látszik, a hangot pedig opcionálisan a beépített zongora adja. A ▶ gomb melletti ▲▼ nyilakkal állítható a lejátszási sebesség (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. A sebességkijelző jobb oldalán a négyzetes ismétlés ikon kapcsolja a DEMO ismétlést: a darab végén újraindul, amíg ki nem kapcsolod (a ▶ továbbra is bármikor megállítja a lejátszást). Ha a könyvet egy hasábban nézed, a DEMO alatt átmenetileg két hasábra vált a gördülékenyebb lapkövetés miatt; a DEMO végén visszaáll a korábbi nézet.\n\nHa be van állítva ütemtartomány (enyhe borostyánsárga szín a kottán), a START és a DEMO csak erre a szakaszra vonatkozik, nem az egész darabra.\nA cím melletti ▲ és ▼ az aktuális könyvtárban az előző vagy a következő darabra vált; a címre kattintva megnyílik a teljes könyvtár.\n\nA következő két fejezet részletesen elmagyarázza az ütemek kijelölését és a könyvjelzőket.',
+            'txt-howBody':   'A START végigvezet a darabon. A kotta mutatja, melyik hang következik, és milyen sorrendben kell játszanod. A szóköz indítja vagy leállítja a gyakorlást.\n\nA DEMO lejátsza helyetted a művet. Az épp aktuális ütem kiemelve marad. A ▶ melletti kis nyilakkal lassíthatsz vagy gyorsíthatsz; a számra kattintva visszaáll az 1×-es tempó. A négyzetes gomb bekapcsolja vagy kikapcsolja az ismétlést: ha be van kapcsolva, a darab végén a DEMO újraindul, amíg ki nem kapcsolod. A ▶ mindig leállítja a lejátszást. Ha egy hasábban olvasod a kottát, a DEMO alatt ideiglenesen két hasábra válthat a lap, hogy könnyebben követhető legyen, majd a DEMO végén visszaáll a nézet.\n\nHa csak egy szakaszt jelöltél ki ütemekben (világosabb háttér a kottán), a START és a DEMO csak arra a szakaszra vonatkozik.\n\nA cím melletti ▲ és ▼ az előző vagy a következő darabra lapoz ugyanabban a könyvtárban. Magára a címre kattintva megnyílik a teljes lista.\n\nA REC gombbal felvételt készíthetsz arról, ami itt lejátszódik. Újabb REC megnyomásával leállítod. A kis billentyűzet ikon megnyitja a lejátszót: ott választhatsz felvételt, meghallgathatod, állíthatod a tempót, vagy elmentheted MIDI fájlba.\n\nLentebb az ütemek kijelölését és a könyvjelzőket részletezzük.',
             'txt-infoMeasureGuideTitle': 'Ütemtartomány — kijelölés és törlés',
-            'txt-infoMeasureGuideBody': 'Mire való: meghatározza, hogy a START és a DEMO a kotta mely ütemein dolgozzon. A kijelölt rész enyhén borostyánsárga háttérrel látszik.\n\nBeállítás:\n• Nyisd meg az ütemtartomány ablakot (vonalkás ikon a 2×2-es gombcsoport jobb felső mezőjében). Írd be az első és az utolsó ütem számát, majd koppints az OK gombra.\n• Egérrel a kottán: kapcsold be a ferde egérmutató ikont (bal felső mező ugyanabban a csoportban), vagy jelöld be ugyanezt az ütemtartomány ablakban. Alapból ki van kapcsolva, hogy véletlen kattintásra ne változzon a kijelölés.\n\nHa be van kapcsolva az egérrel választás:\n• Egy kattintás egy ütemre — csak az az ütem marad kijelölve (a korábbi kijelölés törlődik).\n• Shift és kattintás egy másik ütemre — minden ütem bekerül a két ütem között, az első kattintásodtól számítva (több lépésben is bővítheted a szakaszt).\n• Macen Cmd + kattintás, Windowson Ctrl + kattintás — egy-egy ütem külön be- vagy kikapcsolható a kijelölésből.\n\nKijelölés törlése (újra az egész darab):\n• A 2×2-es csoport bal alsó mezőjében a ∅ gomb (ugyanolyan színű, mint a többi ikon), vagy ugyanez az ütemtartomány ablakban az OK mellett. Ez törli a tartományt: a START és a DEMO ismét az egész kottára vonatkozik.\n• A könyvjelzőt a jobb alsó gomb nyitja. Ha kikapcsolod az egérrel választást, attól a borostyánsárga sáv még megmarad; a tartományt csak a ∅ gombbal törölheted.\n\nHa nem szeretnél többé a kottán kattintással módosítani a kijelölést, kapcsold ki az egérrel választást is.',
+            'txt-infoMeasureGuideBody': 'Megadhatod, hogy a START és a DEMO csak a darab egy részén dolgozzon. Ez a rész világosabb háttérrel látszik a kottán.\n\nAz ütemeket beírhatod egy ablakba: nyisd meg a vonalkás ikont (a zongora melletti négy kis ikon közül a jobb felső). Add meg az első és az utolsó ütem számát, majd erősítsd meg.\n\nÜtemeket a kottára kattintva is kijelölhetsz. Ehhez kapcsold be, hogy a kotta kattintható legyen (ferde egér ikon ugyanebben a négyesben, vagy ugyanez a jelölőnégyzet az ütemablakban). Egy sima kattintás egy ütemre: csak az marad kijelölve. Shift és másik ütemre kattintás: a két ütem között minden bekerül. Macen a Cmd, Windowson a Ctrl egy-egy ütem hozzáadására vagy levételére szolgál.\n\nHa újra az egész darabot szeretnéd, nyomd meg a ∅ jelet (üres halmaz). Ez a négyes bal alsó ikonja, és az ütemablakban is ott van az OK mellett. Ha kikapcsolod a kottán való választást, a színes sáv ettől még megmarad; a teljes darabhoz mindig a ∅ kell.\n\nHa nem akarsz véletlenül átírni semmit, kapcsold ki a kottán való választást, ha végeztél.',
             'txt-infoBookmarksGuideTitle': 'Könyvjelzők B1 · B2 · B3',
-            'txt-infoBookmarksGuideBody': 'Csak a böngészőben tárolódnak; minden kottafájlhoz külön tartoznak a B1, B2, B3 helyek.\n\n• Egyszerű kattintás a B1, B2 vagy B3 gombon — betölti a mentést az épp nyitott darabhoz: visszaáll a mentett ütemtartomány, a kotta görgetési helyzete, és ha két vagy három hasábban nézed a könyvet, az is, melyik oldalpáron voltál.\n• Shift és kattintás ugyanezen a gombon — elmenti az aktuális állapotot ebbe a helyre (csak ehhez a fájlhoz).\n\nMit ment: a kijelölt ütemeket (amit a borostyánsárga mutat), a kottaablak függőleges görgetését, több hasábnál pedig az aktuális oldalpár sorszámát.\n\nMit nem ment: a nagyítást, a hasábszámot (1 / 2 / 3), a tempót, más darabot. Üres helyre sima kattintáskor jelzi, hogy még nincs ott mentés.\n\nA könyvjelzők panelen a LOG a korábbi gyakorlások rövid listája (tempó, lépésszám, ütemtartomány, ha volt).',
+            'txt-infoBookmarksGuideBody': 'A könyvjelzők a böngésződben maradnak. Minden kottafájlhoz három hely tartozik: B1, B2, B3.\n\nHa egyszer rákattintasz egy gombra, betöltöd, amit oda mentettél ehhez a fájlhoz: az ütemtartományt, ha volt, a görgetés helyét, és ha két vagy három hasábban olvasol, azt is, melyik oldalpáron álltál. Ha közben nyomva tartod a Shiftet, és úgy kattintasz, elmented az aktuális nézetet abba a helyre.\n\nNem menti el a nagyítást, a hasábszámot, a tempót, és más fájlokra nincs hatása. Ha üres volt a hely, egy sima kattintás jelzi.\n\nA LOG a korábbi gyakorlások rövid listája: tempó, hány lépés volt, és ha volt ütemkorlát, az is.',
             'txt-infoPanelTitle': 'Eszköztár a kotta mellett (jobb)',
-            'txt-infoPanelBody': 'Sarkok ikon — teljes képernyős kotta nézet: eltűnik a rack és a billentyűzet, a kotta kitölti a területet; böngészőben teljes képernyő is lehetséges (Esc kilép).\nCsúszkák — nagyítás, lapmargó, kottasorok távolsága.\nNyitott könyv ikon — 1, 2 vagy 3 hasáb (folyamatos görgetés vagy oldalanként). Két vagy három hasábnál a ◀ ▶ gombok lapoznak.\nNap gomb — négy megjelenés váltása: világos, papír (bézs), sötét fehér jegyzettel, sötét meleg tónusú jegyzettel.\nKottafájl — .xml, .musicxml vagy .mxl megnyitása a gépről.\nA zongora gomb melletti 2×2-es négyes: bal felső — egérrel kijelölés a kottán; jobb felső — ütemtartomány ablak; bal alsó — ∅ törli az ütemkijelölést (vissza az egész kotta); jobb alsó — könyvjelző.\nCsillag — öt nézetmentés: számra kattintva betöltés, Shift + szám mentés (nagyítás és elrendezés).',
+            'txt-infoPanelBody': 'A sarkok ikon elrejti a rackot és a billentyűzetet, hogy a kotta nagyobb legyen. A böngésző saját teljes képernyős módja is használható; az Esc kilép belőle.\n\nA csúszkák a nagyítást, a lap margóját és a kottasorok távolságát állítják.\n\nA nyitott könyv ikon egy, két vagy három hasábot ad. Két vagy három hasábban a ◀ és ▶ lapoz.\n\nA nap ikon négy színállapotot ad: világos, bézs papír, sötét fehér jegyzettel, sötét meleg tónussal.\n\nA kotta ikon megnyit egy MusicXML vagy MXL fájlt a gépről.\n\nA zongora melletti négy kis ikon sorrendben: kattintással ütemválasztás a kottán, ütemablak, a kijelölés törlése, könyvjelzők.\n\nA csillag öt mentett nézetet tart: számra kattintva betöltöd; ha közben nyomva tartod a Shiftet, elmented a jelenlegi nagyítást és elrendezést.',
             'txt-infoShortcutsTitle': 'Billentyűparancsok',
             'txt-infoShortcutsBody': '← → — előző vagy következő oldalpár, ha a könyv nézet két vagy három hasábos.\nSzóköz — START vagy STOP (gyakorlás).\nNumerikus + / − — nagyítás léptetése.',
             'txt-ctrlTitle': 'Rack (a kotta alatt)',
-            'txt-ctrl0':     'Kulcssáv — sorrendben: két kottasor (violin- és basszuskulcs), csak violin, csak basszus. Meghatározza a segédleteket és azt, melyik sort gyakorlod.',
-            'txt-ctrl4':     'Szem ikon — gyakorláskor LED a billentyűkön és ▼ a sávban (kék = jobb kéz, pasztell narancs = bal kéz); újra rákattintva kikapcsolható.',
+            'txt-ctrl0':     'A kulcssáv váltogatja, hogy mindkét sor, csak a felső (violinkulcs) vagy csak az alsó (basszuskulcs) látszik. Ez szabja meg, melyik sort gyakorlod, és hogyan jelennek meg a segédek.',
+            'txt-ctrl4':     'A szem ikon be- és kikapcsolja a segédeket: fény a billentyűkön és háromszögek a billentyűzet fölött. A kék a jobb kézhez tartozik, a lágy narancs a balhoz. Újabb kattintásra minden eltűnik.',
             'txt-infoHelpTitle': 'Súgó mód (? )',
-            'txt-infoHelpBody': 'Kapcsold be a ? gombot, majd kattints bármely olyan elemre, amelyhez leírás tartozik — a szöveg az infósávba kerül. A ? újbóli megnyomásával kilépsz. Az I gomb ezt az útmutatót nyitja meg; a nyelvet az EN / HU gombokkal válthatod.',
+            'txt-infoHelpBody': 'A ? gomb bekapcsolja a súgó módot. Ezután kattints egy vezérlőre: egy rövid sor jelenik meg az infósávban. A ? újabb megnyomására kilépsz. Az I gomb ezt az oldalt nyitja meg. A nyelvet az EN és a HU gombokkal válthatod.',
             'txt-gotIt':     'Értettem',
             'txt-logTitle':  'Gyakorlás napló (utolsó futások)',
             'txt-logClose':  'Bezár',
             'txt-measureRangeTitle': 'Ütemtartomány',
             'txt-measureRangeSec': 'START / DEMO hatókör',
-            'txt-measureRangeClickPickLabel': 'Engedélyezem, hogy a kottán kattintva válasszak ütemeket (Shift és Ctrl: lásd az útmutatóban)',
+            'txt-measureRangeClickPickLabel': 'A kottára kattintva is választhatok ütemeket (a részletek az útmutatóban: Shift és Ctrl).',
             'txt-measureRangeClose': 'Bezár',
             'txt-bookmarksTitle': 'Könyvjelzők',
             'txt-bookmarksClose': 'Bezár',
             'txt-workshopBmSec': 'B1 · B2 · B3',
             'txt-scoreLibTitle': 'Kottakönyvtár',
-            'txt-scoreLibHint': 'Több elnevezett könyvtár; mindegyik saját darablistát tart (csak a böngészőben tárolva).\n\nElső látogatáskor a samples/manifest.json felsorolásából (és a samples/ mappában lévő fájlokból) töltődik a „Minták” gyűjtemény; egyenként törölheted (Töröl) — nem jönnek vissza, hacsak nem törlöd a böngésző adatait. Új .mxl: tedd a mappába, írd be a fájlnevet a manifest.json-ba, majd egyszer töröld a repertoar_builtin_samples_seeded_v1 kulcsot (vagy az oldal tárhelyét).\n\n+ File / + Batch — MusicXML/MXL import a tárhelyre.\nLink mappa — Chrome/Edge: helyi mappa csatolása; a benne lévő .xml / .mxl fájlok újratöltés után is listázva maradnak.\nURL — csak akkor működik, ha a szerver engedi a külső letöltést (CORS). A MuseScore, IMSLP és sok más oldal általában nem; töltsd le a fájlt, és használd a jobb oldali kotta-fájl ikont.\nMentés — az épp nyitott kotta elmentése névvel az aktív könyvtárba.',
+            'txt-scoreLibHint': 'Több könyvtárat is felvehetsz, mindegyiknek saját darablistája van. Minden adat a böngésződben marad, amíg te nem törlöd.\n\nElső alkalommal megjelenhet egy mintagyűjtemény. A nem kellő darabokat törölheted. Saját kottáidat a + File vagy a + Batch gombbal hozhatod be. Chrome-ban és Edge-ben a Link mappa egy mappa fájljait tartja számon, és újratöltés után is ott maradnak.\n\nHa egy beillesztett webcím nem tölt be, mentsd le a fájlt a böngészővel, majd nyisd meg a jobb oldali kotta-ikonnal.\n\nA Mentés az épp nyitott kottát menti el névvel abba a könyvtárba, amelyiket kiválasztottad.',
             'txt-scoreLibLibsHdr': 'Könyvtárak',
             'btnScoreLibAddLibrary': '+ Új gyűjtemény',
             'txt-scoreLibPiecesHdr': 'Darabok',
@@ -887,6 +927,9 @@
             oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
             btnDemo:'▶ DEMO: plays the score with measure highlight. ▲▼ adjusts playback speed (0.3×–1.8×); tap the speed display to reset to 1.0×. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
             btnDemoRepeat:'DEMO repeat: when on, the score DEMO restarts from the beginning each time it reaches the end, until you tap this button off. ▶ still stops playback immediately.',
+            btnMidiRec:'REC on / off.',
+            btnMidiPlayer:'Player panel.',
+            btnMidiRecRepeat:'Loop playback.',
             audioToggle:'Piano audio: built-in sampled piano on or off.',
             btnMeasureRange:'Measure range (top right of the 2×2 block): limits START and DEMO. Type numbers in the dialog, or use the pointer (top left) / checkbox to pick on the score (Shift / Ctrl+click).',
             btnMeasureClickPick:'Click-to-select (top left of the 2×2 block): OFF by default — ON shows green tint. Same as the checkbox in the measure range dialog.',
@@ -915,6 +958,9 @@
             oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
             btnDemo:'▶ DEMO: lejátszás ütemkiemeléssel. ▲▼ a lejátszási sebesség állítása (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
             btnDemoRepeat:'DEMO ismétlés: bekapcsolva a kotta-DEMO minden lefutás végén elölről indul, amíg ki nem kapcsolod. A ▶ gomb továbbra is azonnal megállítja a lejátszást.',
+            btnMidiRec:'Felvétel be / ki.',
+            btnMidiPlayer:'Lejátszó panel.',
+            btnMidiRecRepeat:'Lejátszás ismétlése.',
             audioToggle:'Zongora hang: belső mintahang be vagy ki.',
             btnMeasureRange:'Ütemtartomány (2×2-es csoport jobb felső): START és DEMO határa. Számok az ablakban, vagy bal felső mutató / jelölőnégyzet + kotta (Shift / Ctrl+katt).',
             btnMeasureClickPick:'Egérrel választás (2×2 bal felső): alapból ki; bekapcsolva zöldes háttér. Ugyanaz, mint az ütemtartomány ablak jelölőnégyzete.',
@@ -945,6 +991,11 @@
                 ?('Előbeállítás '+(i+1)+' — katt: betöltés, Shift+katt: aktuális nézet mentése.')
                 :('Preset '+(i+1)+' — click: load, Shift+click: save current view.'));
         }
+        ['btnMidiRec','btnMidiPlayer'].forEach(id=>{
+            const el=document.getElementById(id);
+            const t=pack[id];
+            if(el&&t)el.setAttribute('title',t);
+        });
     }
     let _sheetContainerCached=null;
     function elSheetContainer(){
@@ -2084,6 +2135,7 @@
         updateViewPresetChrome();
         applyHelpTooltips();
         syncDemoRepeatButtonChrome();
+        syncMidiRecRepeatButtonChrome();
     }
     function syncDemoRepeatButtonChrome(){
         const b=document.getElementById('btnDemoRepeat');
@@ -2190,21 +2242,27 @@
 
     function attachMidiInputHandler(input){
         input.onmidimessage=(msg)=>{
-            const d=msg.data;if(d.length<3)return;
-            const cmd=d[0]>>4,n=d[1],v=d[2];
-            if(cmd===11){ // Sustain Pedal
-                if(n===64){
-                    const on=v>=64;
-                    if(sustainPedalDown&&!on){
-                        midiSustainReleaseQueue.forEach(noteNum=>releaseNoteAudio(noteNum));
-                        midiSustainReleaseQueue.clear();
+            _midiRecorderFromHardwareInput=true;
+            try{
+                midiRecorderOnMidiMessage(msg);
+                const d=msg.data;if(d.length<3)return;
+                const cmd=d[0]>>4,n=d[1],v=d[2];
+                if(cmd===11){ // Sustain Pedal
+                    if(n===64){
+                        const on=v>=64;
+                        if(sustainPedalDown&&!on){
+                            midiSustainReleaseQueue.forEach(noteNum=>releaseNoteAudio(noteNum));
+                            midiSustainReleaseQueue.clear();
+                        }
+                        sustainPedalDown=on;
                     }
-                    sustainPedalDown=on;
+                    return;
                 }
-                return;
+                if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
+                else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleMidiNoteOff(n);}
+            }finally{
+                _midiRecorderFromHardwareInput=false;
             }
-            if(cmd===9&&v>0){document.getElementById(`k-${n}`)?.classList.add('pressed');handleNoteOn(n,v);}
-            else if(cmd===8||(cmd===9&&v===0)){document.getElementById(`k-${n}`)?.classList.remove('pressed');handleMidiNoteOff(n);}
         };
     }
 
@@ -2276,6 +2334,7 @@
     }
 
     function sendMidiDemoNoteOn(note,vel){
+        midiRecorderCaptureDemoNoteIfNeeded(note&127,vel,true);
         if(!midiOutPort) return;
         try {
             if(midiOutPort.state !== 'open') midiOutPort.open();
@@ -2306,6 +2365,7 @@
     }
 
     function sendMidiDemoNoteOff(note){
+        midiRecorderCaptureDemoNoteIfNeeded(note&127,0,false);
         if(!midiOutPort) return;
         try {
             midiOutPort.send([0x80|DEMO_MIDI_CHANNEL, note&127, 0]);
@@ -2313,6 +2373,7 @@
         } catch(e) {}
     }
     function sendMidiDemoSustain(down){
+        midiRecorderCaptureDemoCC64IfNeeded(down?127:0);
         if(!midiOutPort)return;
         try{
             if(midiOutPort.state!=='open')midiOutPort.open();
@@ -2406,10 +2467,12 @@
         const dOff=Math.max(0,(tOff-audioCtx.currentTime)*1000);
         demoTimeouts.push(setTimeout(()=>{
             if(!demoPlaying)return;
+            midiRecorderCaptureDemoNoteIfNeeded(m,Math.max(1,Math.min(127,Math.round(vel*127))),true);
             try{ salamanderPiano.keyDown({ midi:m, velocity:vel }); }catch(e){}
         },dOn));
         demoTimeouts.push(setTimeout(()=>{
             if(!demoPlaying)return;
+            midiRecorderCaptureDemoNoteIfNeeded(m,0,false);
             try{ salamanderPiano.keyUp({ midi:m }); }catch(e){}
         },dOff));
     }
@@ -2424,11 +2487,13 @@
         const dOn=Math.max(0,(t0-audioCtx.currentTime)*1000);
         demoTimeouts.push(setTimeout(()=>{
             if(!demoPlaying||pbGen!==demoLaunchGen)return;
+            midiRecorderCaptureDemoNoteIfNeeded(m,Math.max(1,Math.min(127,Math.round(vel*127))),true);
             try{ salamanderPiano.keyDown({ midi:m, velocity:vel }); }catch(e){}
         },dOn));
         const dOff=Math.max(0,(tNat-audioCtx.currentTime)*1000);
         demoTimeouts.push(setTimeout(()=>{
             if(!demoPlaying||pbGen!==demoLaunchGen)return;
+            midiRecorderCaptureDemoNoteIfNeeded(m,0,false);
             try{ salamanderPiano.keyUp({ midi:m }); }catch(e){}
         },dOff));
     }
@@ -2482,6 +2547,7 @@
     }
 
     function releaseNoteAudio(midi){
+        midiRecorderCaptureAppNoteIfNeeded(midi,0,false);
         if(!salamanderPiano)return;
         try{ salamanderPiano.keyUp({ midi:midi&127 }); }catch(e){}
     }
@@ -3092,6 +3158,7 @@
     function closeInfoGuideModal(){const m=document.getElementById('infoModal');if(m)m.style.display='none';}
     function closePracticeLogModal(){const m=document.getElementById('practiceLogModal');if(m)m.style.display='none';}
     function handleNoteOn(midi,vel=100){
+        midiRecorderCaptureAppNoteIfNeeded(midi,vel,true);
         midiSustainReleaseQueue.delete(midi);
         playTone(midi,vel);
         if(scoreMode&&isRunning&&scorePracticeSteps.length){
@@ -3100,7 +3167,8 @@
         }
     }
     function playScaleRhythmDemo(){
-        if(demoPlaying){stopDemo();return;}
+        if(demoPlaying){stopDemo();stopMidiRecPlayback({rewind:true});return;}
+        stopMidiRecPlayback({rewind:true});
         if(demoAwaitMidi){
             demoLaunchGen++;
             demoAwaitMidi=false;
@@ -3331,6 +3399,477 @@
     }
     function toggleMetroMenu(){const menu=document.getElementById('metroSettingsMenu');menu.style.display=(menu.style.display==='none'||menu.style.display==='')?'flex':'none';}
 
+    // ── MIDI recorder / player (Repertoire rack) ─────────────────────────────
+    const LS_MIDI_REC='repertoar_midi_rec_sessions_v1';
+    let midiRecorderIsRecording=false,midiRecorderEvents=[],midiRecorderStartMs=null,midiRecSilenceTimer=null;
+    let midiRecEventSeq=0;
+    let midiRecSessions=[];
+    let midiRecPlayback=false,midiRecPlayTimers=[],midiRecRafId=0;
+    let midiRecPlayheadSec=0,midiRecDurationSec=1,midiRecPlaySpeed=1,midiRecSpeedIdx=1;
+    const MIDI_REC_SPEEDS=[0.5,1,1.5,2];
+    let midiRecSeekDragging=false,midiRecPlayBaseAudioTime=0,midiRecPlayContentAnchorSec=0;
+    let midiRecRepeatEnabled=false;
+    /** Belső zongora lejátszás: mint élő MIDI — CC64 alatt nem küldünk keyUp-ot note-offra, csak felengedéskor (sor + ürítés). */
+    let midiRecPlaybackSustainActive=false;
+    const midiRecPlaybackSustainReleaseQueue=new Set();
+    /** Web MIDI callback közben true — ne duplázzuk a virtuális billentyű rögzítésével. */
+    let _midiRecorderFromHardwareInput=false;
+    function loadMidiSessionsFromStorage(){
+        try{
+            const j=JSON.parse(localStorage.getItem(LS_MIDI_REC)||'null');
+            midiRecSessions=Array.isArray(j)?j.filter(x=>x&&Array.isArray(x.events)):[];
+        }catch(e){midiRecSessions=[];}
+    }
+    function persistMidiSessions(){
+        try{localStorage.setItem(LS_MIDI_REC,JSON.stringify(midiRecSessions));}catch(e){console.warn('midi sessions persist',e);}
+    }
+    function getMidiRecSelectedSession(){
+        const sel=document.getElementById('midiRecSessionSelect');
+        if(!sel||sel.value===''||sel.selectedIndex<0)return null;
+        const i=parseInt(sel.value,10);
+        return Number.isFinite(i)?midiRecSessions[i]||null:null;
+    }
+    function refreshMidiRecSessionSelect(){
+        const sel=document.getElementById('midiRecSessionSelect');
+        if(!sel)return;
+        sel.innerHTML='';
+        if(!midiRecSessions.length){
+            const opt=document.createElement('option');
+            opt.value='';
+            opt.textContent=currentLang==='HU'?'(nincs felvétel)':'(no sessions)';
+            sel.appendChild(opt);
+            return;
+        }
+        midiRecSessions.forEach((s,i)=>{
+            const opt=document.createElement('option');
+            opt.value=String(i);
+            const sec=Math.max(1,Math.round((s.durationMs||0)/1000));
+            opt.textContent=(s.title||'Session').slice(0,28)+' · '+sec+'s · '+(s.events?s.events.length:0);
+            sel.appendChild(opt);
+        });
+        sel.selectedIndex=midiRecSessions.length-1;
+    }
+    function updateMidiRecSeekBounds(){
+        const sess=getMidiRecSelectedSession();
+        const sk=document.getElementById('midiRecSeek');
+        if(!sk)return;
+        midiRecDurationSec=sess?Math.max(0.5,(sess.durationMs||1000)/1000):1;
+        sk.max=Math.max(100,midiRecDurationSec*1000);
+        if(midiRecPlayheadSec>midiRecDurationSec)midiRecPlayheadSec=midiRecDurationSec;
+        if(!midiRecSeekDragging)sk.value=midiRecPlayheadSec*1000;
+    }
+    function formatMidiRecTime(s){
+        if(!Number.isFinite(s)||s<0)s=0;
+        const m=Math.floor(s/60);
+        const r=s-m*60;
+        const t=Math.floor(r*10)%10;
+        const ss=Math.floor(r);
+        return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0')+'.'+t;
+    }
+    function updateMidiRecSeekUi(){
+        const sk=document.getElementById('midiRecSeek');
+        const el=document.getElementById('midiRecTimeDisplay');
+        if(el)el.textContent=formatMidiRecTime(midiRecPlayheadSec);
+        if(sk&&!midiRecSeekDragging)sk.value=midiRecPlayheadSec*1000;
+    }
+    function syncMidiRecRepeatButtonChrome(){
+        const b=document.getElementById('btnMidiRecRepeat');
+        if(!b)return;
+        b.classList.toggle('active',midiRecRepeatEnabled);
+        const pack=HELP_TOOLTIPS[currentLang]||HELP_TOOLTIPS.EN;
+        const th=pack.btnMidiRecRepeat||'';
+        b.title=th;
+        b.setAttribute('aria-label',th);
+        if(th)b.setAttribute('data-help',th);
+    }
+    function toggleMidiRecRepeat(){
+        if(helpActive)return;
+        midiRecRepeatEnabled=!midiRecRepeatEnabled;
+        syncMidiRecRepeatButtonChrome();
+    }
+    function midiRecScrubToTime(tSec){
+        midiRecPlayheadSec=Math.max(0,Math.min(midiRecDurationSec||1,tSec));
+        updateMidiRecSeekUi();
+    }
+    function touchMidiRecSilenceWatch(){
+        if(!midiRecorderIsRecording)return;
+        if(midiRecSilenceTimer)clearTimeout(midiRecSilenceTimer);
+        midiRecSilenceTimer=setTimeout(()=>{
+            midiRecSilenceTimer=null;
+            if(midiRecorderIsRecording)endMidiRecordingCapture(true);
+        },15000);
+    }
+    /** Virtuális billentyű / egér: nincs Web MIDI üzenet, ezért közvetlenül ide kerülnek a hangok. */
+    function midiRecorderCaptureAppNoteIfNeeded(midi,vel,isOn){
+        if(!midiRecorderIsRecording||midiRecPlayback||_midiRecorderFromHardwareInput)return;
+        if(midiRecorderStartMs==null){
+            midiRecorderStartMs=performance.now();
+            touchMidiRecSilenceWatch();
+        }
+        const t=performance.now()-midiRecorderStartMs;
+        const n=midi&127;
+        midiRecorderEvents.push({t,on:!!isOn,note:n,vel:isOn?Math.max(1,Math.min(127,vel|0)):0,seq:++midiRecEventSeq});
+        touchMidiRecSilenceWatch();
+    }
+    /** DEMO (MIDI kimenet vagy belső minta): mindig az alkalmazásból jön, nem Web MIDI bemenet. */
+    function midiRecorderCaptureDemoNoteIfNeeded(note,vel,isOn){
+        if(!midiRecorderIsRecording||midiRecPlayback)return;
+        if(midiRecorderStartMs==null){
+            midiRecorderStartMs=performance.now();
+            touchMidiRecSilenceWatch();
+        }
+        const t=performance.now()-midiRecorderStartMs;
+        const n=note&127;
+        const v=isOn?Math.max(1,Math.min(127,Math.round(Number(vel))||80)):0;
+        midiRecorderEvents.push({t,on:!!isOn,note:n,vel:v,seq:++midiRecEventSeq});
+        touchMidiRecSilenceWatch();
+    }
+    function midiRecorderCaptureDemoCC64IfNeeded(val){
+        if(!midiRecorderIsRecording||midiRecPlayback)return;
+        if(midiRecorderStartMs==null){
+            midiRecorderStartMs=performance.now();
+            touchMidiRecSilenceWatch();
+        }
+        const t=performance.now()-midiRecorderStartMs;
+        midiRecorderEvents.push({t,cc:true,ctrl:64,val:val&127,seq:++midiRecEventSeq});
+        touchMidiRecSilenceWatch();
+    }
+    function midiRecorderOnMidiMessage(msg){
+        if(!midiRecorderIsRecording||midiRecPlayback)return;
+        const d=msg.data;
+        if(!d||d.length<3)return;
+        const cmd=d[0]>>4,n=d[1],v=d[2];
+        let cap=false;
+        if(cmd===11&&n===64)cap=true;
+        else if(cmd===9&&v>0)cap=true;
+        else if(cmd===8||(cmd===9&&v===0))cap=true;
+        if(!cap)return;
+        if(midiRecorderStartMs==null){
+            midiRecorderStartMs=performance.now();
+            touchMidiRecSilenceWatch();
+        }
+        const t=performance.now()-midiRecorderStartMs;
+        if(cmd===11&&n===64){
+            midiRecorderEvents.push({t,cc:true,ctrl:64,val:v&127,seq:++midiRecEventSeq});
+            touchMidiRecSilenceWatch();
+            return;
+        }
+        const on=cmd===9&&v>0;
+        midiRecorderEvents.push({t,on,note:n&127,vel:on?Math.max(1,v&127):0,seq:++midiRecEventSeq});
+        touchMidiRecSilenceWatch();
+    }
+    function endMidiRecordingCapture(fromIdle){
+        if(!midiRecorderIsRecording)return;
+        midiRecorderIsRecording=false;
+        if(midiRecSilenceTimer){clearTimeout(midiRecSilenceTimer);midiRecSilenceTimer=null;}
+        const b=document.getElementById('btnMidiRec');
+        if(b)b.classList.remove('recording');
+        if(midiRecorderEvents.length>0){
+            const dur=Math.max(...midiRecorderEvents.map(e=>e.t),80)+120;
+            const title=(document.getElementById('lcdScoreTitleOnly')&&document.getElementById('lcdScoreTitleOnly').textContent||'Recording').replace(/\s+/g,' ').trim().slice(0,48);
+            const sess={id:Date.now(),createdAt:new Date().toISOString(),title:title||'Recording',events:midiRecorderEvents.slice(),durationMs:dur};
+            midiRecSessions.push(sess);
+            if(midiRecSessions.length>5)midiRecSessions=midiRecSessions.slice(-5);
+            persistMidiSessions();
+            refreshMidiRecSessionSelect();
+            if(!fromIdle){
+                const hu=currentLang==='HU';
+                setInfoBar(hu?('MIDI felvétel mentve ('+midiRecorderEvents.length+' esemény)'):('MIDI recording saved ('+midiRecorderEvents.length+' events)'),document.getElementById('btnMidiRec'));
+            }
+        }else if(!fromIdle){
+            setInfoBar(currentLang==='HU'?'Nem volt MIDI esemény':'No MIDI events captured',document.getElementById('btnMidiRec'));
+        }
+        midiRecorderEvents=[];
+        midiRecorderStartMs=null;
+    }
+    async function toggleMidiRecorder(){
+        if(helpActive)return;
+        if(midiRecorderIsRecording){endMidiRecordingCapture(false);return;}
+        await userUnlockAudioAndMidi();
+        stopMidiRecPlayback({rewind:true});
+        midiRecorderIsRecording=true;
+        midiRecorderEvents=[];
+        midiRecEventSeq=0;
+        midiRecorderStartMs=null;
+        const br=document.getElementById('btnMidiRec');
+        if(br)br.classList.add('recording');
+        const hu=currentLang==='HU';
+        setInfoBar(hu?'Felvétel… REC újra: stop.':'Recording… tap REC again to stop.',br);
+    }
+    function stopMidiRecPlayback(opts){
+        const o=opts&&typeof opts==='object'?opts:{};
+        const rewind=o.rewind===true;
+        if(midiRecRafId){cancelAnimationFrame(midiRecRafId);midiRecRafId=0;}
+        midiRecPlayTimers.forEach(id=>clearTimeout(id));
+        midiRecPlayTimers=[];
+        midiRecPlayback=false;
+        midiRecPlaybackSustainActive=false;
+        midiRecPlaybackSustainReleaseQueue.clear();
+        const pb=document.getElementById('midiRecPlayBtn');
+        if(pb)pb.textContent='▶';
+        try{
+            if(midiOutPort){
+                if(midiOutPort.state!=='open')midiOutPort.open();
+                for(let ch=0;ch<16;ch++)try{midiOutPort.send([0xB0|ch,123,0]);}catch(e){}
+                try{midiOutPort.send([0xB0|DEMO_MIDI_CHANNEL,64,0]);}catch(e){}
+            }
+        }catch(e){}
+        if(salamanderPiano){try{salamanderPiano.stopAll();}catch(e){}}
+        document.querySelectorAll('.key-glow.pressed').forEach(k=>k.classList.remove('pressed'));
+        try{updatePedalStripVisual(false);}catch(e){}
+        if(rewind){
+            midiRecPlayheadSec=0;
+            midiRecScrubToTime(0);
+        }else{
+            updateMidiRecSeekUi();
+        }
+    }
+    function midiRecOnNaturalEnd(sess){
+        if(!sess)return;
+        stopMidiRecPlayback({rewind:false});
+        midiRecPlayheadSec=0;
+        midiRecScrubToTime(0);
+        if(midiRecRepeatEnabled)void startMidiRecPlayback();
+    }
+    function midiRecPlaybackTick(){
+        if(!midiRecPlayback)return;
+        if(!audioCtx){midiRecRafId=0;return;}
+        const sess=getMidiRecSelectedSession();
+        if(!sess){midiRecRafId=0;return;}
+        const speed=Math.max(0.25,midiRecPlaySpeed||1);
+        const elapsed=(audioCtx.currentTime-midiRecPlayBaseAudioTime)*speed;
+        const endT=sess.durationMs/1000;
+        midiRecPlayheadSec=Math.min(endT,midiRecPlayContentAnchorSec+elapsed);
+        updateMidiRecSeekUi();
+        if(midiRecPlayheadSec>=endT-0.01){midiRecRafId=0;return;}
+        midiRecRafId=requestAnimationFrame(midiRecPlaybackTick);
+    }
+    async function startMidiRecPlayback(){
+        const sess=getMidiRecSelectedSession();
+        if(!sess||!sess.events||!sess.events.length)return;
+        await ensureAudioContextBase();
+        await userUnlockAudioAndMidi();
+        if(!audioCtx)return;
+        if(demoPlaying)stopDemo();
+        stopMidiRecPlayback({rewind:false});
+        if(audioCtx.state==='suspended')try{await audioCtx.resume();}catch(e){}
+        if(audioOn&&!midiOutPort&&!salamanderPiano){try{await initAudio();}catch(e){}}
+        midiRecPlaybackSustainActive=false;
+        midiRecPlaybackSustainReleaseQueue.clear();
+        const speed=Math.max(0.25,midiRecPlaySpeed||1);
+        const evs=sess.events.slice().sort((a,b)=>{
+            if(a.t!==b.t)return a.t-b.t;
+            const ca=!!a.cc,cb=!!b.cc;
+            if(ca!==cb)return ca?-1:1;
+            const sa=typeof a.seq==='number'?a.seq:0,sb=typeof b.seq==='number'?b.seq:0;
+            return sa-sb;
+        });
+        const endT0=sess.durationMs/1000;
+        if(midiRecPlayheadSec>=endT0-0.04)midiRecPlayheadSec=0;
+        const playhead=midiRecPlayheadSec;
+        const tBase=audioCtx.currentTime+0.03;
+        midiRecPlayback=true;
+        midiRecPlayBaseAudioTime=tBase;
+        midiRecPlayContentAnchorSec=playhead;
+        const pb=document.getElementById('midiRecPlayBtn');
+        if(pb)pb.textContent='■';
+        evs.forEach(evt=>{
+            const te=evt.t/1000;
+            if(te+1e-6<playhead)return;
+            const tAudio=tBase+(te-playhead)/speed;
+            const delay=Math.max(0,(tAudio-audioCtx.currentTime)*1000);
+            const id=setTimeout(()=>{
+                if(!midiRecPlayback)return;
+                if(evt.cc&&evt.ctrl===64){
+                    const vv=Math.max(0,Math.min(127,evt.val|0));
+                    const pedOn=vv>=64;
+                    try{updatePedalStripVisual(pedOn);}catch(e){}
+                    if(midiOutPort){
+                        try{
+                            if(midiOutPort.state!=='open')midiOutPort.open();
+                            midiOutPort.send([0xB0|DEMO_MIDI_CHANNEL,64,vv]);
+                        }catch(e){}
+                    }
+                    if(audioOn&&salamanderPiano){
+                        try{
+                            if(!pedOn){
+                                if(midiRecPlaybackSustainActive){
+                                    midiRecPlaybackSustainReleaseQueue.forEach(m=>{
+                                        try{salamanderPiano.keyUp({midi:m&127});}catch(e2){}
+                                    });
+                                    midiRecPlaybackSustainReleaseQueue.clear();
+                                }
+                                midiRecPlaybackSustainActive=false;
+                            }else{
+                                midiRecPlaybackSustainActive=true;
+                            }
+                        }catch(e){}
+                    }
+                    return;
+                }
+                const n=evt.note&127;
+                if(evt.on){
+                    document.getElementById('k-'+n)?.classList.add('pressed');
+                    if(midiOutPort){
+                        try{
+                            if(midiOutPort.state!=='open')midiOutPort.open();
+                            midiOutPort.send([0x90|DEMO_MIDI_CHANNEL,n,scaleMidiOutNoteVelocity(evt.vel||90)]);
+                        }catch(e){}
+                    }
+                    if(audioOn&&salamanderPiano){
+                        try{
+                            const v=Math.min(1,Math.max(0.02,(evt.vel||90)/127));
+                            try{salamanderPiano.keyUp({midi:n});}catch(e2){}
+                            salamanderPiano.keyDown({midi:n,velocity:v});
+                        }catch(e){}
+                    }
+                }else{
+                    document.getElementById('k-'+n)?.classList.remove('pressed');
+                    if(midiOutPort){
+                        try{
+                            if(midiOutPort.state!=='open')midiOutPort.open();
+                            midiOutPort.send([0x80|DEMO_MIDI_CHANNEL,n,0]);
+                        }catch(e){}
+                    }
+                    if(salamanderPiano){
+                        try{
+                            if(midiRecPlaybackSustainActive)midiRecPlaybackSustainReleaseQueue.add(n);
+                            else salamanderPiano.keyUp({midi:n});
+                        }catch(e){}
+                    }
+                }
+            },delay);
+            midiRecPlayTimers.push(id);
+        });
+        const endT=sess.durationMs/1000;
+        const remain=Math.max(0,(endT-playhead)/speed);
+        midiRecPlayTimers.push(setTimeout(()=>{
+            if(!midiRecPlayback)return;
+            midiRecOnNaturalEnd(sess);
+        },remain*1000+120));
+        midiRecRafId=requestAnimationFrame(midiRecPlaybackTick);
+    }
+    async function toggleMidiRecPlayback(){
+        if(helpActive)return;
+        if(midiRecPlayback){stopMidiRecPlayback({rewind:true});return;}
+        loadMidiSessionsFromStorage();
+        const s=getMidiRecSelectedSession();
+        if(s){
+            const et=s.durationMs/1000;
+            if(midiRecPlayheadSec>=et-0.04)midiRecPlayheadSec=0;
+        }
+        await startMidiRecPlayback();
+    }
+    function toggleMidiPlayerPanel(){
+        const p=document.getElementById('midiPlayerPanel');
+        if(!p)return;
+        const isOpen=p.style.display==='flex';
+        if(isOpen){
+            stopMidiRecPlayback({rewind:true});
+            p.style.display='none';
+            return;
+        }
+        p.style.display='flex';
+        loadMidiSessionsFromStorage();
+        refreshMidiRecSessionSelect();
+        midiRecPlaySpeed=MIDI_REC_SPEEDS[midiRecSpeedIdx=1];
+        const sb=document.getElementById('midiRecSpeedBox');
+        if(sb)sb.textContent='×'+midiRecPlaySpeed.toFixed(1);
+        syncMidiRecRepeatButtonChrome();
+        updateMidiRecSeekBounds();
+        midiRecPlayheadSec=0;
+        midiRecScrubToTime(0);
+    }
+    function onMidiRecSessionChange(){
+        stopMidiRecPlayback({rewind:true});
+        loadMidiSessionsFromStorage();
+        midiRecPlayheadSec=0;
+        updateMidiRecSeekBounds();
+        midiRecScrubToTime(0);
+    }
+    function cycleMidiRecPlaySpeed(){
+        if(helpActive)return;
+        const was=midiRecPlayback;
+        if(was)stopMidiRecPlayback({rewind:false});
+        midiRecSpeedIdx=(midiRecSpeedIdx+1)%MIDI_REC_SPEEDS.length;
+        midiRecPlaySpeed=MIDI_REC_SPEEDS[midiRecSpeedIdx];
+        const sb=document.getElementById('midiRecSpeedBox');
+        if(sb)sb.textContent='×'+midiRecPlaySpeed.toFixed(1);
+        if(was)void startMidiRecPlayback();
+    }
+    function midiEncodeVarLen(n){
+        n=Math.max(0,n|0);
+        const stack=[];
+        let v=n;
+        stack.unshift(v&127);
+        v>>=7;
+        while(v>0){stack.unshift((v&127)|128);v>>=7;}
+        return Uint8Array.from(stack);
+    }
+    function encodeStandardMidiFile0(events,bpmExport){
+        const PPQ=480;
+        const bpmX=Math.max(40,Math.min(208,bpmExport||120));
+        const micro=Math.round(60000000/bpmX);
+        const evs=events.slice().sort((a,b)=>{
+            if(a.t!==b.t)return a.t-b.t;
+            const sa=typeof a.seq==='number'?a.seq:0,sb=typeof b.seq==='number'?b.seq:0;
+            return sa-sb;
+        });
+        const track=[];
+        track.push(...midiEncodeVarLen(0),0xff,0x51,0x03,(micro>>16)&255,(micro>>8)&255,micro&255);
+        let prevTick=0;
+        for(const e of evs){
+            const tick=Math.round((e.t/1000)*(bpmX/60)*PPQ);
+            const d=Math.max(0,tick-prevTick);
+            prevTick=tick;
+            track.push(...midiEncodeVarLen(d));
+            if(e.cc){
+                const cc=Math.max(0,Math.min(127,(e.ctrl!=null?e.ctrl:64)|0));
+                const vv=Math.max(0,Math.min(127,(e.val!=null?e.val:0)|0));
+                track.push(0xB0,cc,vv);
+            }else if(e.on)track.push(0x90,e.note&127,Math.max(1,(e.vel||80)&127));
+            else track.push(0x80,e.note&127,0);
+        }
+        track.push(...midiEncodeVarLen(0),0xff,0x2f,0x00);
+        const td=new Uint8Array(track);
+        const len=td.length;
+        const mtrk=new Uint8Array(8+len);
+        mtrk.set([0x4d,0x54,0x72,0x6b,(len>>24)&255,(len>>16)&255,(len>>8)&255,len&255],0);
+        mtrk.set(td,8);
+        const header=new Uint8Array(14);
+        header.set([0x4d,0x54,0x68,0x64,0,0,0,6,0,0,0,1,(PPQ>>8)&255,PPQ&255],0);
+        const out=new Uint8Array(header.length+mtrk.length);
+        out.set(header,0);
+        out.set(mtrk,header.length);
+        return out;
+    }
+    function midiRecFilenameTimestamp(sess){
+        let d;
+        try{
+            if(sess&&typeof sess.createdAt==='string'&&sess.createdAt.trim())
+                d=new Date(sess.createdAt);
+            else if(sess&&typeof sess.id==='number'&&sess.id>1e11)
+                d=new Date(sess.id);
+            else
+                d=new Date();
+        }catch(e){d=new Date();}
+        if(!(d instanceof Date)||isNaN(d.getTime()))d=new Date();
+        const p=n=>String(n).padStart(2,'0');
+        return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'_'+p(d.getHours())+'-'+p(d.getMinutes())+'-'+p(d.getSeconds());
+    }
+    function exportMidiRecorderSession(){
+        const sess=getMidiRecSelectedSession();
+        if(!sess||!sess.events||!sess.events.length)return;
+        const bytes=encodeStandardMidiFile0(sess.events,(typeof bpm==='number'?bpm:120));
+        const blob=new Blob([bytes],{type:'audio/midi'});
+        const a=document.createElement('a');
+        const safe=(sess.title||'take').replace(/[^\w\-]+/g,'_').slice(0,32);
+        a.href=URL.createObjectURL(blob);
+        a.download=safe+'_'+midiRecFilenameTimestamp(sess)+'.mid';
+        a.click();
+        setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    }
+
     // ── DOMContentLoaded & init ───────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded',()=>{
         window.addEventListener('pointerdown',()=>{void userUnlockAudioAndMidi().catch(()=>{});},{once:true,passive:true,capture:true});
@@ -3361,6 +3900,20 @@
                 if(!slp.contains(e.target)&&!slWrap.contains(e.target))slp.style.display='none';
             }
         });
+        const msel=document.getElementById('midiRecSessionSelect');
+        if(msel)msel.addEventListener('change',()=>{if(!helpActive)onMidiRecSessionChange();});
+        const msk=document.getElementById('midiRecSeek');
+        if(msk){
+            msk.addEventListener('pointerdown',()=>{midiRecSeekDragging=true;});
+            msk.addEventListener('pointerup',()=>{midiRecSeekDragging=false;});
+            msk.addEventListener('pointercancel',()=>{midiRecSeekDragging=false;});
+            msk.addEventListener('input',()=>{
+                if(helpActive)return;
+                const v=parseFloat(msk.value)||0;
+                midiRecScrubToTime(v/1000);
+            });
+        }
+        syncMidiRecRepeatButtonChrome();
     });
     let _resizeOsmdTimer=null;
     let _lastResizeWidth=0;
@@ -5575,7 +6128,9 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         scoreSteps=[];
         resetScoreOsmdFollowSnap();
         extractScorePedalEventsFromSheet();
-        if(!osmdInstance||!osmdInstance.cursor)return;
+        if(!osmdInstance||!osmdInstance.cursor){
+            return;
+        }
         let mergedAll;
         try{
             mergedAll=osmdMergeRawRowsToMergedSteps(expandRawRowsWithRepeats(osmdCollectRawCursorRows()));
