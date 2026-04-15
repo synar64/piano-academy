@@ -418,12 +418,6 @@
     </style>
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.9.7/build/opensheetmusicdisplay.min.js?v=osmd197"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-    window.AKIRA_SUPABASE_URL = window.AKIRA_SUPABASE_URL || 'https://ktnnrwabzbdkcgsvflls.supabase.co';
-    window.AKIRA_SUPABASE_ANON_KEY = window.AKIRA_SUPABASE_ANON_KEY || 'sb_publishable_T3265Yuf-k-RNrGzriwu8g_trfy4f-r';
-    </script>
-    <script src="db.js"></script>
 </head>
 <body onclick="void userUnlockAudioAndMidi().catch(()=>{})">
     <input type="file" id="score-file-input" accept=".xml,.musicxml,.mxl" style="display:none">
@@ -791,7 +785,6 @@
         </div>
     </div>
 <script>
-    if(window.AkiraDb&&typeof AkiraDb.init==='function')void AkiraDb.init().catch(function(e){console.warn('AkiraDb init',e);});
     // ── Language ──────────────────────────────────────────────────────────────
     let currentLang='EN';
     const MODULE_NAMES={EN:['EAR TRAIN','SIGHT READ','CHORDS','SCALES','HANON','REPERTOIRE'],HU:['HALLÁS','KOTTAOLVASÁS','AKKORDOK','SKÁLÁK','HANON','REPERTOÁR']};
@@ -5977,23 +5970,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         if(best)return await best.async('string');
         throw new Error('No MusicXML entry found inside MXL');
     }
-    function emitRepertoireFileLoadAnalytics(file){
-        if(!file||typeof file.name!=='string')return;
-        if(!window.AkiraDb||typeof AkiraDb.insertEvent!=='function')return;
-        var payload={
-            metadata:{
-                fileName:file.name,
-                fileSize:file.size,
-                fileType:file.name.split('.').pop()
-            }
-        };
-        var send=function(){return AkiraDb.insertEvent('repertoire_file_load',payload);};
-        if(typeof AkiraDb.ensureAnonymousUserRow==='function'){
-            void AkiraDb.ensureAnonymousUserRow().then(send).catch(function(e){console.warn('repertoire_file_load',e);});
-        }else{
-            void send();
-        }
-    }
     async function readLocalFileAsText(file){
         if(typeof file.text==='function')return file.text();
         return new Promise((res,rej)=>{
@@ -6022,7 +5998,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             if(!xml||typeof xml!=='string'||!xml.trim())
                 throw new Error(isHU?'Üres vagy hibás fájl':'Empty or invalid file');
             await loadXmlScore(xml);
-            emitRepertoireFileLoadAnalytics(file);
             addScoreToLibrary(file.name,lastLoadedScoreXml);
         }catch(e){
             setInfoBar((isHU?'HIBA: ':'ERROR: ')+(e&&e.message?e.message:String(e)),null);
@@ -6129,7 +6104,6 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     xml=await file.text();
                 }
                 if(xml&&xml.length>50){
-                    emitRepertoireFileLoadAnalytics(file);
                     addScoreToLibrary(name,xml);
                     count++;
                 }
