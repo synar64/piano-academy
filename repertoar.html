@@ -159,7 +159,7 @@
         .oled-divider { width:1px; background:rgba(255,255,255,0.05); margin:5px 0; }
         .oled-header { font-size:11px; color:var(--lcd-label-color); font-family:'Share Tech Mono'; text-transform:uppercase; font-weight:bold; margin-bottom:2px; }
         .oled-main { font-size:20px; color:var(--oled-text); font-family:'Share Tech Mono'; font-weight:bold; text-transform:uppercase; }
-        #scoreLibraryLibsBody { max-height:14vh; overflow-y:auto; text-align:left; margin-top:4px; margin-bottom:8px; }
+        #scoreLibraryLibsBody { text-align:left; margin-top:4px; }
         .patch-browser-content { max-width:580px; }
         .patch-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:25px; }
         .patch-btn { background:#111; border:1px solid #333; color:#aaa; padding:12px 5px; font-family:'Share Tech Mono',monospace; font-size:14px; cursor:pointer; border-radius:4px; transition:0.1s; text-align:center; }
@@ -329,7 +329,8 @@
         }
         .modal-overlay .workshop-tools-grid .modal-btn { font-size: 13px; padding: 10px 20px; margin-top: 4px; letter-spacing: 0.5px; }
         #scoreLibraryModal .modal-content.workshop-tools-grid {
-            max-width: min(94vw, 500px); padding: 16px 18px;
+            max-width: min(96vw, 920px); padding: 16px 18px;
+            max-height: min(92vh, 900px); overflow-y: auto; box-sizing: border-box;
         }
         #scoreLibraryModal .lib-hint { font: 11px/1.4 'Inter',sans-serif; color: #888; margin: 0 0 8px 0; }
         #scoreLibraryModal .lib-field-label {
@@ -353,16 +354,65 @@
         }
         #scoreLibraryModal .lib-row-save { margin-top:0; padding:7px 12px; font-size:12px; }
         #scoreLibraryModal .lib-file-lbl { margin-top:0; padding:7px 12px; font-size:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
-        #scoreLibraryListBody { max-height:24vh; overflow-y:auto; text-align:left; margin-top:4px; }
-        #scoreLibraryModal .score-lib-row {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 7px; flex-wrap: nowrap;
+        /* Könyvtár modál: két oszlop együttes max-magassága; belül min-height:0 + overflow = minden darab görgethető */
+        #scoreLibraryModal .score-library-split-pane {
+            display: flex; gap: 12px; align-items: stretch;
+            min-height: 0;
+            max-height: min(52vh, 500px);
+            height: min(52vh, 500px);
+            margin-bottom: 12px;
+            overflow: hidden;
         }
+        #scoreLibraryModal .score-library-libs-col {
+            flex: 0 0 34%;
+            min-width: min(280px, 100%);
+            max-width: 380px;
+            display: flex; flex-direction: column; min-height: 0;
+        }
+        #scoreLibraryModal .score-library-pieces-col {
+            flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+        }
+        #scoreLibraryModal #scoreLibraryLibsBody {
+            flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 4px; text-align: left;
+        }
+        #scoreLibraryModal #scoreLibraryListBody {
+            flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            text-align: left; margin-top: 4px;
+            border: 1px solid #2a2a2a; border-radius: 4px; padding: 4px 6px; box-sizing: border-box;
+            background: rgba(0,0,0,0.25);
+        }
+        #scoreLibraryModal .score-lib-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 7px; flex-wrap: nowrap;
+        }
+        #scoreLibraryModal .score-lib-row:last-child { margin-bottom: 0; }
         #scoreLibraryModal .score-lib-row-title {
             flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            font: 12px 'Share Tech Mono',monospace; color: #bbb;
+            font: 13px 'Share Tech Mono',monospace; color: #bbb; line-height: 1.3;
         }
+        #scoreLibraryModal .score-lib-piece-title {
+            font-size: 16px; color: #e4e4e4; line-height: 1.35;
+            cursor: pointer; padding: 6px 2px; border-radius: 3px;
+        }
+        #scoreLibraryModal .score-lib-piece-title:hover { color: #fff; background: rgba(255,255,255,0.07); }
         #scoreLibraryModal .score-lib-row-actions {
-            display: flex; flex-direction: row; gap: 8px; flex-shrink: 0; align-items: center;
+            display: flex; flex-direction: row; gap: 4px; flex-shrink: 0; align-items: center;
+        }
+        #scoreLibraryModal .lib-row-icon-btn {
+            width: 28px; height: 28px; min-width: 28px; padding: 0; margin: 0;
+            font-size: 17px; font-weight: 800; line-height: 1; font-family: 'Share Tech Mono',monospace;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 4px; cursor: pointer; box-sizing: border-box;
+            box-shadow: 0 2px 0 #000; border: 1px solid var(--btn-border);
+            background: var(--btn-dark); color: #ccc;
+        }
+        #scoreLibraryModal .lib-row-icon-btn.lib-add { color: #8ecf9a; border-color: #355a40; }
+        #scoreLibraryModal .lib-row-icon-btn.lib-del { color: #d08080; border-color: #5a3535; }
+        #scoreLibraryModal .lib-row-icon-btn:active { transform: translateY(1px); box-shadow: 0 0 0 #000; }
+        #scoreLibraryModal .score-lib-row-actions .lib-action-btn {
+            min-width: 0; padding: 4px 7px; font-size: 10px; flex: 0 0 auto; white-space: nowrap;
         }
         #scoreLibraryModal .lib-action-btn {
             min-width: 4.5em; padding: 5px 10px; font-size: 11px; font-weight: 700; font-family: 'Share Tech Mono',monospace;
@@ -507,22 +557,20 @@
         </div>
     </div>
     <div id="scoreLibraryModal" class="modal-overlay" onclick="if(event.target===this)closeScoreLibraryModal()">
-        <div class="modal-content workshop-tools-grid" style="text-align:left;max-width:min(96vw,680px);width:94%;" onclick="event.stopPropagation()">
+        <div class="modal-content workshop-tools-grid" style="text-align:left;max-width:min(96vw,920px);width:96%;" onclick="event.stopPropagation()">
             <h2 class="modal-title wts-title" id="txt-scoreLibTitle" style="text-align:center;">Score library</h2>
-            <!-- Kétpaneles elrendezés -->
-            <div style="display:flex;gap:12px;min-height:180px;margin-bottom:12px;">
-                <!-- BAL: Könyvtárak -->
-                <div style="flex:0 0 140px;display:flex;flex-direction:column;">
-                    <div class="oled-header wts-sec" id="txt-scoreLibLibsHdr" style="margin-bottom:4px;">Libraries</div>
-                    <div id="scoreLibraryLibsBody" style="flex:1;overflow-y:auto;max-height:28vh;"></div>
-                    <button type="button" class="lib-action-btn" id="btnScoreLibAddLibrary" onclick="addNewLibraryFromModal()" style="width:100%;margin-top:6px;font-size:10px;text-align:center;">+ New collection</button>
-                    <button type="button" class="lib-action-btn" id="btnScoreLibLinkFolder" onclick="linkLocalFolder()" style="width:100%;margin-top:4px;font-size:10px;text-align:center;color:var(--oled-text);">📁 Link folder</button>
+            <!-- Kétpaneles elrendezés: görgethető lista — minden kotta -->
+            <div class="score-library-split-pane">
+                <div class="score-library-libs-col">
+                    <div class="oled-header wts-sec" id="txt-scoreLibLibsHdr" style="margin-bottom:4px;flex-shrink:0;">Libraries</div>
+                    <div id="scoreLibraryLibsBody"></div>
+                    <button type="button" class="lib-action-btn" id="btnScoreLibAddLibrary" onclick="addNewLibraryFromModal()" style="width:100%;margin-top:6px;font-size:10px;text-align:center;flex-shrink:0;">+ New collection</button>
+                    <button type="button" class="lib-action-btn" id="btnScoreLibLinkFolder" onclick="linkLocalFolder()" style="width:100%;margin-top:4px;font-size:10px;text-align:center;color:var(--oled-text);flex-shrink:0;">📁 Link folder</button>
                 </div>
-                <!-- JOBB: Darabszűrő + lista -->
-                <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
-                    <div class="oled-header wts-sec" id="txt-scoreLibPiecesHdr" style="margin-bottom:4px;">Pieces</div>
-                    <input type="text" id="scoreLibFilter" autocomplete="off" placeholder="filter..." oninput="refreshScoreLibraryListUI()" style="margin-bottom:6px;">
-                    <div id="scoreLibraryListBody" style="flex:1;overflow-y:auto;max-height:28vh;"></div>
+                <div class="score-library-pieces-col">
+                    <div class="oled-header wts-sec" id="txt-scoreLibPiecesHdr" style="margin-bottom:4px;flex-shrink:0;">Pieces</div>
+                    <input type="text" id="scoreLibFilter" autocomplete="off" placeholder="filter..." oninput="refreshScoreLibraryListUI()" style="margin-bottom:6px;flex-shrink:0;">
+                    <div id="scoreLibraryListBody"></div>
                 </div>
             </div>
             <!-- Alsó sáv: Fájl hozzáadás + URL + Mentés -->
@@ -693,18 +741,12 @@
                         <div style="display:flex;align-items:center;gap:12px;justify-content:center;width:100%;flex-wrap:wrap;">
                             <button id="btnStart" class="hardware-btn" onclick="if(!helpActive) handleMainButton()" data-help="" style="width:80px;font-size:14px;font-weight:800;letter-spacing:2px;flex-shrink:0;">START</button>
                             <div class="lcd-arrow-wrapper">
-                                <div class="arrow-row arrow-row-center">
-                                    <button type="button" class="nav-disk-btn" id="btnLibPrev" onclick="if(!helpActive) void cyclePieceInActiveLibrary(-1)" data-help="">▲</button>
-                                </div>
                                 <div class="oled-wrapper">
                                     <div class="oled-screen">
                                         <div id="oledScoreTitle" class="oled-section oled-score-title-only" onclick="if(!helpActive) openScoreLibraryModal()" data-help="">
                                             <div class="oled-main oled-lib-title" id="lcdScoreTitleOnly">—</div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="arrow-row arrow-row-center">
-                                    <button type="button" class="nav-disk-btn" id="btnLibNext" onclick="if(!helpActive) void cyclePieceInActiveLibrary(1)" data-help="">▼</button>
                                 </div>
                             </div>
                             <div style="display:flex;flex-direction:row;align-items:center;gap:4px;flex-shrink:0;">
@@ -866,9 +908,7 @@
             metroBpmBox:'Tempo: tap for preset BPM grid; ▲▼ nudge BPM.',
             metroMenuBtn:'Metronome menu: sound, volume, accent on beat 1.',
             btnStart:'START/STOP: step practice on the score, or stop.',
-            btnLibPrev:'Previous piece in the active library.',
-            btnLibNext:'Next piece in the active library.',
-            oledScoreTitle:'Score title: ▲▼ change piece; tap opens library (switch collection in the list). The score file icon on the right loads from disk.',
+            oledScoreTitle:'Score title: tap opens the library to pick a piece. The score file icon on the right loads from disk.',
             btnDemo:'▶ DEMO: plays the score with measure highlight. ▲▼ adjusts playback speed (0.3×–1.8×); tap the speed display to reset to 1.0×. Internal piano audio can be toggled. MIDI can target IAC/Pianoteq on Mac when that port exists.',
             btnDemoRepeat:'DEMO repeat: when on, the score DEMO restarts from the beginning each time it reaches the end, until you tap this button off. ▶ still stops playback immediately.',
             btnMidiRec:'REC on / off.',
@@ -897,9 +937,7 @@
             metroBpmBox:'Tempó: katt BPM előbeállítások; ▲▼ finomhangolás.',
             metroMenuBtn:'Metronóm menü: hang, hangerő, hangsúly az 1. ütésen.',
             btnStart:'START/STOP: lépésenkénti gyakorlás a kottán, vagy megáll.',
-            btnLibPrev:'Előző darab az aktív könyvtárban.',
-            btnLibNext:'Következő darab az aktív könyvtárban.',
-            oledScoreTitle:'Kotta címe: ▲▼ darab váltás; katt: könyvtár (gyűjtemény a listában). A kotta-fájl ikon jobbról lemezről tölt.',
+            oledScoreTitle:'Kotta címe: kattintás megnyitja a könyvtárat — onnan választhatsz darabot. A kotta-fájl ikon jobbról lemezről tölt.',
             btnDemo:'▶ DEMO: lejátszás ütemkiemeléssel. ▲▼ a lejátszási sebesség állítása (0,3×–1,8×); a kijelzőre kattintva visszaáll 1,0×-ra. Belső zongora ki/be. MIDI mehet IAC/Pianoteq felé Macen, ha van ilyen port.',
             btnDemoRepeat:'DEMO ismétlés: bekapcsolva a kotta-DEMO minden lefutás végén elölről indul, amíg ki nem kapcsolod. A ▶ gomb továbbra is azonnal megállítja a lejátszást.',
             btnMidiRec:'Felvétel be / ki.',
@@ -1201,14 +1239,18 @@
         }
         updateLibraryOledText();
     }
-    function addScoreToLibrary(displayName,xml,opts){
+    async function addScoreToLibrary(displayName,xml,opts){
         const xmlStr=String(xml||'');
         if(!xmlStr.trim())return false;
         const id=hashScoreXml(xmlStr);
-        try{localStorage.setItem(libStorageKey(id),xmlStr);}catch(e){
-            setInfoBar(currentLang==='HU'?'Tárhely tele — törölj a könyvtárból':'Storage full — remove scores from library',null);
+        try{
+            await idbPutLibraryXml(id,xmlStr);
+        }catch(e){
+            if(!(opts&&opts.quietQuota))
+                setInfoBar(currentLang==='HU'?'Tárhely tele — törölj a könyvtárból':'Storage full — remove scores from library',null);
             return false;
         }
+        try{localStorage.removeItem(libStorageKey(id));}catch(e){}
         let s=readLibrariesState();
         const lib=getActiveLibrary(s);
         if(!lib.entries)lib.entries=[];
@@ -1258,7 +1300,7 @@
         const lib=getActiveLibrary(s);
         const ent=lib.entries||[];
         lib.entries=ent.filter(e=>e&&e.id!==sid);
-        try{localStorage.removeItem(libStorageKey(sid));}catch(e){}
+        void idbRemoveLibraryXml(sid);
         if(s.activeEntryIndex>=lib.entries.length)s.activeEntryIndex=Math.max(0,lib.entries.length-1);
         saveLibrariesState(s);
         applyLibraryOledAfterLoad();
@@ -1281,25 +1323,32 @@
         })();
     }
     async function loadLibraryEntryById(id){
-        const xml=localStorage.getItem(libStorageKey(id));
+        let xml=await idbGetLibraryXml(id);
+        let fromLegacyLs=false;
+        if(!xml||!String(xml).trim()){
+            xml=localStorage.getItem(libStorageKey(id));
+            fromLegacyLs=!!(xml&&String(xml).trim());
+        }
         if(!xml||!String(xml).trim()){
             setInfoBar(currentLang==='HU'?'Hiányzik a könyvtári adat':'Missing library data',null);
             return;
         }
+        if(fromLegacyLs)
+            void idbPutLibraryXml(id,xml).then(()=>{try{localStorage.removeItem(libStorageKey(id));}catch(e){}}).catch(()=>{});
         await loadXmlScore(xml,id);
     }
     /** Törli a beépített „Minták” gyűjtemény(ek)et és a hozzájuk tartozó XML kulcsokat (újraseed / manifest szinkron). */
-    function stripBuiltinSamplesLibrariesFromState(){
+    async function stripBuiltinSamplesLibrariesFromState(){
         let st=readLibrariesState();
         const had=st.libraries.some(l=>l&&l.id==='lib_builtin_samples');
         if(!had)return;
         const prevFocusId=(st.libraries[st.activeLibIndex|0]||{}).id;
-        st.libraries.forEach(lib=>{
-            if(!lib||lib.id!=='lib_builtin_samples')return;
-            (lib.entries||[]).forEach(e=>{
-                if(e&&e.id)try{localStorage.removeItem(libStorageKey(e.id));}catch(_){}
-            });
-        });
+        for(const lib of st.libraries){
+            if(!lib||lib.id!=='lib_builtin_samples')continue;
+            for(const e of (lib.entries||[])){
+                if(e&&e.id) await idbRemoveLibraryXml(e.id);
+            }
+        }
         st.libraries=st.libraries.filter(l=>l&&l.id!=='lib_builtin_samples');
         if(!st.libraries.length){
             st.libraries.push({id:'lib0',name:currentLang==='HU'?'Alapértelmezett':'Default',entries:[]});
@@ -1368,7 +1417,7 @@
                     :'Samples did not load — you can import your own file with the score icon.',null);
                 return;
             }
-            stripBuiltinSamplesLibrariesFromState();
+            await stripBuiltinSamplesLibrariesFromState();
             let st=readLibrariesState();
             const singleEmpty=st.libraries.length===1&&st.libraries.every(L=>!(L.entries||[]).length);
             const prevActive=st.activeLibIndex|0;
@@ -1378,7 +1427,7 @@
             saveLibrariesState(st);
             for(const {rel,xml} of loaded){
                 const fname=rel.split('/').pop()||'sample.mxl';
-                addScoreToLibrary(fname,xml);
+                await addScoreToLibrary(fname,xml);
             }
             st=readLibrariesState();
             if(!singleEmpty){
@@ -1401,7 +1450,7 @@
         if(ix<0||ix>=ent.length)ix=0;
         await loadLibraryEntryById(ent[ix].id);
     }
-    function ensureScoreInLibrary(title,xml){
+    async function ensureScoreInLibrary(title,xml){
         const xmlStr=String(xml||'');
         if(!xmlStr.trim())return;
         const id=hashScoreXml(xmlStr);
@@ -1409,7 +1458,10 @@
         const lib=getActiveLibrary(s);
         if(!lib.entries)lib.entries=[];
         if(lib.entries.some(e=>e&&e.id===id))return;
-        try{localStorage.setItem(libStorageKey(id),xmlStr);}catch(e){return;}
+        try{
+            await idbPutLibraryXml(id,xmlStr);
+        }catch(e){return;}
+        try{localStorage.removeItem(libStorageKey(id));}catch(e){}
         const nice=extractMusicXmlDisplayTitle(xmlStr)||prettifyFilenameScoreTitle(title||'')||String(title||'Restored').replace(/\.(xml|musicxml|mxl)$/i,'').trim()||'Restored';
         lib.entries.push({id,title:nice});
         s.activeEntryIndex=lib.entries.length-1;
@@ -1447,6 +1499,17 @@
     let _linkedDirHandle=null;
     const LS_DIR_HANDLE_KEY='akira_linked_dir_handle';
 
+    /** Összegyűjti az összes .xml / .musicxml / .mxl fájl handle-jét a mappában és minden almappában (régebben csak a gyökér szinten kerestünk). */
+    async function collectXmlMxlHandlesRecursive(dirHandle, bucket, pathPrefix){
+        for await(const h of dirHandle.values()){
+            const rel=pathPrefix?pathPrefix+'/'+h.name:h.name;
+            if(h.kind==='file'&&/\.(xml|musicxml|mxl)$/i.test(h.name))
+                bucket.push({handle:h, relPath:rel});
+            else if(h.kind==='directory')
+                await collectXmlMxlHandlesRecursive(h, bucket, rel);
+        }
+    }
+
     async function linkLocalFolder(){
         if(helpActive)return;
         const hu=currentLang==='HU';
@@ -1472,18 +1535,14 @@
                 }
             }catch(e){}
 
-            // Scan folder for .xml / .mxl files
-            const files=[];
-            for await(const entry of dirHandle.values()){
-                if(entry.kind==='file'&&/\.(xml|musicxml|mxl)$/i.test(entry.name)){
-                    files.push(entry);
-                }
-            }
+            const found=[];
+            await collectXmlMxlHandlesRecursive(dirHandle, found, '');
+            found.sort((a,b)=>a.relPath.localeCompare(b.relPath,'en',{numeric:true}));
 
-            if(files.length===0){
+            if(found.length===0){
                 alert(hu
-                    ?'Nem találtam .xml / .mxl fájlt ebben a mappában.'
-                    :'No .xml / .mxl files found in this folder.');
+                    ?'Nem találtam .xml / .mxl fájlt ebben a mappában (almappákban sem).'
+                    :'No .xml / .mxl files in this folder (including subfolders).');
                 return;
             }
 
@@ -1496,32 +1555,43 @@
             s.activeEntryIndex=0;
             saveLibrariesState(s);
 
-            // Import all found files
-            let count=0;
-            for(const fileEntry of files){
+            let imported=0, skipped=0;
+            let storageFull=false;
+            for(const {handle:fileEntry, relPath} of found){
                 try{
                     const file=await fileEntry.getFile();
-                    const name=file.name.replace(/\.(xml|musicxml|mxl)$/i,'');
+                    const displayName=relPath.replace(/\.(xml|musicxml|mxl)$/i,'').replace(/\//g,' / ');
                     let xml;
                     if(/\.mxl$/i.test(file.name)){
                         const buf=await file.arrayBuffer();
                         const zip=await JSZip.loadAsync(buf);
                         const xmlFile=Object.keys(zip.files).find(n=>/\.(xml|musicxml)$/i.test(n)&&!n.startsWith('META-INF'));
-                        if(!xmlFile)continue;
+                        if(!xmlFile){skipped++;continue;}
                         xml=await zip.files[xmlFile].async('string');
                     }else{
                         xml=await file.text();
                     }
-                    if(xml&&xml.length>50){
-                        addScoreToLibrary(name,xml);
-                        count++;
-                    }
-                }catch(err){console.warn('Folder import skip:',fileEntry.name,err);}
+                    if(!xml||xml.length<=50){skipped++;continue;}
+                    if(await addScoreToLibrary(displayName,xml,{quietQuota:true}))imported++;
+                    else{storageFull=true;break;}
+                }catch(err){skipped++;console.warn('Folder import skip:',relPath,err);}
             }
 
             refreshScoreLibraryListUI();
             updateLibraryOledText();
-            setInfoBar((hu?'📁 '+count+' kotta importálva: '+libName:'📁 '+count+' scores imported from: '+libName),null);
+            const total=found.length;
+            let msg;
+            if(hu){
+                msg='\uD83D\uDCC1 '+imported+' / '+total+' kotta importálva · '+libName;
+                if(storageFull)msg+=' — a böngésző tárhelye megtelt; törölj kottákat vagy próbálj másik profilt / böngészőt.';
+                else if(skipped>0&&imported<total)msg+=' — '+skipped+' kimaradt (hiba / üres MXL).';
+            }else{
+                msg='\uD83D\uDCC1 '+imported+' / '+total+' scores imported · '+libName;
+                if(storageFull)msg+=' — browser storage full; remove scores or try another profile / browser.';
+                else if(skipped>0&&imported<total)msg+=' — '+skipped+' skipped (errors / empty MXL).';
+            }
+            setInfoBar(msg,null);
+
 
         }catch(err){
             // User cancelled the picker or permission denied
@@ -1538,7 +1608,7 @@
         idx=idx|0;
         if(idx<0||idx>=s.libraries.length)return;
         const lib=s.libraries[idx];
-        (lib.entries||[]).forEach(e=>{try{localStorage.removeItem(libStorageKey(e.id));}catch(_){}});
+        (lib.entries||[]).forEach(e=>{if(e&&e.id)void idbRemoveLibraryXml(e.id);});
         const oldActive=s.activeLibIndex|0;
         s.libraries.splice(idx,1);
         if(idx<oldActive)s.activeLibIndex=oldActive-1;
@@ -1565,7 +1635,9 @@
         const s=readLibrariesState();
         const lib=getActiveLibrary(s);
         const base=hu?'Darabok':'Pieces';
-        el.textContent=lib.name?base+' — '+lib.name:base;
+        const n=(lib.entries||[]).length;
+        const cnt=' ('+n+')';
+        el.textContent=(lib.name?base+' — '+lib.name:base)+cnt;
     }
     function refreshScoreLibraryLibsBody(){
         const host=document.getElementById('scoreLibraryLibsBody');
@@ -1651,25 +1723,33 @@
             const row=document.createElement('div');
             row.className='score-lib-row';
             const t=document.createElement('span');
-            t.className='score-lib-row-title';
+            t.className='score-lib-row-title score-lib-piece-title';
             t.textContent=e.title||e.id;
-            t.title=e.title||e.id;
-            const act=document.createElement('div');
-            act.className='score-lib-row-actions';
-            const bLoad=document.createElement('button');
-            bLoad.type='button';bLoad.className='lib-action-btn';bLoad.textContent=hu?'Betölt':'Load';
-            bLoad.onclick=()=>{
+            t.title=(hu?'Betöltés: ':'Open: ')+(e.title||e.id);
+            t.onclick=()=>{
+                if(helpActive)return;
                 let s2=readLibrariesState();
                 const ent=(getActiveLibrary(s2).entries)||[];
                 const ix=ent.findIndex(x=>x&&x.id===e.id);
                 if(ix>=0){s2.activeEntryIndex=ix;saveLibrariesState(s2);}
-                void loadLibraryEntryById(e.id);
-                refreshScoreLibraryListUI();
+                void (async()=>{
+                    await loadLibraryEntryById(e.id);
+                    closeScoreLibraryModal();
+                })();
             };
+            const act=document.createElement('div');
+            act.className='score-lib-row-actions';
             const bDel=document.createElement('button');
-            bDel.type='button';bDel.className='lib-action-btn';bDel.textContent=hu?'Töröl':'Del';
-            bDel.onclick=()=>{if(confirm(hu?'Törlöd ezt a könyvtári bejegyzést?':'Remove this library entry?'))removeLibraryEntryById(e.id);};
-            act.append(bLoad,bDel);
+            bDel.type='button';
+            bDel.className='lib-row-icon-btn lib-del';
+            bDel.textContent='\u2212';
+            bDel.title=hu?'Törlés a könyvtárból':'Remove from library';
+            bDel.setAttribute('aria-label',hu?'Törlés a könyvtárból':'Remove from library');
+            bDel.onclick=ev=>{
+                ev.stopPropagation();
+                if(confirm(hu?'Törlöd ezt a könyvtári bejegyzést?':'Remove this library entry?'))removeLibraryEntryById(e.id);
+            };
+            act.append(bDel);
             row.append(t,act);
             host.appendChild(row);
         });
@@ -1702,7 +1782,7 @@
                 throw new Error(hu?'Nem MusicXML (hiányzik a score-partwise / score-timewise)':'Not MusicXML (missing score root)');
             const nameGuess=(url.split('/').pop()||'download').split('?')[0]||'download';
             await loadXmlScore(xml);
-            addScoreToLibrary(nameGuess,lastLoadedScoreXml||xml);
+            await addScoreToLibrary(nameGuess,lastLoadedScoreXml||xml);
             setInfoBar(hu?'Kotta könyvtárba mentve':'Score saved to library',null);
             if(inp)inp.value='';
         }catch(err){
@@ -1719,7 +1799,7 @@
         const inp=document.getElementById('scoreLibSaveNameInput');
         const def=hu?'Darab':'Piece';
         const t=(inp&&(inp.value||'').trim())||def;
-        addScoreToLibrary(t,xml,{preferUserTitle:true});
+        await addScoreToLibrary(t,xml,{preferUserTitle:true});
         setInfoBar(hu?'Mentve a böngésző könyvtárába':'Saved to browser library',null);
         if(inp)inp.value='';
     }
@@ -2570,6 +2650,43 @@
             }catch(e2){return null;}
         }
     }
+    /** Könyvtári kották: IndexedDB (sok nagy XML); localStorage csak régi / vész fallback. */
+    const IDB_LIB_PREFIX='libxml:';
+    function idbLibraryRecordId(scoreId){return IDB_LIB_PREFIX+String(scoreId||'');}
+    async function idbPutLibraryXml(scoreId,xml){
+        const s=String(xml||'');
+        if(!s.trim())throw new Error('empty xml');
+        const db=await openScoreIdb();
+        await new Promise((res,rej)=>{
+            const tx=db.transaction(IDB_SCORE_STORE,'readwrite');
+            tx.objectStore(IDB_SCORE_STORE).put({id:idbLibraryRecordId(scoreId),xml:s});
+            tx.oncomplete=()=>res();
+            tx.onerror=()=>rej(tx.error);
+        });
+    }
+    async function idbGetLibraryXml(scoreId){
+        try{
+            const db=await openScoreIdb();
+            return await new Promise((res,rej)=>{
+                const tx=db.transaction(IDB_SCORE_STORE,'readonly');
+                const q=tx.objectStore(IDB_SCORE_STORE).get(idbLibraryRecordId(scoreId));
+                q.onsuccess=()=>{const r=q.result;res(r&&r.xml?String(r.xml):null);};
+                q.onerror=()=>rej(q.error);
+            });
+        }catch(e){return null;}
+    }
+    async function idbRemoveLibraryXml(scoreId){
+        try{
+            const db=await openScoreIdb();
+            await new Promise((res,rej)=>{
+                const tx=db.transaction(IDB_SCORE_STORE,'readwrite');
+                tx.objectStore(IDB_SCORE_STORE).delete(idbLibraryRecordId(scoreId));
+                tx.oncomplete=()=>res();
+                tx.onerror=()=>rej(tx.error);
+            });
+        }catch(e){}
+        try{localStorage.removeItem(libStorageKey(scoreId));}catch(e){}
+    }
     /** Könyvtár törlése nem törölte eddig — a nyitott kotta IndexedDB + meta itt maradt, ezért frissítés után „visszajött”. */
     async function clearRepertoarSessionScoreStorage(){
         try{localStorage.removeItem(LS_SCORE_META);}catch(e){}
@@ -2638,8 +2755,9 @@
             if(t==='light'||t==='sepia'||t==='dark'||t==='darksepia')return t;
             const old=localStorage.getItem(LS_OSMD_DARK);
             if(old==='0')return 'light';
+            if(old==null||old==='')return 'light';
             return 'dark';
-        }catch(e){return 'dark';}
+        }catch(e){return 'light';}
     }
     function applyOsmdScoreThemeClass(){
         const cont=document.getElementById('osmd-container');
@@ -3640,18 +3758,21 @@
                             midiOutPort.send([0xB0|DEMO_MIDI_CHANNEL,64,vv]);
                         }catch(e){}
                     }
+                    /* Belső zongora: ugyanaz mint DEMO applyDemoScoreSustainState — pedalDown/Up kell, különben a hangok „levágnak”. */
                     if(audioOn&&salamanderPiano){
                         try{
-                            if(!pedOn){
+                            if(pedOn){
+                                salamanderPiano.pedalDown();
+                                midiRecPlaybackSustainActive=true;
+                            }else{
+                                try{salamanderPiano.pedalUp();}catch(e2){}
                                 if(midiRecPlaybackSustainActive){
                                     midiRecPlaybackSustainReleaseQueue.forEach(m=>{
-                                        try{salamanderPiano.keyUp({midi:m&127});}catch(e2){}
+                                        try{salamanderPiano.keyUp({midi:m&127});}catch(e3){}
                                     });
                                     midiRecPlaybackSustainReleaseQueue.clear();
                                 }
                                 midiRecPlaybackSustainActive=false;
-                            }else{
-                                midiRecPlaybackSustainActive=true;
                             }
                         }catch(e){}
                     }
@@ -3681,7 +3802,7 @@
                             midiOutPort.send([0x80|DEMO_MIDI_CHANNEL,n,0]);
                         }catch(e){}
                     }
-                    if(salamanderPiano){
+                    if(audioOn&&salamanderPiano){
                         try{
                             if(midiRecPlaybackSustainActive)midiRecPlaybackSustainReleaseQueue.add(n);
                             else salamanderPiano.keyUp({midi:n});
@@ -6405,7 +6526,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             const bmPre=document.getElementById('btnOsmdDark');
             if(bmPre)syncOsmdThemeToggleButtonChrome();
             await loadXmlScore(xml);
-            ensureScoreInLibrary(currentLang==='HU'?'Munkamenet':'Session',lastLoadedScoreXml||xml);
+            await ensureScoreInLibrary(currentLang==='HU'?'Munkamenet':'Session',lastLoadedScoreXml||xml);
             if(layoutStale)
                 setTimeout(()=>{void refreshOsmdLayoutAfterRevisionBump();},700);
         }
@@ -6516,7 +6637,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             if(!xml||typeof xml!=='string'||!xml.trim())
                 throw new Error(isHU?'Üres vagy hibás fájl':'Empty or invalid file');
             await loadXmlScore(xml);
-            addScoreToLibrary(file.name,lastLoadedScoreXml);
+            await addScoreToLibrary(file.name,lastLoadedScoreXml);
         }catch(e){
             setInfoBar(isHU?'Nem sikerült betölteni a fájlt — ellenőrizd, hogy MusicXML vagy MXL.':'Could not load the file — use a MusicXML or MXL file.',null);
             console.error('Score load:',e);
@@ -6624,14 +6745,14 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                     xml=await file.text();
                 }
                 if(xml&&xml.length>50){
-                    addScoreToLibrary(name,xml);
-                    count++;
+                    if(await addScoreToLibrary(name,xml,{quietQuota:true}))count++;
                 }
             }catch(err){console.warn('Batch import skip:',file.name,err);}
         }
         if(count>0){
             refreshScoreLibraryListUI();
-            setInfoBar((hu?count+' kotta importálva':count+' scores imported'),null);
+            const tot=files.length;
+            setInfoBar((hu?(count+' / '+tot+' kotta importálva (tárhely / hiba esetén kevesebb)'):(count+' / '+tot+' scores imported (less if storage full)')),null);
         }
         e.target.value='';
     });
