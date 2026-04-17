@@ -685,6 +685,7 @@
                             </div>
                             <div id="bpmPresetsPopup" style="display:none;position:absolute;bottom:55px;left:42px;background:#1a1a1d;border:1px solid #333;padding:8px;border-radius:4px;z-index:1001;box-shadow:0 10px 30px #000;">
                                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
+                                    <button class="metro-preset" onclick="setTempoPreset(20)">20</button>
                                     <button class="metro-preset" onclick="setTempoPreset(40)">40</button>
                                     <button class="metro-preset" onclick="setTempoPreset(60)">60</button>
                                     <button class="metro-preset" onclick="setTempoPreset(72)">72</button>
@@ -2618,38 +2619,6 @@
             };
         });
     }
-    async function idbPutScoreXml(xml){
-        const s=String(xml||'');
-        if(!s)return;
-        try{
-            const db=await openScoreIdb();
-            await new Promise((res,rej)=>{
-                const tx=db.transaction(IDB_SCORE_STORE,'readwrite');
-                tx.objectStore(IDB_SCORE_STORE).put({id:'current',xml:s});
-                tx.oncomplete=()=>res();
-                tx.onerror=()=>rej(tx.error);
-            });
-            try{localStorage.removeItem(LS_SCORE_XML_FB);}catch(e){}
-        }catch(e){
-            try{localStorage.setItem(LS_SCORE_XML_FB,s);}catch(e2){console.warn('Score persist failed (quota?)',e2);}
-        }
-    }
-    async function idbGetScoreXml(){
-        try{
-            const db=await openScoreIdb();
-            return await new Promise((res,rej)=>{
-                const tx=db.transaction(IDB_SCORE_STORE,'readonly');
-                const q=tx.objectStore(IDB_SCORE_STORE).get('current');
-                q.onsuccess=()=>{const r=q.result;res(r&&r.xml?String(r.xml):null);};
-                q.onerror=()=>rej(q.error);
-            });
-        }catch(e){
-            try{
-                const fb=localStorage.getItem(LS_SCORE_XML_FB);
-                return fb&&fb.length?fb:null;
-            }catch(e2){return null;}
-        }
-    }
     /** Könyvtári kották: IndexedDB (sok nagy XML); localStorage csak régi / vész fallback. */
     const IDB_LIB_PREFIX='libxml:';
     function idbLibraryRecordId(scoreId){return IDB_LIB_PREFIX+String(scoreId||'');}
@@ -2687,24 +2656,16 @@
         }catch(e){}
         try{localStorage.removeItem(libStorageKey(scoreId));}catch(e){}
     }
-    /** Könyvtár törlése nem törölte eddig — a nyitott kotta IndexedDB + meta itt maradt, ezért frissítés után „visszajött”. */
-    async function clearRepertoarSessionScoreStorage(){
+    /** Könyvtár törlése: munkamenet-meta + LS kotta; könyvtári tételek külön (IndexedDB / LS). */
+    function clearRepertoarSessionScoreStorage(){
         try{localStorage.removeItem(LS_SCORE_META);}catch(e){}
         try{localStorage.removeItem(LS_SCORE_XML_FB);}catch(e){}
         lastLoadedScoreXml=null;
         currentScoreHash='';
-        try{
-            const db=await openScoreIdb();
-            await new Promise((res,rej)=>{
-                const tx=db.transaction(IDB_SCORE_STORE,'readwrite');
-                tx.objectStore(IDB_SCORE_STORE).delete('current');
-                tx.oncomplete=()=>res();
-                tx.onerror=()=>rej(tx.error);
-            });
-        }catch(e){}
     }
     let _persistScoreTimer=null;
-    async function persistScoreSessionNow(){
+    /** Csak localStorage — szinkron, nincs IDB / hálózat (MIDI/UI ne akadjon). */
+    function persistScoreSessionNow(){
         try{
             const meta=JSON.stringify({
                 v:1,
@@ -2714,13 +2675,14 @@
                 s:Math.max(0,Math.floor(Number(osmdBookSpreadIndex)||0)),
             });
             localStorage.setItem(LS_SCORE_META,meta);
-            if(lastLoadedScoreXml&&lastLoadedScoreXml.length)
-                await idbPutScoreXml(lastLoadedScoreXml);
+            if(lastLoadedScoreXml&&lastLoadedScoreXml.length){
+                try{localStorage.setItem(LS_SCORE_XML_FB,String(lastLoadedScoreXml));}catch(e2){console.warn('Score persist failed (quota?)',e2);}
+            }
         }catch(e){console.warn('persistScoreSession',e);}
     }
     function queuePersistScoreSession(){
         if(_persistScoreTimer)clearTimeout(_persistScoreTimer);
-        _persistScoreTimer=setTimeout(()=>{void persistScoreSessionNow();},450);
+        _persistScoreTimer=setTimeout(persistScoreSessionNow,450);
     }
     function persistOsmdZoomValue(z){
         try{localStorage.setItem(LS_OSMD_ZOOM,String(Math.max(0.1,Math.min(5,z))));}catch(e){}
@@ -3414,7 +3376,7 @@
 
     // ── Metronome ─────────────────────────────────────────────────────────────
     let bpm=80;
-    function cycleTempo(delta){bpm=Math.max(40,Math.min(208,bpm+delta));const d=document.getElementById('metroBpmDisplay');if(d)d.innerText=bpm;setInfoBar((currentLang==='HU'?'TEMPÓ: ':'TEMPO: ')+bpm+' BPM',null);}
+    function cycleTempo(delta){bpm=Math.max(20,Math.min(208,bpm+delta));const d=document.getElementById('metroBpmDisplay');if(d)d.innerText=bpm;setInfoBar((currentLang==='HU'?'TEMPÓ: ':'TEMPO: ')+bpm+' BPM',null);}
     function setTempoPreset(val){if(helpActive)return;bpm=val;const d=document.getElementById('metroBpmDisplay');if(d)d.innerText=bpm;document.getElementById('bpmPresetsPopup').style.display='none';}
     function toggleBpmPresets(){const p=document.getElementById('bpmPresetsPopup');p.style.display=(p.style.display==='none'||p.style.display==='')?'grid':'none';}
     function toggleScoreLayoutPopup(){
@@ -3879,7 +3841,7 @@
     }
     function encodeStandardMidiFile0(events,bpmExport){
         const PPQ=480;
-        const bpmX=Math.max(40,Math.min(208,bpmExport||120));
+        const bpmX=Math.max(20,Math.min(208,bpmExport||120));
         const micro=Math.round(60000000/bpmX);
         const evs=events.slice().sort((a,b)=>{
             if(a.t!==b.t)return a.t-b.t;
@@ -5428,7 +5390,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             if(typeof d0==='number'&&d0>0)raw=d0;
         }
         if(typeof raw!=='number'||raw<=0||raw>400)return;
-        bpm=Math.max(40,Math.min(208,Math.round(raw)));
+        bpm=Math.max(20,Math.min(208,Math.round(raw)));
         lastLoadedScoreBpmFromXml=bpm;
         const d=document.getElementById('metroBpmDisplay');
         if(d)d.innerText=bpm;
@@ -5538,7 +5500,7 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
                 if(!(typeof absWhole==='number'&&absWhole>1e-9))absWhole=raw.length*1e-5;
                 const pm=osmdNoteToSourceMeasure(notes[0]);
                 const mt=readTempoFromSourceMeasure(pm);
-                if(mt>0)carryBpm=Math.max(40,Math.min(208,mt));
+                if(mt>0)carryBpm=Math.max(20,Math.min(208,mt));
                 const playInfos=notes.map(n=>{
                     const midi=osmdHalfToneToMidi(n.Pitch.halfTone);
                     const staffIndex=osmdStaffIndexOfNote(n);
@@ -6511,7 +6473,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
         let meta=null;
         try{meta=JSON.parse(localStorage.getItem(LS_SCORE_META)||'');}catch(e){}
         if(!meta||meta.v!==1)return;
-        const xml=await idbGetScoreXml();
+        let xml=null;
+        try{xml=localStorage.getItem(LS_SCORE_XML_FB);}catch(e){}
         if(!xml||typeof xml!=='string'||!xml.trim())return;
         lastLoadedScoreXml=xml;
         const bc=Number(meta.b);
@@ -6766,8 +6729,8 @@ function osmdSystemGrandStaffClientVerticalSpan(sys){
             void handleUploadedScoreFile(file);
         });
     })();
-    window.addEventListener('pagehide',()=>{clearTimeout(_resizeOsmdTimer);void persistScoreSessionNow();});
-    document.addEventListener('visibilitychange',()=>{if(document.hidden)void persistScoreSessionNow();});
+    window.addEventListener('pagehide',()=>{clearTimeout(_resizeOsmdTimer);persistScoreSessionNow();});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)persistScoreSessionNow();});
 </script>
 </body>
 </html>
