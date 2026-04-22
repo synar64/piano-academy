@@ -29,6 +29,17 @@
         .master-dashboard { display:flex; justify-content:space-between; align-items:center; background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px); background-size:100% 3px; padding:25px 30px; border-top:1px solid #333; position:relative; width:100%; box-sizing:border-box; }
         .dashboard-logo { position:absolute; top:-35px; left:30px; z-index:5; pointer-events:none; }
         .control-group { display:flex; align-items:center; gap:8px; z-index:10; }
+        .dashboard-tool-stack { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; flex-shrink:0; }
+        .sq-btn.sq-btn-practice { width:40px; min-width:40px; height:36px; min-height:36px; padding:0; font-size:18px; font-weight:800; line-height:1; display:inline-flex; align-items:center; justify-content:center; font-family:'Share Tech Mono',monospace; }
+        #btnStrict.sq-btn-practice { font-size:0; line-height:0; display:inline-flex !important; align-items:center; justify-content:center; }
+        #btnStrict.sq-btn-practice svg { width:19.8px; height:19.8px; flex-shrink:0; display:block; transform:translateX(2.5px); }
+        #btnErrorFlash.sq-btn-practice { font-size:0; line-height:0; }
+        #btnErrorFlash.sq-btn-practice svg { width:19.8px; height:19.8px; flex-shrink:0; display:block; }
+        .sq-btn.sq-btn-tool-ow { width:40px; min-width:40px; height:36px; min-height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; }
+        .sq-btn.sq-btn-tool-ow svg { width:28px; height:28px; }
+        .control-hints-col { display:flex; flex-direction:column; align-items:center; justify-content:center; align-self:stretch; min-height:76px; padding:0 4px; }
+        .control-hints-col .sq-btn { width:40px; height:40px; min-width:40px; min-height:40px; }
+        .control-hints-col .sq-btn svg { width:27px; height:27px; }
         .hardware-btn { width:95px; height:38px; background-color:var(--btn-dark); color:var(--text-dim); border:1px solid var(--btn-border); border-radius:3px; cursor:pointer; font-weight:700; font-size:12px; text-transform:uppercase; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 3px 0 #000; transition:transform 0.1s; }
         .hardware-btn:active { transform:translateY(2px); box-shadow:0 0 0 #000; }
         .hardware-btn.active { color:#fff; background-color:#121214; }
@@ -76,7 +87,14 @@
         .key-finger-num { position:absolute; top:-24px; left:50%; transform:translateX(-50%); min-width:10px; text-align:center; font-family:'Inter',sans-serif; font-size:11px; font-weight:700; color:rgba(179,230,255,0.65); opacity:0; transition:opacity 0.2s,color 0.2s,text-shadow 0.2s; pointer-events:none; z-index:10000; line-height:1; display:none; }
         .key-glow.scale-num-hint .key-finger-num { display:block; opacity:0.45; color:rgba(179,230,255,0.75); text-shadow:0 0 6px rgba(179,230,255,0.4); }
         .key-glow.chord-num-hint .key-finger-num { display:block; opacity:1; color:#b3e6ff; text-shadow:0 0 12px rgba(179,230,255,0.85); }
+        .key-glow.mistake-mark .key-led { opacity:1 !important; background:#e53333 !important; box-shadow:0 0 14px rgba(229,51,51,0.95) !important; }
+        .key-glow.scale-hint.mistake-mark .key-led { background:#e53333 !important; box-shadow:0 0 12px rgba(229,51,51,0.9) !important; }
+        .key-glow.mistake-mark .key-finger-num { color:#e85555 !important; text-shadow:0 0 8px rgba(229,80,80,0.6) !important; }
+        .key-glow.chord-hint.mistake-mark .key-led { background:#e53333 !important; box-shadow:0 0 12px rgba(229,51,51,0.9) !important; }
+        .key-glow.chord-num-hint.mistake-mark .key-finger-num { color:#ff6b6b !important; text-shadow:0 0 10px rgba(255,100,100,0.8) !important; }
+        .key-glow.scale-num-hint.mistake-mark .key-finger-num { color:#e85555 !important; opacity:0.9 !important; }
         .hitbox-layer.wrap-keynums .key-glow:not(.demo-flash) .key-led { opacity:0 !important; box-shadow:none !important; }
+        .hitbox-layer.wrap-keynums .key-glow.mistake-mark:not(.demo-flash) .key-finger-num { color:#e85555 !important; }
         .metro-preset { background:#222;border:1px solid #333;color:#aaa;padding:6px 2px;font-family:'Share Tech Mono';font-size:12px;cursor:pointer;border-radius:3px;text-align:center;transition:0.1s; }
         .metro-preset:hover { background:#333;color:#fff; }
         .metro-preset:active { transform:translateY(1px); }
@@ -87,6 +105,12 @@
         .modal-btn:active { transform:translateY(3px); box-shadow:0 0 0 #000; }
         #wheelCanvas { position:fixed; right:40px; top:60px; width:400px; height:400px; z-index:10000; pointer-events:auto; background:rgba(5,5,8,0.85); border-radius:50%; box-shadow:0 10px 40px rgba(0,0,0,0.9),inset 0 0 0 2px rgba(255,255,255,0.05); backdrop-filter:blur(8px); display:none; cursor:grab; }
         #wheelCanvas:active { cursor:grabbing; }
+        .error-flash { animation: flash-red 0.4s ease-out; }
+        @keyframes flash-red {
+            0% { box-shadow: inset 0 0 0 0px rgba(255, 0, 0, 0); }
+            30% { box-shadow: inset 0 0 100px 20px rgba(255, 0, 0, 0.7); }
+            100% { box-shadow: inset 0 0 0 0px rgba(255, 0, 0, 0); }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 </head>
@@ -164,10 +188,19 @@
         </div>
     </div>
     <div id="resultModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 class="modal-title">Session Complete</h2>
-            <div style="margin-bottom:20px;"><div class="oled-header" style="margin-bottom:8px;">Avg Tempo</div><div id="modalBpm" style="font-family:'Share Tech Mono';font-size:28px;color:var(--oled-text);font-weight:bold;">0 BPM</div></div>
-            <button class="modal-btn" onclick="closeModal()">Acknowledge</button>
+        <div class="modal-content" style="max-width:580px;">
+            <h2 class="modal-title" id="modalResultTitle">Session Complete</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:18px;text-align:left;">
+                <div><div class="oled-header" style="margin-bottom:6px;" id="modalLblStrokes">Total notes</div><div id="modalStrokes" style="font-family:'Share Tech Mono';font-size:22px;color:var(--oled-text);font-weight:bold;">0</div></div>
+                <div><div class="oled-header" style="margin-bottom:6px;" id="modalLblErr">Mistakes</div><div id="modalErrCount" style="font-family:'Share Tech Mono';font-size:22px;color:var(--oled-text);font-weight:bold;">0</div></div>
+                <div><div class="oled-header" style="margin-bottom:6px;" id="modalLblAcc">Accuracy</div><div id="modalAccuracy" style="font-family:'Share Tech Mono';font-size:22px;color:var(--oled-text);font-weight:bold;">100%</div></div>
+                <div><div class="oled-header" style="margin-bottom:6px;" id="modalLblBpm">Avg Tempo</div><div id="modalBpm" style="font-family:'Share Tech Mono';font-size:22px;color:var(--oled-text);font-weight:bold;">0 BPM</div></div>
+            </div>
+            <div style="margin-bottom:20px;text-align:left;">
+                <div class="oled-header" style="margin-bottom:8px;" id="modalLblNotes">Trouble spots</div>
+                <div id="modalErrorNotes" style="font-family:'Inter',sans-serif;font-size:15px;color:#aaa;line-height:1.5;min-height:1.2em;">—</div>
+            </div>
+            <button class="modal-btn" onclick="closeModal()" id="modalResultOk">Acknowledge</button>
         </div>
     </div>
     <div id="infoModal" class="modal-overlay">
@@ -183,6 +216,8 @@
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:center;"><div style="background:#111;border:1px solid #222;padding:4px;border-radius:3px;min-width:80px;display:flex;justify-content:center;color:#555;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl4">Cycles: 1× note names, 2× + fingering, 3× keyboard LEDs, 4× fingering numbers above keys (same as staff), 5× all off.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Scale ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl1">Cycle through scales. Click the SCALE display to open the Encyclopedia.</span></div>
                 <div style="display:flex;gap:10px;margin-bottom:7px;align-items:baseline;"><span style="font-family:'Share Tech Mono';font-size:11px;background:#111;border:1px solid #222;border-radius:3px;padding:2px 8px;white-space:nowrap;min-width:80px;text-align:center;color:#555;">Mode ▲▼</span><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl2">Sprint (1×), Marathon (3×), Training (endless loop).</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;"><div style="background:#111;border:1px solid #222;border-radius:3px;min-width:40px;min-height:36px;display:flex;align-items:center;justify-content:center;color:#888;line-height:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform:translateX(1px)"><polyline points="8 4 15 12 8 20"/><polyline points="3 4 10 12 3 20"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl3">Bright: on, dim: off</span></div>
+                <div style="display:flex;gap:10px;margin-bottom:7px;align-items:flex-start;"><div style="background:#111;border:1px solid #222;border-radius:3px;min-width:40px;min-height:36px;display:flex;align-items:center;justify-content:center;color:#888;line-height:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/></svg></div><span style="font-size:14px;color:#999;font-family:'Inter';line-height:1.6;" id="txt-ctrl5">Error flash on wrong note.</span></div>
             </div>
             <div style="margin-bottom:18px;">
                 <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--lcd-label-color);text-transform:uppercase;letter-spacing:2px;font-weight:bold;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:5px;" id="txt-encTitle">Scale Encyclopedia</div>
@@ -230,25 +265,33 @@
                             <text x="135" y="28" fill="#444" font-family="'Inter',sans-serif" font-weight="600" font-size="14" letter-spacing="3">WORKSTATION</text>
                         </svg>
                     </div>
-                    <div class="control-group">
-                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;" data-help="HOME: RETURN TO MAIN MODULE MENU">
+                    <div class="control-group" style="align-items:center;">
+                        <a id="btnHome" href="index.html" class="sq-btn" style="text-decoration:none;flex-shrink:0;" data-help="HOME: RETURN TO MAIN MODULE MENU">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
                         </a>
-                        <button id="btnClef" class="clef-split" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
+                        <button id="btnClef" class="clef-split" style="flex-shrink:0;" onclick="if(!helpActive) cycleClef()" data-help="CLEF: CYCLES THROUGH — TREBLE + BASS / TREBLE ONLY / BASS ONLY">
                             <span id="clefRH" class="active" style="font-size:28px;">𝄞</span>
                             <div class="clef-divider"></div>
                             <span id="clefLH" class="active" style="font-size:22px;">𝄢</span>
                         </button>
-                        <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× KEY LEDS | 4× FINGER # ON KEYS (LED OFF) | 5× OFF">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
-                        </button>
-                        <button id="btnOctave" class="sq-btn" onclick="if(!helpActive) toggleOctave()" data-help="OCTAVE: TOGGLE BETWEEN 1 AND 2 OCTAVE SCALE RUN">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="10" width="8" height="10" rx="1"/><rect x="14" y="4" width="8" height="16" rx="1"/></svg>
-                        </button>
-                        <button id="btnWheel" class="sq-btn" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
-                        </button>
-                        <div style="width:8px;"></div>
+                        <div class="dashboard-tool-stack" style="flex-shrink:0;" title="Practice mode &amp; error flash">
+                            <button type="button" id="btnStrict" class="sq-btn active sq-btn-practice" onclick="if(!helpActive) toggleStrictMode()" aria-label="Performance flow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="8 4 15 12 8 20"/><polyline points="3 4 10 12 3 20"/></svg></button>
+                            <button type="button" id="btnErrorFlash" class="sq-btn active sq-btn-practice" onclick="if(!helpActive) toggleErrorFlash()" aria-label="Error flash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/></svg></button>
+                        </div>
+                        <div class="dashboard-tool-stack" style="flex-shrink:0;" title="Octave &amp; circle of fifths">
+                            <button id="btnOctave" class="sq-btn sq-btn-tool-ow" onclick="if(!helpActive) toggleOctave()" data-help="OCTAVE: TOGGLE BETWEEN 1 AND 2 OCTAVE SCALE RUN">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="10" width="8" height="10" rx="1"/><rect x="14" y="4" width="8" height="16" rx="1"/></svg>
+                            </button>
+                            <button id="btnWheel" class="sq-btn sq-btn-tool-ow" onclick="if(!helpActive) toggleWheel()" data-help="WHEEL: SHOW OR HIDE THE DRAGGABLE CIRCLE OF FIFTHS">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+                            </button>
+                        </div>
+                        <div class="control-hints-col" style="flex-shrink:0;" title="Hints">
+                            <button id="btnHints" class="sq-btn" onclick="if(!helpActive) cycleHints()" data-help="HINTS: 1× NOTE NAMES | 2× + FINGERING | 3× KEY LEDS | 4× FINGER # ON KEYS (LED OFF) | 5× OFF">
+                                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+                            </button>
+                        </div>
+                        <div style="width:8px;flex-shrink:0;"></div>
                         <div class="metronome-block" style="display:flex;align-items:center;gap:4px;position:relative;">
                             <button id="metroToggle" class="sq-btn" onclick="if(!helpActive) toggleMetronome()" data-help="METRONOME: START/STOP CLICK">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L7 22h10l-5-20z"/><circle cx="12" cy="18" r="1"/></svg>
@@ -355,7 +398,7 @@
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
                         </button>
                         <div style="display:flex;flex-direction:column;width:38px;height:76px;background:var(--btn-dark);border:1px solid var(--btn-border);border-radius:3px;box-shadow:0 3px 0 #000;overflow:hidden;">
-                            <button id="btnHelp" onclick="toggleHelp()" data-help="HELP: CLICK ANY ELEMENT TO READ ITS DESCRIPTION" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
+                            <button id="btnHelp" onclick="toggleHelp()" data-help="Click for help" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;font-size:22px;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">?</button>
                             <div style="height:1px;background:#222;"></div>
                             <button id="btnInfo" onclick="if(!helpActive) document.getElementById('infoModal').style.display='flex'" data-help="INFO: OPEN MODULE GUIDE" style="flex:1;background:transparent;border:none;cursor:pointer;color:#444;display:flex;align-items:center;justify-content:center;transition:color 0.15s;">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="7" x2="12" y2="7" stroke-width="3"/><line x1="12" y1="11" x2="12" y2="17" stroke-width="3"/></svg>
@@ -393,13 +436,25 @@
             'txt-ctrl4':     'Cycles: 1× note names, 2× + fingering, 3× keyboard LEDs, 4× fingering numbers above keys (same as staff), 5× all off.',
             'txt-ctrl1':     'Cycle through scales. Click the SCALE display to open the Encyclopedia.',
             'txt-ctrl2':     'Sprint (1×), Marathon (3×), Training (endless loop).',
+            'txt-ctrl3':     'Bright (on) = default — you move on after a wrong key; only the note turns red, then the next expected note. Dim (off) = strict: the cursor stays until the correct key. Error flash: below.',
+            'txt-ctrl5':     'Error flash: on — red border when you miss; off — no flash, mistakes still saved and shown on the staff and in the summary.',
+            'help-strict':   'Advance or wait',
+            'help-flash':    'Flashes for mistakes',
+            'help-bubble':   'Click for help',
             'txt-encTitle':  'Scale Encyclopedia',
             'txt-encBody':   'Click the SCALE display to open the Scale Encyclopedia. Browse Standard, Modal (Church) and Exotic (World) scales from around the globe.',
             'txt-wheelTitle':'Circle of Fifths',
             'txt-wheelBody': 'Use the Wheel icon to open the Circle of Fifths. Click sectors to jump to keys and see I-IV-V relationships.',
             'txt-tipTitle':  'Learning Tip',
             'txt-tipBody':   'Start with Sprint mode and 1 octave. Once you can play a scale cleanly, switch to 2 octaves and Marathon to build muscle memory.',
-            'txt-gotIt':     'Got It'
+            'txt-gotIt':     'Got It',
+            'modalResultTitle': 'Session complete',
+            'modalLblStrokes': 'Total notes',
+            'modalLblErr': 'Mistakes',
+            'modalLblAcc': 'Accuracy',
+            'modalLblBpm': 'Avg tempo',
+            'modalLblNotes': 'Trouble spots (expected notes)',
+            'modalResultOk': 'OK'
         },
         HU:{
             'txt-infoTitle': 'Skálák — Modul útmutató',
@@ -410,15 +465,34 @@
             'txt-ctrl4':     'Körkörösen: 1× hangnevek, 2× + ujjrend a kottán, 3× billentyű LED, 4× ujjszámok a billentyűk felett (ugyanaz mint a kottán), 5× mind ki.',
             'txt-ctrl1':     'Váltás a skálák között. Kattints a SKÁLA kijelzőre az Enciklopédia megnyitásához.',
             'txt-ctrl2':     'Sprint (1×), Maraton (3×), Tréning (végtelen hurok).',
+            'txt-ctrl3':     'Világos (be, alap) — rossz leütés után jön a következő elvárt hang, a hiba csak pirossal jelölve. Sötétebb (ki) — szigor: a helyes hangot kell leütni, a kurzor nem lép. Hibavillanás: alább.',
+            'txt-ctrl5':     'Hibavillanás: be — piros szélvillanás; ki — nincs villanás, a hibák és a kotta jelölése megmarad.',
+            'help-strict':   'Tovább vagy vár',
+            'help-flash':    'Hibánál piros villanás',
+            'help-bubble':   'Katt, elem súgó',
             'txt-encTitle':  'Skála Enciklopédia',
             'txt-encBody':   'Kattints a SKÁLA kijelzőre a Skála Enciklopédia megnyitásához. Böngészd a Szabványos, Modális (Egyházi) és Egzotikus (Világi) skálákat a világ minden tájáról.',
             'txt-wheelTitle':'Kvintkör',
             'txt-wheelBody': 'Használd a Kerék ikont a kvintkör megnyitásához. Kattints a szektorokra a hangnemváltáshoz és az I-IV-V fokok megjelenítéséhez.',
             'txt-tipTitle':  'Tanulási tipp',
             'txt-tipBody':   'Kezdj Sprint módban és 1 oktávval. Ha tisztán tudod játszani a skálát, válts 2 oktávra és Maratonra az izommemória fejlesztéséhez.',
-            'txt-gotIt':     'Értettem'
+            'txt-gotIt':     'Értettem',
+            'modalResultTitle': 'Szakasz vége',
+            'modalLblStrokes': 'Összes hang (lépés)',
+            'modalLblErr': 'Hibák',
+            'modalLblAcc': 'Pontosság',
+            'modalLblBpm': 'Átlag tempó',
+            'modalLblNotes': 'Kritikus hangok (elvárt hangnév)',
+            'modalResultOk': 'Rendben'
         }
     };
+    function setPracticeHelpDatasets(){
+        const T=MODAL_STRINGS[currentLang]||MODAL_STRINGS.EN;
+        const s=document.getElementById('btnStrict'),f=document.getElementById('btnErrorFlash'),h=document.getElementById('btnHelp');
+        if(s&&T['help-strict'])s.setAttribute('data-help',T['help-strict']);
+        if(f&&T['help-flash'])f.setAttribute('data-help',T['help-flash']);
+        if(h&&T['help-bubble'])h.setAttribute('data-help',T['help-bubble']);
+    }
     function setLang(lang){
         localStorage.setItem('akira_lang',lang);currentLang=lang;
         document.getElementById('btnLangEN').classList.toggle('active',lang==='EN');
@@ -433,6 +507,8 @@
         // Update info modal text
         const T=MODAL_STRINGS[lang]||MODAL_STRINGS.EN;
         Object.keys(T).forEach(id=>{const el=document.getElementById(id);if(el)el.innerText=T[id];});
+        updateStrictFlashButtons();
+        setPracticeHelpDatasets();
         if(helpActive)setInfoBar(lang==='HU'?'SÚGÓ MÓD — KATTINTS BÁRMELY ELEMRE A LEÍRÁSÉRT':'HELP MODE — CLICK ANY ELEMENT TO READ ITS DESCRIPTION',null);
         else if(!isRunning)setInfoBar(lang==='HU'?'VÁLASSZ SKÁLÁT VAGY NYOMJ STARTOT':'SELECT SCALE OR PRESS START',null);
     }
@@ -531,7 +607,34 @@
     const VJ_BOTTOM=(VFAnnotation&&VFAnnotation.VerticalJustify)?VFAnnotation.VerticalJustify.BOTTOM:4;
     let KOTTA_ZOOM=1.1;
     const VEXFLOW_BASE_WIDTH=1100,VEXFLOW_ROW_HEIGHT=230;
-    const C_LINES='#4a4a4a',C_BRIGHT='#c3c3c3',C_PAST='#888888',C_ACTIVE='#00d0ff';
+    const C_LINES='#4a4a4a',C_BRIGHT='#c3c3c3',C_PAST='#888888',C_ACTIVE='#00d0ff',C_ERROR='#e53333';
+    let errorStepIndices=new Set();
+    let sessionReviewMode=false;
+    let errorCount=0,errorPositionLabels=[];
+    function blockBaseOffset(bIdx){
+        let g=0;for(let b=0;b<bIdx && b<seqBlocks.length;b++)g+=seqBlocks[b].length;
+        return g;
+    }
+    function collectMistakeKeyMidis(){
+        const s=new Set();
+        if(!errorStepIndices.size||!seqBlocks.length)return s;
+        const flat=seqBlocks.flat();
+        errorStepIndices.forEach(idx=>{if(idx<0||idx>=flat.length)return;const n=flat[idx];
+            if(activeRH&&n.m_rh)s.add(n.m_rh);
+            if(activeLH&&n.m_lh)s.add(n.m_lh);
+        });
+        return s;
+    }
+    function applyMistakeMarkToKeys(){
+        const mm=collectMistakeKeyMidis();
+        mm.forEach(midi=>{const el=document.getElementById('k-'+midi);if(el)el.classList.add('mistake-mark');});
+    }
+    function resetMistakeState(){
+        errorStepIndices.clear();
+        errorCount=0;
+        errorPositionLabels.length=0;
+        sessionReviewMode=false;
+    }
 
     function getMaxZoom(){
         const c=document.querySelector('.sheet-container');if(!c)return 2.5;
@@ -682,9 +785,10 @@
                         const blockIdx=startIdx+(page*ROWS)+i;
                         const block=seqBlocks[blockIdx];if(!block)break;
                         let active=-1;
-                        if(currentBlockIndex===blockIdx)active=currentNoteInBlock;
+                        if(sessionReviewMode&&!isRunning)active=999;
+                        else if(currentBlockIndex===blockIdx)active=currentNoteInBlock;
                         else if(currentBlockIndex>blockIdx)active=999;
-                        renderScaleSystem(ctx,block,30,i*VEXFLOW_ROW_HEIGHT,active,i===0&&page===0&&startIdx===0);
+                        renderScaleSystem(ctx,block,30,i*VEXFLOW_ROW_HEIGHT,active,i===0&&page===0&&startIdx===0,blockIdx);
                     }
                     const pageNum=spreadIdx*2+page+1;
                     const totalPages=Math.ceil(seqBlocks.length/ROWS);
@@ -697,11 +801,13 @@
                 renderer.resize(VEXFLOW_BASE_WIDTH*KOTTA_ZOOM,(ROWS*VEXFLOW_ROW_HEIGHT+60)*KOTTA_ZOOM);
                 const ctx=renderer.getContext();ctx.scale(KOTTA_ZOOM,KOTTA_ZOOM);
                 for(let i=0;i<ROWS;i++){
-                    const block=seqBlocks[startIdx+i];if(!block)break;
+                    const blockIdx=startIdx+i;
+                    const block=seqBlocks[blockIdx];if(!block)break;
                     let active=-1;
-                    if(currentBlockIndex===startIdx+i)active=currentNoteInBlock;
-                    else if(currentBlockIndex>startIdx+i)active=999;
-                    renderScaleSystem(ctx,block,30,i*VEXFLOW_ROW_HEIGHT,active,i===0&&startIdx===0);
+                    if(sessionReviewMode&&!isRunning)active=999;
+                    else if(currentBlockIndex===blockIdx)active=currentNoteInBlock;
+                    else if(currentBlockIndex>blockIdx)active=999;
+                    renderScaleSystem(ctx,block,30,i*VEXFLOW_ROW_HEIGHT,active,i===0&&startIdx===0,blockIdx);
                 }
                 const totalPages=Math.ceil(seqBlocks.length/ROWS);
                 if(totalPages>1){const lbl=document.createElement('div');lbl.style.cssText='text-align:center;font-family:"Share Tech Mono";font-size:11px;color:#444;margin-top:4px;';lbl.textContent=(pageIdx+1)+' / '+totalPages;container.appendChild(lbl);}
@@ -711,7 +817,7 @@
         paintScaleKeys(document.getElementById('scaleSelectValue').value);
     }
 
-    function renderScaleSystem(ctx,block,x,y,activeIndex,showClef){
+    function renderScaleSystem(ctx,block,x,y,activeIndex,showClef,blockIdxInSeq){
         const staveW=VEXFLOW_BASE_WIDTH-60;
         const fmtW=staveW-(showClef?85:30);
         const staveTreble=new VF.Stave(x,y,staveW);
@@ -732,14 +838,20 @@
         }
         function buildVoice(isTreble){
             const vfNotes=block.map((n,i)=>{
+                const gIdx=blockBaseOffset(blockIdxInSeq)+i;
+                const isErr=errorStepIndices.has(gIdx);
                 const ki=isTreble?{key:n.rh_key,acc:n.rh_acc}:{key:n.lh_key,acc:n.lh_acc};
                 const vfn=new VF.StaveNote({clef:isTreble?'treble':'bass',keys:[ki.key],duration:'q',auto_stem:true});
                 if(ki.acc)vfn.addModifier(new VF.Accidental(ki.acc));
                 let color=C_BRIGHT;
-                if(i===activeIndex)color=C_ACTIVE;
+                if(isErr)color=C_ERROR;
+                else if(i===activeIndex)color=C_ACTIVE;
                 else if(activeIndex===999||(activeIndex>-1&&i<activeIndex))color=C_PAST;
                 vfn.setStyle({fillStyle:color,strokeStyle:color});
-                if(vfn.setLedgerLineStyle){const lc=i===activeIndex?C_ACTIVE:'#666';vfn.setLedgerLineStyle({strokeStyle:lc,fillStyle:lc,lineWidth:1.5});}
+                if(vfn.setLedgerLineStyle){
+                    const lc=isErr?C_ERROR:(i===activeIndex?C_ACTIVE:'#666');
+                    vfn.setLedgerLineStyle({strokeStyle:lc,fillStyle:lc,lineWidth:1.5});
+                }
                 if(showNames){
                     const accStr=n.na==='#'?'♯':n.na==='b'?'♭':'';
                     let letter=n.nl.toUpperCase();
@@ -751,7 +863,12 @@
                 }
                 if(showFinger){
                     const f=isTreble?n.f_rh:n.f_lh;
-                    if(f){const fa=new VFAnnotation(String(f)).setFont('Inter',7,'bold').setVerticalJustification(isTreble?VJ_BOTTOM:VJ_TOP);fa.setStyle({fillStyle:C_BRIGHT,strokeStyle:C_BRIGHT});vfn.addModifier(fa);}
+                    if(f){
+                        const fCol=isErr?C_ERROR:C_BRIGHT;
+                        const fa=new VFAnnotation(String(f)).setFont('Inter',7,'bold').setVerticalJustification(isTreble?VJ_BOTTOM:VJ_TOP);
+                        fa.setStyle({fillStyle:fCol,strokeStyle:fCol});
+                        vfn.addModifier(fa);
+                    }
                 }
                 return vfn;
             });
@@ -766,7 +883,61 @@
     let isRunning=false,activeRH=true,activeLH=true,currentNoteInBlock=0,currentBlockIndex=0;
     let showNames=false,showFinger=false,showLeds=false,showKeyNums=false,hintState=0;
     let seqBlocks=[],rhHit=false,lhHit=false,lastHitTime=0,hitIntervals=[],demoActiveNoteIdx=-1;
+    let strictMode=false,errorFlashEnabled=true,sessionStepTotal=0;
     let demoPlaying=false,demoTimeouts=[];
+    function loadPracticePreferences(){
+        try{strictMode=localStorage.getItem('akira_scales_strict')==='1';}catch(e){strictMode=false;}
+        try{errorFlashEnabled=localStorage.getItem('akira_scales_errflash')!=='0';}catch(e){errorFlashEnabled=true;}
+    }
+    const BTN_SVG_FLOW_MODE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="8 4 15 12 8 20"/><polyline points="3 4 10 12 3 20"/></svg>';
+    function updateStrictFlashButtons(){
+        const bs=document.getElementById('btnStrict');const bf=document.getElementById('btnErrorFlash');
+        if(bs){
+            const hu=currentLang==='HU';
+            bs.classList.toggle('active',!strictMode);
+            bs.style.opacity=strictMode?'0.4':'1';
+            bs.innerHTML=BTN_SVG_FLOW_MODE;
+            bs.setAttribute('aria-label',!strictMode?(hu?'Előadás, továbblépés hiba után':'Performance, advance after miss'):(hu?'Szigor, helyes hang':'Strict, correct key'));
+            bs.title=!strictMode
+                ?(hu?'Alap: hiba után a következő hang, piros jelölés. Kattintás: szigor, csak jó lép.':'Default: after a miss, next expected note, red on staff. Click: strict, correct key only.')
+                :(hu?'Szigor: a kurzor a helyes hangot várja. Kattintás: előadás, továbblépés.':'Strict: cursor waits for the correct key. Click: flow, advance on miss (red).');
+        }
+        if(bf){bf.classList.toggle('active',errorFlashEnabled);bf.style.opacity=errorFlashEnabled?'1':'0.4';}
+    }
+    function toggleStrictMode(){if(helpActive)return;strictMode=!strictMode;try{localStorage.setItem('akira_scales_strict',strictMode?'1':'0');}catch(e){}updateStrictFlashButtons();}
+    function toggleErrorFlash(){if(helpActive)return;errorFlashEnabled=!errorFlashEnabled;try{localStorage.setItem('akira_scales_errflash',errorFlashEnabled?'1':'0');}catch(e){}updateStrictFlashButtons();}
+    function triggerErrorFlash(){
+        if(!errorFlashEnabled)return;
+        document.body.classList.add('error-flash');
+        setTimeout(()=>document.body.classList.remove('error-flash'),400);
+    }
+    function formatPracticeNoteName(n){
+        if(!n||!n.nl)return'';
+        let letter=n.nl.toUpperCase();
+        if(currentLang==='HU'&&letter==='B'&&(!n.na||n.na==='n'))letter='H';
+        if(n.na==='#')return letter+'#';
+        if(n.na==='b'||n.na==='bb')return letter+(n.na==='bb'?'bb':'b');
+        if(n.na==='n')return letter+'♮';
+        return letter;
+    }
+    function registerMistake(note){
+        const gIdx=blockBaseOffset(currentBlockIndex)+currentNoteInBlock;
+        errorStepIndices.add(gIdx);
+        errorCount++;
+        errorPositionLabels.push(formatPracticeNoteName(note));
+        triggerErrorFlash();
+    }
+    function advancePracticeStep(){
+        rhHit=false;lhHit=false;const now=performance.now();
+        if(lastHitTime>0)hitIntervals.push(now-lastHitTime);
+        lastHitTime=now;
+        currentNoteInBlock++;
+        if(currentNoteInBlock>=seqBlocks[currentBlockIndex].length){
+            currentNoteInBlock=0;currentBlockIndex++;
+            if(currentBlockIndex>=seqBlocks.length){showResults();return;}
+        }
+        draw();
+    }
     let selectedOctaves=1,clefState=0;
     const MODES=['SPRINT','MARATHON','TRAINING'];let currentModeIdx=0;
     const RHYTHMS=[
@@ -789,10 +960,20 @@
         paintScaleKeys(document.getElementById('scaleSelectValue').value);
     }
     function updateKeyLeds(){
-        document.querySelectorAll('.key-glow').forEach(k=>{k.classList.remove('chord-hint','chord-num-hint');});
-        if((!showLeds&&!showKeyNums)||seqBlocks.length===0)return;
+        document.querySelectorAll('.key-glow').forEach(k=>{k.classList.remove('chord-hint','chord-num-hint','mistake-mark');});
+        const mm=collectMistakeKeyMidis();
+        function markMistakeKeys(){
+            if(mm.size)mm.forEach(midi=>{const el=document.getElementById('k-'+midi);if(el)el.classList.add('mistake-mark');});
+        }
+        if((!showLeds&&!showKeyNums)||seqBlocks.length===0){
+            markMistakeKeys();
+            return;
+        }
         const note=seqBlocks[currentBlockIndex]?seqBlocks[currentBlockIndex][currentNoteInBlock]:null;
-        if(!note)return;
+        if(!note){
+            markMistakeKeys();
+            return;
+        }
         if(showLeds){
             if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-hint');}
             if(activeLH){const el=document.getElementById('k-'+note.m_lh);if(el)el.classList.add('chord-hint');}
@@ -801,17 +982,21 @@
             if(activeRH){const el=document.getElementById('k-'+note.m_rh);if(el)el.classList.add('chord-num-hint');}
             if(activeLH){const el=document.getElementById('k-'+note.m_lh);if(el)el.classList.add('chord-num-hint');}
         }
+        markMistakeKeys();
     }
     // Lights LED dots (hint 3) or fingering digits above keys (hint 4) for every scale tone; bright = next note to play
     function paintScaleKeys(scaleKey){
         const wrap=document.getElementById('hb-wrap');
         if(wrap)wrap.classList.toggle('wrap-keynums',showKeyNums);
         document.querySelectorAll('.key-glow').forEach(k=>{
-            k.classList.remove('scale-hint','scale-num-hint');
+            k.classList.remove('scale-hint','scale-num-hint','mistake-mark');
             const fn=k.querySelector('.key-finger-num');
             if(fn){fn.textContent='';fn.style.display='none';}
         });
-        if(!showLeds&&!showKeyNums)return;
+        if(!showLeds&&!showKeyNums){
+            applyMistakeMarkToKeys();
+            return;
+        }
         if(!scaleKey||!SCALES_DATABASE[scaleKey])return;
         const seq=buildScaleSequence(scaleKey,selectedOctaves);
         if(showLeds){
@@ -840,6 +1025,7 @@
                 }
             });
         }
+        applyMistakeMarkToKeys();
     }
     function cycleClef(){
         if(helpActive)return;clefState=(clefState+1)%3;activeRH=clefState!==2;activeLH=clefState!==1;
@@ -914,6 +1100,7 @@
         closePatchBrowser();if(isRunning)stopPractice();buildSequence();draw();syncWheelToScale();
     }
     function buildSequence(){
+        resetMistakeState();
         const scaleKey=document.getElementById('scaleSelectValue').value;
         const rawSeq=buildScaleSequence(scaleKey,selectedOctaves);
         const loops=MODES[currentModeIdx]==='SPRINT'?1:MODES[currentModeIdx]==='MARATHON'?3:100;
@@ -931,29 +1118,69 @@
     // ── Practice & Demo ───────────────────────────────────────────────────────
     function handleMainButton(){
         if(helpActive)return;
-        if(!isRunning){initAudio();initMidi();buildSequence();isRunning=true;document.getElementById('btnStart').textContent='STOP';lastHitTime=0;hitIntervals=[];draw();}
+        if(!isRunning){
+            initAudio();initMidi();buildSequence();
+            sessionStepTotal=seqBlocks.flat().length;lastHitTime=0;hitIntervals=[];
+            isRunning=true;document.getElementById('btnStart').textContent='STOP';
+            rhHit=false;lhHit=false;draw();
+        }
         else stopPractice();
     }
-    function stopPractice(){isRunning=false;currentNoteInBlock=0;currentBlockIndex=0;document.getElementById('btnStart').textContent='START';draw();}
+    function stopPractice(){
+        if(isRunning)sessionReviewMode=false;
+        isRunning=false;currentNoteInBlock=0;currentBlockIndex=0;rhHit=false;lhHit=false;
+        document.getElementById('btnStart').textContent='START';draw();
+    }
     function showResults(){
         isRunning=false;document.getElementById('btnStart').textContent='START';
-        if(hitIntervals.length===0){stopPractice();return;}
-        let avgDiff=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;let avgBpm=Math.round(60000/avgDiff);
-        document.getElementById('modalBpm').innerText=avgBpm+' BPM';
-        document.getElementById('resultModal').style.display='flex';currentBlockIndex=0;currentNoteInBlock=0;draw();
+        const total=sessionStepTotal>0?sessionStepTotal:seqBlocks.flat().length;
+        const elS=document.getElementById('modalStrokes');
+        if(elS)elS.textContent=String(total);
+        const elE=document.getElementById('modalErrCount');
+        if(elE)elE.textContent=String(errorCount);
+        let accPct=100;
+        if(errorCount>0&&total>0)accPct=Math.round(100*total/(total+errorCount));
+        const elA=document.getElementById('modalAccuracy');
+        if(elA)elA.textContent=accPct+'%';
+        const bpmEl=document.getElementById('modalBpm');
+        if(hitIntervals.length>0){
+            const avgDiff=hitIntervals.reduce((a,b)=>a+b)/hitIntervals.length;
+            if(bpmEl)bpmEl.textContent=Math.round(60000/avgDiff)+' BPM';
+        }else{
+            if(bpmEl)bpmEl.textContent=currentLang==='HU'?'—':'—';
+        }
+        const uniques=[...new Set(errorPositionLabels)];
+        const notesEl=document.getElementById('modalErrorNotes');
+        if(notesEl){
+            if(uniques.length)notesEl.textContent=uniques.join(', ');
+            else notesEl.textContent=currentLang==='HU'?'(nincs hiba)':'(none)';
+        }
+        document.getElementById('resultModal').style.display='flex';
+        currentBlockIndex=0;currentNoteInBlock=0;sessionReviewMode=true;draw();
     }
     function closeModal(){document.getElementById('resultModal').style.display='none';stopPractice();}
     function handleNoteOn(midi,vel=100){
-        playTone(midi,vel);if(!isRunning||seqBlocks.length===0)return;
-        let note=seqBlocks[currentBlockIndex][currentNoteInBlock];
-        if(activeRH&&midi===note.m_rh)rhHit=true;if(activeLH&&midi===note.m_lh)lhHit=true;
-        let hit=false;
-        if(activeRH&&!activeLH&&rhHit)hit=true;else if(!activeRH&&activeLH&&lhHit)hit=true;else if(activeRH&&activeLH&&rhHit&&lhHit)hit=true;
-        if(hit){
-            rhHit=false;lhHit=false;let now=performance.now();if(lastHitTime>0)hitIntervals.push(now-lastHitTime);lastHitTime=now;
-            currentNoteInBlock++;
-            if(currentNoteInBlock>=seqBlocks[currentBlockIndex].length){currentNoteInBlock=0;currentBlockIndex++;if(currentBlockIndex>=seqBlocks.length){showResults();return;}}
-            draw();
+        playTone(midi,vel);
+        if(!isRunning||seqBlocks.length===0)return;
+        const note=seqBlocks[currentBlockIndex][currentNoteInBlock];
+        if(!note)return;
+        const needsRh=activeRH&&!rhHit;
+        const needsLh=activeLH&&!lhHit;
+        const isValidPart=(needsRh&&midi===note.m_rh)||(needsLh&&midi===note.m_lh);
+        if(isValidPart){
+            if(activeRH&&midi===note.m_rh)rhHit=true;
+            if(activeLH&&midi===note.m_lh)lhHit=true;
+            let hit=false;
+            if(activeRH&&!activeLH&&rhHit)hit=true;
+            else if(!activeRH&&activeLH&&lhHit)hit=true;
+            else if(activeRH&&activeLH&&rhHit&&lhHit)hit=true;
+            if(hit)advancePracticeStep();
+            return;
+        }
+        if(needsRh||needsLh){
+            registerMistake(note);
+            if(!strictMode)advancePracticeStep();
+            else draw();
         }
     }
     function playScaleRhythmDemo(){
@@ -1163,7 +1390,7 @@
         });
     });
     window.addEventListener('resize',()=>{if(seqBlocks.length>0)draw();});
-    window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';setLang(sl);showFileProtocolAudioHintIfNeeded();create88();buildSequence();draw();};
+    window.onload=()=>{const sl=localStorage.getItem('akira_lang')||'EN';loadPracticePreferences();setLang(sl);showFileProtocolAudioHintIfNeeded();create88();buildSequence();draw();};
 </script>
 </body>
 </html>
